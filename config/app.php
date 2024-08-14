@@ -39,7 +39,22 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => env('MAIL_TO_ADDRESS', 'support@viveaventurascaribenas.com'),
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Email Address
+    |--------------------------------------------------------------------------
+    |
+    |Email Address used for comms
+    |
+    */
+
+    'MAIL_TO_ADDRESS' => (bool) env('APP_DEBUG', false),
+
 
     /*
     |--------------------------------------------------------------------------

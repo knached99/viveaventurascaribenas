@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Components\TravelComponents;
+namespace App\View\Components\travelcomponents;
 
 use Closure;
 use Illuminate\Contracts\View\View;
@@ -21,6 +21,6 @@ class footer extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.travel-components.footer');
+        return view('components.travelcomponents.footer');
     }
 }
