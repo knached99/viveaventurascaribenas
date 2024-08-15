@@ -7,8 +7,8 @@ use Livewire\Form;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ContactNotification;
-use Illuminate\Validation\NotificationException;
 use App\Mail\ContactFormSubmitted;
+use Exception;
 
 class ContactForm extends Form
 {
@@ -24,48 +24,57 @@ class ContactForm extends Form
     #[Validate('required|string')]
     public string $message = '';
 
+    public string $status = '';
+    public string $error = '';
+
     /**
      * Handle the form submission.
      */
     public function submitContactForm(): void
     {
         $this->validate();
-        \Log::info('Validating User Input...');
 
-        // Send notification using the Notification facade
         try {
-            \Log::info('User input validated!');
-            \Log::info('Payload:');
+            $data = [
+                'name' => $this->name,
+                'email' => $this->email,
+                'subject' => $this->subject,
+                'message' => $this->message,
+            ];
 
-            \Log::info([
-                'Name' => $this->name,
-                'Email' => $this->email,
-                'Subject' => $this->subject,
-                'Message' => $this->message
-            ]);
+            $recipientEmail = config('mail.mailers.smtp.to_email');
+            
+            $notificationClass = ContactFormSubmitted::class;
 
-            \Log::info('Attempting to send contact data to ' . env('MAIL_TO_ADDRESS'));
+            $this->sendNotification($data, $recipientEmail, $notificationClass);
 
-            // Using the custom sendEmail method
-            $this->sendEmail($this->name, $this->email, $this->subject, $this->message);
-
-            \Log::info('Notified target contact');
-            session()->flash('status', 'Your message has been sent successfully!');
-            \Log::info('Success message displayed to user');
-        } catch (\Exception $e) {
-            \Log::error('Notification Exception Caught. Unable to send email because: ' . $e->getMessage());
+            $this->status = 'Your message has been sent successfully!';
+            $this->resetForm(); // Optional: Reset the form fields after successful submission
+        } catch (Exception $e) {
+            $this->error = 'Unable to send email, something went wrong. If this issue persists, please email us directly at '. config('mail.mailers.smtp.to_email');
+            \Log::error('Notification Exception Caught: ' . $e->getMessage());
         }
     }
 
-    private function sendEmail($name, $email, $subject, $message)
+    private function sendNotification(array $data, string $recipientEmail, string $notificationClass): void
     {
-        // Mail::raw($message, function($mail) use ($name, $email, $subject) {
-        //     $mail->to(env('MAIL_TO_ADDRESS'))
-        //         ->subject($subject)
-        //         ->from($email, $name);
-        // });
+        Mail::to($recipientEmail)
+            ->send(new $notificationClass($data));
+    }
 
-        Mail::to("support@viveaventurascaribenas.com")
-        ->send(new ContactFormSubmitted($name, $email, $subject, $message));
+    /**
+     * Optional: Reset form fields after successful submission.
+     */
+    private function resetForm(): void
+    {
+        $this->name = '';
+        $this->email = '';
+        $this->subject = '';
+        $this->message = '';
+    }
+
+    public function render()
+    {
+        return view('livewire.forms.contact-form');
     }
 }

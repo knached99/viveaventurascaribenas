@@ -25,12 +25,12 @@ class ContactNotification extends Notification
      * @param string $subject
      * @param string $message
      */
-    public function __construct($name, $email, $subject, $message)
+    public function __construct(array $data)
     {
-        $this->name = $name;
-        $this->email = $email;
-        $this->subject = $subject;
-        $this->message = $message;
+        $this->name = $data['name'];
+        $this->email = $data['email'];
+        $this->subject = $data['subject'];
+        $this->message = $data['message'];
     }
     /**
      * Get the notification's delivery channels.

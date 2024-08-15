@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'debug' => env('MAIL_TO_ADDRESS', 'support@viveaventurascaribenas.com'),
+    'debug' => env('APP_DEBUG', true),
 
 
 

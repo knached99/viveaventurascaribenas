@@ -69,7 +69,9 @@
             </div>
 
             <div class="col-md-6 d-flex">
-                <div id="map" class="bg-white"></div>
+                {{-- <div id="map" class="bg-white"></div> --}}
+                <x-travelcomponents.google-map-embed />
+
             </div>
         </div>
     </div>

@@ -18,20 +18,9 @@ class ContactFormSubmitted extends Mailable
     public $subject;
     public $message;
 
-    /**
-     * Create a new message instance.
-     *
-     * @param string $name
-     * @param string $email
-     * @param string $subject
-     * @param string $message
-     */
-    public function __construct(string $name, string $email, string $subject, string $message)
+    public function __construct(array $data)
     {
-        $this->name = $name;
-        $this->email = $email;
-        $this->subject = $subject;
-        $this->message = $message;
+        $this->data = $data;
     }
 
     /**
@@ -40,11 +29,11 @@ class ContactFormSubmitted extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address($this->email, $this->name),
+            from: new Address($this->data['email'], $this->data['name']),
             replyTo: [
-                new Address($this->email, $this->name)
+                new Address($this->data['email'], $this->data['name'])
             ],
-            subject: $this->subject
+            subject: $this->data['subject']
         );
     }
 
@@ -56,12 +45,11 @@ class ContactFormSubmitted extends Mailable
         return new Content(
             view: 'mail.contactForm.formSubmitted',
             with: [
-                'name' => $this->name,
-                'email' => $this->email,
-                'subject' => $this->subject,
-                'message' => $this->message
+               'data'=>$this->data
             ]
         );
+
+        \Log::info('Email Sent!');
     }
 
     /**
