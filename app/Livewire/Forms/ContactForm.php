@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ContactNotification;
 use Illuminate\Validation\NotificationException;
+use App\Mail\ContactFormSubmitted;
 
 class ContactForm extends Form
 {
@@ -31,28 +32,40 @@ class ContactForm extends Form
         $this->validate();
         \Log::info('Validating User Input...');
 
-         // Send notification using the Notification facade
-    try{
-        \Log::info('User input validated!');
-        \Log::info('Payload Sent:');
+        // Send notification using the Notification facade
+        try {
+            \Log::info('User input validated!');
+            \Log::info('Payload:');
 
-        \Log::info(['Name'=> $this->name, 'Email'=>$this->email,  'Subject'=>$this->subject, 'Message'=>$this->message]);
+            \Log::info([
+                'Name' => $this->name,
+                'Email' => $this->email,
+                'Subject' => $this->subject,
+                'Message' => $this->message
+            ]);
 
-        \Log::info('Attempting to send contact data to '.env('MAIL_TO_ADDRESS'));
+            \Log::info('Attempting to send contact data to ' . env('MAIL_TO_ADDRESS'));
 
-        Notification::route('mail', 'support@viveaventurascaribenas.com')
-        ->notify(new ContactNotification($this->name, $this->email, $this->subject, $this->message));
-        \Log::info('Notified contact target');
-            // You could also use session to flash success messages if needed
+            // Using the custom sendEmail method
+            $this->sendEmail($this->name, $this->email, $this->subject, $this->message);
+
+            \Log::info('Notified target contact');
             session()->flash('status', 'Your message has been sent successfully!');
             \Log::info('Success message displayed to user');
-        }
-
-        catch(NotificationException $e){
-            \Log::error('Notification Exception Caught. Unable to send email because: '.$e->getMessage());
+        } catch (\Exception $e) {
+            \Log::error('Notification Exception Caught. Unable to send email because: ' . $e->getMessage());
         }
     }
 
-  
-   
+    private function sendEmail($name, $email, $subject, $message)
+    {
+        // Mail::raw($message, function($mail) use ($name, $email, $subject) {
+        //     $mail->to(env('MAIL_TO_ADDRESS'))
+        //         ->subject($subject)
+        //         ->from($email, $name);
+        // });
+
+        Mail::to("support@viveaventurascaribenas.com")
+        ->send(new ContactFormSubmitted($name, $email, $subject, $message));
+    }
 }

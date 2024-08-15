@@ -52,9 +52,8 @@ class ContactNotification extends Notification
             ->from($this->email, $this->name)
             ->line($this->message)
             ->line('This contact is expecting a response from you within 24-48 hours.');
-
     }
-
+    
     /**
      * Get the array representation of the notification.
      *
