@@ -13,7 +13,7 @@
                 </li>
 
                 <li class="nav-item {{request()->routeIs('about') ? 'active' : ''}}"><a href="{{route('about')}}" class="nav-link">About</a></li>
-                <li class="nav-item {{request()->routeIs('destinations' ? 'active' : '')}}"><a href="{{route('destinations')}}" class="nav-link">Destinations</a></li>
+                <li class="nav-item {{request()->routeIs('destinations') ? 'active' : ''}}"><a href="{{route('destinations')}}" class="nav-link">Destinations</a></li>
                 <li class="nav-item {{request()->routeIs('blog') ? 'active' : ''}}"><a href="{{route('blog')}}" class="nav-link">Blog</a></li>
                 <li class="nav-item {{ request()->routeIs('contact') ? 'active' : '' }}"><a
                         href="{{ route('contact') }}" class="nav-link">Contact</a></li>
