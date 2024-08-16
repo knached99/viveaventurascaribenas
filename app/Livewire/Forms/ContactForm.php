@@ -48,7 +48,7 @@ class ContactForm extends Form
 
             $this->sendNotification($data, $recipientEmail, $notificationClass);
 
-            $this->status = 'Your message has been sent successfully!';
+            $this->status = 'Your message has been sent successfully! We will respond to you within 24-48 hours.';
             $this->resetForm(); // Optional: Reset the form fields after successful submission
         } catch (Exception $e) {
             $this->error = 'Unable to send email, something went wrong. If this issue persists, please email us directly at '. config('mail.mailers.smtp.to_email');

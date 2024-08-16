@@ -79,11 +79,11 @@
         </h1>
 
         <ul>
-            <li>Reply Email: <a
+            <li><b>Reply Email:</b> <a
                     href="mailto:{{ $data['email'] ?? 'no-reply@example.com' }}">{{ $data['email'] ?? 'No Email' }}</a>
             </li>
-            <li>Subject: {{ $data['subject'] ?? 'No Subject' }}</li>
-            <li>Message: {{ $data['message'] ?? 'No Message' }}</li>
+            <li><b>Subject:</b> {{ $data['subject'] ?? 'No Subject' }}</li>
+            <li><b>Message:</b> {{ $data['message'] ?? 'No Message' }}</li>
         </ul>
 
         <p>
