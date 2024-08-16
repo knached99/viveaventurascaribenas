@@ -12,9 +12,9 @@
                     <a href="/" class="nav-link">Home</a>
                 </li>
 
-                <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
-                <li class="nav-item"><a href="destination.html" class="nav-link">Destination</a></li>
-                <li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>
+                <li class="nav-item {{request()->routeIs('about') ? 'active' : ''}}"><a href="{{route('about')}}" class="nav-link">About</a></li>
+                <li class="nav-item {{request()->routeIs('destinations' ? 'active' : '')}}"><a href="{{route('destinations')}}" class="nav-link">Destinations</a></li>
+                <li class="nav-item {{request()->routeIs('blog') ? 'active' : ''}}"><a href="{{route('blog')}}" class="nav-link">Blog</a></li>
                 <li class="nav-item {{ request()->routeIs('contact') ? 'active' : '' }}"><a
                         href="{{ route('contact') }}" class="nav-link">Contact</a></li>
                 <li class="nav-item cta"><a href="#" class="nav-link">Book Now</a></li>

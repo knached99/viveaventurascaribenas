@@ -15,10 +15,10 @@
             </div>
             <div class="col-md">
                 <div class="ftco-footer-widget mb-4 ml-md-5">
-                    <h2 class="ftco-heading-2">Infromation</h2>
+                    <h2 class="ftco-heading-2">Information</h2>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="py-2 d-block">Online Enquiry</a></li>
-                        <li><a href="#" class="py-2 d-block">General Enquiries</a></li>
+                        <li><a href="#" class="py-2 d-block">Online Inquiry</a></li>
+                        <li><a href="#" class="py-2 d-block">General Inquiries</a></li>
                         <li><a href="#" class="py-2 d-block">Booking Conditions</a></li>
                         <li><a href="#" class="py-2 d-block">Privacy and Policy</a></li>
                         <li><a href="#" class="py-2 d-block">Refund Policy</a></li>

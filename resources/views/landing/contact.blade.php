@@ -9,7 +9,7 @@
         <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-center">
             <div class="col-md-9 ftco-animate pb-5 text-center">
                 <h1 class="mb-3 bread" style="font-weight: 900;">Contact Us</h1>
-                <p style="font-weight: 500; font-size: 18px;">Contact us with any questions you might have. We will
+                <p style="font-weight: 500; font-size: 18px;">Contact us with any questions you might have and we will
                     respond back to you within
                     24-48 hours</p>
             </div>
@@ -26,7 +26,7 @@
                         <span class="icon-map-signs"></span>
                     </div>
                     <h3 class="mb-2">Address</h3>
-                    <p>198 West 21th Street, Suite 721 New York NY 10016</p>
+                    <p>123 Fake st, West Haven, CT</p>
                 </div>
             </div>
             <div class="col-md-3 d-flex">
@@ -35,7 +35,7 @@
                         <span class="icon-phone2"></span>
                     </div>
                     <h3 class="mb-2">Contact Number</h3>
-                    <p><a href="tel://1234567920">+ 1235 2355 98</a></p>
+                    <p><a href="tel://1234567890">123-456-7890</a></p>
                 </div>
             </div>
             <div class="col-md-3 d-flex">
@@ -44,17 +44,10 @@
                         <span class="icon-paper-plane"></span>
                     </div>
                     <h3 class="mb-2">Email Address</h3>
-                    <p><a href="mailto:info@yoursite.com">info@yoursite.com</a></p>
+                    <p><a href="mailto:support@viveaventurascaribenas.com">support@viveaventurascaribenas.com</a></p>
                 </div>
             </div>
-            <div class="col-md-3 d-flex">
-                <div class="align-self-stretch box p-4 text-center">
-                    <div class="icon d-flex align-items-center justify-content-center">
-                        <span class="icon-globe"></span>
-                    </div>
-                    <h3 class="mb-2">Website</h3>
-                    <p><a href="#">yoursite.com</a></p>
-                </div>
+          
             </div>
         </div>
     </div>

@@ -209,7 +209,7 @@
     <div class="container">
         <div class="row justify-content-center pb-4">
             <div class="col-md-12 heading-section text-center ftco-animate">
-                <h2 class="mb-4 font-bold">Current Tours</h2>
+                <h2 class="mb-4 font-bold">Most Popular Tours</h2>
             </div>
         </div>
         <div class="row">
@@ -497,9 +497,8 @@
                                 <span class="mos">August</span>
                             </div>
                         </div>
-                        <h3 class="heading"><a href="#">Why Lead Generation is Key for Business Growth</a></h3>
-                        <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.
-                        </p>
+                        <h3 class="heading"><a href="#">What a great adventure!</a></h3>
+                        <p>We embarked on an amazing adventure in the tropical paradise of...                        </p>
                     </div>
                 </div>
             </div>
@@ -518,9 +517,8 @@
                                 <span class="mos">August</span>
                             </div>
                         </div>
-                        <h3 class="heading"><a href="#">Why Lead Generation is Key for Business Growth</a></h3>
-                        <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.
-                        </p>
+                        <h3 class="heading"><a href="#">What a great adventure!</a></h3>
+                        <p>We embarked on an amazing adventure in the tropical paradise of...                        </p>
                     </div>
                 </div>
             </div>
@@ -539,9 +537,8 @@
                                 <span class="mos">August</span>
                             </div>
                         </div>
-                        <h3 class="heading"><a href="#">Why Lead Generation is Key for Business Growth</a></h3>
-                        <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.
-                        </p>
+                        <h3 class="heading"><a href="#">What a great adventure!</a></h3>
+                        <p>We embarked on an amazing adventure in the tropical paradise of...                        </p>
                     </div>
                 </div>
             </div>
