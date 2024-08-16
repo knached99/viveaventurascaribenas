@@ -6,7 +6,7 @@
       <div class="container">
         <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-center">
           <div class="col-md-9 ftco-animate pb-5 text-center">
-            <h1 class="mb-3 bread">About Us</h1>
+            <h1 class="mb-3 bread" style="font-weight:900;">About Us</h1>
             <p style="font-weight: bold;">What makes us the best travel agency</p>
           </div>
         </div>
