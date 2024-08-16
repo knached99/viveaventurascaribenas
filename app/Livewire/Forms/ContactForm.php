@@ -42,7 +42,7 @@ class ContactForm extends Form
                 'message' => $this->message,
             ];
 
-            $recipientEmail = config('mail.mailers.smtp.to_email');
+            $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com';
             
             $notificationClass = ContactFormSubmitted::class;
 

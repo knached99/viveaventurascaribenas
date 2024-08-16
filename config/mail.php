@@ -45,7 +45,7 @@ return [
             'encryption' => env('MAIL_ENCRYPTION', null),
             'username' => env('MAIL_USERNAME', null),
             'password' => env('MAIL_PASSWORD', null),
-            'from_email' => env('MAIL_FROM_ADDRESS', 'no-reply@viveaventurascaribenas.co'),
+            'from_email' => env('MAIL_FROM_ADDRESS', 'no-reply@viveaventurascaribenas.com'),
             'to_email' => env('MAIL_TO_ADDRESS', 'support@viveaventurascaribenas.com'),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url(env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
