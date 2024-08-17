@@ -52,7 +52,7 @@
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-tour-guide"></span></div>
                             <div class="media-body">
-                                <h3 class="heading mb-3">Private Guide</h3>
+                                <h3 class="heading mb-3">Private chauffeur</h3>
                                 <p>A small river named Duden flows by their place and supplies it with the necessary</p>
                             </div>
                         </div>
@@ -89,11 +89,7 @@
                                 include flights, accommodations, and guided tours.
                             </li>
 
-                            <li class="list-group-item">
-                                <b>Customizable Packages:</b>
-                                Want something a little more tailored? We can customize our packages to suit your
-                                specific needs and preferences.
-                            </li>
+
 
                             <li class="list-group-item">
                                 <b>Affordable Pricing:</b>

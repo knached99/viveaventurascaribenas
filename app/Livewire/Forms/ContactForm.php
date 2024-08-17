@@ -33,7 +33,7 @@ class ContactForm extends Form
     public function submitContactForm(): void
     {
         $this->validate();
-
+        
         try {
             $data = [
                 'name' => $this->name,
@@ -42,15 +42,15 @@ class ContactForm extends Form
                 'message' => $this->message,
             ];
 
-            $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com';
+            $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com'; // Failsafe email if email is not loaded from config file
             
             $notificationClass = ContactFormSubmitted::class;
 
             $this->sendNotification($data, $recipientEmail, $notificationClass);
 
             $this->status = 'Your message has been sent successfully! We will respond to you within 24-48 hours.';
-            $this->resetForm(); // Optional: Reset the form fields after successful submission
-        } catch (Exception $e) {
+            $this->resetForm(); // Resets form to original state after successful submission
+        } catch (\Exception $e) {
             $this->error = 'Unable to send email, something went wrong. If this issue persists, please email us directly at '. config('mail.mailers.smtp.to_email');
             \Log::error('Notification Exception Caught: ' . $e->getMessage());
         }

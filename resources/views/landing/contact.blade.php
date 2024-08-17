@@ -47,9 +47,9 @@
                     <p><a href="mailto:support@viveaventurascaribenas.com">support@viveaventurascaribenas.com</a></p>
                 </div>
             </div>
-          
-            </div>
+
         </div>
+    </div>
     </div>
 </section>
 
@@ -63,7 +63,7 @@
 
             <div class="col-md-6 d-flex">
                 {{-- <div id="map" class="bg-white"></div> --}}
-                <x-travelcomponents.google-map-embed />
+                {{-- <x-travelcomponents.google-map-embed /> --}}
 
             </div>
         </div>

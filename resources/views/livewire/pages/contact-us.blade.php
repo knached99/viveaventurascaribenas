@@ -9,7 +9,7 @@ new #[Layout('layouts.guest')] class extends Component {
 
     public function submitContactForm(): void
     {
-        $this->validate();
+        // $this->validate();
 
         $this->form->submitContactForm();
 
@@ -61,7 +61,8 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
         <div class="col-12">
             <div class="form-group">
-                <textarea wire:model="form.message" rows="7" class="form-control" placeholder="Message"></textarea>
+                <textarea wire:model="form.message" rows="7" class="form-control"
+                    placeholder="Please provide a detailed description of your inquiry."></textarea>
                 @error('form.message')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
