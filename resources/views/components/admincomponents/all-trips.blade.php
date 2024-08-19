@@ -63,7 +63,7 @@
         <td>{{date('F jS, Y', strtotime($trip->tripStartDate))}}</td>
         <td>{{date('F jS, Y', strtotime($trip->tripEndDate))}}</td>
         <td>{{\Carbon\Carbon::parse( $trip->tripStartDate )->diffInDays( $trip->tripEndDate )}}</td>
-        <td>{{number_format($trip->tripPrice, 2)}}</td>
+        <td>${{number_format($trip->tripPrice, 2)}}</td>
     </tr>
     @endforeach     
   </tbody>
