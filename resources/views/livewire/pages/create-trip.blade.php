@@ -141,6 +141,10 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
     <div class="mb-6">
     <button type="submit" wire:loading.remove class="btn btn-primary">Create Trip</button>
     </div>
+
+    <div class="text-center" wire:loading>
+     creating trip...
+    </div>
     
     </form>
     </div>

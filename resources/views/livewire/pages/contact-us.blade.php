@@ -68,7 +68,11 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
         <div class="col-12">
             <div class="form-group">
-                <button type="submit" class="btn btn-primary w-100 py-3">Send Message</button>
+                <button type="submit" class="btn btn-primary w-100 py-3" wire:loading.remove>Send Message</button>
+
+                <div class="text-center" wire:loading>
+                 submitting...
+                </div>
             </div>
         </div>
     </form>
