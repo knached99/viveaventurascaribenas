@@ -24,6 +24,12 @@ class Admin extends Controller
         return view('admin/trips', compact('trips'));
     }
 
+    public function allTripsPage(){
+        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();
+        
+        return view('admin/all-trips', compact('trips'));
+    }
+
 
 
 }

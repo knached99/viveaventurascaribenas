@@ -1,7 +1,3 @@
-@php
-    use Carbon\Carbon;
-@endphp
-
 <section class="ftco-section ftco-no-pt">
     <div class="container">
         <div class="row justify-content-center pb-4">
@@ -11,7 +7,7 @@
         </div>
         <div class="row">
             @foreach($trips as $trip)
-              
+             
                 <div class="col-md-4 ftco-animate">
                     <div class="project-wrap">
 
@@ -20,7 +16,7 @@
                             </a>
                         <div class="text p-4">
                             <span class="price">${{ number_format($trip->tripPrice, 2) }}/person</span>
-                            <span class="days"> Days Tour</span>
+                            <span class="days">{{\Carbon\Carbon::parse( $trip->tripStartDate )->diffInDays( $trip->tripEndDate )}} Days Tour</span>
                             <h3><a href="#">{{ $trip->tripLocation }}</a></h3>
                             <p class="location"><span class="ion-ios-map"></span> {{ $trip->tripLocation }}</p>
                             <ul>

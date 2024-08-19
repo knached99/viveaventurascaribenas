@@ -50,11 +50,11 @@
         @break 
 
         @case('coming soon')
-        <td class="badge rounded-pill bg-warning">{{$trip->tripAvailability}}</td>
+        <td class="m-3 text-white badge rounded-pill bg-warning">{{$trip->tripAvailability}}</td>
         @break 
 
         @case('unavailable')
-        <td class="badge rounded-pill bg-danger">{{$trip->tripAvailability}}</td>
+        <td class="m-3 text-white badge rounded-pill bg-danger">{{$trip->tripAvailability}}</td>
         @break 
 
         @endswitch

@@ -1,6 +1,6 @@
 <x-authenticated-theme-layout>
  <div class="row">
-                <div class="col-xxl-8 mb-6 order-0">
+                {{-- <div class="col-xxl-8 mb-6 order-0">
                   <div class="card">
                     <div class="d-flex align-items-start row">
                       <div class="col-sm-7">
@@ -14,7 +14,7 @@
 
                         </div>
                       </div>
-                      {{-- <div class="col-sm-5 text-center text-sm-left">
+                      <div class="col-sm-5 text-center text-sm-left">
                         <div class="card-body pb-0 px-0 px-md-6">
                           <img
                             src="{{asset('assets/theme_assets/assets/img/illustrations/man-with-laptop.png')}}"
@@ -22,15 +22,15 @@
                             class="scaleX-n1-rtl"
                             alt="View Badge User" />
                         </div>
-                      </div> --}}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </div> --}}
             
                 <!-- Trips Table -->
                @if(!$trips->isEmpty())
                <div class="card shadow-sm bg-white rounded">
-                <h5 class="m-3">Displays the first 5 available bookings.</h5>
+                <h5 class="m-3">Here are all of your bookings</h5>
 
                <x-admincomponents.all-trips :trips="$trips"/>
                </div>

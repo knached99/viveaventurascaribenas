@@ -59,8 +59,8 @@
                     {{-- <div class="badge rounded-pill bg-label-primary text-uppercase fs-tiny ms-auto">Pro</div> --}}
                   </a>
                 </li>
-                <li class="menu-item">
-                  <a href="#" class="menu-link">
+                <li class="menu-item {{request()->routeIs('admin.all-trips') ? 'active' : ''}}">
+                  <a href="{{route('admin.all-trips')}}" class="menu-link">
                     <div class="text-truncate" data-i18n="Without navbar"><i class='menu-icon tf-icons bx bx-briefcase' ></i> All Trips</div>
                   </a>
                 </li>
