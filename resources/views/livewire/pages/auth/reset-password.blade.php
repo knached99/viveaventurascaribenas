@@ -10,7 +10,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component
+new #[Layout('layouts.theme')] class extends Component
 {
     #[Locked]
     public string $token = '';
@@ -69,37 +69,80 @@ new #[Layout('layouts.guest')] class extends Component
     }
 }; ?>
 
-<div>
-    <form wire:submit="resetPassword">
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+ <div class="container-xxl">
+      <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner">
+          <!-- Register -->
+          <div class="card px-sm-6 px-0">
+            <div class="card-body">
+              <!-- Logo -->
+              <div class="app-brand justify-content-center">
+                <a href="{{route('/')}}" class="app-brand-link gap-2">
+                  <span class="app-brand-logo demo">
+                   <img src="{{asset('assets/images/faviconIcon.png')}}" />
+              
+                  </span>
+                  <span class="app-brand-text demo text-heading fw-bold">{{config('app.name')}}</span>
+                </a>
+              </div>
+              <!-- /Logo -->
+              <p class="mb-6">Enter your new password to complete the password reset</p>
+       <x-auth-session-status class="mb-4" :status="session('status')" />
+            <form id="formAuthentication" class="mb-6" wire:submit.prevent="resetPassword">
+    <div class="mb-6">
+        <label for="email" class="form-label">Email</label>
+        <input
+            type="text"
+            class="form-control {{$errors->has('email') ? 'border border-danger' : ''}}"
+            id="email"
+            name="email-username"
+            placeholder="Enter your email"
+            autofocus
+            wire:model="email" />
+            <x-input-error :messages="$errors->get('email')" class="mt-2"/>
+    </div>
+    <div class="mb-6 form-password-toggle">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-group input-group-merge">
+            <input
+                type="password"
+                id="password"
+                class="form-control {{$errors->has('password') ? 'border border-danger' : ''}}"
+                name="password"
+                placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                aria-describedby="password"
+                wire:model="password" />
+            <span class="input-group-text cursor-pointer {{$errors->has('password') ? 'border border-danger' : ''}}"><i class="bx bx-hide"></i></span>
         </div>
+        <x-input-error :messages="$errors->get('password')" class="mt-2"/>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input wire:model="password" id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+    </div>
+
+        <div class="mb-6 form-password-toggle">
+        <label class="form-label" for="password">Confirm Password</label>
+        <div class="input-group input-group-merge">
+            <input
+                type="password"
+                id="password_confirmation"
+                class="form-control {{$errors->has('password_confirmation') ? 'border border-danger' : ''}}"
+                name="password_confirmation"
+                placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                aria-describedby="password"
+                wire:model="password_confirmation" />
+            <span class="input-group-text cursor-pointer {{$errors->has('password_confirmation') ? 'border border-danger' : ''}}"><i class="bx bx-hide"></i></span>
         </div>
+        <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2"/>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+    </div>
+    <!-- Other form fields -->
+    <div class="mb-6">
+        <button class="btn btn-primary d-grid w-100" type="submit">Reset Password</button>
+    </div>
+</form>
 
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full"
-                          type="password"
-                          name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+            </div>
+          </div>
+          <!-- /Register -->
         </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
-    </form>
-</div>
+      </div>
+    </div>

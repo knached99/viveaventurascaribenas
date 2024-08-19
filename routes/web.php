@@ -2,9 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Home;
+use App\Http\Controllers\Admin;
+use Livewire\Volt\Volt;
 
 // Landing Pages 
-
 
 Route::get('/', [Home::class, 'homePage'])->name('/');
 
@@ -12,18 +13,23 @@ Route::get('/about', [Home::class, 'aboutPage'])->name('about');
 
 Route::get('/destinations', [Home::class, 'destinationsPage'])->name('destinations');
 
-Route::get('/blog', [Home::class, 'blogPage'])->name('blog');
-
 Route::get('/gallery', [Home::class, 'galleryPage'])->name('gallery');
 
 Route::get('/contact', [Home::class, 'contactPage'])->name('contact');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// Protected Routes 
+Route::group(['middleware' => 'auth', 'verified'], function () {
+    Route::get('/admin/dashboard', [Admin::class, 'dashboardPage'])->name('admin.dashboard');
+    Route::get('/admin/profile', [Admin::class, 'profilePage'])->name('admin.profile');
+    Route::get('/admin/trips', [Admin::class, 'tripsPage'])->name('admin.trips');
+    Volt::route('/admin/createTrip', 'pages.create-trip')->name('admin.create-trip');
+});
+// Route::view('admin/dashboard', 'admin/dashboard')
+//     ->middleware(['auth', 'verified'])
+//     ->name('admin.dashboard');
 
-Route::view('profile', 'profile')
-    ->middleware(['auth'])
-    ->name('profile');
+// Route::view('profile', 'profile')
+//     ->middleware(['auth'])
+//     ->name('profile');
 
 require __DIR__.'/auth.php';

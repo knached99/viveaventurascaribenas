@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\TripsModel;
 
 class Home extends Controller
 {
     public function homePage(){
-        return view('/landing/home');
+        $trips = TripsModel::all(); 
+        return view('/landing/home', compact('trips'));
     }
 
     public function aboutPage(){
@@ -18,9 +20,6 @@ class Home extends Controller
         return view('/landing/destinations');
     }
 
-    public function blogPage(){
-        return view('/landing/blog');
-    }
 
     public function galleryPage(){
         return view('/landing/gallery');

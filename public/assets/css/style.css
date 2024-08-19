@@ -3717,9 +3717,9 @@ input[type="button"].btn-block {
     display: none; }
 
 .navbar-light .navbar-brand {
-  color: rgba(0, 0, 0, 0.9); }
+  color: rgba(239, 173, 76); }
   .navbar-light .navbar-brand:hover, .navbar-light .navbar-brand:focus {
-    color: rgba(0, 0, 0, 0.9); }
+    color: rgba(239, 173, 76); }
 
 .navbar-light .navbar-nav .nav-link {
   color: rgba(0, 0, 0, 0.5); }

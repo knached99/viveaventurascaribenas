@@ -48,11 +48,9 @@ new #[Layout('layouts.guest')] class extends Component {
         <div class="col-12">
             <div class="form-group">
                 <select wire:model="form.subject" class="form-control">
-                    <option value="" disabled selected>Choose Subject</option>
+                    <option value="" disabled selected>Choose a Subject</option>
                     <option value="general question">General Question</option>
-                    <option value="Technical Support">Technical Support</option>
                     <option value="Question About a Booking">Question About a Booking</option>
-                    <option value="Refund Process">Refund Process</option>
                 </select>
                 @error('form.subject')
                     <span class="text-danger">{{ $message }}</span>
