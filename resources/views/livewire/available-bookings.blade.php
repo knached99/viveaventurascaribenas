@@ -24,8 +24,10 @@
                             <h3><a href="#">{{ $trip->tripLocation }}</a></h3>
                             <p class="location"><span class="ion-ios-map"></span> {{ $trip->tripLocation }}</p>
                             <ul>
-                                <li><i class='bx bx-calendar'></i> From {{date('F jS, Y', strtotime($trip->tripStartDate))}}</li>
-                                <li><i class="bx bx-calendar"></i> To {{date('F jS, Y', strtotime($trip->tripEndDate))}}</li>
+                            <li><img src="{{asset('assets/images/calendar.png')}}" style="width: 20px; height: 20px; margin: 5px;"/> 
+                            {{date('F jS, Y', strtotime($trip->tripStartDate))}} - {{date('F jS, Y', strtotime($trip->tripEndDate))}} 
+                            </li>
+
                                 @switch($trip->tripLandscape)
                                     @case('Beach')
                                         <li><img src="{{asset('assets/images/beach.png')}}" style="width: 40px; height: 40px; margin: 5px;"/> {{ $trip->tripLandscape }}</li>
