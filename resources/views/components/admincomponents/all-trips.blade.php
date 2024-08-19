@@ -9,6 +9,7 @@
       <th scope="col">Availability</th>
       <th scope="col">Start Date</th>
       <th scope="col">End Date</th>
+      <th scope="col">Number of Days</th>
       <th scope="col">Price (per person)</th>
     </tr>
   </thead>
@@ -61,6 +62,7 @@
 
         <td>{{date('F jS, Y', strtotime($trip->tripStartDate))}}</td>
         <td>{{date('F jS, Y', strtotime($trip->tripEndDate))}}</td>
+        <td>{{\Carbon\Carbon::parse( $trip->tripStartDate )->diffInDays( $trip->tripEndDate )}}</td>
         <td>{{number_format($trip->tripPrice, 2)}}</td>
     </tr>
     @endforeach     
