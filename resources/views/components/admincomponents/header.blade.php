@@ -55,7 +55,6 @@
     <!-- Page CSS -->
     <!-- Page -->
     <link rel="stylesheet" href="{{asset('assets/theme_assets/assets/vendor/css/pages/page-auth.css')}}" />
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
 
     <!-- Helpers -->
     <script src="{{asset('assets/theme_assets/assets/vendor/js/helpers.js')}}"></script>

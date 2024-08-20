@@ -26,5 +26,9 @@ class TripsModel extends Model
         'tripPrice'
     ];
 
+    protected $casts = [
+        'tripID'=>'string'
+    ];
+
 
 }

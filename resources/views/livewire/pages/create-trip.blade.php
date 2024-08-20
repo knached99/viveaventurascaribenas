@@ -53,12 +53,18 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                 <label class="form-label">Trip Photo</label>
                                 <input type="file"
                                     class="form-control {{ $errors->has('form.tripPhoto') ? 'border border-danger' : '' }}"
-                                    id="tripPhoto" name="tripPhoto" autofocus wire:model="form.tripPhoto" />
+                                    id="tripPhoto" name="tripPhoto" autofocus wire:model="form.tripPhoto" wire:loading.remove/>
+
+                                  
 
                                 <x-input-error :messages="$errors->get('form.tripPhoto')" class="mt-2" />
+                                  <div class="spinner-border text-primary" role="status" wire:loading wire:target.except="form.tripPhoto">
+                                    <span class="visually-hidden">Loading...</span>
+                                    </div>
                                 @if ($form->tripPhoto)
+                                    
                                     <img src="{{ $form->tripPhoto->temporaryUrl() }}" class="img-responsive m-3"
-                                        style="width: 500px; height: 500px;" />
+                                        style="width: 300px; height: 300px; border-radius: 15px;" />
                                 @endif
                             </div>
 
@@ -94,7 +100,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             <div class="mb-6">
                                 <label class="form-label">Trip Description</label>
 
-                                <textarea id="editor" name="tripDescription" placeholder="Enter description of this trip"
+                                <textarea name="tripDescription" placeholder="Enter description of this trip"
                                     wire:model="form.tripDescription"
                                     class="form-control {{ $errors->has('form.tripDescription') ? 'border border-danger' : '' }}"></textarea>
                                 <x-input-error :messages="$errors->get('form.tripDescription')" class="mt-2" />
@@ -134,9 +140,9 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                 <button type="submit" wire:loading.remove class="btn btn-primary">Create Trip</button>
                             </div>
 
-                            <div class="text-center" wire:loading>
-                                creating trip...
-                            </div>
+                            <div class="spinner-border text-primary" role="status" wire:Loading>
+                                    <span class="visually-hidden">Loading...</span>
+                                    </div>
 
                         </form>
                     </div>

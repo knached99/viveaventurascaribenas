@@ -70,8 +70,7 @@ new #[Layout('layouts.guest')] class extends Component {
             <div class="form-group">
                 <button type="submit" class="btn btn-primary w-100 py-3" wire:loading.remove>Send Message</button>
 
-                <div class="text-center" wire:loading>
-                 submitting...
+                <div class="spinner-border text-primary" role="status" wire:loading>
                 </div>
             </div>
         </div>

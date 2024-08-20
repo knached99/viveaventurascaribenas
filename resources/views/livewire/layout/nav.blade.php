@@ -25,7 +25,7 @@
 
      <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
          <!-- Search Livewire Component -->
-         <livewire:forms.search />
+         <livewire:forms.search lazy/>
 
          <!-- /Search Livewire Component -->
 

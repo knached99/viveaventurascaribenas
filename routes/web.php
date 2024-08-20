@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Home;
 use App\Http\Controllers\Admin;
 use Livewire\Volt\Volt;
+use App\Http\Livewire\TripInfoForm;
 
 // Landing Pages 
 
@@ -24,6 +25,7 @@ Route::group(['middleware' => 'auth', 'verified'], function () {
     Route::get('/admin/trips', [Admin::class, 'tripsPage'])->name('admin.trips');
     Route::get('/admin/all-trips', [Admin::class, 'allTripsPage'])->name('admin.all-trips');
     Volt::route('/admin/createTrip', 'pages.create-trip')->name('admin.create-trip');
+    Route::get('/admin/trip/{tripID}', [Admin::class, 'getTripDetails'])->name('admin.trip');
 });
 // Route::view('admin/dashboard', 'admin/dashboard')
 //     ->middleware(['auth', 'verified'])

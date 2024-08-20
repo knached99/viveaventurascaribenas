@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\TripsModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Database\Eloquent\ModelNotFoundException; 
 
 class Admin extends Controller
 {
@@ -28,6 +29,23 @@ class Admin extends Controller
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();
         
         return view('admin/all-trips', compact('trips'));
+    }
+
+    public function getTripDetails($tripID){
+        
+        try{
+
+        $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
+        
+        return view('admin/trip', ['tripId'=>$tripID, 'trip'=>$trip]);
+
+        }
+        
+        catch(ModelNotFoundException $e){
+            \Log::error('Unable to get trip details for method: '.__FUNCTION__.' on line: '.__LINE__.' '.$e->getMessage());
+            abort(404);
+        }
+
     }
 
 

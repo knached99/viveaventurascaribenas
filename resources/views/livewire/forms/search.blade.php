@@ -22,7 +22,7 @@ new class extends Component {
                 ->orWhere('tripAvailability', 'LIKE', "%{$this->searchQuery}%")
                 ->orWhere('tripStartDate', 'LIKE', "%{$this->searchQuery}%")
                 ->orWhere('tripEndDate', 'LIKE', "%{$this->searchQuery}%")
-                ->select('tripID', 'tripLocation', 'tripDescription', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate')
+                ->select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability')
                 ->get()
                 ->toArray();
         } catch (ValidationException $e) {
@@ -59,11 +59,12 @@ new class extends Component {
                     @if (!empty($searchResults))
                         <ul class="list-group m-0 p-0">
                             @foreach ($searchResults as $result)
+                                <a href="{{route('admin.trip', ['tripID'=>$result['tripID']])}}">
                                 <li class="list-group-item p-2 border-bottom hover:bg-light cursor-pointer">
                                     <h5 class="mb-1">{{ $result['tripLocation'] }}</h5>
-                                    <p class="mb-1">{{ Str::limit($result['tripDescription'], 100) }}</p>
-                                    <small>From {{ $result['tripStartDate'] }} to {{ $result['tripEndDate'] }}</small>
+                                    <img src="{{asset('storage/'.$result['tripPhoto'])}}" class="img-thumbnail rounded" style="width: 50px; height: 50px;" />
                                 </li>
+                                </a>
                             @endforeach
                         </ul>
                         <button type="button" wire:click="clearSearchResults">Clear</button>

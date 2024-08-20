@@ -8,7 +8,7 @@ use App\Models\TripsModel;
 class Home extends Controller
 {
     public function homePage(){
-        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->orderBy('created_at', 'desc')->get();
+        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->where('tripAvailability', 'available')->orderBy('created_at', 'desc')->get();
 
         return view('/landing/home', compact('trips'));
     }

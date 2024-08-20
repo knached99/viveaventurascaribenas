@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Forms;
 
+use Carbon\Carbon;
+
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 use Illuminate\Support\Facades\Mail;
@@ -52,7 +54,10 @@ class ContactForm extends Form
             $this->resetForm(); // Resets form to original state after successful submission
         } catch (\Exception $e) {
             $this->error = 'Unable to send email, something went wrong. If this issue persists, please email us directly at '. config('mail.mailers.smtp.to_email');
+            $this->resetForm();
             \Log::error('Notification Exception Caught: ' . $e->getMessage());
+            \Log::info(['Contact Submission Details: ',$data]);
+            \Log::info('Submitted on '. date('F jS, Y \a\t g:i A ', strtotime(Carbon::now())));
         }
     }
 
