@@ -32,15 +32,16 @@
       <div class="col-sm-7">
         <div class="card-body">
           <h5 class="card-title text-primary mb-3">Storage Usage</h5>
-          <p class="mb-6">
-            You have used <strong>{{ number_format($usedStorage, 2) }} MB</strong> of your <strong>{{ number_format($totalStorage, 2) }} MB</strong> storage capacity.
-          </p>
-          <div class="progress mb-3">
-            <div class="progress-bar" role="progressbar" style="width: {{ ($usedStorage / $totalStorage) * 100 }}%;" aria-valuenow="{{ ($usedStorage / $totalStorage) * 100 }}" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-          <p class="mb-6">
-            You have <strong>{{ number_format($remainingStorage, 2) }} MB</strong> of storage remaining.
-          </p>
+        <p class="mb-6">
+            You have used <strong>{{ $usedStorage }}</strong> of your <strong>{{ $totalStorage }}</strong> storage capacity.
+        </p>
+        <div class="progress mb-3">
+            <div class="progress-bar" role="progressbar" style="width: {{ ($storageData['usedSpace'] / $storageData['totalSpace']) * 100 }}%;" aria-valuenow="{{ ($storageData['usedSpace'] / $storageData['totalSpace']) * 100 }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <p class="mb-6">
+            You have <strong>{{ $remainingStorage }}</strong> of storage remaining.
+        </p>
+
           <a href="javascript:;" class="btn btn-sm btn-outline-primary">Manage Storage</a>
         </div>
       </div>

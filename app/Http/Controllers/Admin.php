@@ -14,23 +14,22 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class Admin extends Controller
 {
     public function dashboardPage()
-{
+    {
+        $directories = [
+            storage_path('app/public/booking_photos'),
+            // Any other directories go here
+        ];
     
-    $directories = [
-        storage_path('app/public/booking_photos'),
-        // Any other directories go here
-    ];
-
-    // Calculate storage usage
-    $storageData = $this->calculateStorageUsage($directories);
-
-    $usedStorage = $storageData['usedSpace'] / (1024 * 1024 * 1024); // Used space in GB
-    $totalStorage = $storageData['totalSpace'] / (1024 * 1024 * 1024); // Total space in GB
-    $remainingStorage = $storageData['freeSpace'] / (1024 * 1024 * 1024); // Remaining space in GB
+        // Calculate storage usage
+        $storageData = $this->calculateStorageUsage($directories);
     
+        $usedStorage = $this->formatSize($storageData['usedSpace']); // Used space formatted
+        $totalStorage = $this->formatSize($storageData['totalSpace']); // Total space formatted
+        $remainingStorage = $this->formatSize($storageData['freeSpace']); // Remaining space formatted
+        
+        return view('admin.dashboard', compact('storageData','usedStorage', 'totalStorage', 'remainingStorage'));
+    }
     
-    return view('admin.dashboard', compact('usedStorage', 'totalStorage', 'remainingStorage'));
-}
 
     public function profilePage(){
         return view('admin/profile');
@@ -107,14 +106,33 @@ class Admin extends Controller
         }
     }
 
+    private function formatSize($bytes)
+{
+    if ($bytes >= 1073741824) {
+        $size = number_format($bytes / 1073741824, 2) . ' GB';
+    } elseif ($bytes >= 1048576) {
+        $size = number_format($bytes / 1048576, 2) . ' MB';
+    } elseif ($bytes >= 1024) {
+        $size = number_format($bytes / 1024, 2) . ' KB';
+    } else {
+        $size = $bytes . ' bytes';
+    }
+
+    return $size;
+}
+
+
+
     private function getDirectorySize($directory) {
         $size = 0;
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
+            \Log::info("File found: " . $file->getPathname() . " Size: " . $file->getSize() . " bytes");
             $size += $file->getSize();
         }
         return $size;
     }
-
+    
+    
     private function getFileCount($directory) {
         $count = 0;
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
@@ -129,11 +147,15 @@ class Admin extends Controller
         $totalUsedSpace = 0;
     
         foreach ($directories as $dir) {
-            $totalUsedSpace += $this->getDirectorySize($dir);
+            $dirSize = $this->getDirectorySize($dir);
+            \Log::info("Used space for directory {$dir}: {$dirSize} bytes");
+            $totalUsedSpace += $dirSize;
         }
     
-        // Total disk space (in bytes) for the first directory (assuming all directories are on the same disk)
         $totalSpace = disk_total_space(reset($directories));
+    
+        \Log::info("Total disk space: {$totalSpace} bytes");
+        \Log::info("Total used space: {$totalUsedSpace} bytes");
     
         return [
             'usedSpace' => $totalUsedSpace,
@@ -141,6 +163,7 @@ class Admin extends Controller
             'freeSpace' => $totalSpace - $totalUsedSpace
         ];
     }
+    
     
     
 
