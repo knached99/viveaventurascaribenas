@@ -1,6 +1,6 @@
   <x-authenticated-theme-layout>
   <div class="row">
-                <div class="col-xxl-8 mb-6 order-0">
+                {{-- <div class="col-xxl-8 mb-6 order-0">
                   <div class="card">
                     <div class="d-flex align-items-start row">
                       <div class="col-sm-7">
@@ -24,7 +24,42 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> --}}
+
+<div class="col-xxl-8 mb-6 order-0">
+  <div class="card">
+    <div class="d-flex align-items-start row">
+      <div class="col-sm-7">
+        <div class="card-body">
+          <h5 class="card-title text-primary mb-3">Storage Usage</h5>
+          <p class="mb-6">
+            You have used <strong>{{ number_format($usedStorage, 2) }} MB</strong> of your <strong>{{ number_format($totalStorage, 2) }} MB</strong> storage capacity.
+          </p>
+          <div class="progress mb-3">
+            <div class="progress-bar" role="progressbar" style="width: {{ ($usedStorage / $totalStorage) * 100 }}%;" aria-valuenow="{{ ($usedStorage / $totalStorage) * 100 }}" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <p class="mb-6">
+            You have <strong>{{ number_format($remainingStorage, 2) }} MB</strong> of storage remaining.
+          </p>
+          <a href="javascript:;" class="btn btn-sm btn-outline-primary">Manage Storage</a>
+        </div>
+      </div>
+      <div class="col-sm-5 text-center text-sm-left">
+        <div class="card-body pb-0 px-0 px-md-6">
+          <img
+            src="{{ asset('assets/theme_assets/assets/img/illustrations/storage-illustration.png') }}"
+            height="175"
+            class="scaleX-n1-rtl"
+            alt="Storage Usage" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
                 <div class="col-lg-4 col-md-4 order-1">
                   <div class="row">
                     <div class="col-lg-6 col-md-12 col-6 mb-6">

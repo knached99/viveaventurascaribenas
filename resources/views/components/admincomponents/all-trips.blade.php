@@ -12,6 +12,7 @@
       <th scope="col">Number of Days</th>
       <th scope="col">Price (per person)</th>
       <th scope="col">View</th>
+      <th scope="col">Delete</th>
     </tr>
   </thead>
   <tbody>
@@ -70,6 +71,15 @@
         View
        </a>
 
+      </td>
+
+      <td>
+      <form method="post" action="{{route('admin.trip.delete', ['tripID'=>$trip->tripID])}}">
+      @csrf 
+      @method('DELETE')
+      <button type="submit" class="btn btn-danger text-white">Delete</button>
+
+      </form>
       </td>
   
         </tr>

@@ -36,7 +36,15 @@
 
                 <x-admincomponents.all-trips :trips="$trips" />
             </div>
+        
+        @else 
+
+        <h3 class="text-secondary">
+        No Available Trips. Go ahead and create one now
+        </h3>
+        
         @endif
+
         <!-- End Trips -->
         <!--/ Trips Table -->
 

@@ -72,8 +72,8 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                 <label class="form-label">Trip Landscape</label>
 
                                 <select
-                                    class="form-control {{ $errors->has('tripLandscape') ? 'border border-danger' : '' }}"
-                                    id="tripLandscape" name="tripLandscape" wire:model="form.tripLandscape">
+                                    class="form-control {{ $errors->has('form.tripLandscape') ? 'border border-danger' : '' }}"
+                                    id="tripLandscape" name="form.tripLandscape" wire:model="form.tripLandscape">
                                     <option value="" selected disabled>Select Landscape</option>
                                     <option value="Beach">Beach</option>
                                     <option value="City">City</option>
@@ -88,13 +88,15 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             <div class="mb-2">
 
                                 <select
-                                    class="form-control {{ $errors->has('tripAvailability') ? 'border border-danger' : '' }}"
-                                    id="tripAvailability" name="tripAvailability" wire:model="form.tripAvailability">
+                                    class="form-control {{ $errors->has('form.tripAvailability') ? 'border border-danger' : '' }}"
+                                    id="tripAvailability" name="form.tripAvailability" wire:model="form.tripAvailability">
                                     <option value="" disabled selected>Select Availability</option>
                                     <option value="available">Available</option>
                                     <option value="coming soon">Coming Soon</option>
                                     <option value="unavailable">Unavailable</option>
                                 </select>
+                             <x-input-error :messages="$errors->get('form.tripAvailability')" class="mt-2" />
+
                             </div>
 
                             <div class="mb-6">
@@ -102,7 +104,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
                                 <textarea name="tripDescription" placeholder="Enter description of this trip"
                                     wire:model="form.tripDescription"
-                                    class="form-control {{ $errors->has('form.tripDescription') ? 'border border-danger' : '' }}"></textarea>
+                                    class="form-control {{ $errors->has('form.tripDescription') ? 'border border-danger' : '' }}" rows="4" cols="8"></textarea>
                                 <x-input-error :messages="$errors->get('form.tripDescription')" class="mt-2" />
 
                             </div>
@@ -111,7 +113,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                 <label class="form-label">Trip Start Date</label>
 
                                 <input type="date" id="tripStartDate" name="tripStartDate"
-                                    class="form-control {{ $errors->has('tripStartDate') ? 'border border-danger' : '' }}"
+                                    class="form-control {{ $errors->has('form.tripStartDate') ? 'border border-danger' : '' }}"
                                     wire:model="form.tripStartDate" />
                                 <x-input-error :messages="$errors->get('form.tripStartDate')" class="mt-2" />
 
@@ -121,7 +123,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                 <label class="form-label">Trip End Date</label>
 
                                 <input type="date" id="tripEndDate" name="tripEndDate"
-                                    class="form-control {{ $errors->has('tripEndDate') ? 'border border-danger' : '' }}"
+                                    class="form-control {{ $errors->has('form.tripEndDate') ? 'border border-danger' : '' }}"
                                     wire:model="form.tripEndDate" />
                                 <x-input-error :messages="$errors->get('form.tripEndDate')" class="mt-2" />
 
@@ -131,7 +133,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                 <label class="form-label">Trip Price (Per Person)</label>
 
                                 <input type="text" id="tripPrice" name="tripPrice"
-                                    class="form-control {{ $errors->has('tripPrice') ? 'border border-danger' : '' }}"
+                                    class="form-control {{ $errors->has('form.tripPrice') ? 'border border-danger' : '' }}"
                                     wire:model="form.tripPrice" placeholder="$1.00" />
                                 <x-input-error :messages="$errors->get('form.tripPrice')" class="mt-2" />
                             </div>
