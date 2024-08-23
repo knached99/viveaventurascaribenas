@@ -24,6 +24,9 @@ Route::group(['middleware' => 'auth', 'verified'], function () {
     Route::get('/admin/profile', [Admin::class, 'profilePage'])->name('admin.profile');
     Route::get('/admin/trips', [Admin::class, 'tripsPage'])->name('admin.trips');
     Route::get('/admin/all-trips', [Admin::class, 'allTripsPage'])->name('admin.all-trips');
+    Route::get('/admin/testimonials', [Admin::class, 'testimonialsPage'])->name('admin.testimonials');
+    Route::get('/admin/testimonial/{testimonialID}', [Admin::class, 'testimonialPage'])->name('admin.testimonial');
+    Route::delete('/admin/testimonial/delete/{testimonialID}', [Admin::class, 'deleteTestimonial'])->name('admin.testimonial.delete');
     Volt::route('/admin/createTrip', 'pages.create-trip')->name('admin.create-trip');
     Route::get('/admin/trip/{tripID}', [Admin::class, 'getTripDetails'])->name('admin.trip');
     Route::delete('/admin/trip/delete/{tripID}', [Admin::class, 'deleteTrip'])->name('admin.trip.delete');

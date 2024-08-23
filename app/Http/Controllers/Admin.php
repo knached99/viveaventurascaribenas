@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\TripsModel;
+use App\Models\Testimonials;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-
 use Illuminate\Database\Eloquent\ModelNotFoundException; 
 
 class Admin extends Controller
@@ -22,10 +22,11 @@ class Admin extends Controller
     
         // Calculate storage usage
         $storageData = $this->calculateStorageUsage($directories);
-    
-        $usedStorage = $this->formatSize($storageData['usedSpace']); // Used space formatted
-        $totalStorage = $this->formatSize($storageData['totalSpace']); // Total space formatted
-        $remainingStorage = $this->formatSize($storageData['freeSpace']); // Remaining space formatted
+
+        // Format storage values
+        $usedStorage = $this->formatSize($storageData['usedSpace']);        // Formatted used space
+        $totalStorage = $this->formatSize($storageData['totalSpace']);      // Formatted total space
+        $remainingStorage = $this->formatSize($storageData['freeSpace']);   // Formatted remaining space
         
         return view('admin.dashboard', compact('storageData','usedStorage', 'totalStorage', 'remainingStorage'));
     }
@@ -45,6 +46,16 @@ class Admin extends Controller
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();
         
         return view('admin/all-trips', compact('trips'));
+    }
+
+    public function testimonialsPage(){
+        $testimonials = Testimonials::select('testimonialID', 'name', 'email', 'trip_details', 'trip_date', 'trip_rating', 'created_at')->orderBy('created_at', 'desc')->get();
+        return view('admin/testimonials', compact('testimonials'));
+    }
+
+    public function testimonialPage($testimonialID){
+        $testimonial = Testimonials::where('testimonialID', $testimonialID)->firstOrFail();
+        return view('admin/testimonial', ['testimonialID'=>$testimonialID, 'testimonial'=>$testimonial]);
     }
 
     public function getTripDetails($tripID){
@@ -126,7 +137,6 @@ class Admin extends Controller
     private function getDirectorySize($directory) {
         $size = 0;
         foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS)) as $file) {
-            \Log::info("File found: " . $file->getPathname() . " Size: " . $file->getSize() . " bytes");
             $size += $file->getSize();
         }
         return $size;
@@ -148,19 +158,19 @@ class Admin extends Controller
     
         foreach ($directories as $dir) {
             $dirSize = $this->getDirectorySize($dir);
-            \Log::info("Used space for directory {$dir}: {$dirSize} bytes");
             $totalUsedSpace += $dirSize;
         }
     
-        $totalSpace = disk_total_space(reset($directories));
+        $directory = reset($directories);
+        $totalSpace = disk_total_space($directory);
+        $freeSpace = disk_free_space($directory);
     
-        \Log::info("Total disk space: {$totalSpace} bytes");
-        \Log::info("Total used space: {$totalUsedSpace} bytes");
-    
+        $usedSpace = $totalSpace - $freeSpace;
+
         return [
-            'usedSpace' => $totalUsedSpace,
+            'usedSpace' => $usedSpace,
             'totalSpace' => $totalSpace,
-            'freeSpace' => $totalSpace - $totalUsedSpace
+            'freeSpace' => $freeSpace
         ];
     }
     

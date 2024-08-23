@@ -19,19 +19,19 @@ new #[Layout('layouts.guest')] class extends Component {
 
 <div>
     @if ($form->status)
-        <div class="mb-4 text-success">
+        <div class="mb-4 alert alert-success" role="alert">
             {{ $form->status }}
         </div>
     @elseif($form->error)
-        <div class="mb-4 text-danger">
-            {{ $form->error }}
-        </div>
+      <div class="mb-4 alert alert-danger" role="alert">
+       {{$form->error}}
+       </div>
     @endif
 
     <form wire:submit.prevent="submitContactForm" class="row g-3">
         <div class="col-12">
             <div class="form-group">
-                <input type="text" wire:model="form.name" class="form-control" placeholder="Your Name">
+                <input type="text" wire:model="form.name" class="form-control {{$errors->has('form.name') ? 'border border-danger' : ''}}" placeholder="Your Name">
                 @error('form.name')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -39,7 +39,7 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
         <div class="col-12">
             <div class="form-group">
-                <input type="email" wire:model="form.email" class="form-control" placeholder="Your Email">
+                <input type="email" wire:model="form.email" class="form-control {{$errors->has('form.email') ? 'border border-danger': ''}}" placeholder="Your Email">
                 @error('form.email')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -47,7 +47,7 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
         <div class="col-12">
             <div class="form-group">
-                <select wire:model="form.subject" class="form-control">
+                <select wire:model="form.subject" class="form-control {{$errors->has('form.subject') ? 'border border-danger' : ''}}">
                     <option value="" disabled selected>Choose a Subject</option>
                     <option value="general question">General Question</option>
                     <option value="Question About a Booking">Question About a Booking</option>
@@ -59,7 +59,7 @@ new #[Layout('layouts.guest')] class extends Component {
         </div>
         <div class="col-12">
             <div class="form-group">
-                <textarea wire:model="form.message" rows="7" class="form-control"
+                <textarea wire:model="form.message" rows="7" class="form-control " {{$errors->has('form.message') ? 'border border-danger' : '' }}
                     placeholder="Please provide a detailed description of your inquiry."></textarea>
                 @error('form.message')
                     <span class="text-danger">{{ $message }}</span>

@@ -53,7 +53,7 @@ class ContactForm extends Form
             $this->status = 'Your message has been sent successfully! We will respond to you within 24-48 hours.';
             $this->resetForm(); // Resets form to original state after successful submission
         } catch (\Exception $e) {
-            $this->error = 'Unable to send email, something went wrong. If this issue persists, please email us directly at '. config('mail.mailers.smtp.to_email');
+            $this->error = 'Unable to send submit contact form, something went wrong. If this issue persists, please email us directly at '. config('mail.mailers.smtp.to_email');
             $this->resetForm();
             \Log::error('Notification Exception Caught: ' . $e->getMessage());
             \Log::info(['Contact Submission Details: ',$data]);

@@ -48,7 +48,7 @@
       <div class="col-sm-5 text-center text-sm-left">
         <div class="card-body pb-0 px-0 px-md-6">
           <img
-            src="{{ asset('assets/theme_assets/assets/img/illustrations/storage-illustration.png') }}"
+            src="{{ asset('assets/theme_assets/assets/img/illustrations/cloud-storage.webp') }}"
             height="175"
             class="scaleX-n1-rtl"
             alt="Storage Usage" />

@@ -38,6 +38,12 @@
                    
                   </a>
                 </li>
+
+                <li class="menu-item {{request()->routeIs('admin.testimonials') ? 'active' : ''}}">
+                <a href="{{route('admin.testimonials')}}" class="menu-link">
+                <div class="text-truncate" data-i18n="testimonials"><i class='menu-icon tf-icons bx bx-paper-plane'></i> Testimonials</div>
+                </a>
+                </li>
               
               </ul>
             </li>
@@ -50,12 +56,12 @@
               </a>
 
               <ul class="menu-sub">
-                 <li class="menu-item {{request()->routeIs('admin.trips') ? 'active' : ''}}">
+                 <li class="menu-item {{request()->routeIs('admin.create-trip') ? 'active' : ''}}">
                   <a
-                    href="{{route('admin.trips')}}"
+                    href="{{route('admin.create-trip')}}"
                  
                     class="menu-link">
-                    <div class="text-truncate" data-i18n="trips"><i class="menu-icon tf-icons bx bx-plus"></i> Create</div>
+                    <div class="text-truncate" data-i18n="trips"><i class="menu-icon tf-icons bx bx-plus"></i> Create Trip</div>
                     {{-- <div class="badge rounded-pill bg-label-primary text-uppercase fs-tiny ms-auto">Pro</div> --}}
                   </a>
                 </li>
