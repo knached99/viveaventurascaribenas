@@ -58,6 +58,21 @@ class Admin extends Controller
         return view('admin/testimonial', ['testimonialID'=>$testimonialID, 'testimonial'=>$testimonial]);
     }
 
+    public function approveTestimonial($testimonialID){
+        try{
+
+        $testimonial = Testimonials::findOrFail($testimonialID);
+        $testimonial->testimonial_approval_status = 'Approved';
+        $testimonial->save();
+        return redirect()->back()->with('testominal_approve', 'This testimonial is approved and is now visible on the homepage!');
+        }
+        catch(\Exception $e){
+            return redirect()->back()->with('testominal_approve_error', 'Something went wrong approving this testimonial. If this happens again, please contact the developer');
+            \Log::error('Unable to approve testimonial. Function: '.__FUNCTION__.' on line: '.__LINE__.' '.$e->getMessage());
+
+        }
+    }
+
     public function getTripDetails($tripID){
         
         try{

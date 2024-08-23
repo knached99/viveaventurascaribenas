@@ -33,15 +33,15 @@
       @switch($testimonial->testimonial_approval_status)
       
       @case('Pending')
-      <span class="badge rounded-pill text-bg-warning">{{$testimonial->testimonial_approval_status}}</span>
+      <span class="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-indigo-900 dark:text-indigo-300">{{$testimonial->testimonial_approval_status}}</span>
       @break 
 
       @case('Approved')
-      <span class="badge rounded-pill text-bg-success">{{$testimonial->testimonial_approval_status}}</span>
+      <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">{{$testimonial_approval_status}}</span>
       @break
 
       @case('Denied')
-      <span class="badge rounded-pill text-bg-danger">{{$testimonial->testimonial_approval_status}}</span>
+      <span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">{{$testimonial_approval_status}}</span>
       @break
       @endswitch 
       </td>
