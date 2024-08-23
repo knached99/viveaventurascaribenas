@@ -22,7 +22,8 @@ class Testimonials extends Model
         'trip_date',
         'trip_rating',
         'testimonial',
-        'consent'
+        'consent',
+        'testimonial_approval_status',
     ];
 
     protected $casts = [

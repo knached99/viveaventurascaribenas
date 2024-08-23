@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('trip_rating');
             $table->longText('testimonial');
             $table->boolean('consent');
+            $table->string('testimonial_approval_status');
             $table->timestamps();
         });
     }
