@@ -49,7 +49,7 @@ class Admin extends Controller
     }
 
     public function testimonialsPage(){
-        $testimonials = Testimonials::select('testimonialID', 'name', 'email', 'trip_details', 'trip_date', 'trip_rating', 'created_at')->orderBy('created_at', 'desc')->get();
+        $testimonials = Testimonials::select('testimonialID', 'name', 'email', 'trip_details', 'trip_date', 'trip_rating', 'testimonial_approval_status', 'created_at')->orderBy('created_at', 'desc')->get();
         return view('admin/testimonials', compact('testimonials'));
     }
 

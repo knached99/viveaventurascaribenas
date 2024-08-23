@@ -52,7 +52,8 @@ class TestimonialForm extends Component
                 'trip_date' => $this->trip_date,
                 'trip_rating' => $this->trip_rating,
                 'testimonial' => $this->testimonial,
-                'consent' => $this->consent
+                'consent' => $this->consent,
+                'testimonial_approval_status'=>'Pending'
             ];
     
             // Create a new testimonial with the data

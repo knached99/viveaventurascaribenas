@@ -8,6 +8,7 @@
       <th scope="col">Trip Details</th>
       <th scope="col">Trip Date</th>
       <th scope="col">Trip Rating</th>
+      <th scope="col">Status</th>
       <th scope="col">Submission Date</th>
       <th scope="col">View</th>
       <th scope="col">Delete</th>
@@ -27,6 +28,24 @@
           @endfor
         </div>
       </td>
+
+      <td>
+      @switch($testimonial->testimonial_approval_status)
+      
+      @case('Pending')
+      <span class="badge rounded-pill text-bg-warning">{{$testimonial->testimonial_approval_status}}</span>
+      @break 
+
+      @case('Approved')
+      <span class="badge rounded-pill text-bg-success">{{$testimonial->testimonial_approval_status}}</span>
+      @break
+
+      @case('Denied')
+      <span class="badge rounded-pill text-bg-danger">{{$testimonial->testimonial_approval_status}}</span>
+      @break
+      @endswitch 
+      </td>
+
       <td>{{ date('F jS, Y \a\t g:i A', strtotime($testimonial->created_at)) }}</td>
       <td>
         <a href="{{ route('admin.testimonial', ['testimonialID' => $testimonial->testimonialID]) }}" class="text-decoration-underline">
