@@ -30,14 +30,14 @@ class Testimonials extends Model
         'testimonialID' => 'string'
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::creating(function ($model) {
-            if (empty($model->testimonialID)) {
-                $model->testimonialID = (string) Str::uuid();
-            }
-        });
-    }
+    //     static::creating(function ($model) {
+    //         if (empty($model->testimonialID)) {
+    //             $model->testimonialID = (string) Str::uuid();
+    //         }
+    //     });
+    // }
 }

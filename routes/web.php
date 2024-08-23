@@ -27,6 +27,7 @@ Route::group(['middleware' => 'auth', 'verified'], function () {
     Route::get('/admin/testimonials', [Admin::class, 'testimonialsPage'])->name('admin.testimonials');
     Route::get('/admin/testimonial/{testimonialID}', [Admin::class, 'testimonialPage'])->name('admin.testimonial');
     Route::put('/admin/testimonial/approveTestimonial/{testimonialID}', [Admin::class, 'approveTestimonial'])->name('admin.testimonial.approveTestimonial');
+    Route::put('/admin/testimonial/declineTestimonial/{testimonialID}', [Admin::class, 'declineTestimonial'])->name('admin.testimonial.declineTestimonial');
     Route::delete('/admin/testimonial/delete/{testimonialID}', [Admin::class, 'deleteTestimonial'])->name('admin.testimonial.delete');
     Volt::route('/admin/createTrip', 'pages.create-trip')->name('admin.create-trip');
     Route::get('/admin/trip/{tripID}', [Admin::class, 'getTripDetails'])->name('admin.trip');

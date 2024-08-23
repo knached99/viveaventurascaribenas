@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TripsModel;
+use App\Models\Testimonials;
 
 class Home extends Controller
 {
     public function homePage(){
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->where('tripAvailability', 'available')->orderBy('created_at', 'desc')->get();
-
-        return view('/landing/home', compact('trips'));
+        $testimonials = Testimonials::where('testimonial_approval_status', 'Approved')->get();
+        return view('/landing/home', compact('trips', 'testimonials'));
     }
 
     public function aboutPage(){

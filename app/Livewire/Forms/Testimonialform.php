@@ -14,6 +14,11 @@ use Exception;
 
 class TestimonialForm extends Component 
 {
+
+    public function __construct(){
+        $this->testimonialID = Str::uuid();
+    }
+
     #[Validate('required|string')]
     public string $name = '';
 
@@ -46,6 +51,7 @@ class TestimonialForm extends Component
     
         try {
             $data = [
+                'testimonialID' => $this->testimonialID,
                 'name' => $this->name,
                 'email' => $this->email,
                 'trip_details' => $this->trip_details,

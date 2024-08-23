@@ -68,6 +68,13 @@
                         class="icon-heart color-danger" aria-hidden="true"></i> by <a href="https://colorlib.com"
                         target="_blank">Colorlib</a>
                     <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    Icons are not owned by {{ config('app.name') }} The 404 illustration is owned by <a
+                        href="https://www.vecteezy.com/vector-art/26776449-asian-man-looking-on-plane-error-404-flash-message-empty-state-ui-design-page-not-found-popup-cartoon-image-vector-flat-illustration-concept-on-white-background"
+                        _target="blank" rel="noreferrer noopener ">vecteezy</a>
+
+                    The 503 illustration is owned by <a
+                        href="https://www.freepik.com/premium-vector/travel-around-world-online-journey-couple-is-planning-their-trip-choosing-best-route-travel-agency-tour-abroad-color-vector-illustration-flat-style_61502026.htm"
+                        _target="blank" rel="noreferrer noopener">Freepik</a>
                 </p>
             </div>
         </div>
@@ -100,6 +107,56 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
 <script src="{{ asset('assets/js/google-map.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const btns = document.querySelectorAll(".btn");
+        const slideRow = document.getElementById("slide-row");
+        const prevBtn = document.querySelector(".prev-btn");
+        const nextBtn = document.querySelector(".next-btn");
+        let currentIndex = 0;
+        const totalSlides = btns.length;
+
+        function updateSlide() {
+            const slideWidth = document.querySelector(".slide-col").offsetWidth;
+            slideRow.style.transform = `translateX(${-currentIndex * slideWidth}px)`;
+
+            btns.forEach((btn, index) => {
+                btn.classList.toggle("active", index === currentIndex);
+            });
+        }
+
+        function goToSlide(index) {
+            currentIndex = (index + totalSlides) % totalSlides;
+            updateSlide();
+        }
+
+        btns.forEach((btn, index) => {
+            btn.addEventListener("click", () => {
+                goToSlide(index);
+            });
+        });
+
+        prevBtn.addEventListener("click", () => {
+            goToSlide(currentIndex - 1);
+        });
+
+        nextBtn.addEventListener("click", () => {
+            goToSlide(currentIndex + 1);
+        });
+
+        window.addEventListener("resize", () => {
+            updateSlide();
+        });
+
+        // Initialize slider position
+        updateSlide();
+    });
+</script>
+
+
+
+
 @livewireScripts
 
 </body>

@@ -75,18 +75,18 @@
 <body>
     <div class="container">
         <h1>
-           {{$data['name']}} has submitted a testimonial 
+            {{ $data['name'] }} has submitted a testimonial
         </h1>
 
         <ul>
-            <li><b>Reply Email:</b> <a
-                    href="mailto:{{$data['email']}}">{{$data['email']}}</a>
+            <li><b>Reply Email:</b> <a href="mailto:{{ $data['email'] }}">{{ $data['email'] }}</a>
             </li>
-         <li>{{$data['testimonial']}}</li>
+            <li>{{ $data['testimonial'] }}</li>
         </ul>
 
         <p>
-            <a href="#">View Testimonial Here</a>
+            <a href="{{ route('admin.testimonial', ['testimonialID' => $data['testimonialID']]) }}">View Testimonial
+                Here</a>
         </p>
     </div>
 </body>

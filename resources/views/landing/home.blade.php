@@ -209,7 +209,7 @@
     <div class="container">
         <div class="row justify-content-center pb-4">
             <div class="col-md-12 heading-section text-center ftco-animate">
-                <h2 class="mb-4 font-bold">Most Popular Tours</h2>
+                <h2 class="mb-4" style="font-weight: 900;">Most Popular Tours</h2>
             </div>
         </div>
         <div class="row">
@@ -261,108 +261,16 @@
     </div>
 </section>
 
-<!-- Available Bookings Component --> 
-<!-- End Available Bookings Component --> 
-{{-- <x-travelcomponents.available-bookings :trips="$trips"/> --}}
-<livewire:available-bookings :trips="$trips"/>
+<!-- Available Bookings Component -->
+<!-- End Available Bookings Component -->
+<livewire:available-bookings :trips="$trips" />
 
-<section class="ftco-section testimony-section bg-bottom"
-    style="background-image: url({{ asset('assets/images/bg_3.jpg') }});">
-    <div class="container">
-        <div class="row justify-content-center pb-4">
-            <div class="col-md-7 text-center heading-section ftco-animate">
-                <h2 class="mb-4">Tourist Feedback</h2>
-            </div>
-        </div>
-        <div class="row ftco-animate">
-            <div class="col-md-12">
-                <div class="carousel-testimony owl-carousel ftco-owl">
-                    <div class="item">
-                        <div class="testimony-wrap py-4">
-                            <div class="text">
-                                <p class="mb-4">Far far away, behind the word mountains, far from the countries
-                                    Vokalia and Consonantia, there live the blind texts.</p>
-                                <div class="d-flex align-items-center">
-                                    <div class="user-img"
-                                        style="background-image: url({{ asset('assets/images/tourist.png') }})"></div>
-                                    <div class="pl-3">
-                                        <p class="name">Roger Scott</p>
-                                        <span class="position">Marketing Manager</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="testimony-wrap py-4">
-                            <div class="text">
-                                <p class="mb-4">Far far away, behind the word mountains, far from the countries
-                                    Vokalia and Consonantia, there live the blind texts.</p>
-                                <div class="d-flex align-items-center">
-                                    <div class="user-img"
-                                        style="background-image: url({{ asset('assets/images/tourist.png') }})"></div>
-                                    <div class="pl-3">
-                                        <p class="name">Roger Scott</p>
-                                        <span class="position">Marketing Manager</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="testimony-wrap py-4">
-                            <div class="text">
-                                <p class="mb-4">Far far away, behind the word mountains, far from the countries
-                                    Vokalia and Consonantia, there live the blind texts.</p>
-                                <div class="d-flex align-items-center">
-                                    <div class="user-img"
-                                        style="background-image: url({{ asset('assets/images/tourist.png') }})"></div>
-                                    <div class="pl-3">
-                                        <p class="name">Roger Scott</p>
-                                        <span class="position">Marketing Manager</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="testimony-wrap py-4">
-                            <div class="text">
-                                <p class="mb-4">Far far away, behind the word mountains, far from the countries
-                                    Vokalia and Consonantia, there live the blind texts.</p>
-                                <div class="d-flex align-items-center">
-                                    <div class="user-img"
-                                        style="background-image: url({{ asset('assets/images/tourist.png') }})"></div>
-                                    <div class="pl-3">
-                                        <p class="name">Roger Scott</p>
-                                        <span class="position">Marketing Manager</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="testimony-wrap py-4">
-                            <div class="text">
-                                <p class="mb-4">Far far away, behind the word mountains, far from the countries
-                                    Vokalia and Consonantia, there live the blind texts.</p>
-                                <div class="d-flex align-items-center">
-                                    <div class="user-img"
-                                        style="background-image: url({{ asset('assets/images/tourist.png') }})"></div>
-                                    <div class="pl-3">
-                                        <p class="name">Roger Scott</p>
-                                        <span class="position">Marketing Manager</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
-<livewire:forms.testimonial-form/>
+<!-- Start Testimonials -->
+<!-- End Testimonials -->
+@if ($testimonials)
+    <x-travelcomponents.testimonials :testimonials="$testimonials" />
+@endif
+<livewire:forms.testimonial-form />
 <!-- Testimonial Submission -->
 <x-travelcomponents.footer />

@@ -66,11 +66,57 @@ class Admin extends Controller
         $testimonial->save();
         return redirect()->back()->with('testominal_approve', 'This testimonial is approved and is now visible on the homepage!');
         }
+
+        catch(ModelNotFoundException $e){
+            \Log::error('Unable to approve testimonial. Function: '.__FUNCTION__.' on line: '.__LINE__.' '.$e->getMessage());
+            return redirect()->back()->with('testominal_approve_error', 'Something went wrong approving this testimonial. If this happens again, please contact the developer');
+
+        }
         catch(\Exception $e){
             return redirect()->back()->with('testominal_approve_error', 'Something went wrong approving this testimonial. If this happens again, please contact the developer');
             \Log::error('Unable to approve testimonial. Function: '.__FUNCTION__.' on line: '.__LINE__.' '.$e->getMessage());
 
         }
+    }
+
+    public function declineTestimonial($testimonialID){
+        try{
+            $testimonial = Testimonials::findOrFail($testionialID);
+            $testimonial->testimonial_approval_status = 'Declined';
+            $testimonial->save();
+            return redirect()->back()->with('testimonial_declined', 'This testimonial is declined and will not be visible on the homepage. You may feel free to delete it.');
+        }
+
+        catch(ModelNotFoundException $e){
+            \Log::error('Testimonial Not Found. Function: '.__FUNCTION__.' on line: '.__LINE__.' '.$e->getMessage());
+            return redirect()->back()->with('testimonial_decline_error', 'Something went wrong declining this testimonial. If this happens again, please contact the developer');
+
+        }
+        catch(\Exception $e){
+            return redirect()->back()->with('testimonial_decline_error', 'Something went wrong declining this testimonial. If this happens again, please contact the developer');
+            \Log::error('Unable to decline testimonial. Function: '.__FUNCTION__.' on line: '.__LINE__.' '.$e->getMessage());
+
+        }
+
+    }
+
+    public function deleteTestimonial($testimonialID){
+       try{
+
+        Testimonials::destroy($testimonialID);
+        return redirect()->route('admin.testimonials')->with('testimonial_delete_success', 'Testimony deleted successfully!');
+
+       }
+
+       catch(ModelNotFoundException $e){
+        \Log::error('Testimonial Not Found. Function: '.__FUNCTION__.' on line: '.__LINE__.' '.$e->getMessage());
+        return redirect()->route('admin.testimonials')->With('testimonial_delete_error', 'Unable to delete testimony. Something went wrong and if this error persists, please contact the developer');
+       }
+
+       catch(\Exception $e){
+        \Log::error('Testimonial deletion error. Function: '.__FUNCTION__.' on line: '.__LINE__.' '.$e->getMessage());
+        return redirect()->route('admin.testimonials')->With('testimonial_delete_error', 'Unable to delete testimony. Something went wrong and if this error persists, please contact the developer');
+       }
     }
 
     public function getTripDetails($tripID){
