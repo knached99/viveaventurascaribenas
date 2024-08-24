@@ -5,14 +5,14 @@
                 <h2 class="mb-4">Share Your Travel Experience with Us!</h2>
                 <p class="text-secondary">Your feedback helps us improve and inspires other travelers. We'd love to hear about your journey!</p>
                <div>
-            @if ($status)
-                <div class="mb-4 text-success">
-                    {{ $status }}
+              @if ($status)
+                <div class="mb-4 alert alert-success" role="alert">
+                    {{$status }}
                 </div>
             @elseif($error)
-                <div class="mb-4 text-danger">
-                    {{ $error }}
-                </div>
+            <div class="mb-4 alert alert-danger" role="alert">
+            {{$error}}
+            </div>
             @endif
         </div>
 
@@ -39,7 +39,7 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                               <input class="form-control {{$errors->has('trip_details') ? 'border border-danger' : ''}}" wire:model="trip_details" placeholder="Where did you travel with us? (Destination/Trip Package)">
+                               <input class="form-control {{$errors->has('trip_details') ? 'border border-danger' : ''}}" wire:model="trip_details" placeholder="Where did you travel with us? (Destination)">
                                 @error('trip_details')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -48,7 +48,7 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label class="form-label">Travel Date</label>
-                                <input wire:model="trip_date" type="month" value="{{date('Y-m')}}" class="form-control {{$errors->has('trip_date') ? 'border border-danger' : ''}}">
+                                <input wire:model="trip_date" type="month" max="{{date('Y-m')}}" value="{{date('Y-m')}}" class="form-control {{$errors->has('trip_date') ? 'border border-danger' : ''}}">
                                 @error('trip_date')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror

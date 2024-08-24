@@ -262,8 +262,8 @@
 </section>
 
 <!-- Available Bookings Component -->
+<x-travelcomponents.available-bookings :trips="$trips"/>
 <!-- End Available Bookings Component -->
-<livewire:available-bookings :trips="$trips" />
 
 
 <!-- Start Testimonials -->

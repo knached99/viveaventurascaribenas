@@ -9,8 +9,9 @@ use App\Models\Testimonials;
 class Home extends Controller
 {
     public function homePage(){
-        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->where('tripAvailability', 'available')->orderBy('created_at', 'desc')->get();
+        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();
         $testimonials = Testimonials::where('testimonial_approval_status', 'Approved')->get();
+
         return view('/landing/home', compact('trips', 'testimonials'));
     }
 
@@ -19,7 +20,9 @@ class Home extends Controller
     }
 
     public function destinationsPage(){
-        return view('/landing/destinations');
+        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();
+
+        return view('/landing/destinations', compact('trips'));
     }
 
 

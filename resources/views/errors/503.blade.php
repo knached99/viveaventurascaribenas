@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Site en maintenance</title>
+    <title>Site in maintenance</title>
     <meta charset="utf-8">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">

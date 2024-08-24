@@ -23,7 +23,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 @if ($form->status)
     <div class="mb-4 text-success">
         {{ $form->status }}
-        <a href="{{ route('admin.trips') }}" class="btn btn-primary m-3 block">See Trips</a>
+        <a href="{{ route('admin.all-trips') }}" class="btn btn-primary m-3 block">See Trips</a>
     </div>
 @elseif($form->error)
     <div class="mb-4 text-danger">

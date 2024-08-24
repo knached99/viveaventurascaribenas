@@ -1,3 +1,4 @@
+@props(['trips'])
 <section class="ftco-section ftco-no-pt">
     <div class="container">
         <div class="row justify-content-center pb-4">
@@ -19,7 +20,22 @@
                                 class="days">{{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}
                                 Days Tour</span>
                             <h3><a href="#">{{ $trip->tripLocation }}</a></h3>
-                            <p class="location"><span class="ion-ios-map"></span> {{ $trip->tripLocation }}</p>
+                              @switch($trip->tripAvailability)
+
+                            @case('available')
+                            <span class="success-badge">{{$trip->tripAvailability}}</span>
+                            @break 
+
+                            @case('coming soon')
+                            <span class="warning-badge">{{$trip->tripAvailability}}</span>
+
+                            @break 
+
+                            @case('unavailable')
+                            <span class="danger-badge">{{$trip->tripAvailability}}</span>
+                            @break 
+
+                            @endswitch
                             <ul>
                                 <li><img src="{{ asset('assets/images/calendar.png') }}"
                                         style="width: 20px; height: 20px; margin: 5px;" />

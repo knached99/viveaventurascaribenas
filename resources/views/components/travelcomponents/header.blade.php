@@ -299,6 +299,43 @@
         }
     </style>
 
+    <style>
+    .success-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem; /* 1.5 * 0.25rem (base unit) */
+    padding: 0.375rem 0.75rem; /* py-1.5 px-3 */
+    border-radius: 9999px; /* rounded-full */
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 500; /* font-medium */
+    background-color: #d1fae5; /* bg-emerald-100 (light green) */
+    color: #10b981; /* text-emerald-500 */
+}
+    .warning-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem; /* 1.5 * 0.25rem (base unit) */
+    padding: 0.375rem 0.75rem; /* py-1.5 px-3 */
+    border-radius: 9999px; /* rounded-full */
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 500; /* font-medium */
+    background-color: #fefcbf; /* bg-yellow-100 */
+    color: #d97706; /* text-yellow-800 */
+}
+
+.danger-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem; /* 1.5 * 0.25rem (base unit) */
+    padding: 0.375rem 0.75rem; /* py-1.5 px-3 */
+    border-radius: 9999px; /* rounded-full */
+    font-size: 0.75rem; /* text-xs */
+    font-weight: 500; /* font-medium */
+    background-color: #fee2e2; /* bg-red-100 (light red) */
+    color: #ef4444; /* text-red-500 */
+}
+
+    </style>
 
     @livewireStyles
 </head>

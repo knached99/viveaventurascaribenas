@@ -37,14 +37,10 @@ class Admin extends Controller
     }
 
 
-    public function tripsPage(){
-        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get()->take(5);
-        return view('admin/trips', compact('trips'));
-    }
 
     public function allTripsPage(){
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();
-        
+        \Log::info('Trips: '.json_encode($trips));
         return view('admin/all-trips', compact('trips'));
     }
 
@@ -81,7 +77,7 @@ class Admin extends Controller
 
     public function declineTestimonial($testimonialID){
         try{
-            $testimonial = Testimonials::findOrFail($testionialID);
+            $testimonial = Testimonials::findOrFail($testimonialID);
             $testimonial->testimonial_approval_status = 'Declined';
             $testimonial->save();
             return redirect()->back()->with('testimonial_declined', 'This testimonial is declined and will not be visible on the homepage. You may feel free to delete it.');

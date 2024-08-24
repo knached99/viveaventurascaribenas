@@ -1,49 +1,3 @@
-<?php
-
-use Illuminate\Validation\ValidationException;
-use App\Models\TripsModel;
-
-use Livewire\Volt\Component;
-
-new class extends Component {
-    public string $searchQuery = '';
-    public array $searchResults = [];
-
-    public function search(): void
-    {
-        try {
-            $validate = $this->validate([
-                'searchQuery' => ['required', 'string'],
-            ]);
-
-            $this->searchResults = TripsModel::where('tripLocation', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('tripDescription', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('tripLandscape', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('tripAvailability', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('tripStartDate', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('tripEndDate', 'LIKE', "%{$this->searchQuery}%")
-                ->select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability')
-                ->get()
-                ->toArray();
-        } catch (ValidationException $e) {
-            $this->reset('searchQuery');
-        } catch (\Exception $e) {
-            \Log::error('Search Error: ' . $e->getMessage());
-            $this->reset('searchQuery');
-        }
-    }
-
-    public function clearSearchResults()
-    {
-        $this->searchResults = [];
-        $this->searchQuery = '';
-    }
-};
-
-?>
-
-
-
 <div class="position-relative">
     <form wire:submit.prevent="search">
         <div class="navbar-nav align-items-center">
@@ -59,17 +13,41 @@ new class extends Component {
                     @if (!empty($searchResults))
                         <ul class="list-group m-0 p-0">
                             @foreach ($searchResults as $result)
-                                <a href="{{route('admin.trip', ['tripID'=>$result['tripID']])}}">
-                                <li class="list-group-item p-2 border-bottom hover:bg-light cursor-pointer">
-                                    <h5 class="mb-1">{{ $result['tripLocation'] }}</h5>
-                                    <img src="{{asset('storage/'.$result['tripPhoto'])}}" class="img-thumbnail rounded" style="width: 50px; height: 50px;" />
-                                </li>
-                                </a>
+                                @if(isset($result['tripID']))
+                                    <!-- Trip Result -->
+                                    <a href="{{ route('admin.trip', ['tripID' => $result['tripID'] ?? '']) }}" class="text-decoration-none">
+                                        <li class="list-group-item p-2 border-bottom hover:bg-light cursor-pointer d-flex align-items-center">
+                                            <div class="me-2">
+                                                <h5 class="mb-1">{{ $result['tripLocation'] ?? 'No Location' }}</h5>
+                                                <small class="text-muted text-truncate">{{ $result['tripDescription'] ?? 'No Description' }}</small>
+                                            </div>
+                                            @if(!empty($result['tripPhoto']))
+                                                <img src="{{ asset('storage/'.$result['tripPhoto']) }}" 
+                                                     class="img-thumbnail rounded" 
+                                                     style="width: 50px; height: 50px;" />
+                                            @else
+                                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded"
+                                                     style="width: 50px; height: 50px;">
+                                                    No Image
+                                                </div>
+                                            @endif
+                                        </li>
+                                    </a>
+                                @elseif(isset($result['testimonialID'])) 
+                                    <!-- Testimonial Result -->
+                                    <a href="{{ route('admin.testimonial', ['testimonialID' => $result['testimonialID'] ?? '']) }}" class="text-decoration-none">
+                                        <li class="list-group-item p-2 border-bottom hover:bg-light cursor-pointer">
+                                            <h5 class="mb-1">{{ $result['name'] ?? 'Anonymous' }}</h5>
+                                            <p class="mb-0 text-muted">{{ \Str::limit($result['testimonial'] ?? 'No Testimonial', 100) }}</p>
+                                        </li>
+                                    </a>
+                                @endif
                             @endforeach
                         </ul>
-                        <button type="button" wire:click="clearSearchResults">Clear</button>
+                        <button type="button" wire:click="clearSearchResults" class="btn btn-link mt-2">Clear</button>
                     @elseif(isset($searchQuery) && $searchQuery !== '')
                         <p class="p-2 text-center">No results found for "{{ $searchQuery }}"</p>
+                        <button type="button" wire:click="clearSearchResults" class="btn btn-link mt-2">Clear</button>
                     @endif
                 </div>
             </div>

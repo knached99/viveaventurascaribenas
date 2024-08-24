@@ -22,7 +22,6 @@ Route::get('/contact', [Home::class, 'contactPage'])->name('contact');
 Route::group(['middleware' => 'auth', 'verified'], function () {
     Route::get('/admin/dashboard', [Admin::class, 'dashboardPage'])->name('admin.dashboard');
     Route::get('/admin/profile', [Admin::class, 'profilePage'])->name('admin.profile');
-    Route::get('/admin/trips', [Admin::class, 'tripsPage'])->name('admin.trips');
     Route::get('/admin/all-trips', [Admin::class, 'allTripsPage'])->name('admin.all-trips');
     Route::get('/admin/testimonials', [Admin::class, 'testimonialsPage'])->name('admin.testimonials');
     Route::get('/admin/testimonial/{testimonialID}', [Admin::class, 'testimonialPage'])->name('admin.testimonial');
