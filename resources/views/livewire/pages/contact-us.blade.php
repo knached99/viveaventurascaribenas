@@ -29,6 +29,7 @@ new #[Layout('layouts.guest')] class extends Component {
     @endif
 
     <form wire:submit.prevent="submitContactForm" class="row g-3">
+    <x-honeypot livewire-model="extraFields" />
         <div class="col-12">
             <div class="form-group">
                 <input type="text" wire:model="form.name" class="form-control {{$errors->has('form.name') ? 'border border-danger' : ''}}" placeholder="Your Name">

@@ -3,6 +3,8 @@
 namespace App\Livewire\Forms;
 
 use App\Models\Testimonials;
+use Spatie\Honeypot\Http\Livewire\Concerns\UsesSpamProtection;
+use Spatie\Honeypot\Http\Livewire\Concerns\HoneypotData;
 use App\Mail\TestimonialSubmitted;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
@@ -14,6 +16,11 @@ use Exception;
 
 class TestimonialForm extends Component 
 {
+
+    use UsesSpamProtection;
+
+   
+    
 
     public function __construct(){
         $this->testimonialID = Str::uuid();
@@ -43,11 +50,18 @@ class TestimonialForm extends Component
 
     public string $status = '';
     public string $error = '';
-
-
+    
+    public HoneypotData $extraFields;
+    
+    public function mount()
+    {
+        $this->extraFields = new HoneypotData();
+    }
+  
     public function submitTestimonialForm(): void 
     {
         $this->validate();
+        $this->protectAgainstSpam();
     
         try {
             $data = [

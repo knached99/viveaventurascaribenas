@@ -21,6 +21,7 @@
             <div class="col-md-8 col-lg-6">
                 <div class="blog-entry p-4  shadow-md rounded bg-light">
                     <form class="row g-3" wire:submit.prevent="submitTestimonialForm">
+                   <x-honeypot livewire-model="extraFields" />
                         <div class="col-12">
                             <div class="form-group">
                                 <input type="text" wire:model="name" name="name" class="form-control {{$errors->has('name') ? 'border border-danger' : ''}}" placeholder="Full Name">

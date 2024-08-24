@@ -3,7 +3,8 @@
 namespace App\Livewire\Forms;
 
 use Carbon\Carbon;
-
+use Spatie\Honeypot\Http\Livewire\Concerns\UsesSpamProtection;
+use Spatie\Honeypot\Http\Livewire\Concerns\HoneypotData;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 use Illuminate\Support\Facades\Mail;
@@ -14,6 +15,8 @@ use Exception;
 
 class ContactForm extends Form
 {
+    use UsesSpamProtection;
+
     #[Validate('required|string')]
     public string $name = '';
 
@@ -32,10 +35,17 @@ class ContactForm extends Form
     /**
      * Handle the form submission.
      */
+    public HoneypotData $extraFields;
+    
+    public function mount()
+    {
+        $this->extraFields = new HoneypotData();
+    }
+    
     public function submitContactForm(): void
     {
         $this->validate();
-        
+         $this->protectAgainstSpam();
         try {
             $data = [
                 'name' => $this->name,
