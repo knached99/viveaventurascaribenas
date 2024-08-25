@@ -134,7 +134,7 @@
                     <h3>Book this Trip</h3>
                     <form action="#" method="POST">
                         <!-- Booking form fields go here -->
-                        <button type="submit" class="btn btn-primary">Book Now</button>
+                        <button type="submit" class="btn">Book Now</button>
                     </form>
                 </div>
             </div>

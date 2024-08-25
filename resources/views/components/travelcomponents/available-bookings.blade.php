@@ -11,7 +11,7 @@
                 <div class="col-md-4 ftco-animate">
                     <div class="project-wrap">
 
-                        <a href="{{route('landing.destination.trip', ['tripID'=>$trip->tripID])}}" class="img"
+                        <a href="{{route('landing.destination', ['tripID'=>$trip->tripID])}}" class="img"
                             style="background-image: url({{ $trip->tripPhoto ? asset('storage/' . $trip->tripPhoto) : asset('assets/images/image_placeholder.jpg') }});">
                         </a>
                         <div class="text p-4">

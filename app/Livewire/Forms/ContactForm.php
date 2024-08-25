@@ -6,15 +6,16 @@ use Carbon\Carbon;
 use Spatie\Honeypot\Http\Livewire\Concerns\UsesSpamProtection;
 use Spatie\Honeypot\Http\Livewire\Concerns\HoneypotData;
 use Livewire\Attributes\Validate;
-use Livewire\Form;
+use Livewire\Component;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ContactNotification;
 use App\Mail\ContactFormSubmitted;
 use Exception;
 
-class ContactForm extends Form
+class ContactForm extends Component
 {
+
     use UsesSpamProtection;
 
     #[Validate('required|string')]
@@ -32,21 +33,22 @@ class ContactForm extends Form
     public string $status = '';
     public string $error = '';
 
-    /**
-     * Handle the form submission.
-     */
     public HoneypotData $extraFields;
-    
-    public function mount()
-    {
+
+    public function mount(){
         $this->extraFields = new HoneypotData();
     }
+
     
-    public function submitContactForm(): void
+
+    public function submitContactForm(): void 
     {
         $this->validate();
-         $this->protectAgainstSpam();
+
+        $this->protectAgainstSpam();
+
         try {
+            
             $data = [
                 'name' => $this->name,
                 'email' => $this->email,
@@ -54,39 +56,39 @@ class ContactForm extends Form
                 'message' => $this->message,
             ];
 
-            $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com'; // Failsafe email if email is not loaded from config file
-            
+
+
+            $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com';
+
             $notificationClass = ContactFormSubmitted::class;
 
             $this->sendNotification($data, $recipientEmail, $notificationClass);
 
             $this->status = 'Your message has been sent successfully! We will respond to you within 24-48 hours.';
-            $this->resetForm(); // Resets form to original state after successful submission
-        } catch (\Exception $e) {
+            $this->resetForm();
+
+        } catch (Exception $e) {
             $this->error = 'Unable to send submit contact form, something went wrong. If this issue persists, please email us directly at '. config('mail.mailers.smtp.to_email');
             $this->resetForm();
             \Log::error('Notification Exception Caught: ' . $e->getMessage());
-            \Log::info(['Contact Submission Details: ',$data]);
+            \Log::info(['Contact Submission Details: ', $data]);
             \Log::info('Submitted on '. date('F jS, Y \a\t g:i A ', strtotime(Carbon::now())));
         }
     }
 
-    private function sendNotification(array $data, string $recipientEmail, string $notificationClass): void
+    public function sendNotification(array $data, string $recipientEmail, string $notificationClass): void 
     {
-        Mail::to($recipientEmail)
-            ->send(new $notificationClass($data));
+        Mail::to($recipientEmail)->send(new $notificationClass($data));
     }
 
-    /**
-     * Optional: Reset form fields after successful submission.
-     */
-    private function resetForm(): void
+    public function resetForm(): void 
     {
         $this->name = '';
         $this->email = '';
         $this->subject = '';
         $this->message = '';
     }
+    
 
     public function render()
     {

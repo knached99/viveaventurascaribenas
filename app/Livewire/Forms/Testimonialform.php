@@ -10,7 +10,6 @@ use Spatie\Honeypot\Http\Livewire\Concerns\HoneypotData;
 use App\Mail\TestimonialSubmitted;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
-use Livewire\Form;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Exception;
@@ -45,7 +44,7 @@ class TestimonialForm extends Component
     #[Validate('required|string|max:1000')]
     public string $testimonial = '';
 
-    #[Validate('required|boolean')]
+    #[Validate('required|accepted')]
     public bool $consent = false;
 
     public string $status = '';
@@ -66,6 +65,7 @@ class TestimonialForm extends Component
     public function submitTestimonialForm(): void 
     {
         $this->validate();
+
         $this->protectAgainstSpam();
 
         try {
@@ -80,6 +80,7 @@ class TestimonialForm extends Component
                 'consent' => $this->consent,
                 'testimonial_approval_status' => 'Pending'
             ];
+
 
             // Create a new testimonial with the data
             Testimonials::create($data);

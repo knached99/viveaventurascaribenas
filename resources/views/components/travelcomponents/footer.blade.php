@@ -154,7 +154,7 @@
     });
 </script>
 
-   @if(\Route::currentRouteName() === 'landing.destination.trip')
+   @if(\Route::currentRouteName() === 'landing.destination')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const carouselElement = document.querySelector("#testimonialsCarousel");

@@ -58,7 +58,7 @@
         <div class="row block-9">
             <div class="col-md-6 order-md-last d-flex">
                 <!-- Form Goes Here -->
-                <livewire:pages.contact-us />
+                <livewire:forms.contact-form />
             </div>
 
             <div class="col-md-6 d-flex">

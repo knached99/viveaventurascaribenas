@@ -93,11 +93,12 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group d-flex align-items-center {{$errors->has('consent') ? 'border border-danger' : ''}}">
-                            <input wire:model="consent" type="checkbox" class="form-check-input me-2" id="consent" name="consent">
+                                <input wire:model="consent" type="checkbox" class="form-check-input me-2" id="consent" name="consent">
                                 <label class="form-label mb-0 m-3" for="consent">I consent to my testimonial being used on the website</label>
                                 @error('consent')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
+
                             </div>
                         </div>
                         <div class="col-12">

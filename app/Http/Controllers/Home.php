@@ -11,7 +11,7 @@ class Home extends Controller
     public function homePage(){
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();
         $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
-
+        
         return view('/landing/home', compact('trips', 'testimonials'));
     }
 
@@ -20,7 +20,7 @@ class Home extends Controller
         $testimonials = Testimonials::with('trip')->where('tripID', $tripID)->where('testimonial_approval_status', 'approved')->get();
         $averageTestimonialRating = $testimonials->isNotEmpty() ? $testimonials->avg('trip_rating') : 0;
 
-        return view('/landing/destination/trip', ['tripID'=>$tripID, 'trip'=>$trip, 'testimonials'=>$testimonials, 'averageTestimonialRating'=>$averageTestimonialRating]);
+        return view('/landing/destination', ['tripID'=>$tripID, 'trip'=>$trip, 'testimonials'=>$testimonials, 'averageTestimonialRating'=>$averageTestimonialRating]);
     }
 
     public function aboutPage(){

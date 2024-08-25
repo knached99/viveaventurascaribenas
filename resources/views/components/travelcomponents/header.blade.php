@@ -363,7 +363,7 @@
 .trip-price {
     font-size: 24px;
     font-weight: 700;
-    color: #ffc107;
+    color: #efad4c;
 }
 
 .trip-duration {
@@ -435,15 +435,19 @@
     font-size: 18px;
     font-weight: 700;
     border-radius: 5px;
-    background-color: #ff5a5f;
+    background-color: #efad4c;
     color: #fff;
     text-transform: uppercase;
     border: none;
 }
 
+.booking-widget .btn:hover{
+    background-color: #000;
+}
+
     </style>
 
-   @if(\Route::currentRouteName() === 'landing.destination.trip')
+   @if(\Route::currentRouteName() === 'landing.destination')
     <style>
     .testimonials-slider .card {
         border: none;

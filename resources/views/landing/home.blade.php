@@ -110,7 +110,7 @@
                     beautiful destinations in the Caribbean and beyond.
                     Our mission is to provide you with unforgettable travel experiences at prices that won’t break the
                     bank.</p>
-                <p><a href="#" class="btn btn-primary py-3 px-4">Book a Travel</a></p>
+                <p><a href="{{route('destinations')}}" class="btn btn-primary py-3 px-4">Book a Travel</a></p>
             </div>
             <div class="col-md-6">
                 <div class="row">
