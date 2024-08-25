@@ -58,7 +58,7 @@ class TestimonialForm extends Component
         $this->extraFields = new HoneypotData();
         $this->trips = TripsModel::select('tripID', 'tripLocation')
             ->where('tripStartDate', '<', Carbon::now())
-            ->where('tripEndDate', '<', Carbon::now())
+            ->orWhere('tripEndDate', '<', Carbon::now())
             ->get()
             ->toArray();
     }

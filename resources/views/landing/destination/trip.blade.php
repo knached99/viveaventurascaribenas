@@ -11,29 +11,44 @@
                 <div class="trip-details">
                     <h2>{{ $trip->tripLocation }}</h2>
                     
-                  <!-- Average Star Rating -->
-                    <div class="star-rating mb-3">
-                        @php
-                            $fullStars = floor($averageTestimonialRating);
-                            $halfStar = ($averageTestimonialRating - $fullStars) >= 0.5;
-                            $emptyStars = 5 - ($fullStars + ($halfStar ? 1 : 0));
-                        @endphp
+                        <!-- Average Star Rating -->
+                        <div class="star-rating mb-3">
+                            @php
+                                // Calculate the number of full stars
+                                $fullStars = floor($averageTestimonialRating);
+                                
+                                // Determine if there is a half star needed
+                                $halfStar = ($averageTestimonialRating - $fullStars) >= 0.5;
+                                
+                                // Calculate the number of empty stars
+                                $emptyStars = 5 - ($fullStars + ($halfStar ? 1 : 0));
+                                
+                                // Calculate the fraction of the star needed
+                                $fraction = ($averageTestimonialRating - $fullStars);
+                            @endphp
 
-                        @for ($i = 1; $i <= $fullStars; $i++)
-                            <i class="bx bxs-star star-icon text-warning"></i>
-                        @endfor
+                            <!-- Render full stars -->
+                            @for ($i = 1; $i <= $fullStars; $i++)
+                                <i class="bx bxs-star star-icon text-warning"></i>
+                            @endfor
 
-                        @if ($halfStar)
-                            <i class="bx bxs-star-half star-icon text-warning"></i>
-                        @endif
+                            <!-- Render half star if needed -->
+                            @if ($fraction >= 0.25 && $fraction < 0.75)
+                                <i class="bx bxs-star-half star-icon text-warning"></i>
+                            @elseif ($fraction >= 0.75)
+                                <i class="bx bxs-star star-icon text-warning"></i>
+                            @endif
 
-                        @for ($i = 1; $i <= $emptyStars; $i++)
-                            <i class="bx bxs-star star-icon text-secondary"></i>
-                        @endfor
+                            <!-- Render empty stars -->
+                            @for ($i = 1; $i <= $emptyStars; $i++)
+                                <i class="bx bxs-star star-icon text-secondary"></i>
+                            @endfor
 
-                        <span class="text-muted">({{ number_format($averageTestimonialRating, 1) }} / 5.0)</span>
-                    </div>
-                  <!-- End Average Star Rating -->
+                            <!-- Display the average rating -->
+                            <span class="text-muted">({{ number_format($averageTestimonialRating, 1) }} / 5.0)</span>
+                        </div>
+                        <!-- End Average Star Rating -->
+
                     <span class="trip-price">${{ number_format($trip->tripPrice, 2) }} /person</span>
                     <p class="trip-duration">{{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }} Days Tour</p>
                     <p class="trip-availability">
@@ -77,6 +92,7 @@
               <!-- Testimonials Slider -->
                 <div class="testimonials-slider mt-4">
                     <h3>What other travellers have to say</h3>
+                    @if(!$testimonials->isEmpty())
                     <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-inner">
                             @foreach($testimonials as $key => $testimonial)
@@ -104,6 +120,9 @@
                             <span class="visually-hidden"><i class='bx bx-right-arrow-alt'></i></span>
                         </button>
                     </div>
+                    @else 
+                    <p style="font-size: 25px; color: #94a3b8; margin-left: 10px;">No reviews yet</p>
+                    @endif
                 </div>
                 <!-- End Testimonials Slider -->
 
