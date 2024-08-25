@@ -9,9 +9,7 @@ class TripsModel extends Model
 {
     use HasFactory;
 
-
     protected $primaryKey = 'tripID';
-
     protected $table = 'trips';
 
     protected $fillable = [
@@ -19,16 +17,21 @@ class TripsModel extends Model
         'tripLocation',
         'tripPhoto',
         'tripDescription',
+        'tripActivities',
         'tripLandscape',
         'tripAvailability',
         'tripStartDate',
         'tripEndDate',
-        'tripPrice'
+        'tripPrice',
+        'testimonial_id' // Ensure this field is fillable
     ];
 
     protected $casts = [
-        'tripID'=>'string'
+        'tripID' => 'string'
     ];
 
-
+    public function testimonial()
+    {
+        return $this->belongsTo(Testimonials::class, 'testimonial_id', 'testimonialID');
+    }
 }

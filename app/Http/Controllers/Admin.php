@@ -40,19 +40,23 @@ class Admin extends Controller
 
     public function allTripsPage(){
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();
-        \Log::info('Trips: '.json_encode($trips));
         return view('admin/all-trips', compact('trips'));
     }
 
-    public function testimonialsPage(){
-        $testimonials = Testimonials::select('testimonialID', 'name', 'email', 'trip_details', 'trip_date', 'trip_rating', 'testimonial_approval_status', 'created_at')->orderBy('created_at', 'desc')->get();
-        return view('admin/testimonials', compact('testimonials'));
-    }
+    public function testimonialsPage()
+        {
+            $testimonials = Testimonials::with('trip')
+                ->select('testimonialID', 'name', 'email', 'tripID', 'trip_date', 'trip_rating', 'testimonial_approval_status', 'created_at')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return view('admin/testimonials', compact('testimonials'));
+        }
 
     public function testimonialPage($testimonialID){
-        $testimonial = Testimonials::where('testimonialID', $testimonialID)->firstOrFail();
+        $testimonial = Testimonials::with('trip')->where('testimonialID', $testimonialID)->firstOrFail();
         return view('admin/testimonial', ['testimonialID'=>$testimonialID, 'testimonial'=>$testimonial]);
-    }
+    }   
 
     public function approveTestimonial($testimonialID){
         try{

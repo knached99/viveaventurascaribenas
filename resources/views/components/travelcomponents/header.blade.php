@@ -29,7 +29,6 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/theme_assets/assets/vendor/fonts/boxicons.css') }}" />
 
-
     <style>
         .position-relative {
             position: relative;
@@ -336,6 +335,171 @@
 }
 
     </style>
+
+    <!-- Individual Trip Details css -->
+    <style>
+    .trip-section {
+    padding: 40px 0;
+    background-color: #f7f7f7;
+}
+
+.trip-image {
+    height: 500px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 10px;
+}
+
+.trip-details {
+    margin-top: 20px;
+}
+
+.trip-details h2 {
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.trip-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffc107;
+}
+
+.trip-duration {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+.trip-availability {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.trip-availability.available {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.trip-availability['coming soon'] {
+    background-color: #ffc107;
+    color: #fff;
+}
+
+.trip-availability.unavailable {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.trip-description {
+    font-size: 16px;
+    margin: 20px 0;
+}
+
+.trip-info {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.trip-info li {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.trip-info .icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.booking-widget {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.booking-widget h3 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.booking-widget .btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 5px;
+    background-color: #ff5a5f;
+    color: #fff;
+    text-transform: uppercase;
+    border: none;
+}
+
+    </style>
+
+   @if(\Route::currentRouteName() === 'landing.destination.trip')
+    <style>
+    .testimonials-slider .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .testimonials-slider .card-body {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .testimonials-slider .card-text {
+        font-size: 1.125rem;
+        color: #333;
+        font-style: italic;
+    }
+
+    .testimonials-slider .card-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-top: 1rem;
+    }
+
+    .testimonials-slider .text-muted {
+        color: #666;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #000;
+        border: 1px solid #000;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+ 
+
+
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover {
+        background-color: #000; 
+    }
+
+
+</style>
+
+   @endif
+
+    <!-- End Individual Trip Details css -->
 
     @livewireStyles
 </head>

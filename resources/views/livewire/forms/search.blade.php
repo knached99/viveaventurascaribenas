@@ -3,9 +3,10 @@
         <div class="navbar-nav align-items-center">
             <div class="nav-item d-flex align-items-center position-relative">
                 <i class="bx bx-search bx-md"></i>
-                <input id="searchQuery" name="searchQuery" wire:model="searchQuery" type="text"
+                    <input id="searchQuery" name="searchQuery" wire:model.live.throttle.200ms="searchQuery" type="text"
                     class="form-control border-0 shadow-none ps-1 ps-sm-2" placeholder="Search..."
                     aria-label="Search..." />
+
 
                 <!-- Autocomplete Results Container -->
                 <div class="autocomplete-results position-absolute top-100 start-0 w-100 bg-white rounded shadow-lg mt-1 max-height-200 overflow-auto"

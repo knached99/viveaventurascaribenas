@@ -40,8 +40,15 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                               <input class="form-control {{$errors->has('trip_details') ? 'border border-danger' : ''}}" wire:model="trip_details" placeholder="Where did you travel with us? (Destination)">
-                                @error('trip_details')
+                           <select class="form-control {{$errors->has('tripID') ? 'border border-danger' : ''}}" wire:model="tripID">
+                                <option value="" disabled selected>Where did you travel with us?</option>
+                                @foreach($trips as $trip)
+                                    <option value="{{ $trip['tripID'] }}"> {{ $trip['tripLocation'] }}</option>
+                                @endforeach 
+                            </select>
+
+                               {{-- <input class="form-control {{$errors->has('trip_location') ? 'border border-danger' : ''}}" wire:model="trip_location" placeholder="Where did you travel with us? (Destination)"> --}}
+                                @error('trip_location')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -86,8 +93,8 @@
                         </div>
                         <div class="col-12">
                             <div class="form-group d-flex align-items-center {{$errors->has('consent') ? 'border border-danger' : ''}}">
-                                <input wire:model="consent" type="checkbox" class="form-check-input me-2" id="consentCheckbox">
-                                <label class="form-label mb-0 m-3" for="consentCheckbox">I consent to my testimonial being used on the website</label>
+                            <input wire:model="consent" type="checkbox" class="form-check-input me-2" id="consent" name="consent">
+                                <label class="form-label mb-0 m-3" for="consent">I consent to my testimonial being used on the website</label>
                                 @error('consent')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror

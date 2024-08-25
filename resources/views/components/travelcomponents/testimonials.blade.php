@@ -21,7 +21,7 @@
                         </div>
                         <div class="inline-block">
                             <span class="m-3 text-secondary"><i class='bx bx-map'
-                                    style="font-size: 30px;"></i>{{ $testimony->trip_details }}</span>
+                                    style="font-size: 30px;"></i>{{ $testimony->trip->tripLocation }}</span>
                             <span class="m-3 text-secondary"><i class='bx bx-calendar'
                                     style="font-size: 30px;"></i>{{ date('F jS, Y', strtotime($testimony->created_at)) }}</span>
                         </div>

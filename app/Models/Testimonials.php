@@ -4,6 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use App\Models\TripsModel;
 
 class Testimonials extends Model
 {
@@ -11,14 +12,14 @@ class Testimonials extends Model
 
     protected $table = 'testimonials';
     protected $primaryKey = 'testimonialID';
-    public $incrementing = false; // Disable auto-increment
-    protected $keyType = 'string'; // Key type is string
+    public $incrementing = false; 
+    protected $keyType = 'string'; 
 
     protected $fillable = [
         'testimonialID',
         'name',
         'email',
-        'trip_details',
+        'tripID', 
         'trip_date',
         'trip_rating',
         'testimonial',
@@ -27,17 +28,14 @@ class Testimonials extends Model
     ];
 
     protected $casts = [
-        'testimonialID' => 'string'
+        'testimonialID' => 'string',
+        'tripID' => 'string', 
     ];
 
-    // protected static function boot()
-    // {
-    //     parent::boot();
 
-    //     static::creating(function ($model) {
-    //         if (empty($model->testimonialID)) {
-    //             $model->testimonialID = (string) Str::uuid();
-    //         }
-    //     });
-    // }
+    public function trip()
+    {
+        return $this->belongsTo(TripsModel::class, 'tripID', 'tripID');
+    }
+    
 }

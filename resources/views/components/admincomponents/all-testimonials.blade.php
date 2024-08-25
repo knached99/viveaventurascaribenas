@@ -10,7 +10,7 @@
         <tr>
             <th scope="col">Name</th>
             <th scope="col">Email</th>
-            <th scope="col">Trip Details</th>
+            <th scope="col">Trip Location</th>
             <th scope="col">Trip Date</th>
             <th scope="col">Trip Rating</th>
             <th scope="col">Status</th>
@@ -23,8 +23,8 @@
         @foreach ($testimonials as $testimonial)
             <tr>
                 <td>{{ $testimonial->name }}</td>
-                <td>{{ $testimonial->email }}</td>
-                <td>{{ $testimonial->trip_details }}</td>
+                <td>{{ $testimonial->email ? $testimonial->email : 'no email provided'}}</td>
+                <td>{{$testimonial->trip->tripLocation}}</td>
                 <td>{{ date('F, Y', strtotime($testimonial->trip_date)) }}</td>
                 <td>
                     <div class="d-flex">

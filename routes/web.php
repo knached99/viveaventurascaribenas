@@ -10,6 +10,7 @@ use App\Http\Livewire\TripInfoForm;
 
 Route::get('/', [Home::class, 'homePage'])->name('/');
 
+Route::get('/landing/destination/trip/{tripID}', [Home::class, 'getDestinationDetails'])->name('landing.destination.trip');
 Route::get('/about', [Home::class, 'aboutPage'])->name('about');
 
 Route::get('/destinations', [Home::class, 'destinationsPage'])->name('destinations');

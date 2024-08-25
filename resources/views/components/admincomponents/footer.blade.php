@@ -1,3 +1,4 @@
+ 
          <!-- Footer -->
             <footer class="content-footer footer bg-footer-theme">
               <div class="container-xxl">
@@ -76,5 +77,8 @@
 
     <!-- Place this tag before closing body tag for github widget button. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    @livewireScripts
+
+
   </body>
 </html>

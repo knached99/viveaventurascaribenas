@@ -154,6 +154,33 @@
     });
 </script>
 
+   @if(\Route::currentRouteName() === 'landing.destination.trip')
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const carouselElement = document.querySelector("#testimonialsCarousel");
+        const prevBtn = document.querySelector(".carousel-control-prev");
+        const nextBtn = document.querySelector(".carousel-control-next");
+
+        // Initialize Bootstrap carousel if it exists
+        if (carouselElement) {
+            const carousel = new bootstrap.Carousel(carouselElement);
+
+            // Attach functionality to custom carousel control buttons
+            prevBtn.addEventListener("click", () => {
+                carousel.prev(); // Move to the previous slide
+            });
+
+            nextBtn.addEventListener("click", () => {
+                carousel.next(); // Move to the next slide
+            });
+        }
+    });
+</script>
+
+
+
+@endif 
+
 
 
 
