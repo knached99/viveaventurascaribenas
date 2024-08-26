@@ -14,6 +14,7 @@ class TripsModel extends Model
 
     protected $fillable = [
         'tripID',
+        'stripe_product_id',
         'tripLocation',
         'tripPhoto',
         'tripDescription',

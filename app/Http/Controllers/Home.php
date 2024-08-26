@@ -33,6 +33,10 @@ class Home extends Controller
         return view('/landing/destinations', compact('trips'));
     }
 
+    public function bookingPage($tripID){
+        return view('/booking', ['tripID'=>$tripID]);
+    }
+
 
     public function galleryPage(){
         return view('/landing/gallery');

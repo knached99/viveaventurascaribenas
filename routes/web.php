@@ -19,6 +19,7 @@ Route::get('/gallery', [Home::class, 'galleryPage'])->name('gallery');
 
 Route::get('/contact', [Home::class, 'contactPage'])->name('contact');
 
+Route::get('/booking/{tripID}', [Home::class, 'bookingPage'])->name('booking');
 // Protected Routes 
 Route::group(['middleware' => 'auth', 'verified'], function () {
     Route::get('/admin/dashboard', [Admin::class, 'dashboardPage'])->name('admin.dashboard');

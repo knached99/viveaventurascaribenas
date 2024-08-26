@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('trips', function (Blueprint $table) {
             $table->uuid('tripID')->primary();
+            $table->uuid('stripe_product_id');
             $table->string('tripLocation');
             $table->string('tripPhoto');
             $table->text('tripDescription');

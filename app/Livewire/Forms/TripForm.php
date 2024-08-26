@@ -74,24 +74,8 @@ class TripForm extends Form {
             // Store the uploaded file in the 'booking_photos' directory under 'storage/app/public'
             $filePath = $this->tripPhoto->store('booking_photos', 'public');
     
-            $data = [
-                'tripID' => Str::uuid(),
-                'tripLocation' => $this->tripLocation,
-                'tripDescription' => $this->tripDescription,
-                'tripActivities'=>$this->tripActivities,
-                'tripLandscape' => $this->tripLandscape,
-                'tripAvailability' => $this->tripAvailability,
-                'tripPhoto' => $filePath, // relative file path
-                'tripStartDate' => $this->tripStartDate,
-                'tripEndDate' => $this->tripEndDate,
-                'tripPrice' => $this->tripPrice
-            ];
-
             $imageURL = asset(Storage::url($filePath));
-            \Log::info('Image URL:', ['url' => $imageURL]);
 
-            // Save trip data
-            TripsModel::create($data);
 
             // Create as a product in Stripe 
             $product = $this->stripe->products->create([
@@ -112,12 +96,34 @@ class TripForm extends Form {
 
                 if($price){
                     // Reset the temporary file from Livewire
-                    $this->tripPhoto = null;
+
+                    $data = [
+                        'tripID' => Str::uuid(),
+                        'stripe_product_id'=>$product->id,
+                        'tripLocation' => $this->tripLocation,
+                        'tripDescription' => $this->tripDescription,
+                        'tripActivities'=>$this->tripActivities,
+                        'tripLandscape' => $this->tripLandscape,
+                        'tripAvailability' => $this->tripAvailability,
+                        'tripPhoto' => $filePath, // relative file path
+                        'tripStartDate' => $this->tripStartDate,
+                        'tripEndDate' => $this->tripEndDate,
+                        'tripPrice' => $this->tripPrice
+                    ];
+        
+        
+                    // Save trip data
+                    TripsModel::create($data);
+
+                    
+                    $this->resetForm();
             
                     // Set success message
                     $this->status = 'Trip Successfully Created!';
                 }
             }
+
+          
 
     
             

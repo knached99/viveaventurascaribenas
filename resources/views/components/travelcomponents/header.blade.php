@@ -299,212 +299,373 @@
     </style>
 
     <style>
-    .success-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem; /* 1.5 * 0.25rem (base unit) */
-    padding: 0.375rem 0.75rem; /* py-1.5 px-3 */
-    border-radius: 9999px; /* rounded-full */
-    font-size: 0.75rem; /* text-xs */
-    font-weight: 500; /* font-medium */
-    background-color: #d1fae5; /* bg-emerald-100 (light green) */
-    color: #10b981; /* text-emerald-500 */
-}
-    .warning-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem; /* 1.5 * 0.25rem (base unit) */
-    padding: 0.375rem 0.75rem; /* py-1.5 px-3 */
-    border-radius: 9999px; /* rounded-full */
-    font-size: 0.75rem; /* text-xs */
-    font-weight: 500; /* font-medium */
-    background-color: #fefcbf; /* bg-yellow-100 */
-    color: #d97706; /* text-yellow-800 */
-}
+        .success-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            /* 1.5 * 0.25rem (base unit) */
+            padding: 0.375rem 0.75rem;
+            /* py-1.5 px-3 */
+            border-radius: 9999px;
+            /* rounded-full */
+            font-size: 0.75rem;
+            /* text-xs */
+            font-weight: 500;
+            /* font-medium */
+            background-color: #d1fae5;
+            /* bg-emerald-100 (light green) */
+            color: #10b981;
+            /* text-emerald-500 */
+        }
 
-.danger-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem; /* 1.5 * 0.25rem (base unit) */
-    padding: 0.375rem 0.75rem; /* py-1.5 px-3 */
-    border-radius: 9999px; /* rounded-full */
-    font-size: 0.75rem; /* text-xs */
-    font-weight: 500; /* font-medium */
-    background-color: #fee2e2; /* bg-red-100 (light red) */
-    color: #ef4444; /* text-red-500 */
-}
+        .warning-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            /* 1.5 * 0.25rem (base unit) */
+            padding: 0.375rem 0.75rem;
+            /* py-1.5 px-3 */
+            border-radius: 9999px;
+            /* rounded-full */
+            font-size: 0.75rem;
+            /* text-xs */
+            font-weight: 500;
+            /* font-medium */
+            background-color: #fefcbf;
+            /* bg-yellow-100 */
+            color: #d97706;
+            /* text-yellow-800 */
+        }
 
+        .danger-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            /* 1.5 * 0.25rem (base unit) */
+            padding: 0.375rem 0.75rem;
+            /* py-1.5 px-3 */
+            border-radius: 9999px;
+            /* rounded-full */
+            font-size: 0.75rem;
+            /* text-xs */
+            font-weight: 500;
+            /* font-medium */
+            background-color: #fee2e2;
+            /* bg-red-100 (light red) */
+            color: #ef4444;
+            /* text-red-500 */
+        }
     </style>
 
     <!-- Individual Trip Details css -->
     <style>
-    .trip-section {
-    padding: 40px 0;
-    background-color: #f7f7f7;
-}
+        .trip-section {
+            padding: 40px 0;
+            background-color: #f7f7f7;
+        }
 
-.trip-image {
-    height: 500px;
-    background-size: cover;
-    background-position: center;
-    border-radius: 10px;
-}
+        .trip-image {
+            height: 500px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+        }
 
-.trip-details {
-    margin-top: 20px;
-}
+        .trip-details {
+            margin-top: 20px;
+        }
 
-.trip-details h2 {
-    font-size: 32px;
-    font-weight: 900;
-    margin-bottom: 10px;
-}
+        .trip-details h2 {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
 
-.trip-price {
-    font-size: 24px;
-    font-weight: 700;
-    color: #efad4c;
-}
+        .trip-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #efad4c;
+        }
 
-.trip-duration {
-    font-size: 18px;
-    margin: 10px 0;
-}
+        .trip-duration {
+            font-size: 18px;
+            margin: 10px 0;
+        }
 
-.trip-availability {
-    font-size: 16px;
-    font-weight: 600;
-    padding: 5px 10px;
-    border-radius: 5px;
-    display: inline-block;
-}
+        .trip-availability {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
 
-.trip-availability.available {
-    background-color: #28a745;
-    color: #fff;
-}
+        .trip-availability.available {
+            background-color: #28a745;
+            color: #fff;
+        }
 
-.trip-availability['coming soon'] {
-    background-color: #ffc107;
-    color: #fff;
-}
+        .trip-availability['coming soon'] {
+            background-color: #ffc107;
+            color: #fff;
+        }
 
-.trip-availability.unavailable {
-    background-color: #dc3545;
-    color: #fff;
-}
+        .trip-availability.unavailable {
+            background-color: #dc3545;
+            color: #fff;
+        }
 
-.trip-description {
-    font-size: 16px;
-    margin: 20px 0;
-}
+        .trip-description {
+            font-size: 16px;
+            margin: 20px 0;
+        }
 
-.trip-info {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0;
-}
+        .trip-info {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
 
-.trip-info li {
-    font-size: 16px;
-    margin-bottom: 10px;
-}
+        .trip-info li {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
 
-.trip-info .icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-}
+        .trip-info .icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
 
-.booking-widget {
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-}
+        .booking-widget {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
 
-.booking-widget h3 {
-    font-size: 24px;
-    margin-bottom: 20px;
-}
+        .booking-widget h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
 
-.booking-widget .btn {
-    width: 100%;
-    padding: 15px;
-    font-size: 18px;
-    font-weight: 700;
-    border-radius: 5px;
-    background-color: #efad4c;
-    color: #fff;
-    text-transform: uppercase;
-    border: none;
-}
+        .booking-widget .btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 5px;
+            background-color: #efad4c;
+            color: #fff;
+            text-transform: uppercase;
+            border: none;
+        }
 
-.booking-widget .btn:hover{
-    background-color: #000;
-}
-
+        .booking-widget .btn:hover {
+            background-color: #000;
+        }
     </style>
 
-   @if(\Route::currentRouteName() === 'landing.destination')
-    <style>
-    .testimonials-slider .card {
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
+    @if (\Route::currentRouteName() === 'landing.destination')
+        <style>
+            .testimonials-slider .card {
+                border: none;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            }
 
-    .testimonials-slider .card-body {
-        padding: 2rem;
-        text-align: center;
-    }
+            .testimonials-slider .card-body {
+                padding: 2rem;
+                text-align: center;
+            }
 
-    .testimonials-slider .card-text {
-        font-size: 1.125rem;
-        color: #333;
-        font-style: italic;
-    }
+            .testimonials-slider .card-text {
+                font-size: 1.125rem;
+                color: #333;
+                font-style: italic;
+            }
 
-    .testimonials-slider .card-title {
-        font-size: 1.25rem;
-        font-weight: bold;
-        margin-top: 1rem;
-    }
+            .testimonials-slider .card-title {
+                font-size: 1.25rem;
+                font-weight: bold;
+                margin-top: 1rem;
+            }
 
-    .testimonials-slider .text-muted {
-        color: #666;
-    }
+            .testimonials-slider .text-muted {
+                color: #666;
+            }
 
-    .carousel-control-prev,
-    .carousel-control-next {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background-color: #000;
-        border: 1px solid #000;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
- 
+            .carousel-control-prev,
+            .carousel-control-next {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background-color: #000;
+                border: 1px solid #000;
+                color: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
 
 
-    .carousel-control-prev:hover,
-    .carousel-control-next:hover {
-        background-color: #000; 
-    }
 
 
-</style>
-
-   @endif
+            .carousel-control-prev:hover,
+            .carousel-control-next:hover {
+                background-color: #000;
+            }
+        </style>
+    @endif
 
     <!-- End Individual Trip Details css -->
 
+    <!-- Booking Page Styling -->
+    @if (\Route::currentRouteName() === 'booking')
+        <style>
+            .section {
+                position: relative;
+                height: 100vh;
+            }
+
+            .section .section-center {
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                -webkit-transform: translateY(-50%);
+                transform: translateY(-50%);
+            }
+
+            #booking {
+                font-family: 'Montserrat', sans-serif;
+                background-image: url('https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+                background-size: cover;
+                background-position: center;
+            }
+
+            #booking::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                top: 0;
+                background: rgba(47, 103, 177, 0.6);
+            }
+
+            .booking-form {
+                background-color: #fff;
+                padding: 50px 20px;
+                -webkit-box-shadow: 0px 5px 20px -5px rgba(0, 0, 0, 0.3);
+                box-shadow: 0px 5px 20px -5px rgba(0, 0, 0, 0.3);
+                border-radius: 4px;
+            }
+
+            .booking-form .form-group {
+                position: relative;
+                margin-bottom: 30px;
+            }
+
+            .booking-form .form-control {
+                background-color: #ebecee;
+                border-radius: 4px;
+                border: none;
+                height: 40px;
+                -webkit-box-shadow: none;
+                box-shadow: none;
+                color: #3e485c;
+                font-size: 14px;
+            }
+
+            .booking-form .form-control::-webkit-input-placeholder {
+                color: rgba(62, 72, 92, 0.3);
+            }
+
+            .booking-form .form-control:-ms-input-placeholder {
+                color: rgba(62, 72, 92, 0.3);
+            }
+
+            .booking-form .form-control::placeholder {
+                color: rgba(62, 72, 92, 0.3);
+            }
+
+            .booking-form input[type="date"].form-control:invalid {
+                color: rgba(62, 72, 92, 0.3);
+            }
+
+            .booking-form select.form-control {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+            }
+
+            .booking-form select.form-control+.select-arrow {
+                position: absolute;
+                right: 0px;
+                bottom: 4px;
+                width: 32px;
+                line-height: 32px;
+                height: 32px;
+                text-align: center;
+                pointer-events: none;
+                color: rgba(62, 72, 92, 0.3);
+                font-size: 14px;
+            }
+
+            .booking-form select.form-control+.select-arrow:after {
+                content: '\279C';
+                display: block;
+                -webkit-transform: rotate(90deg);
+                transform: rotate(90deg);
+            }
+
+            .booking-form .form-label {
+                display: inline-block;
+                color: #3e485c;
+                font-weight: 700;
+                margin-bottom: 6px;
+                margin-left: 7px;
+            }
+
+            .booking-form .submit-btn {
+                display: inline-block;
+                color: #fff;
+                background-color: #1e62d8;
+                font-weight: 700;
+                padding: 14px 30px;
+                border-radius: 4px;
+                border: none;
+                -webkit-transition: 0.2s all;
+                transition: 0.2s all;
+            }
+
+            .booking-form .submit-btn:hover,
+            .booking-form .submit-btn:focus {
+                opacity: 0.9;
+            }
+
+            .booking-cta {
+                margin-top: 80px;
+                margin-bottom: 30px;
+            }
+
+            .booking-cta h1 {
+                font-size: 52px;
+                text-transform: uppercase;
+                color: #fff;
+                font-weight: 700;
+            }
+
+            .booking-cta p {
+                font-size: 16px;
+                color: rgba(255, 255, 255, 0.8);
+            }
+        </style>
+    @endif
+    <!-- End Booking Page Styling -->
     @livewireStyles
 </head>
 
