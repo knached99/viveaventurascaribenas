@@ -51,6 +51,8 @@
 
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="{{asset('assets/theme_assets/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css')}}" />
+    <!-- Quill -->
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
 
     <!-- Page CSS -->
     <!-- Page -->

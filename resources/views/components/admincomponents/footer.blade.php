@@ -67,6 +67,16 @@
 
     <!-- Vendors JS -->
     <script src="{{asset('assets/theme_assets/assets/vendor/libs/apex-charts/apexcharts.js')}}"></script>
+    
+    <!-- Quill -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+
+    <!-- Initializing Quill editor -->
+      <script>
+        const quill = new Quill('#quill', {
+          theme: 'snow'
+        });
+      </script>
 
     <!-- Main JS -->
     <script src="{{asset('assets/theme_assets/assets/js/main.js')}}"></script>

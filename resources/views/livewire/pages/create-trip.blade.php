@@ -110,6 +110,22 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             </div>
 
                             <div class="mb-6">
+                            <label class="form-label">Trip Activities</label>
+                            <textarea 
+                            name="tripActivities" 
+                            placeholder="Enter trip activities of this trip" 
+                            wire:model="form.tripActivities"
+                            class="form-control {{ $errors->has('form.tripActivities') ? 'border border-danger' : ''}}"
+                            rows="4"
+                            cols="8"
+                            id="quill">
+                            </textarea>
+                            <x-input-error :messages="$errors->get('form.tripActivities')" class="mt-2"/>
+
+
+                            </div>
+
+                            <div class="mb-6">
                                 <label class="form-label">Trip Start Date</label>
 
                                 <input type="date" id="tripStartDate" name="tripStartDate"
