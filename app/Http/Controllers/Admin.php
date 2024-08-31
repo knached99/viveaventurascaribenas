@@ -38,7 +38,12 @@ class Admin extends Controller
         $totalStorage = $this->formatSize($storageData['totalSpace']);      // Formatted total space
         $remainingStorage = $this->formatSize($storageData['freeSpace']);   // Formatted remaining space
         
-        $transactions = $this->stripe->charges->all();
+        $charges = $this->stripe->charges->all();
+        $transactions = array_filter($charges->data, function($charge){
+            return empty($charge->refunds->data);
+        });
+        \Log::info('Charges: '.$charges);
+        \Log::info('Filtered transactions: '. $transactions);
         return view('admin.dashboard', compact('storageData','usedStorage', 'totalStorage', 'remainingStorage', 'transactions'));
     }
     

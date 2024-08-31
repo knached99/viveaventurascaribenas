@@ -233,8 +233,8 @@
                               </div>
                               <p class="mb-1">Successful Payments</p>
                               <h4 class="card-title mb-3">{{ $totalTransactions }}</h4>
-                              <small class="text-danger fw-medium"><i class="bx bx-down-arrow-alt"></i>
-                                  -14.82%</small>
+                              {{-- <small class="text-danger fw-medium"><i class="bx bx-down-arrow-alt"></i>
+                                  -14.82%</small> --}}
                           </div>
                       </div>
                   </div>
@@ -260,7 +260,6 @@
                               <p class="mb-1">Transactions</p>
                               <h4 class="card-title mb-3">${{ $formattedTotalAmount }}</h4>
                               {{-- <small class="text-success fw-medium"><i class="bx bx-up-arrow-alt"></i></small> --}}
-                              <span class="fw-bold">Total number of transactions: {{ $totalTransactions }}</span>
                           </div>
                       </div>
                   </div>
