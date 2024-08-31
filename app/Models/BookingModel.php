@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TripsModel;
 
 class BookingModel extends Model
 {
@@ -33,4 +34,11 @@ class BookingModel extends Model
         'stripe_checkout_id'=>'string',
         'stripe_product_id'=>'string'
     ];
+
+
+public function trip()
+{
+    return $this->belongsTo(TripsModel::class, 'tripID', 'tripID');
+}
+
 }

@@ -1,13 +1,13 @@
-  @php
-      $totalTransactions = count($transactions);
-      $totalAmount = 0;
+@php
+    $totalTransactions = count($transactions);
+    $totalAmount = 0;
 
-      foreach ($transactions as $transaction) {
-          $totalAmount += $transaction->amount / 100;
-      }
+    foreach ($transactions as $transaction) {
+        $totalAmount += $transaction->amount / 100; // Stripe amounts are in cents
+    }
 
-      $formattedTotalAmount = number_format($totalAmount, 2);
-  @endphp
+    $formattedTotalAmount = number_format($totalAmount, 2);
+@endphp
   <x-authenticated-theme-layout>
       <div class="row">
           {{-- <div class="col-xxl-8 mb-6 order-0">
@@ -458,103 +458,72 @@
                       </div>
                   </div>
                   <div class="card-body pt-4">
-                      <ul class="p-0 m-0">
-                          <li class="d-flex align-items-center mb-6">
-                              <div class="avatar flex-shrink-0 me-3">
-                                  <img src="{{ asset('assets/theme_assets/assets/img/icons/unicons/paypal.png') }}"
-                                      alt="User" class="rounded" />
-                              </div>
-                              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                  <div class="me-2">
-                                      <small class="d-block">Paypal</small>
-                                      <h6 class="fw-normal mb-0">Send money</h6>
-                                  </div>
-                                  <div class="user-progress d-flex align-items-center gap-2">
-                                      <h6 class="fw-normal mb-0">+82.6</h6>
-                                      <span class="text-muted">USD</span>
-                                  </div>
-                              </div>
-                          </li>
-                          <li class="d-flex align-items-center mb-6">
-                              <div class="avatar flex-shrink-0 me-3">
-                                  <img src="{{ asset('assets/theme_assets/assets/img/icons/unicons/wallet.png') }}"
-                                      alt="User" class="rounded" />
-                              </div>
-                              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                  <div class="me-2">
-                                      <small class="d-block">Wallet</small>
-                                      <h6 class="fw-normal mb-0">Mac'D</h6>
-                                  </div>
-                                  <div class="user-progress d-flex align-items-center gap-2">
-                                      <h6 class="fw-normal mb-0">+270.69</h6>
-                                      <span class="text-muted">USD</span>
-                                  </div>
-                              </div>
-                          </li>
-                          <li class="d-flex align-items-center mb-6">
-                              <div class="avatar flex-shrink-0 me-3">
-                                  <img src="{{ asset('assets/theme_assets/assets/img/icons/unicons/chart.png') }}"
-                                      alt="User" class="rounded" />
-                              </div>
-                              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                  <div class="me-2">
-                                      <small class="d-block">Transfer</small>
-                                      <h6 class="fw-normal mb-0">Refund</h6>
-                                  </div>
-                                  <div class="user-progress d-flex align-items-center gap-2">
-                                      <h6 class="fw-normal mb-0">+637.91</h6>
-                                      <span class="text-muted">USD</span>
-                                  </div>
-                              </div>
-                          </li>
-                          <li class="d-flex align-items-center mb-6">
-                              <div class="avatar flex-shrink-0 me-3">
-                                  <img src="{{ asset('assets/theme_assets/assets/img/icons/unicons/cc-primary.png') }}"
-                                      alt="User" class="rounded" />
-                              </div>
-                              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                  <div class="me-2">
-                                      <small class="d-block">Credit Card</small>
-                                      <h6 class="fw-normal mb-0">Ordered Food</h6>
-                                  </div>
-                                  <div class="user-progress d-flex align-items-center gap-2">
-                                      <h6 class="fw-normal mb-0">-838.71</h6>
-                                      <span class="text-muted">USD</span>
-                                  </div>
-                              </div>
-                          </li>
-                          <li class="d-flex align-items-center mb-6">
-                              <div class="avatar flex-shrink-0 me-3">
-                                  <img src="{{ asset('assets/theme_assets/assets/img/icons/unicons/wallet.png') }}"
-                                      alt="User" class="rounded" />
-                              </div>
-                              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                  <div class="me-2">
-                                      <small class="d-block">Wallet</small>
-                                      <h6 class="fw-normal mb-0">Starbucks</h6>
-                                  </div>
-                                  <div class="user-progress d-flex align-items-center gap-2">
-                                      <h6 class="fw-normal mb-0">+203.33</h6>
-                                      <span class="text-muted">USD</span>
-                                  </div>
-                              </div>
-                          </li>
-                          <li class="d-flex align-items-center">
-                              <div class="avatar flex-shrink-0 me-3">
-                                  <img src="{{ asset('assets/theme_assets/assets/img/icons/unicons/cc-warning.png') }}"
-                                      alt="User" class="rounded" />
-                              </div>
-                              <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                                  <div class="me-2">
-                                      <small class="d-block">Mastercard</small>
-                                      <h6 class="fw-normal mb-0">Ordered Food</h6>
-                                  </div>
-                                  <div class="user-progress d-flex align-items-center gap-2">
-                                      <h6 class="fw-normal mb-0">-92.45</h6>
-                                      <span class="text-muted">USD</span>
-                                  </div>
-                              </div>
-                          </li>
+                      <ul class="p-0 m-0" style="overflow: scroll;">
+             @foreach($bookings as $booking)
+             @php
+                $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+                $checkout_session_id = $booking->stripe_checkout_id; 
+                $product = $stripe->products->retrieve($booking->stripe_product_id);
+                $location = $product->name;
+
+                if(!empty($checkout_session_id)){
+                    $checkoutSession = $stripe->checkout->sessions->retrieve($checkout_session_id);
+
+                    if($checkoutSession){
+                        if(!empty($checkoutSession->payment_intent)){
+                            $payment_intent = $checkoutSession->payment_intent;
+
+                            $charges = $stripe->charges->all(['payment_intent'=>$payment_intent]);
+
+                            if(count($charges->data) > 0){
+                                $charge = $charges->data[0];
+
+                                $cardExpirationMonth = $charge->payment_method_details->card->exp_month;
+                                $cardExpirationYear = $charge->payment_method_details->card->exp_year;
+                                $cardFunding = $charge->payment_method_details->card->funding;
+
+                                $paymentAmount = `$`.number_format($charge->amount / 100, 2);
+
+                                $status = $charge->status;
+                                $paymentMethod = $charge->payment_method_details->type;
+                                $cardLast4 = $charge->payment_method_details->card->last4;
+                                $paymentMethodCard = $charge->payment_method_details->card->brand;
+                            } 
+
+                            else{
+                                $cardExpirationMonth = 'N/A';
+                                $cardExpirationYear = 'N/A';
+                                $cardFunding = 'N/A';
+                                $paymentAmount = 0;
+                                $status = 'N/A';
+                                $paymentMethod = 'N/A';
+                                $cardLast4 = 'N/A';
+                                $paymentMethodCard = 'N/A';
+
+
+                            }
+                        }
+                    }
+                }
+             @endphp
+ 
+
+    <li class="d-flex align-items-center mb-6">
+        <div class="avatar flex-shrink-0 me-3">
+            <img src="{{ asset('assets/theme_assets/assets/img/icons/unicons/paypal.png') }}" alt="User" class="rounded" />
+        </div>
+        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+            <div class="me-2">
+                <h6 class="fw-normal mb-0">{{ $booking->name }}</h6>
+                <small class="d-block">Paid: ${{ $paymentAmount }} using {{ ucfirst($paymentMethod) }}</small>
+                <small class="d-block">Card ending in {{ $cardLast4 }}</small>
+                <small class="d-block">Product: {{ $location ?? 'N/A' }}</small>
+            </div>
+        </div>
+    </li>
+@endforeach
+
+
                       </ul>
                   </div>
               </div>

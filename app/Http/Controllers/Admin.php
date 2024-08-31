@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\TripsModel;
+use App\Models\BookingModel;
 use App\Models\Testimonials;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -32,22 +33,24 @@ class Admin extends Controller
     
         // Calculate storage usage
         $storageData = $this->calculateStorageUsage($directories);
-
+    
         // Format storage values
-        $usedStorage = $this->formatSize($storageData['usedSpace']);        // Formatted used space
-        $totalStorage = $this->formatSize($storageData['totalSpace']);      // Formatted total space
-        $remainingStorage = $this->formatSize($storageData['freeSpace']);   // Formatted remaining space
+        $usedStorage = $this->formatSize($storageData['usedSpace']);     
+        $totalStorage = $this->formatSize($storageData['totalSpace']);      
+        $remainingStorage = $this->formatSize($storageData['freeSpace']);   
         
         $charges = $this->stripe->charges->all();
-        $transactions = array_filter($charges->data, function($charge){
-            return empty($charge->refunds->data);
+
+        // Gets all transactions that aren't refunded 
+        $transactions = array_filter($charges->data, function($charge) {
+            return !$charge->refunded; // Filter out refunded transactions
         });
-        \Log::info('Charges: '.$charges);
-        \Log::info('Filtered transactions: '. $transactions);
-        return view('admin.dashboard', compact('storageData','usedStorage', 'totalStorage', 'remainingStorage', 'transactions'));
+
+        $bookings = BookingModel::all();
+
+        return view('admin.dashboard', compact('storageData', 'usedStorage', 'totalStorage', 'remainingStorage', 'transactions', 'bookings'));
     }
     
-
     public function profilePage(){
         return view('admin/profile');
     }

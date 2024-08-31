@@ -60,7 +60,7 @@
                         <!-- Display the average rating -->
                         <span class="text-muted">({{ number_format($averageTestimonialRating, 1) }} / 5.0)</span>
                         <span class="inline-block m-3">
-                            @if (empty($trip->tripRating))
+                            @if ($testimonials->isEmpty())
                                 (This trip has not yet been rated)
                             @endif
                         </span>

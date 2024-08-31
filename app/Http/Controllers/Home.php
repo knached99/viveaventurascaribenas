@@ -46,10 +46,14 @@ class Home extends Controller
 
     public function bookingPage($tripID){
         try{
-        TripsModel::findOrFail($tripID);
+        
+            TripsModel::findOrFail($tripID);
+        
         return view('booking/booking', ['tripID'=>$tripID]);
         }
+        
         catch(\Exception $e){
+            \Log::error($e->getMessage());
         return redirect('/');
         }
     }

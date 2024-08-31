@@ -343,6 +343,7 @@
     <!-- Individual Trip Details css -->
     <style>
         .trip-section {
+            margin-top: 80px;
             padding: 40px 0;
             background-color: #f7f7f7;
         }
@@ -425,7 +426,7 @@
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
+            margin-top: 50px;
         }
 
         .booking-widget h3 {
