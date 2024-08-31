@@ -10,9 +10,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\ModelNotFoundException; 
+use Stripe\Stripe;
+use Stripe\Product;
+use Stripe\StripeClient;
 
 class Admin extends Controller
 {
+
+    public function __construct(){
+        Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+        $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+    }
+    
     public function dashboardPage()
     {
         $directories = [
@@ -28,7 +38,8 @@ class Admin extends Controller
         $totalStorage = $this->formatSize($storageData['totalSpace']);      // Formatted total space
         $remainingStorage = $this->formatSize($storageData['freeSpace']);   // Formatted remaining space
         
-        return view('admin.dashboard', compact('storageData','usedStorage', 'totalStorage', 'remainingStorage'));
+        $transactions = $this->stripe->charges->all();
+        return view('admin.dashboard', compact('storageData','usedStorage', 'totalStorage', 'remainingStorage', 'transactions'));
     }
     
 

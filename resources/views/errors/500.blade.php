@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Site in maintenance</title>
+    <title>Server Error</title>
     <meta charset="utf-8">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,16 +17,11 @@
                 <img src="{{ asset('assets/images/faviconIcon.png') }}" />
 
 
-                <h1>We’re Taking a Pit
-                    Stop!</h1>
-                <h2>
-                    Adventure Awaits, but We’re Currently Under Construction!
-                </h2>
+                <h1>Looks like we've hit a detour!</h1>
+
                 <hr>
-                <p>Our travel site is temporarily offline as we embark on a journey to enhance your experience with
-                    exciting new features and improvements. We’re working hard to ensure your next adventure with us
-                    is
-                    even better!
+                <p> Don't worry, our technical wizards are working to get everything back on track. Please refresh or
+                    try again later, and we'll have you jet-setting in no time!
 
                 </p>
             </div>

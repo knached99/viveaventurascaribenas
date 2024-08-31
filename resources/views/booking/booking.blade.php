@@ -1,5 +1,5 @@
 <x-travelcomponents.header />
-<x-travelcomponents.navbar />
+{{-- <x-travelcomponents.navbar /> --}}
 <div id="booking" class="section">
     <div class="section-center">
         <div class="container">
@@ -20,5 +20,5 @@
         </div>
     </div>
 </div>
-
-</x-travelcomponents.footer />
+@livewireScripts
+{{-- <x-travelcomponents.footer /> --}}

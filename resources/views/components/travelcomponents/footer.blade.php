@@ -178,10 +178,6 @@
     </script>
 @endif
 
-
-
-
-
 @livewireScripts
 
 </body>

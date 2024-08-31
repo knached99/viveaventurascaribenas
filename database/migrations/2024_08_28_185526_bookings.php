@@ -35,6 +35,7 @@ return new class extends Migration
             ->references('stripe_product_id')
             ->on('trips')
             ->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
