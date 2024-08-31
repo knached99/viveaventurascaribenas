@@ -115,6 +115,8 @@ class BookingForm extends Component
                 'email' => $this->email,
                 'name' => $this->name,
                 'metadata' => [
+                    'name'=>$this->name,
+                    'email'=>$this->email,
                     'phone_number' => $this->phone_number,
                     'address_line_1' => $this->address_line_1,
                     'address_line_2' => $this->address_line_2,

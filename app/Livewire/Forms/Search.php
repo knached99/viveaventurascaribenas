@@ -4,6 +4,7 @@ namespace App\Livewire\Forms;
 
 use App\Models\Testimonials;
 use App\Models\TripsModel;
+use App\Models\BookingModel;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
 use Exception;
@@ -39,7 +40,18 @@ class Search extends Component
                 ->get()
                 ->toArray();
 
-            $this->searchResults = array_merge($tripsResults, $testimonialsResults);
+        $bookingResults = BookingModel::where('name', 'LIKE', "%{$this->searchQuery}%")
+        ->orWhere('email', 'LIKE', "%{$this->searchQuery}%")
+        ->orWhere('phone_number', 'LIKE', "%{$this->searchQuery}%")
+        ->orWhere('address_line_1', 'LIKE', "%{$this->searchQuery}%")
+        ->orWhere('address_line_2', 'LIKE', "%{$this->searchQuery}%")
+        ->orWhere('city', 'LIKE', "%{$this->searchQuery}%")
+        ->orWhere('state', 'LIKE', "%{$this->searchQuery}%")
+        ->orWhere('zip_code', 'LIKE', "%{$this->searchQuery}%")
+        ->get()
+        ->toArray();
+
+            $this->searchResults = array_merge($tripsResults, $testimonialsResults, $bookingResults);
         } catch (Exception $e) {
             $this->searchError = 'Unable to perform search';
             \Log::error('Search Error Occurred on line: ' . __LINE__ . ' in file: ' . __FILE__ . ' in function: ' . __FUNCTION__ . ' Error Message: ' . $e->getMessage());

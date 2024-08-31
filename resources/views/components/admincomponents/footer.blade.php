@@ -62,6 +62,17 @@
     <script src="{{asset('assets/theme_assets/assets/vendor/js/bootstrap.js')}}"></script>
     <script src="{{asset('assets/theme_assets/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')}}"></script>
     <script src="{{asset('assets/theme_assets/assets/vendor/js/menu.js')}}"></script>
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script> --}}
+    <script src="https://cdn.datatables.net/2.1.5/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.1.5/js/dataTables.bootstrap5.js"></script>
+    <script>
+    new DataTable('.dataTable', {
+    scrollY: '200px',
+    scrollCollapse: true,
+    paging: true
+    });
+    </script>
+
 
     <!-- endbuild -->
 

@@ -55,6 +55,21 @@ class Admin extends Controller
         return view('admin/profile');
     }
 
+    public function bookingInfo($bookingID){
+        try{
+        
+            $booking = BookingModel::findOrFail($bookingID);
+           
+            return view('admin/booking', ['bookingID'=>$bookingID, 'booking'=>$booking]);
+        }
+
+        catch(ModelNotFoundException $e){
+            \Log::error('ModelNotFoundException encountered on line '.__LINE__. ' in class: '.__CLASS__. ' Error Message: '.$e->getMessage());
+            abort(404);
+        }
+
+    }
+
 
 
     public function allTripsPage(){

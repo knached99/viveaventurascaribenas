@@ -48,7 +48,8 @@
     <link rel="stylesheet" href="{{asset('assets/theme_assets/assets/vendor/css/core.css')}}" class="template-customizer-core-css" />
     <link rel="stylesheet" href="{{asset('assets/theme_assets/assets/vendor/css/theme-default.css')}}" class="template-customizer-theme-css" />
     <link rel="stylesheet" href="{{asset('assets/theme_assets/assets/css/demo.css')}}" />
-
+    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css"/> --}}
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.5/css/dataTables.bootstrap5.css" />
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="{{asset('assets/theme_assets/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css')}}" />
     <!-- Quill -->

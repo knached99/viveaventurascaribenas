@@ -42,6 +42,14 @@
                                             <p class="mb-0 text-muted">{{ \Str::limit($result['testimonial'] ?? 'No Testimonial', 100) }}</p>
                                         </li>
                                     </a>
+                                @elseif(isset($result['bookingID']))
+                                <!-- Booking Result -->
+                                <a href="{{ route('admin.booking', ['bookingID' => $result['bookingID'] ?? '']) }}" class="text-decoration-none">
+                                <li class="list-group-item p-2 border-bottom hover:bg-light cursor-pointer">
+                                <h5 class="mb-1">{{$result['name']}}</h5>
+                                <p class="mb-0 text-muted">{{$result['email']}} | {{$result['phone_number']}}></p>
+                                </li>
+                                </a>
                                 @endif
                             @endforeach
                         </ul>

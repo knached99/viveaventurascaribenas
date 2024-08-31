@@ -290,7 +290,7 @@
       </div>
       <div class="row">
           <!-- Order Statistics -->
-          <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-6">
+          {{-- <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-6">
               <div class="card h-100">
                   <div class="card-header d-flex justify-content-between">
                       <div class="card-title mb-0">
@@ -381,11 +381,11 @@
                       </ul>
                   </div>
               </div>
-          </div>
+          </div> --}}
           <!--/ Order Statistics -->
 
           <!-- Expense Overview -->
-          <div class="col-md-6 col-lg-4 order-1 mb-6">
+          {{-- <div class="col-md-6 col-lg-4 order-1 mb-6">
               <div class="card h-100">
                   <div class="card-header nav-align-top">
                       <ul class="nav nav-pills" role="tablist">
@@ -437,97 +437,10 @@
                       </div>
                   </div>
               </div>
-          </div>
+          </div> --}}
           <!--/ Expense Overview -->
 
-          <!-- Transactions -->
-          <div class="col-md-6 col-lg-4 order-2 mb-6">
-              <div class="card h-100">
-                  <div class="card-header d-flex align-items-center justify-content-between">
-                      <h5 class="card-title m-0 me-2">Transactions</h5>
-                      <div class="dropdown">
-                          <button class="btn text-muted p-0" type="button" id="transactionID"
-                              data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <i class="bx bx-dots-vertical-rounded bx-lg"></i>
-                          </button>
-                          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">
-                              <a class="dropdown-item" href="javascript:void(0);">Last 28 Days</a>
-                              <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
-                              <a class="dropdown-item" href="javascript:void(0);">Last Year</a>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="card-body pt-4">
-                      <ul class="p-0 m-0" style="overflow: scroll;">
-             @foreach($bookings as $booking)
-             @php
-                $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
-                $checkout_session_id = $booking->stripe_checkout_id; 
-                $product = $stripe->products->retrieve($booking->stripe_product_id);
-                $location = $product->name;
-
-                if(!empty($checkout_session_id)){
-                    $checkoutSession = $stripe->checkout->sessions->retrieve($checkout_session_id);
-
-                    if($checkoutSession){
-                        if(!empty($checkoutSession->payment_intent)){
-                            $payment_intent = $checkoutSession->payment_intent;
-
-                            $charges = $stripe->charges->all(['payment_intent'=>$payment_intent]);
-
-                            if(count($charges->data) > 0){
-                                $charge = $charges->data[0];
-
-                                $cardExpirationMonth = $charge->payment_method_details->card->exp_month;
-                                $cardExpirationYear = $charge->payment_method_details->card->exp_year;
-                                $cardFunding = $charge->payment_method_details->card->funding;
-
-                                $paymentAmount = `$`.number_format($charge->amount / 100, 2);
-
-                                $status = $charge->status;
-                                $paymentMethod = $charge->payment_method_details->type;
-                                $cardLast4 = $charge->payment_method_details->card->last4;
-                                $paymentMethodCard = $charge->payment_method_details->card->brand;
-                            } 
-
-                            else{
-                                $cardExpirationMonth = 'N/A';
-                                $cardExpirationYear = 'N/A';
-                                $cardFunding = 'N/A';
-                                $paymentAmount = 0;
-                                $status = 'N/A';
-                                $paymentMethod = 'N/A';
-                                $cardLast4 = 'N/A';
-                                $paymentMethodCard = 'N/A';
-
-
-                            }
-                        }
-                    }
-                }
-             @endphp
- 
-
-    <li class="d-flex align-items-center mb-6">
-        <div class="avatar flex-shrink-0 me-3">
-            <img src="{{ asset('assets/theme_assets/assets/img/icons/unicons/paypal.png') }}" alt="User" class="rounded" />
-        </div>
-        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-            <div class="me-2">
-                <h6 class="fw-normal mb-0">{{ $booking->name }}</h6>
-                <small class="d-block">Paid: ${{ $paymentAmount }} using {{ ucfirst($paymentMethod) }}</small>
-                <small class="d-block">Card ending in {{ $cardLast4 }}</small>
-                <small class="d-block">Product: {{ $location ?? 'N/A' }}</small>
-            </div>
-        </div>
-    </li>
-@endforeach
-
-
-                      </ul>
-                  </div>
-              </div>
-          </div>
-          <!--/ Transactions -->
+            <!-- Transactions Go Here -->
+            <x-admincomponents.transactions :bookings="$bookings"/>
       </div>
   </x-authenticated-theme-layout>
