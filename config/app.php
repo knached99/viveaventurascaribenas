@@ -53,7 +53,7 @@ return [
     |
     */
 
-    'MAIL_TO_ADDRESS' => (bool) env('APP_DEBUG', false),
+    'MAIL_TO_ADDRESS' => (bool) env('APP_DEBUG', true),
 
 
     /*

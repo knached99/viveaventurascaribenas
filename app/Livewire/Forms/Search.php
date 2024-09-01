@@ -48,6 +48,7 @@ class Search extends Component
         ->orWhere('city', 'LIKE', "%{$this->searchQuery}%")
         ->orWhere('state', 'LIKE', "%{$this->searchQuery}%")
         ->orWhere('zip_code', 'LIKE', "%{$this->searchQuery}%")
+        ->select('bookingID', 'name', 'email', 'phone_number', 'stripe_product_id')
         ->get()
         ->toArray();
 

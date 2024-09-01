@@ -20,7 +20,7 @@ class Admin extends Controller
 
     public function __construct(){
         Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
-        $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+    //    $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
     }
     
@@ -46,7 +46,7 @@ class Admin extends Controller
             return !$charge->refunded; // Filter out refunded transactions
         });
 
-        $bookings = BookingModel::all();
+        $bookings = BookingModel::select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id')->get();
 
         return view('admin.dashboard', compact('storageData', 'usedStorage', 'totalStorage', 'remainingStorage', 'transactions', 'bookings'));
     }
@@ -55,19 +55,62 @@ class Admin extends Controller
         return view('admin/profile');
     }
 
-    public function bookingInfo($bookingID){
-        try{
-        
+    public function bookingInfo($bookingID)
+    {
+        try {
             $booking = BookingModel::findOrFail($bookingID);
-           
-            return view('admin/booking', ['bookingID'=>$bookingID, 'booking'=>$booking]);
-        }
+    
+            // Construct the full address
+            // $address = "{$booking->address_line_1}, {$booking->city}, {$booking->state}, {$booking->zip_code}";
+            $address = "{$booking->city}, {$booking->state}, {$booking->zip_code}";
+            // Create the query URL
+            $url = 'https://nominatim.openstreetmap.org/search?' . http_build_query([
+                'q' => $address,
+                'format' => 'json',
+                'limit' => 1
+            ]);
+    
+            // Request to Nominatim API with User-Agent header
+            $context = stream_context_create([
+                'http' => [
+                    'header' => 'User-Agent: YourAppName/1.0 (your-email@example.com)'
+                ]
+            ]);
+    
+            $response = file_get_contents($url, false, $context);
+    
+            if ($response === FALSE) {
+                throw new \Exception("Failed to retrieve data from Nominatim API.");
+            }
+    
+            $data = json_decode($response, true);
 
-        catch(ModelNotFoundException $e){
-            \Log::error('ModelNotFoundException encountered on line '.__LINE__. ' in class: '.__CLASS__. ' Error Message: '.$e->getMessage());
+    
+            // Check if the response contains data
+            if (is_array($data) && !empty($data) && isset($data[0]['lat']) && isset($data[0]['lon'])) {
+                $latitude = $data[0]['lat'];
+                $longitude = $data[0]['lon'];
+            } else {
+                // Handle case where no data is found
+                $latitude = null;
+                $longitude = null;
+            }
+
+    
+            return view('admin.booking', [
+                'bookingID' => $bookingID,
+                'booking' => $booking,
+                'latitude' => $latitude,
+                'longitude' => $longitude
+            ]);
+    
+        } catch (ModelNotFoundException $e) {
+            \Log::error('ModelNotFoundException encountered on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' Error Message: ' . $e->getMessage());
             abort(404);
+        } catch (\Exception $e) {
+            \Log::error('Exception encountered on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' Error Message: ' . $e->getMessage());
+            abort(500);
         }
-
     }
 
 

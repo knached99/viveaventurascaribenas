@@ -1,3 +1,7 @@
+@php 
+$stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'))
+@endphp 
+
 <div class="position-relative">
     <form wire:submit.prevent="search">
         <div class="navbar-nav align-items-center">
@@ -34,6 +38,30 @@
                                             @endif
                                         </li>
                                     </a>
+
+                                @elseif(isset($result['bookingID']))
+                                <!-- Booking Result -->
+                                <a href="{{ route('admin.booking', ['bookingID' => $result['bookingID'] ?? '']) }}" class="text-decoration-none">
+                                    <li class="list-group-item p-2 border-bottom hover:bg-light cursor-pointer">
+                                        <h5 class="mb-1">{{$result['name']}}</h5>
+                                        <p class="mb-0 text-muted">{{$result['email']}} | {{$result['phone_number']}}</p>
+                                        <p class="mb-0 text-muted">Booked location: 
+                                        
+                                        @php 
+                                        try {
+                                            $product = $stripe->products->retrieve($result['stripe_product_id']);
+                                            $location = $product->name;
+                                        } catch (\Exception $e) {
+                                            $location = 'Unknown location';
+                                        }
+                                        @endphp
+                                        {{$location}}
+                                        </p>
+                                    </li>
+                                </a>
+                            
+
+
                                 @elseif(isset($result['testimonialID'])) 
                                     <!-- Testimonial Result -->
                                     <a href="{{ route('admin.testimonial', ['testimonialID' => $result['testimonialID'] ?? '']) }}" class="text-decoration-none">
@@ -42,14 +70,7 @@
                                             <p class="mb-0 text-muted">{{ \Str::limit($result['testimonial'] ?? 'No Testimonial', 100) }}</p>
                                         </li>
                                     </a>
-                                @elseif(isset($result['bookingID']))
-                                <!-- Booking Result -->
-                                <a href="{{ route('admin.booking', ['bookingID' => $result['bookingID'] ?? '']) }}" class="text-decoration-none">
-                                <li class="list-group-item p-2 border-bottom hover:bg-light cursor-pointer">
-                                <h5 class="mb-1">{{$result['name']}}</h5>
-                                <p class="mb-0 text-muted">{{$result['email']}} | {{$result['phone_number']}}></p>
-                                </li>
-                                </a>
+                               
                                 @endif
                             @endforeach
                         </ul>

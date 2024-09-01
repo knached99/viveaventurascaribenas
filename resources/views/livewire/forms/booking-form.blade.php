@@ -93,6 +93,7 @@
         @if ($currentStep === 3)
             <div class="step">
                 <div class="form-btn">
+                    <button type="button" class="btn btn-primary" wire:click="previousStep">Previous</button>
                     <button class="submit-btn" wire:loading.remove type="submit">Book</button>
                 </div>
 
