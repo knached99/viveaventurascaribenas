@@ -86,7 +86,7 @@
                     <td>{{$paymentAmount}}</td>
                     <td>{{$paymentStatus}}</td>
                     <td>{{$paymentMethodCard}}</td>
-                    <td>{{$cardExpirationMonth. ','.$cardExpirationYear}}</td>
+                    <td>{{$cardExpirationMonth. '/'.$cardExpirationYear}}</td>
                     <td>{{$cardLast4}}</td>
                     <td><a href="{{$receiptLink}}" target="_blank" rel="noreferrer noopener">View Receipt</a></td>
                     <td><a href="{{route('admin.booking', ['bookingID'=>$booking->bookingID])}}">View Booking</a></td>
