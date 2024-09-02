@@ -49,7 +49,23 @@ class Admin extends Controller
 
         $bookings = BookingModel::select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id')->get();
 
-        return view('admin.dashboard', compact('storageData', 'usedStorage', 'totalStorage', 'remainingStorage', 'transactions', 'bookings'));
+        $mostPopularBooking = BookingModel::select('stripe_product_id')
+        ->selectRaw('COUNT(*) as booking_count') 
+        ->groupBy('stripe_product_id')
+        ->having('booking_count', '>', 1) //  only bookings with more than 1 entry are considered
+        ->orderByDesc('booking_count')
+        ->first();
+
+        $mostPopularTripName = null;
+
+        if($mostPopularBooking){
+            $product = $this->stripe->products->retrieve($mostPopularBooking->stripe_product_id);
+            $mostPopularTripName = $product->name;   
+        }
+
+        
+
+        return view('admin.dashboard', compact('storageData', 'usedStorage', 'totalStorage', 'remainingStorage', 'transactions', 'bookings', 'mostPopularBooking', 'mostPopularTripName'));
     }
     
     public function profilePage(){

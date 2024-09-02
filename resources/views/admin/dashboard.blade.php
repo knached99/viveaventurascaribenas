@@ -118,9 +118,13 @@
                                       </div>
                                   </div>
                               </div>
-                              <p class="mb-1">Sales</p>
-                              <h4 class="card-title mb-3">$4,679</h4>
-                              <small class="text-success fw-medium"><i class="bx bx-up-arrow-alt"></i> +28.42%</small>
+                              <p class="mb-1">Most Popular Booking</p>
+                             @if($mostPopularBooking && $mostPopularTripName)
+                            <h4>{{$mostPopularTripName}}</h4>
+                            <p>Booked {{ $mostPopularBooking->booking_count }} times</p>
+                        @endif
+
+                              {{-- <small class="text-success fw-medium"><i class="bx bx-up-arrow-alt"></i> +28.42%</small> --}}
                           </div>
                       </div>
                   </div>
