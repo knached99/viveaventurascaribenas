@@ -64,15 +64,39 @@ class Home extends Controller
 
     public function getDestinationDetails($tripID){
         $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
-        $testimonials = Testimonials::with('trip')->where('tripID', $tripID)->where('testimonial_approval_status', 'approved')->get();
+        $testimonials = Testimonials::with('trip')
+            ->where('tripID', $tripID)
+            ->where('testimonial_approval_status', 'approved')
+            ->get();
         $averageTestimonialRating = $testimonials->isNotEmpty() ? $testimonials->avg('trip_rating') : 0;
-
-        return view('/landing/destination', ['tripID'=>$tripID, 'trip'=>$trip, 'testimonials'=>$testimonials, 'averageTestimonialRating'=>$averageTestimonialRating]);
+    
+        // Retrieve the most popular booking
+        $mostPopularBooking = BookingModel::select('stripe_product_id')
+            ->selectRaw('COUNT(*) as booking_count') 
+            ->groupBy('stripe_product_id')
+            ->having('booking_count', '>', 1) // only bookings with more than 1 entry are considered
+            ->orderByDesc('booking_count')
+            ->first();
+        
+        $isMostPopular = false;
+    
+        if ($mostPopularBooking) {
+            // Retrieve the product from Stripe
+            $product = $this->stripe->products->retrieve($mostPopularBooking->stripe_product_id);
+    
+            // Check if the current trip is the most popular
+            $isMostPopular = $trip->stripe_product_id === $mostPopularBooking->stripe_product_id;
+        }
+    
+        return view('/landing/destination', [
+            'tripID' => $tripID,
+            'trip' => $trip,
+            'testimonials' => $testimonials,
+            'averageTestimonialRating' => $averageTestimonialRating,
+            'isMostPopular' => $isMostPopular
+        ]);
     }
-
-    public function aboutPage(){
-        return view('/landing/about');
-    }
+    
 
     public function destinationsPage(){
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();

@@ -20,7 +20,14 @@
                     style="background-image: url('{{ $trip->tripPhoto ? asset('storage/' . $trip->tripPhoto) : asset('assets/images/image_placeholder.jpg') }}');">
                 </div>
                 <div class="trip-details">
-                    <h2>{{ $trip->tripLocation }}</h2>
+                    <h2>{{ $trip->tripLocation }}
+                     <!-- If this is the most popular booking, then dispaly the badge here-->
+                      @if($isMostPopular)
+                        <img src="{{asset('assets/theme_assets/assets/img/mostPopularBadge.webp')}}" style="width: 100px; height: 100px;"/>
+                        @endif 
+                    </h2>
+                   
+
 
                     <!-- Average Star Rating -->
                     <div class="star-rating mb-3">
@@ -65,10 +72,14 @@
                             @endif
                         </span>
                     </div>
-                    <!-- End Average Star Rating -->
+                  
+                    
 
                     <span class="trip-price">${{ number_format($trip->tripPrice, 2) }} /person</span>
                     <p class="trip-duration">
+                      <!-- End Average Star Rating -->
+                      
+
                         {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }} Days Tour</p>
                     <p class="trip-availability">
                         @switch($trip->tripAvailability)
