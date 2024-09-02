@@ -23,7 +23,7 @@
                     <h2>{{ $trip->tripLocation }}
                      <!-- If this is the most popular booking, then dispaly the badge here-->
                       @if($isMostPopular)
-                        <img src="{{asset('assets/theme_assets/assets/img/mostPopularBadge.webp')}}" style="width: 100px; height: 100px;"/>
+                        <img src="{{asset('assets/theme_assets/assets/img/popularBadge.webp')}}" style="width: 100px; height: 100px;"/>
                         @endif 
                     </h2>
                    
