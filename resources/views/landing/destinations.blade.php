@@ -17,62 +17,9 @@
     </div>
 </section>
 
-<section class="ftco-section">
-    <div class="container">
-        <div class="row justify-content-center pb-4">
-            <div class="col-md-12 heading-section text-center ftco-animate">
-                <h2 class="mb-4">Most Popular Attractions</h2>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3 ftco-animate">
-                <div class="project-destination">
-                    <a href="#" class="img"
-                        style="background-image: url({{ asset('assets/images/place-1.jpg') }});">
-                        <div class="text">
-                            <h3>Singapore</h3>
-                            <span>8 Tours</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-3 ftco-animate">
-                <div class="project-destination">
-                    <a href="#" class="img"
-                        style="background-image: url({{ asset('assets/images/place-2.jpg') }});">
-                        <div class="text">
-                            <h3>Canada</h3>
-                            <span>2 Tours</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-3 ftco-animate">
-                <div class="project-destination">
-                    <a href="#" class="img"
-                        style="background-image: url({{ asset('assets/images/place-3.jpg') }});">
-                        <div class="text">
-                            <h3>Thailand</h3>
-                            <span>5 Tours</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-3 ftco-animate">
-                <div class="project-destination">
-                    <a href="#" class="img"
-                        style="background-image: url({{ asset('assets/images/place-4.jpg') }});">
-                        <div class="text">
-                            <h3>Autralia</h3>
-                            <span>5 Tours</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
+<!-- Most Popular Attractions -->
+<x-travelcomponents.most-popular-attractions :popularTrips="$popularTrips"/>
+<!-- / Most Popular Attractions -->
 {{-- <section class="ftco-section ftco-no-pb ftco-no-pt">
     	<div class="container">
 	    	<div class="row">

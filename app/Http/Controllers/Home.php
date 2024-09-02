@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\TripsModel;
 use App\Models\Testimonials;
 use Stripe\Stripe;
+use Stripe\Product;
+use Stripe\StripeClient;
 use App\Models\BookingModel;
 use Illuminate\Database\Eloquent\ModelNotFoundException; 
 use Illuminate\Support\Str;
@@ -17,14 +19,48 @@ class Home extends Controller
 
     public function __construct(){
          Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+         $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
     }
 
-    public function homePage(){
-        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();
-        $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
+    public function homePage()
+    {
+        // Fetch all trips
+        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->get();
         
-        return view('/landing/home', compact('trips', 'testimonials'));
+        // Fetch approved testimonials
+        $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
+    
+        // Find the top 4 most popular bookings with more than one entry
+        $mostPopularBookings = BookingModel::select('stripe_product_id')
+            ->selectRaw('COUNT(*) as booking_count')
+            ->groupBy('stripe_product_id')
+            ->having('booking_count', '>', 1) // Ensure only bookings with more than 1 entry are considered
+            ->orderByDesc('booking_count')
+            ->take(4) // Get the top 4 most popular bookings
+            ->get();
+    
+        $popularTrips = [];
+    
+        foreach ($mostPopularBookings as $booking) {
+            // Retrieve the product from Stripe using the stripe_product_id
+            $product = $this->stripe->products->retrieve($booking->stripe_product_id);
+            
+            // Fetch the trip details based on the product ID
+            $trip = TripsModel::where('stripe_product_id', $booking->stripe_product_id)->first();
+    
+            $popularTrips[] = [
+                'id' => $trip->tripID,
+                'name' => $product->name,
+                'count' => $booking->booking_count,
+                'image' => $trip ? $trip->tripPhoto : 'path/to/default-image.jpg' // Use trip photo or default image
+            ];
+        }
+    
+        return view('landing.home', compact('trips', 'testimonials', 'popularTrips'));
     }
+    
+    
 
     public function getDestinationDetails($tripID){
         $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
@@ -40,8 +76,33 @@ class Home extends Controller
 
     public function destinationsPage(){
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();
+         // Find the top 4 most popular bookings with more than one entry
+         $mostPopularBookings = BookingModel::select('stripe_product_id')
+         ->selectRaw('COUNT(*) as booking_count')
+         ->groupBy('stripe_product_id')
+         ->having('booking_count', '>', 1) // Ensure only bookings with more than 1 entry are considered
+         ->orderByDesc('booking_count')
+         ->take(4) // Get the top 4 most popular bookings
+         ->get();
+ 
+     $popularTrips = [];
+ 
+     foreach ($mostPopularBookings as $booking) {
+         // Retrieve the product from Stripe using the stripe_product_id
+         $product = $this->stripe->products->retrieve($booking->stripe_product_id);
+         
+         // Fetch the trip details based on the product ID
+         $trip = TripsModel::where('stripe_product_id', $booking->stripe_product_id)->first();
+ 
+         $popularTrips[] = [
+             'id' => $trip->tripID,
+             'name' => $product->name,
+             'count' => $booking->booking_count,
+             'image' => $trip ? $trip->tripPhoto : 'path/to/default-image.jpg' // Use trip photo or default image
+         ];
+     }
 
-        return view('/landing/destinations', compact('trips'));
+        return view('/landing/destinations', compact('trips', 'popularTrips'));
     }
 
     public function bookingPage($tripID){

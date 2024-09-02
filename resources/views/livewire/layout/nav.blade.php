@@ -38,7 +38,7 @@
                      data-bs-toggle="dropdown">
                      <div class="avatar avatar-online">
                          <img src="{{ asset('assets/theme_assets/assets/img/avatars/default_profile_pic.jpg') }}" alt
-                             class="w-px-40 h-auto rounded-circle" />
+                             class="w-px-40 h-100 w-100 rounded-circle" />
                      </div>
                  </a>
                  <ul class="dropdown-menu dropdown-menu-end">
@@ -48,7 +48,7 @@
                                  <div class="flex-shrink-0 me-3">
                                      <div class="avatar avatar-online">
                                          <img src="{{ asset('assets/theme_assetsassets/img/avatars/default_profile_pic.jpg') }}" alt
-                                             class="w-px-40 h-auto rounded-circle" />
+                                             class="w-px-40 rounded-circle h-100 w-100" />
                                      </div>
                                  </div>
                                  <div class="flex-grow-1">
