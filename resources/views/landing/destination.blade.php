@@ -171,17 +171,25 @@
 
 
             </div>
-            {{-- @if ($startDate->gte($today) && $endDate->gte($today)) --}}
+            @if($trip->tripAvailability === 'unavailable')
+             <div class="col-md-4">
+                <!-- Booking Widget -->
+                <div class="booking-widget">
+                    <h3 class="text-secondary">Trip not available to book</h3>
+            
+
+                </div>
+            </div>
+            @else 
             <div class="col-md-4">
                 <!-- Booking Widget -->
                 <div class="booking-widget">
                     <h3>Book this Trip</h3>
-                    <!-- Booking form fields go here -->
                     <a href="{{ route('booking', ['tripID' => $tripID]) }}" type="submit" class="btn">Book Now</a>
 
                 </div>
             </div>
-            {{-- @endif --}}
+            @endif
         </div>
     </div>
 </section>

@@ -1,7 +1,7 @@
 
 @php
 
-$isLandingDestination = \Route::currentRouteName() === 'landing.destination';
+$isLandingDestination = \Route::currentRouteName() === 'landing.destination' || \Route::currentRouteName() === 'booking.success' || \Route::currentRouteName() === 'booking.cancel';
 
 $linkClass = $isLandingDestination ? 'nav-link text-dark' : 'nav-link';
 
@@ -37,12 +37,12 @@ $fontSizeStyle = 'font-size: 20px;';
             <a href="{{ route('contact') }}" class="{{ $linkClass }}" style="{{ $fontSizeStyle }}">Contact</a>
         </li>
 
-        <li class="nav-item cta">
+        {{-- <li class="nav-item cta">
             <a href="{{ $isLandingDestination ? route('booking', ['tripID' => last(request()->segments())]) : route('destinations') }}"
                class="nav-link">
                Book Now
             </a>
-        </li>
+        </li> --}}
     </ul>
 </div>
 

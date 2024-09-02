@@ -99,9 +99,14 @@ class BookingForm extends Component
 
     public function bookTrip()
     {
+        
         $this->validate();
         $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
         $trip = TripsModel::findOrFail($this->tripID);
+
+        if($trip->tripAvailability === 'unavailable'){
+            return redirect('/');
+        }
     
         // Check if the customer already exists
         $existingCustomer = null;

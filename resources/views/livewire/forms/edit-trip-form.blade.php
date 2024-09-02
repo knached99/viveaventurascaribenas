@@ -95,7 +95,12 @@
 
                     <!-- Save Button -->
                     <div class="text-end m-3">
-                        <button type="submit" class="btn btn-primary mt-3 px-4 py-2 rounded-pill">Save Changes</button>
+                        <button type="submit" class="btn btn-primary mt-3 px-4 py-2 rounded-pill" wire:loading.remove>Save Changes</button>
+                          
+                          <div class="spinner-border text-primary" role="status" wire:Loading>
+                         <span class="visually-hidden">Loading...</span>
+                         </div>
+
                            @if ($success)
                     <div class="mb-4 text-success">
                         {{ $success }}

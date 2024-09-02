@@ -40,5 +40,23 @@
                 <!--/ Password Update -->
        
               </div>
+
+
+              <!-- 2FA  -->
+                <div class="col-12 col-xxl-8 order-2 order-md-3 order-xxl-2 mb-6">
+                  <div class="card">
+                    <div class="row row-bordered g-0">
+                      <div class="col-lg-8">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                        <livewire:profile.configure2fa/>
+                        </div>
+                      </div>
+                   
+                    </div>
+                  </div>
+                </div>
+                <!--/ 2FA -->
+       
+              </div>
         
   </x-authenticated-theme-layout>

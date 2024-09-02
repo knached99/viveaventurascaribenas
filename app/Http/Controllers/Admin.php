@@ -21,6 +21,7 @@ class Admin extends Controller
     public function __construct(){
         Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
          $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+    
 
     }
     
