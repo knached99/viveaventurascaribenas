@@ -210,7 +210,7 @@
 <!-- / Most Popular Attractions -->
 
 <!-- Available Bookings Component -->
-<x-travelcomponents.available-bookings :trips="$trips"/>
+<x-travelcomponents.available-bookings :trips="$trips" :mostPopularTripIds="$mostPopularTripIds"/>
 <!-- End Available Bookings Component -->
 
 

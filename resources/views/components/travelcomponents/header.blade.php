@@ -451,6 +451,99 @@
         }
     </style>
 
+    <!-- Booking Cards -->
+    <style>
+    .project-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-wrap:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.project-wrap .img {
+    position: relative;
+    display: block;
+    height: 250px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px 8px 0 0;
+    transition: opacity 0.3s ease;
+}
+
+.project-wrap .text {
+    background: white;
+    padding: 20px;
+    border-radius: 0 0 8px 8px;
+}
+
+.project-wrap .text .price {
+    font-size: 20px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.project-wrap .text .days {
+    display: block;
+    margin-bottom: 10px;
+    color: #888;
+    font-size: 18px;
+}
+
+.project-wrap .text h3 {
+    margin-bottom: 15px;
+}
+
+.project-wrap .text h3 a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.project-wrap .text h3 a:hover {
+    color: #007bff;
+}
+
+.project-wrap .text ul {
+    list-style: none;
+    padding: 0;
+}
+
+.project-wrap .text ul li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.project-wrap .text ul li img {
+    margin-right: 10px;
+}
+
+.popular-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    border-radius: 50%;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.popular-badge img {
+    width: 80px;
+    height: auto;
+}
+
+    </style>
+
     @if (\Route::currentRouteName() === 'landing.destination')
         <style>
             .testimonials-slider .card {

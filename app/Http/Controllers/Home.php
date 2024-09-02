@@ -41,6 +41,7 @@ class Home extends Controller
             ->get();
     
         $popularTrips = [];
+        $mostPopularTripIds = [];
     
         foreach ($mostPopularBookings as $booking) {
             // Retrieve the product from Stripe using the stripe_product_id
@@ -48,16 +49,24 @@ class Home extends Controller
             
             // Fetch the trip details based on the product ID
             $trip = TripsModel::where('stripe_product_id', $booking->stripe_product_id)->first();
-    
-            $popularTrips[] = [
-                'id' => $trip->tripID,
-                'name' => $product->name,
-                'count' => $booking->booking_count,
-                'image' => $trip ? $trip->tripPhoto : 'path/to/default-image.jpg' // Use trip photo or default image
-            ];
+            
+            if ($trip) {
+                $popularTrips[] = [
+                    'id' => $trip->tripID,
+                    'name' => $product->name,
+                    'count' => $booking->booking_count,
+                    'image' => $trip->tripPhoto, // Use trip photo or default image
+                ];
+                $mostPopularTripIds[] = $trip->tripID; // Collect trip IDs directly
+            }
         }
     
-        return view('landing.home', compact('trips', 'testimonials', 'popularTrips'));
+        return view('landing.home', [
+            'trips' => $trips,
+            'testimonials' => $testimonials,
+            'popularTrips' => $popularTrips,
+            'mostPopularTripIds' => $mostPopularTripIds
+        ]);
     }
     
     
