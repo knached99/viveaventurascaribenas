@@ -108,34 +108,44 @@ class Home extends Controller
     
 
     public function destinationsPage(){
-        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice')->get();
-         // Find the top 4 most popular bookings with more than one entry
-         $mostPopularBookings = BookingModel::select('stripe_product_id')
-         ->selectRaw('COUNT(*) as booking_count')
-         ->groupBy('stripe_product_id')
-         ->having('booking_count', '>', 1) // Ensure only bookings with more than 1 entry are considered
-         ->orderByDesc('booking_count')
-         ->take(4) // Get the top 4 most popular bookings
-         ->get();
- 
-     $popularTrips = [];
- 
-     foreach ($mostPopularBookings as $booking) {
-         // Retrieve the product from Stripe using the stripe_product_id
-         $product = $this->stripe->products->retrieve($booking->stripe_product_id);
-         
-         // Fetch the trip details based on the product ID
-         $trip = TripsModel::where('stripe_product_id', $booking->stripe_product_id)->first();
- 
-         $popularTrips[] = [
-             'id' => $trip->tripID,
-             'name' => $product->name,
-             'count' => $booking->booking_count,
-             'image' => $trip ? $trip->tripPhoto : 'path/to/default-image.jpg' // Use trip photo or default image
-         ];
-     }
+       // Fetch all trips
+       $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->get();
+        
+       // Fetch approved testimonials
+       $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
+   
+       // Find the top 4 most popular bookings with more than one entry
+       $mostPopularBookings = BookingModel::select('stripe_product_id')
+           ->selectRaw('COUNT(*) as booking_count')
+           ->groupBy('stripe_product_id')
+           ->having('booking_count', '>', 1) // Ensure only bookings with more than 1 entry are considered
+           ->orderByDesc('booking_count')
+           ->take(4) // Get the top 4 most popular bookings
+           ->get();
+   
+       $popularTrips = [];
+       $mostPopularTripIds = [];
+   
+       foreach ($mostPopularBookings as $booking) {
+           // Retrieve the product from Stripe using the stripe_product_id
+           $product = $this->stripe->products->retrieve($booking->stripe_product_id);
+           
+           // Fetch the trip details based on the product ID
+           $trip = TripsModel::where('stripe_product_id', $booking->stripe_product_id)->first();
+           
+           if ($trip) {
+               $popularTrips[] = [
+                   'id' => $trip->tripID,
+                   'name' => $product->name,
+                   'count' => $booking->booking_count,
+                   'image' => $trip->tripPhoto, // Use trip photo or default image
+               ];
+               $mostPopularTripIds[] = $trip->tripID; // Collect trip IDs directly
+           }
+       }
 
-        return view('/landing/destinations', compact('trips', 'popularTrips'));
+        return view('/landing/destinations', compact('trips', 'popularTrips', 'mostPopularTripIds'));
+        
     }
 
     public function bookingPage($tripID){

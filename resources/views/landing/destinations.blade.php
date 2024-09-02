@@ -96,5 +96,5 @@
     </section> --}}
 
 
-<x-travelcomponents.available-bookings :trips="$trips"/>
+<x-travelcomponents.available-bookings :trips="$trips" :mostPopularTripIds="$mostPopularTripIds"/>
 <x-travelcomponents.footer />
