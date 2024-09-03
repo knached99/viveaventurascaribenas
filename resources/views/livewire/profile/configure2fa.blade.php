@@ -16,7 +16,18 @@
     <form method="POST" action="/user/two-factor-authentication">
         @csrf
 
-        @if (auth()->user()->two_factor_enabled)
+        @if (auth()->user()->two_factor_confirmed_at)
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">
+                {{ __('disable two-step verification') }}
+            </button>
+        @else
+            <button type="submit" class="btn btn-primary">
+                {{ __('enable two-step verification') }}
+            </button>
+        @endif
+
+        {{-- @if (auth()->user()->two_factor_enabled)
             <!-- Disable 2FA -->
             @method('DELETE')
             <button type="submit" class="btn btn-danger">
@@ -26,7 +37,7 @@
             <button type="submit" class="btn btn-primary">
                 {{ __('Enable Two-Factor Authentication') }}
             </button>
-        @endif
+        @endif --}}
     </form>
 
     @if (session('status') == 'two-factor-authentication-enabled')

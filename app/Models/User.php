@@ -46,4 +46,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function verifyTwoFactor($code)
+{
+    return $this->twoFactorVerify($code);
+}
+
 }
