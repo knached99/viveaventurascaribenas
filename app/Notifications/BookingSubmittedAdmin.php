@@ -14,9 +14,10 @@ class BookingSubmittedAdmin extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(string $name, string $bookingID)
     {
-        //
+        $this->name = $name;
+        $this->bookingID = $bookingID;
     }
 
     /**
@@ -35,9 +36,14 @@ class BookingSubmittedAdmin extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+         
+                    ->subject($this->name. ' Has booked a trip!')
+                    ->greeting('Hey Pablo!')
+                    ->line('You can view the booking details by clicking on the link below')
+                    ->action('View booking', url('/admin/'.$this->bookingID.'/booking'))
+                    ->line('Have a great day!');
+
+                   
     }
 
     /**

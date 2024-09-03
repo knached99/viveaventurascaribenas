@@ -11,7 +11,9 @@ use Stripe\StripeClient;
 use App\Models\BookingModel;
 use Illuminate\Database\Eloquent\ModelNotFoundException; 
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\BookingSubmittedAdmin;
+use App\Notifications\BookingSubmittedCustomer;
 
 class Home extends Controller
 {
@@ -20,6 +22,7 @@ class Home extends Controller
     public function __construct(){
          Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
          $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+         $this->bookingID = STR::uuid();
 
     }
 
@@ -161,36 +164,39 @@ class Home extends Controller
         return redirect('/');
         }
     }
-
     public function bookingSuccess(Request $request)
     {
         $tripID = $request->query('tripID');
         $sessionID = $request->query('session_id');
     
-        // Retrieve the Stripe session using the session ID
-        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
-        $session = $stripe->checkout->sessions->retrieve($sessionID);
-    
-        if (!$tripID || !$sessionID) {
-            abort(404);
+        // Validate tripID and sessionID
+        if (empty($tripID) || empty($sessionID)) {
+            abort(404, 'Trip ID or Session ID is missing.');
         }
     
-        // Check if the session exists and has the correct payment status
-        if ($session && $session->payment_status == 'paid') {
-            // Check if a booking already exists with the same stripe_checkout_id
-            $existingBooking = BookingModel::where('stripe_checkout_id', $session->id)->first();
-            
-            if ($existingBooking) {
-                return redirect()->route('booking.cancel', ['tripID' => $tripID])
-                                 ->with('message', 'Booking already completed.');
-            }
+        // Initialize Stripe client
+        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
     
-            try {
+        try {
+            // Retrieve the Stripe session using the session ID
+            $session = $stripe->checkout->sessions->retrieve($sessionID);
+    
+            // Check if the session exists and has the correct payment status
+            if ($session && $session->payment_status == 'paid') {
+                // Check if a booking already exists with the same stripe_checkout_id
+                $existingBooking = BookingModel::where('stripe_checkout_id', $session->id)->first();
+    
+                if ($existingBooking) {
+                    return redirect()->route('booking.cancel', ['tripID' => $tripID])
+                                     ->with('message', 'Booking already completed.');
+                }
+    
+                // Create a new booking record
                 BookingModel::create([
-                    'bookingID' => STR::uuid(),
+                    'bookingID' => $this->bookingID,
                     'tripID' => $session->metadata->tripID ?? null,
                     'name' => $session->metadata->name ?? 'N/A',
-                    'email' => $session->email ?? 'N/A',
+                    'email' => $session->metadata->email ?? 'N/A',
                     'phone_number' => $session->metadata->phone_number ?? 'N/A',
                     'address_line_1' => $session->metadata->address_line_1 ?? 'N/A',
                     'address_line_2' => $session->metadata->address_line_2 ?? '',
@@ -201,21 +207,44 @@ class Home extends Controller
                     'stripe_product_id' => $session->metadata->stripe_product_id ?? null,
                 ]);
     
+                // Retrieve charges and receipt link
+                $receiptLink = null;
+                if (!empty($session->payment_intent)) {
+                    $charges = $stripe->charges->all(['payment_intent' => $session->payment_intent]);
+    
+                    if (!empty($charges->data) && count($charges->data) > 0) {
+                        $receiptLink = $charges->data[0]->receipt_url;
+                    }
+                }
+    
+                // Retrieve the Stripe product
+                if (!empty($session->metadata->stripe_product_id)) {
+                    $product = $stripe->products->retrieve($session->metadata->stripe_product_id);
+                }
+    
+                // Send notifications
+                Notification::route('mail', config('mail.mailers.smtp.to_email'))
+                    ->notify(new BookingSubmittedAdmin($session->metadata->name, $this->bookingID));
+    
+                Notification::route('mail', $session->metadata->email)
+                    ->notify(new BookingSubmittedCustomer($session->metadata->name, $this->bookingID, $receiptLink));
+    
                 // Pass the metadata to the view
                 return view('booking.success', [
                     'customerName' => $session->metadata->name,
                     'customerEmail' => $session->metadata->email,
                     'tripID' => $tripID,
                 ]);
-            } catch (\Exception $e) {
-                \Log::error('Uncaught database or stripe exception in class: ' . __CLASS__ . ' On line: ' . __LINE__ . ' Error Message: ' . $e->getMessage());
-                abort(500);
+            } else {
+                // Handle the case where the payment was not successful or the session is invalid
+                return redirect()->route('booking.cancel', ['tripID' => $tripID]);
             }
-        } else {
-            // Handle the case where the payment was not successful or the session is invalid
-            return redirect()->route('booking.cancel', ['tripID' => $tripID]);
+        } catch (\Exception $e) {
+            \Log::error('Uncaught database or stripe exception in class: ' . __CLASS__ . ' On line: ' . __LINE__ . ' Error Message: ' . $e->getMessage());
+            abort(500, 'An error occurred while processing your booking.');
         }
     }
+    
     
     
     

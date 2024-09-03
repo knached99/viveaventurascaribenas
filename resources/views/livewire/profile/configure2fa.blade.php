@@ -5,7 +5,7 @@
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
-            {{ __('Enable or disable two-factor authentication to add an extra layer of security to your account.') }}
+            {{ __('Two-Step Verification adds an extra layer of security to your account.') }}
         </p>
     </header>
 

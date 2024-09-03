@@ -11,7 +11,7 @@
                     <div class="project-destination">
                         <a href="{{ url('/landing/destination/' . $trip['id']) }}" class="img" style="background-image: url({{ asset('storage/' . $trip['image']) }});">
                             <div class="text">
-                                <h3>{{ $trip['name'] }}</h3>
+                                <h3 style="font-weight: 900; color: #f8fafc;">{{ $trip['name'] }}</h3>
                                 <span>{{ $trip['count'] }} bookings</span>
                             </div>
                         </a>

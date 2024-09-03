@@ -7,6 +7,7 @@ use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use App\Models\TripsModel;
 
+
 class BookingForm extends Component
 {
     public $currentStep = 1;

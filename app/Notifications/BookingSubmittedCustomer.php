@@ -14,9 +14,11 @@ class BookingSubmittedCustomer extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(string $name, string $bookingID, string $receiptLink)
     {
-        //
+        $this->name = $name;
+        $this->bookingID = $bookingID;
+        $this->receiptLInk = $receiptLink;
     }
 
     /**
@@ -27,6 +29,7 @@ class BookingSubmittedCustomer extends Notification
     public function via(object $notifiable): array
     {
         return ['mail'];
+        
     }
 
     /**
@@ -35,9 +38,13 @@ class BookingSubmittedCustomer extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+        
+        ->subject('Booking Confirmation: '.$this->bookingID)
+        ->greeting('Hey '.$this->name. ' This is your booking confirmation email!')
+        ->line('Click on the link below to view your receipt')
+        ->action('Notification Action', url('/'))
+        ->line('Thank you for using our application!');
+                  
     }
 
     /**
