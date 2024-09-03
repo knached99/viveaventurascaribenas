@@ -18,7 +18,7 @@ class BookingSubmittedCustomer extends Notification
     {
         $this->name = $name;
         $this->bookingID = $bookingID;
-        $this->receiptLInk = $receiptLink;
+        $this->receiptLink = $receiptLink;
     }
 
     /**
@@ -42,8 +42,8 @@ class BookingSubmittedCustomer extends Notification
         ->subject('Booking Confirmation: '.$this->bookingID)
         ->greeting('Hey '.$this->name. ' This is your booking confirmation email!')
         ->line('Click on the link below to view your receipt')
-        ->action('Notification Action', url('/'))
-        ->line('Thank you for using our application!');
+        ->action('View Receipt', $this->receiptLink)
+        ->line('Thank you for using '.config('app.name').'!');
                   
     }
 

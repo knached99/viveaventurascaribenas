@@ -150,6 +150,7 @@ class BookingForm extends Component
             'cancel_url' => route('booking.cancel', [
                 'tripID' => $this->tripID,
                 'name' => $this->name,
+                'email'=>$this->email,
                 'phone_number' => $this->phone_number,
                 'address_line_1' => $this->address_line_1,
                 'address_line_2' => $this->address_line_2,
@@ -160,6 +161,7 @@ class BookingForm extends Component
             'metadata' => [
                 'tripID' => $this->tripID,
                 'name' => $this->name,
+                'email'=>$this->email,
                 'phone_number' => $this->phone_number,
                 'address_line_1' => $this->address_line_1,
                 'address_line_2' => $this->address_line_2,

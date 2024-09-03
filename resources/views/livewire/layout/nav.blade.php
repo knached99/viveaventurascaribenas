@@ -25,12 +25,12 @@
 
      <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
          <!-- Search Livewire Component -->
-         <livewire:forms.search lazy/>
+         <livewire:forms.search lazy />
 
          <!-- /Search Livewire Component -->
 
          <ul class="navbar-nav flex-row align-items-center ms-auto">
-           
+
 
              <!-- User -->
              <li class="nav-item navbar-dropdown dropdown-user dropdown">
@@ -47,8 +47,8 @@
                              <div class="d-flex">
                                  <div class="flex-shrink-0 me-3">
                                      <div class="avatar avatar-online">
-                                         <img src="{{ asset('assets/theme_assetsassets/img/avatars/default_profile_pic.jpg') }}" alt
-                                             class="w-px-40 rounded-circle h-100 w-100" />
+                                         <img src="{{ asset('assets/theme_assets/assets/img/avatars/default_profile_pic.jpg') }}"
+                                             alt class="w-px-40 rounded-circle h-100 w-100" />
                                      </div>
                                  </div>
                                  <div class="flex-grow-1">

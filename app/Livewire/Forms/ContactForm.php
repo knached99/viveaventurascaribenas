@@ -10,7 +10,8 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ContactNotification;
-use App\Mail\ContactFormSubmitted;
+// use App\Mail\ContactFormSubmitted;
+
 use Exception;
 
 class ContactForm extends Component
@@ -60,7 +61,7 @@ class ContactForm extends Component
 
             $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com';
 
-            $notificationClass = ContactFormSubmitted::class;
+            $notificationClass = ContactNotification::class;
 
             $this->sendNotification($data, $recipientEmail, $notificationClass);
 
@@ -78,7 +79,8 @@ class ContactForm extends Component
 
     public function sendNotification(array $data, string $recipientEmail, string $notificationClass): void 
     {
-        Mail::to($recipientEmail)->send(new $notificationClass($data));
+        Notification::route('mail', $recipientEmail)->notify(new $notificationClass($data));
+        // Mail::to($recipientEmail)->send(new $notificationClass($data));
     }
 
     public function resetForm(): void 

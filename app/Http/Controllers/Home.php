@@ -275,6 +275,9 @@ class Home extends Controller
     
     
 
+    public function aboutPage(){
+        return view('/landing/about');
+    }
 
     public function galleryPage(){
         return view('/landing/gallery');

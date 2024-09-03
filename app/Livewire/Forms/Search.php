@@ -40,7 +40,8 @@ class Search extends Component
                 ->get()
                 ->toArray();
 
-        $bookingResults = BookingModel::where('name', 'LIKE', "%{$this->searchQuery}%")
+        $bookingResults = BookingModel::where('bookingID', 'LIKE', "%{$this->searchQuery}%")
+        ->orWhere('name', 'LIKE', "%{$this->searchQuery}%")
         ->orWhere('email', 'LIKE', "%{$this->searchQuery}%")
         ->orWhere('phone_number', 'LIKE', "%{$this->searchQuery}%")
         ->orWhere('address_line_1', 'LIKE', "%{$this->searchQuery}%")

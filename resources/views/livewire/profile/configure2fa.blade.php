@@ -7,12 +7,15 @@
         <p class="mt-1 text-sm text-gray-600">
             {{ __('Two-Step Verification adds an extra layer of security to your account.') }}
         </p>
+
+        <p class="mt-2 text-md text-indigo-600 font-semibold">
+            {{ __('In development. Feature not yet fully functional') }}
     </header>
 
     <!-- Enable 2FA -->
     <form method="POST" action="/user/two-factor-authentication">
         @csrf
-        
+
         @if (auth()->user()->two_factor_enabled)
             <!-- Disable 2FA -->
             @method('DELETE')
@@ -51,7 +54,8 @@
                 @csrf
                 <div>
                     <x-input-label for="code" :value="__('Code')" />
-                    <x-text-input id="code" name="code" type="text" class="mt-1 block w-full" autofocus autocomplete="one-time-code" />
+                    <x-text-input id="code" name="code" type="text" class="mt-1 block w-full" autofocus
+                        autocomplete="one-time-code" />
                     <x-input-error :messages="$errors->get('code')" class="mt-2" />
                 </div>
                 <div class="flex items-center gap-4 mt-4">

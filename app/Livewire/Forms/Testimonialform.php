@@ -5,13 +5,16 @@ namespace App\Livewire\Forms;
 use Carbon\Carbon;
 use App\Models\Testimonials;
 use App\Models\TripsModel;
+use App\Models\BookingModel;
 use Spatie\Honeypot\Http\Livewire\Concerns\UsesSpamProtection;
 use Spatie\Honeypot\Http\Livewire\Concerns\HoneypotData;
-use App\Mail\TestimonialSubmitted;
+// use App\Mail\TestimonialSubmitted;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
-use Illuminate\Support\Facades\Mail;
+// use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\TestimonialSubmitted;
 use Exception;
 
 class TestimonialForm extends Component 
@@ -29,7 +32,7 @@ class TestimonialForm extends Component
     #[Validate('required|string')]
     public string $name = '';
 
-    #[Validate('nullable|string|email')]
+    #[Validate('required|string|email')]
     public string $email = '';
 
     #[Validate('required|uuid')]
@@ -68,7 +71,23 @@ class TestimonialForm extends Component
 
         $this->protectAgainstSpam();
 
+        
+
+        // Prevent testimonial submissions unless the user is a legit customer 
+
+       
+
         try {
+
+            $booking = BookingModel::where('email', $this->email)->first();
+            \Log::info('Booking: ' . ($booking ? 'Found' : 'Not Found'));
+
+            if(empty($booking)){
+                $this->error = 'You cannot submit a testimonial if you have not booked a trip with us';
+                return; // Kills PHP script to prevent form submission 
+            }
+
+
             $data = [
                 'testimonialID' => $this->testimonialID,
                 'name' => $this->name,
@@ -101,7 +120,8 @@ class TestimonialForm extends Component
 
     public function sendNotification(array $data, string $recipientEmail, string $notificationClass): void 
     {
-        Mail::to($recipientEmail)->send(new $notificationClass($data));
+        Notification::route('mail', $recipientEmail)->notify(new $notificationClass($data));
+        // Mail::to($recipientEmail)->send(new $notificationClass($data));
     }
 
     public function resetForm(): void 

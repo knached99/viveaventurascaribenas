@@ -7,15 +7,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ContactNotification extends Notification
+class TestimonialSubmitted extends Notification
 {
     use Queueable;
 
-
+    /**
+     * Create a new notification instance.
+     */
     public function __construct(array $data)
     {
-        $this->data = $data;
+       $this->data = $data;
     }
+
     /**
      * Get the notification's delivery channels.
      *
@@ -29,19 +32,18 @@ class ContactNotification extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail($notifiable)
+    public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject($this->data['subject'])
-            ->greeting('Hey Pablo, '.$this->data['name']. ' has contacted you')
-            ->from($this->data['email'], $this->data['name'])
-            ->line($this->data['message'])
-            ->line('This contact is expecting a response from you within 24-48 hours.')
-            ->line('You can reply to them by')
-            ->line("[Clicking Here](mailto:{$this->data['email']})");
-
+     
+                    ->subject($this->data['name']. ' Submitted a testimonial!')
+                    ->greeting('Hey Pablo, a customer has submitted a testimonial regarding their experience with you!')
+                    ->line('If you\'d like to respond to the user, you can ')
+                    ->line("[click here to email them](mailto:{$this->data['email']})")
+                    ->action('View Testimonial', url('/admin/testimonial/'.$this->data['testimonialID'].''))
+                    ->line('You can then approve, deny, or delete the testimonial');
     }
-    
+
     /**
      * Get the array representation of the notification.
      *
