@@ -22,6 +22,28 @@ Route::get('/contact', [Home::class, 'contactPage'])->name('contact');
 Route::get('/booking/{tripID}', [Home::class, 'bookingPage'])->name('booking');
 Route::get('/success', [Home::class, 'bookingSuccess'])->name('booking.success');
 Route::get('/booking/{tripID}/cancel', [Home::class, 'bookingCancel'])->name('booking.cancel');
+
+// 2FA Challenge 
+
+Route::get('/two-factor-challenge', function(){
+    return view('auth.two-factor-challenge'); 
+})->name('two-factor.challenge');
+
+Route::post('/two-factor-challenge', function(Request $request){
+    $user = Auth::loginUsingId(session('login.id'));
+
+    if(!$user->verifyTwoFactorCode($request->code)){
+        throw ValidationException::withMessages([
+            'code' => __('The provided two-factor authentication code was invalid.'),
+        ]);
+    }
+
+    Auth::login($user, session('login.remember'));
+
+    return redirect()->intended();
+})->name('two-factor.verify');
+
+
 // Protected Routes 
 Route::group(['middleware' => 'auth', 'verified'], function () {
     Route::get('/admin/dashboard', [Admin::class, 'dashboardPage'])->name('admin.dashboard');

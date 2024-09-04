@@ -13,7 +13,7 @@
 
 
                 <!-- Autocomplete Results Container -->
-                <div class="autocomplete-results position-absolute top-100 start-0 w-100 bg-white rounded shadow-lg mt-1 max-height-200 overflow-scroll"
+                <div class="autocomplete-results position-absolute top-100 start-0 w-100 bg-white rounded shadow-lg mt-1 max-height-200 overflow-auto"
                     style="width: 100%;">
                     @if (!empty($searchResults))
                         <ul class="list-group m-0 p-0">
