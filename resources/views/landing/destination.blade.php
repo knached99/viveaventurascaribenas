@@ -21,12 +21,13 @@
                 </div>
                 <div class="trip-details">
                     <h2>{{ $trip->tripLocation }}
-                     <!-- If this is the most popular booking, then dispaly the badge here-->
-                      @if($isMostPopular)
-                        <img src="{{asset('assets/theme_assets/assets/img/popularBadge.webp')}}" style="width: 100px; height: 100px;"/>
-                        @endif 
+                        <!-- If this is the most popular booking, then dispaly the badge here-->
+                        @if ($isMostPopular)
+                            <img src="{{ asset('assets/theme_assets/assets/img/popularBadge.webp') }}"
+                                style="width: 100px; height: 100px;" />
+                        @endif
                     </h2>
-                   
+
 
 
                     <!-- Average Star Rating -->
@@ -66,21 +67,24 @@
 
                         <!-- Display the average rating -->
                         <span class="text-muted">({{ number_format($averageTestimonialRating, 1) }} / 5.0)</span>
-                        <span class="inline-block m-3">
+                        <span class="mt-3 block">
+                            <br />
                             @if ($testimonials->isEmpty())
-                                (This trip has not yet been rated)
+                                Be among the first to experience this trip and share your review! Your feedback will
+                                help others discover this amazing adventure.
                             @endif
                         </span>
                     </div>
-                  
-                    
+
+
 
                     <span class="trip-price">${{ number_format($trip->tripPrice, 2) }} /person</span>
                     <p class="trip-duration">
-                      <!-- End Average Star Rating -->
-                      
+                        <!-- End Average Star Rating -->
 
-                        {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }} Days Tour</p>
+
+                        {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }} Days Tour
+                    </p>
                     <p class="trip-availability">
                         @switch($trip->tripAvailability)
                             @case('available')
@@ -89,6 +93,13 @@
 
                             @case('coming soon')
                                 <span class="warning-badge">{{ $trip->tripAvailability }}</span>
+                                <!-- Add a disclaimer -->
+                                <br />
+                                <span class="text-gray-800 mt-3" style="font-style: italic; ">This trip will be available soon!
+                                    Once
+                                    we have enough travelers,
+                                    dates will be released. Let us know your preferred month to travel, and we’ll do our best to
+                                    accommodate.</span>
                             @break
 
                             @case('unavailable')
@@ -129,7 +140,18 @@
                             @break
                         @endswitch
                     </ul>
+
+                    <!-- No refunds disclaimer -->
+                    <div class="mt-4 text-lg text-gray-800" style="font-weight: bold;">
+                        <p>
+                            Please note that due to the time-sensitive nature and significant costs involved in
+                            organizing our trips, we are unable to offer refunds once the booking is confirmed. We
+                            deeply value your understanding and appreciate your support in helping us maintain the
+                            high-quality experiences we strive to provide.
+                        </p>
+                    </div>
                 </div>
+
 
                 <!-- Activities Section -->
                 <div class="border-bottom-1 border-secondary"> </div>
@@ -182,24 +204,25 @@
 
 
             </div>
-            @if($trip->tripAvailability === 'unavailable')
-             <div class="col-md-4">
-                <!-- Booking Widget -->
-                <div class="booking-widget">
-                    <h3 class="text-secondary">Trip not available to book</h3>
-            
+            @if ($trip->tripAvailability === 'unavailable')
+                <div class="col-md-4">
+                    <!-- Booking Widget -->
+                    <div class="booking-widget">
+                        <h3 class="text-secondary">Trip not available to book</h3>
 
-                </div>
-            </div>
-            @else 
-            <div class="col-md-4">
-                <!-- Booking Widget -->
-                <div class="booking-widget">
-                    <h3>Book this Trip</h3>
-                    <a href="{{ route('booking', ['tripID' => $tripID]) }}" type="submit" class="btn">Book Now</a>
 
+                    </div>
                 </div>
-            </div>
+            @else
+                <div class="col-md-4">
+                    <!-- Booking Widget -->
+                    <div class="booking-widget">
+                        <h3>Book this Trip</h3>
+                        <a href="{{ route('booking', ['tripID' => $tripID]) }}" type="submit" class="btn">Book
+                            Now</a>
+
+                    </div>
+                </div>
             @endif
         </div>
     </div>

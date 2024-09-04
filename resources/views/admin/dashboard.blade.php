@@ -93,7 +93,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="mb-1">Profit</p>
+                            <p class="mb-1">Gross Profit</p>
                             <h4 class="card-title mb-3">${{ $formattedTotalAmount }}</h4>
                             <small class="text-success fw-medium"><i class="bx bx-up-arrow-alt"></i> +72.80%</small>
                         </div>

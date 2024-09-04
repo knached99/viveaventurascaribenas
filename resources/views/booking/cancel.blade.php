@@ -18,6 +18,7 @@
 
                         Best regards,
                         <b>{{ config('app.name') }}</b>
+                        <a href="{{ route('contact') }}" style="text-decoration: underline;">Contact us</a>
                     @else
                         You have already booked the trip! Please check your email for more details.
                     @endif

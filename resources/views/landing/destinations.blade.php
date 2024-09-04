@@ -18,7 +18,10 @@
 </section>
 
 <!-- Most Popular Attractions -->
-<x-travelcomponents.most-popular-attractions :popularTrips="$popularTrips"/>
+@if (!empty($popularTrips))
+    <x-travelcomponents.most-popular-attractions :popularTrips="$popularTrips" />
+@else
+@endif
 <!-- / Most Popular Attractions -->
 {{-- <section class="ftco-section ftco-no-pb ftco-no-pt">
     	<div class="container">
@@ -95,6 +98,8 @@
 	    </div>
     </section> --}}
 
-
-<x-travelcomponents.available-bookings :trips="$trips" :mostPopularTripIds="$mostPopularTripIds"/>
+@if (!empty($trips) || !empty($mostPopularTripIds))
+    <x-travelcomponents.available-bookings :trips="$trips" :mostPopularTripIds="$mostPopularTripIds" />
+@else
+@endif
 <x-travelcomponents.footer />

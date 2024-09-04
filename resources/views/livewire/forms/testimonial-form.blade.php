@@ -27,7 +27,7 @@
                                 <div class="form-group">
                                     <input type="text" wire:model="name" name="name"
                                         class="form-control {{ $errors->has('name') ? 'border border-danger' : '' }}"
-                                        placeholder="Full Name">
+                                        placeholder="First Name">
                                     @error('name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror

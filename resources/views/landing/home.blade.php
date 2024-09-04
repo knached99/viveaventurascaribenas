@@ -110,7 +110,7 @@
                     beautiful destinations in the Caribbean and beyond.
                     Our mission is to provide you with unforgettable travel experiences at prices that won’t break the
                     bank.</p>
-                <p><a href="{{route('destinations')}}" class="btn btn-primary py-3 px-4">Book a Travel</a></p>
+                <p><a href="{{ route('destinations') }}" class="btn btn-primary py-3 px-4">Book a Travel</a></p>
             </div>
             <div class="col-md-6">
                 <div class="row">
@@ -206,19 +206,27 @@
 
 
 <!-- Most Popular Attractions -->
-<x-travelcomponents.most-popular-attractions :popularTrips="$popularTrips"/>
+@if (!empty($popularTrips))
+    <x-travelcomponents.most-popular-attractions :popularTrips="$popularTrips" />
+@else
+@endif
 <!-- / Most Popular Attractions -->
 
 <!-- Available Bookings Component -->
-<x-travelcomponents.available-bookings :trips="$trips" :mostPopularTripIds="$mostPopularTripIds"/>
+@if (!empty($trips) || !empty($mostPopularTripIds))
+    <x-travelcomponents.available-bookings :trips="$trips" :mostPopularTripIds="$mostPopularTripIds" />
+@else
+@endif
 <!-- End Available Bookings Component -->
 
 
 <!-- Start Testimonials -->
-<!-- End Testimonials -->
-@if ($testimonials)
+@if (!empty($testimonials))
     <x-travelcomponents.testimonials :testimonials="$testimonials" />
+@else
 @endif
+<!-- End Testimonials -->
+
 <livewire:forms.testimonial-form />
 <!-- Testimonial Submission -->
 <x-travelcomponents.footer />
