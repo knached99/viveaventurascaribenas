@@ -54,6 +54,9 @@ class Search extends Component
         ->toArray();
 
             $this->searchResults = array_merge($tripsResults, $testimonialsResults, $bookingResults);
+
+
+
         } catch (Exception $e) {
             $this->searchError = 'Unable to perform search';
             \Log::error('Search Error Occurred on line: ' . __LINE__ . ' in file: ' . __FILE__ . ' in function: ' . __FUNCTION__ . ' Error Message: ' . $e->getMessage());
