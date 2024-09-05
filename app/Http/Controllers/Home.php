@@ -9,12 +9,12 @@ use Stripe\Stripe;
 use Stripe\Product;
 use Stripe\StripeClient;
 use App\Models\BookingModel;
+use App\Models\Reservations;
 use Illuminate\Database\Eloquent\ModelNotFoundException; 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\BookingSubmittedAdmin;
 use App\Notifications\BookingSubmittedCustomer;
-
 class Home extends Controller
 {
 
@@ -22,7 +22,7 @@ class Home extends Controller
     public function __construct(){
          Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
          $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-         $this->bookingID = STR::uuid();
+         $this->bookingID = Str::uuid();
 
     }
 
@@ -271,6 +271,13 @@ class Home extends Controller
             'email' => $session && $session->customer_email,
             'stripe_session_id' => $session && $session->id ,
         ]);
+    }
+
+    public function reservationConfirmed($reservationID){
+        $reservation = Reservations::find($reservationID);
+        $customerName = $reservation->name;
+        $customerEmail = $reservation->email;
+        return view('reservation-confirmed', ['reservationID'=>$reservationID, 'customerName' => $customerName, 'customerEmail' => $customerEmail]);
     }
     
     

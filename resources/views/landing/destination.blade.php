@@ -217,9 +217,9 @@
                 <div class="col-md-4">
                     <!-- Booking Widget -->
                     <div class="booking-widget">
-                        <h3>Book this Trip</h3>
-                        <a href="{{ route('booking', ['tripID' => $tripID]) }}" type="submit" class="btn">Book
-                            Now</a>
+                        <h3>{{$trip->tripAvailability === 'coming soon' ? 'Reserve this Trip' : 'Book this Trip'}}</h3>
+                        <a href="{{ route('booking', ['tripID' => $tripID]) }}" type="submit" class="btn">{{$trip->tripAvailability === 'coming soon' ? 'Reserve Now' : 'Book
+                            Now'}}</a>
 
                     </div>
                 </div>

@@ -6,7 +6,11 @@ use Livewire\Component;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use App\Models\TripsModel;
-
+use App\Models\Reservations; 
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\BookingReservedCustomer;
+use App\Notifications\BookingReservedAdmin;
+use Illuminate\Support\Str;
 
 class BookingForm extends Component
 {
@@ -100,16 +104,53 @@ class BookingForm extends Component
 
     public function bookTrip()
     {
-        
         $this->validate();
         $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
         $trip = TripsModel::findOrFail($this->tripID);
-
-        if($trip->tripAvailability === 'unavailable'){
+        $reservationID = Str::uuid();
+    
+        // If trip is unavailable, redirect
+        if ($trip->tripAvailability === 'unavailable') {
             return redirect('/');
         }
     
-        // Check if the customer already exists
+        // If the trip is coming soon, handle reservation without Stripe
+        if ($trip->tripAvailability === 'coming soon') {
+            // Insert reservation into the Reservations model
+            Reservations::create([
+                'reservationID' => $reservationID,
+                'stripe_product_id' => $trip->stripe_product_id,
+                'name' => $this->name,
+                'email' => $this->email,
+                'phone_number' => $this->phone_number,
+                'address_line_1' => $this->address_line_1,
+                'address_line_2' => $this->address_line_2,
+                'city' => $this->city,
+                'state' => $this->state,
+                'zip_code' => $this->zipcode,
+            ]);
+    
+            // Send notifications to customer and admin
+            $data = [
+                'reservationID' => $reservationID,
+                'stripe_product_id' => $trip->stripe_product_id,
+                'name' => $this->name,
+                'email' => $this->email,
+                'phone_number' => $this->phone_number,
+                'address_line_1' => $this->address_line_1,
+                'address_line_2' => $this->address_line_2,
+                'city' => $this->city,
+                'state' => $this->state,
+                'zip_code' => $this->zipcode,
+            ];
+    
+            Notification::route('mail', $this->email)->notify(new BookingReservedCustomer($data));
+            Notification::route('mail', config('mail.mailers.smtp.to_email'))->notify(new BookingReservedAdmin($data));
+    
+            return redirect()->route('reservation-confirmed', ['reservationID' => $reservationID]);
+        }
+    
+        // Handle Stripe-related logic for available trips
         $existingCustomer = null;
         $customers = $stripe->customers->all(['email' => $this->email]);
     
@@ -121,8 +162,8 @@ class BookingForm extends Component
                 'email' => $this->email,
                 'name' => $this->name,
                 'metadata' => [
-                    'name'=>$this->name,
-                    'email'=>$this->email,
+                    'name' => $this->name,
+                    'email' => $this->email,
                     'phone_number' => $this->phone_number,
                     'address_line_1' => $this->address_line_1,
                     'address_line_2' => $this->address_line_2,
@@ -141,16 +182,15 @@ class BookingForm extends Component
                     'product' => $trip->stripe_product_id,
                     'unit_amount' => $trip->tripPrice * 100,
                 ],
-                
                 'quantity' => 1,
             ]],
             'customer' => $existingCustomer->id, // Use the existing or newly created customer ID
             'mode' => 'payment',
-            'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID, 
+            'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID,
             'cancel_url' => route('booking.cancel', [
                 'tripID' => $this->tripID,
                 'name' => $this->name,
-                'email'=>$this->email,
+                'email' => $this->email,
                 'phone_number' => $this->phone_number,
                 'address_line_1' => $this->address_line_1,
                 'address_line_2' => $this->address_line_2,
@@ -161,14 +201,14 @@ class BookingForm extends Component
             'metadata' => [
                 'tripID' => $this->tripID,
                 'name' => $this->name,
-                'email'=>$this->email,
+                'email' => $this->email,
                 'phone_number' => $this->phone_number,
                 'address_line_1' => $this->address_line_1,
                 'address_line_2' => $this->address_line_2,
                 'city' => $this->city,
                 'state' => $this->state,
                 'zipcode' => $this->zipcode,
-                'stripe_product_id' => $trip->stripe_product_id 
+                'stripe_product_id' => $trip->stripe_product_id
             ],
         ]);
     

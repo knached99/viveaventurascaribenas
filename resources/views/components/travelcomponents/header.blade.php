@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/theme_assets/assets/vendor/fonts/boxicons.css') }}" />
 
-    @if (\Route::currentRouteName() === 'booking.success' || \Route::currentRouteName() === 'booking.cancel')
+    @if (\Route::currentRouteName() === 'booking.success' || \Route::currentRouteName() === 'booking.cancel' || \Route::currentRouteName() === 'reservation-confirmed')
         <link rel="stylesheet" href="{{ asset('assets/css/booking_success.css') }}" />
     @endif
 
