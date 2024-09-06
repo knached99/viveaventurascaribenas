@@ -1,6 +1,6 @@
 @props(['trips'])
 
-<table class="table">
+<table class="table dataTable">
     <thead>
         <tr>
             <th scope="col">Image</th>

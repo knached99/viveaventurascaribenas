@@ -1,5 +1,4 @@
-<?php
-
+<?php 
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
@@ -10,6 +9,8 @@ use Illuminate\Notifications\Notification;
 class BookingReservedAdmin extends Notification
 {
     use Queueable;
+
+    protected $data;
 
     /**
      * Create a new notification instance.
@@ -35,11 +36,16 @@ class BookingReservedAdmin extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->subject('You have a new reservation!')
-                    ->greeting('Hey Pablo, you have a new reservation from '.$this->data['name'])
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+                    ->subject('New Reservation Notification - '.$this->data['reservationID'])
+                    ->greeting('Hello Pablo,')
+                    ->line('A new reservation has been made by '.$this->data['name'].'.')
+                    ->line('Reservation Details:')
+                    ->line('Reservation ID: '.$this->data['reservationID'])
+                    ->line('Trip: '.$this->data['tripLocation'])
+                    ->line('Status: Reservation Confirmed - "Coming Soon"')
+                    ->line('Please review the reservation in the admin panel.')
+                    ->action('View Reservation', url('/admin/reservations/'.$this->data['reservationID']))
+                    ->line('Thank you for managing the reservations efficiently!');
     }
 
     /**

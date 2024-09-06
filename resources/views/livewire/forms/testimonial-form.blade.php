@@ -46,7 +46,7 @@
                             <div class="col-12">
                                 <div class="form-group">
                                     <select
-                                        class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
+                                    class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
                                         wire:model="tripID">
                                         <option value="" disabled selected>Where did you travel with us?</option>
                                         @foreach ($trips as $trip)
@@ -55,7 +55,7 @@
                                     </select>
 
                                     {{-- <input class="form-control {{$errors->has('trip_location') ? 'border border-danger' : ''}}" wire:model="trip_location" placeholder="Where did you travel with us? (Destination)"> --}}
-                                    @error('trip_location')
+                                    @error('tripID')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>

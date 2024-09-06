@@ -91,6 +91,13 @@
 
         <!-- Final Step -->
         @if ($currentStep === 3)
+
+        @if($error)
+            <div class="alert alert-danger">
+            {{$error}}
+            </div>
+        
+        @endif 
             <div class="step">
                 <div class="form-btn">
                     <button type="button" class="btn btn-primary" wire:click="previousStep">Previous</button>

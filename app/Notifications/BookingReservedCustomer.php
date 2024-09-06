@@ -1,5 +1,4 @@
-<?php
-
+<?php 
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
@@ -10,6 +9,8 @@ use Illuminate\Notifications\Notification;
 class BookingReservedCustomer extends Notification
 {
     use Queueable;
+
+    protected $data;
 
     /**
      * Create a new notification instance.
@@ -36,10 +37,18 @@ class BookingReservedCustomer extends Notification
     {
         return (new MailMessage)
                     ->subject('Reservation Confirmation - '.$this->data['reservationID'])
-                    ->greeting('Hey '.$this->data['name']. ' this email is to confirm your reservation')
-                    ->line('Reservation details below:')
-                    ->line('Trip: ')
-                    ->line('');
+                    ->greeting('Dear '.$this->data['name'].',')
+                    ->line('We are pleased to confirm your reservation for the upcoming trip to '.$this->data['tripLocation'].'.')
+                    ->line('Reservation Details:')
+                    ->line('Reservation ID: '.$this->data['reservationID'])
+                    ->line('Trip: '.$this->data['tripLocation'])
+                    ->line('Status: Reservation Confirmed')
+                    ->line('At this time, the trip is marked as "Coming Soon". Once the trip becomes available, we will notify you so you can proceed with the payment to secure and confirm your booking.')
+                    ->line('Please keep an eye on your email for further updates.')
+                    ->line('We look forward to helping you embark on an exciting journey to '.$this->data['tripLocation'].'!')
+                    ->line('Thank you for choosing us for your travel plans.')
+                    ->salutation('Best regards,')
+                    ->salutation('The Travel Team');
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\TripsModel;
 use App\Models\BookingModel;
 use App\Models\Testimonials;
+use App\Models\Reservations;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -48,6 +49,7 @@ class Admin extends Controller
         });
 
         $bookings = BookingModel::select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id')->get();
+        $reservations = Reservations::select('reservationID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();
 
         $mostPopularBooking = BookingModel::select('stripe_product_id')
         ->selectRaw('COUNT(*) as booking_count') 
@@ -65,7 +67,7 @@ class Admin extends Controller
 
         
 
-        return view('admin.dashboard', compact('storageData', 'usedStorage', 'totalStorage', 'remainingStorage', 'transactions', 'bookings', 'mostPopularBooking', 'mostPopularTripName'));
+        return view('admin.dashboard', compact('storageData', 'usedStorage', 'totalStorage', 'remainingStorage', 'transactions', 'bookings', 'reservations', 'mostPopularBooking', 'mostPopularTripName'));
     }
     
     public function profilePage(){
@@ -77,48 +79,9 @@ class Admin extends Controller
         try {
             $booking = BookingModel::findOrFail($bookingID);
     
-            // Construct the full address
-            // $address = "{$booking->address_line_1}, {$booking->city}, {$booking->state}, {$booking->zip_code}";
-            $address = "{$booking->city}, {$booking->state}, {$booking->zip_code}";
-            // Create the query URL
-            $url = 'https://nominatim.openstreetmap.org/search?' . http_build_query([
-                'q' => $address,
-                'format' => 'json',
-                'limit' => 1
-            ]);
-    
-            // Request to Nominatim API with User-Agent header
-            $context = stream_context_create([
-                'http' => [
-                    'header' => 'User-Agent: YourAppName/1.0 (your-email@example.com)'
-                ]
-            ]);
-    
-            $response = file_get_contents($url, false, $context);
-    
-            if ($response === FALSE) {
-                throw new \Exception("Failed to retrieve data from Nominatim API.");
-            }
-    
-            $data = json_decode($response, true);
-
-    
-            // Check if the response contains data
-            if (is_array($data) && !empty($data) && isset($data[0]['lat']) && isset($data[0]['lon'])) {
-                $latitude = $data[0]['lat'];
-                $longitude = $data[0]['lon'];
-            } else {
-                // Handle case where no data is found
-                $latitude = null;
-                $longitude = null;
-            }
-
-    
             return view('admin.booking', [
                 'bookingID' => $bookingID,
-                'booking' => $booking,
-                'latitude' => $latitude,
-                'longitude' => $longitude
+                'booking' => $booking
             ]);
     
         } catch (ModelNotFoundException $e) {
@@ -129,6 +92,21 @@ class Admin extends Controller
             abort(500);
         }
     }
+
+    public function getReservationDetails($reservationID){
+        try{
+            
+            $reservation = Reservations::findOrFail($reservationID);
+
+            return view('admin/reservations/', ['reservationID' => $reservationID, 'reservation'=>$reservation]);
+        
+    }
+    catch(ModelNotFoundException $e){
+        \Log::error('ModelNotFoundException encountered on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' Error Message: ' . $e->getMessage());
+        abort(404);
+    }
+
+}
 
 
 
@@ -229,6 +207,7 @@ class Admin extends Controller
         }
 
     }
+    
 
     public function deleteTrip($tripID){
         try {

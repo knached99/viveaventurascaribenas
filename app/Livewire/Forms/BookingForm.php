@@ -25,6 +25,7 @@ class BookingForm extends Component
     public string $zipcode = '';
     public string $tripID;
     public array $states = [];
+    public string $error = '';
 
     protected $rules = [
         'name' => 'required|string',
@@ -116,7 +117,15 @@ class BookingForm extends Component
     
         // If the trip is coming soon, handle reservation without Stripe
         if ($trip->tripAvailability === 'coming soon') {
+
+            $reservationExists = Reservations::where('email', $this->email)->orWhere('phone_number', $this->phone_number)->first();
+
+            if(!empty($reservationExists)){
+                $this->error = 'A reservation for this trip has already been confirmed for you. Please check your email for further information and next steps';
+                return;
+            }
             // Insert reservation into the Reservations model
+
             Reservations::create([
                 'reservationID' => $reservationID,
                 'stripe_product_id' => $trip->stripe_product_id,
@@ -133,15 +142,8 @@ class BookingForm extends Component
             // Send notifications to customer and admin
             $data = [
                 'reservationID' => $reservationID,
-                'stripe_product_id' => $trip->stripe_product_id,
                 'name' => $this->name,
-                'email' => $this->email,
-                'phone_number' => $this->phone_number,
-                'address_line_1' => $this->address_line_1,
-                'address_line_2' => $this->address_line_2,
-                'city' => $this->city,
-                'state' => $this->state,
-                'zip_code' => $this->zipcode,
+                'tripLocation'=>$trip->tripLocation
             ];
     
             Notification::route('mail', $this->email)->notify(new BookingReservedCustomer($data));
@@ -175,7 +177,7 @@ class BookingForm extends Component
         }
     
         $stripe_session = $stripe->checkout->sessions->create([
-            'payment_method_types' => ['card'],
+            'payment_method_types' => ['card', 'cashapp', 'affirm'],
             'line_items' => [[
                 'price_data' => [
                     'currency' => 'usd',

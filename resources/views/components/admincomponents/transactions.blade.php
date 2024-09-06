@@ -34,48 +34,64 @@
                       </thead>
                       <tbody>
                           @foreach ($bookings as $booking)
-                              @php
-                                  $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
-                                  $checkoutSessionID = $booking->stripe_checkout_id;
-                                  $product = $stripe->products->retrieve($booking->stripe_product_id);
-                                  $location = $product->name;
+                        @php
+                            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+                            $checkoutSessionID = $booking->stripe_checkout_id;
+                            $product = $stripe->products->retrieve($booking->stripe_product_id);
+                            $location = $product->name;
 
-                                  if (!empty($checkoutSessionID)) {
-                                      $checkoutSession = $stripe->checkout->sessions->retrieve($checkoutSessionID);
+                            if (!empty($checkoutSessionID)) {
+                                $checkoutSession = $stripe->checkout->sessions->retrieve($checkoutSessionID);
 
-                                      if ($checkoutSession) {
-                                          if (!empty($checkoutSession->payment_intent)) {
-                                              $payment_intent = $checkoutSession->payment_intent;
-                                              $charges = $stripe->charges->all(['payment_intent' => $payment_intent]);
+                                if ($checkoutSession && !empty($checkoutSession->payment_intent)) {
+                                    $payment_intent = $checkoutSession->payment_intent;
+                                    $charges = $stripe->charges->all(['payment_intent' => $payment_intent]);
 
-                                              if (count($charges->data) > 0) {
-                                                  $charge = $charges->data[0];
+                                    if (count($charges->data) > 0) {
+                                        $charge = $charges->data[0];
+                                        $paymentMethod = $charge->payment_method_details->type;
 
-                                                  $cardExpirationMonth =
-                                                      $charge->payment_method_details->card->exp_month;
-                                                  $cardExpirationYear = $charge->payment_method_details->card->exp_year;
-                                                  $cardFunding = $charge->payment_method_details->card->funding;
-                                                  $paymentAmount = '$' . number_format($charge->amount / 100, 2);
-                                                  $paymentStatus = $charge->status;
-                                                  $paymentMethod = $charge->payment_method_details->type;
-                                                  $cardLast4 = $charge->payment_method_details->card->last4;
-                                                  $paymentMethodCard = $charge->payment_method_details->card->brand;
-                                                  $receiptLink = $charge->receipt_url;
-                                              } else {
-                                                  $cardExpirationMonth = 'N/A';
-                                                  $cardExpirationYear = 'N/A';
-                                                  $cardFunding = 'N/A';
-                                                  $paymentAmount = 0;
-                                                  $status = 'N/A';
-                                                  $paymentMethod = 'N/A';
-                                                  $cardLast4 = 'N/A';
-                                                  $paymentMethodCard = 'N/A';
-                                                  $receiptLink = 'N/A';
-                                              }
-                                          }
-                                      }
-                                  }
-                              @endphp
+                                        switch ($paymentMethod) {
+                                            case 'card':
+                                                $cardExpirationMonth = $charge->payment_method_details->card->exp_month;
+                                                $cardExpirationYear = $charge->payment_method_details->card->exp_year;
+                                                $cardFunding = $charge->payment_method_details->card->funding;
+                                                $cardLast4 = $charge->payment_method_details->card->last4;
+                                                $paymentMethodCard = $charge->payment_method_details->card->brand;
+                                                break;
+
+                                            case 'cashapp':
+                                                $paymentMethodCashapp = 'CashApp';
+                                                break;
+
+                                            case 'affirm':
+                                                $paymentMethodAffirm = 'Affirm';
+                                                break;
+
+                                            default:
+                                                $paymentMethod = 'Unknown';
+                                                break;
+                                        }
+
+                                        $paymentAmount = '$' . number_format($charge->amount / 100, 2);
+                                        $paymentStatus = $charge->status;
+                                        $receiptLink = $charge->receipt_url;
+                                    } else {
+                                        // Set default values if no charge is found
+                                        $cardExpirationMonth = 'N/A';
+                                        $cardExpirationYear = 'N/A';
+                                        $cardFunding = 'N/A';
+                                        $paymentAmount = 0;
+                                        $paymentStatus = 'N/A';
+                                        $paymentMethod = 'N/A';
+                                        $cardLast4 = 'N/A';
+                                        $paymentMethodCard = 'N/A';
+                                        $receiptLink = 'N/A';
+                                    }
+                                }
+                            }
+                            @endphp
+
                               <tr>
                                   <td>{{ $booking->name }}</td>
                                   <td>{{ $location }}</td>

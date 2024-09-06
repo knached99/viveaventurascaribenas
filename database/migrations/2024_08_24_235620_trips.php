@@ -17,8 +17,8 @@ return new class extends Migration
             $table->longText('tripActivities')->nullable();
             $table->string('tripLandscape');
             $table->string('tripAvailability');
-            $table->datetime('tripStartDate'); 
-            $table->datetime('tripEndDate');
+            $table->datetime('tripStartDate')->nullable(); 
+            $table->datetime('tripEndDate')->nullable();
             $table->string('tripPrice');
            // $table->uuid('testimonial_id')->nullable();
 

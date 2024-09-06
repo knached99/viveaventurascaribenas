@@ -445,5 +445,8 @@
 
         <!-- Transactions Go Here -->
         <x-admincomponents.transactions :bookings="$bookings" />
+
+        <!-- Reservations --> 
+        <x-admincomponents.reservations-table :reservations="$reservations"/>
     </div>
 </x-authenticated-theme-layout>

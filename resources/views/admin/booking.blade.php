@@ -13,70 +13,52 @@
 
             if (count($charges->data) > 0) {
                 $charge = $charges->data[0];
-
-                $cardExpirationMonth = $charge->payment_method_details->card->exp_month;
-                $cardExpirationYear = $charge->payment_method_details->card->exp_year;
-                $cardFunding = $charge->payment_method_details->card->funding;
-                $paymentAmount = '$' . number_format($charge->amount / 100, 2);
-                $paymentStatus = $charge->status;
                 $paymentMethod = $charge->payment_method_details->type;
-                $cardLast4 = $charge->payment_method_details->card->last4;
-                $paymentMethodCard = $charge->payment_method_details->card->brand;
-                $receiptLink = $charge->receipt_url;
-            } else {
+
+                // Initialize variables to avoid undefined errors
                 $cardExpirationMonth = 'N/A';
                 $cardExpirationYear = 'N/A';
                 $cardFunding = 'N/A';
-                $paymentAmount = '0';
-                $paymentStatus = 'N/A';
-                $paymentMethod = 'N/A';
                 $cardLast4 = 'N/A';
                 $paymentMethodCard = 'N/A';
+                $paymentMethodCashapp = 'N/A';
+                $paymentMethodAffirm = 'N/A';
+
+                switch ($paymentMethod) {
+                    case 'card':
+                        $cardExpirationMonth = $charge->payment_method_details->card->exp_month;
+                        $cardExpirationYear = $charge->payment_method_details->card->exp_year;
+                        $cardFunding = $charge->payment_method_details->card->funding;
+                        $cardLast4 = $charge->payment_method_details->card->last4;
+                        $paymentMethodCard = $charge->payment_method_details->card->brand;
+                        break;
+
+                    case 'cashapp':
+                        $paymentMethodCashapp = 'CashApp';
+                        break;
+
+                    case 'affirm':
+                        $paymentMethodAffirm = 'Affirm';
+                        break;
+
+                    default:
+                        $paymentMethod = 'Unknown';
+                        break;
+                }
+
+                $paymentAmount = '$' . number_format($charge->amount / 100, 2);
+                $paymentStatus = $charge->status;
+                $receiptLink = $charge->receipt_url;
+            } else {
+                // Set default values if no charge is found
+                $paymentAmount = '0';
+                $paymentStatus = 'N/A';
                 $receiptLink = 'N/A';
             }
         }
     }
 @endphp
 
-@php
-    $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
-    $stripeCheckoutID = $booking->stripe_checkout_id;
-    $product = $stripe->products->retrieve($booking->stripe_product_id);
-    $location = $product->name;
-
-    if (!empty($stripeCheckoutID)) {
-        $stripeCheckoutSession = $stripe->checkout->sessions->retrieve($stripeCheckoutID);
-
-        if ($stripeCheckoutSession && !empty($stripeCheckoutSession->payment_intent)) {
-            $paymentIntent = $stripeCheckoutSession->payment_intent;
-            $charges = $stripe->charges->all(['payment_intent' => $paymentIntent]);
-
-            if (count($charges->data) > 0) {
-                $charge = $charges->data[0];
-
-                $cardExpirationMonth = $charge->payment_method_details->card->exp_month;
-                $cardExpirationYear = $charge->payment_method_details->card->exp_year;
-                $cardFunding = $charge->payment_method_details->card->funding;
-                $paymentAmount = '$' . number_format($charge->amount / 100, 2);
-                $paymentStatus = $charge->status;
-                $paymentMethod = $charge->payment_method_details->type;
-                $cardLast4 = $charge->payment_method_details->card->last4;
-                $paymentMethodCard = $charge->payment_method_details->card->brand;
-                $receiptLink = $charge->receipt_url;
-            } else {
-                $cardExpirationMonth = 'N/A';
-                $cardExpirationYear = 'N/A';
-                $cardFunding = 'N/A';
-                $paymentAmount = '0';
-                $paymentStatus = 'N/A';
-                $paymentMethod = 'N/A';
-                $cardLast4 = 'N/A';
-                $paymentMethodCard = 'N/A';
-                $receiptLink = 'N/A';
-            }
-        }
-    }
-@endphp
 
 <x-authenticated-theme-layout>
     <div class="relative w-full mt-6 text-gray-700 bg-white shadow-md rounded-xl">
@@ -140,35 +122,53 @@
                 </span>
             </div>
 
-            <!-- Payment Details -->
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div class="p-4 bg-gray-100 rounded-lg">
-                    <h6 class="text-lg font-medium text-blue-gray-800">
-                        <i class='bx bxs-credit-card'></i> Payment Method
-                    </h6>
-                    <p class="text-base font-light leading-relaxed">{{ $paymentMethodCard }} (**** {{ $cardLast4 }})
-                    </p>
-                </div>
-                <div class="p-4 bg-gray-100 rounded-lg">
-                    <h6 class="text-lg font-medium text-blue-gray-800">
-                        <i class='bx bx-dollar-circle'></i> Payment Amount
-                    </h6>
-                    <p class="text-base font-light leading-relaxed">{{ $paymentAmount }}</p>
-                </div>
-                <div class="p-4 bg-gray-100 rounded-lg">
-                    <h6 class="text-lg font-medium text-blue-gray-800">
-                        <i class='bx bxs-calendar'></i> Card Expiration
-                    </h6>
-                    <p class="text-base font-light leading-relaxed">{{ $cardExpirationMonth }}/{{ $cardExpirationYear }}
-                    </p>
-                </div>
-                <div class="p-4 bg-gray-100 rounded-lg">
-                    <h6 class="text-lg font-medium text-blue-gray-800">
-                        <i class='bx bx-link-external'></i> Receipt
-                    </h6>
-                    <a href="{{ $receiptLink }}" target="_blank" class="text-blue-600 underline">View Receipt</a>
-                </div>
-            </div>
+           <!-- Payment Details -->
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <!-- Payment Method -->
+    <div class="p-4 bg-gray-100 rounded-lg">
+        <h6 class="text-lg font-medium text-blue-gray-800">
+            <i class='bx bxs-credit-card'></i> Payment Method
+        </h6>
+        <p class="text-base font-light leading-relaxed">
+            @if ($paymentMethod === 'card')
+                {{ $paymentMethodCard }} (**** {{ $cardLast4 }})
+            @elseif ($paymentMethod === 'cashapp')
+                CashApp
+            @elseif ($paymentMethod === 'affirm')
+                Affirm
+            @else
+                Unknown Payment Method
+            @endif
+        </p>
+    </div>
+
+    <!-- Payment Amount -->
+    <div class="p-4 bg-gray-100 rounded-lg">
+        <h6 class="text-lg font-medium text-blue-gray-800">
+            <i class='bx bx-dollar-circle'></i> Payment Amount
+        </h6>
+        <p class="text-base font-light leading-relaxed">{{ $paymentAmount }}</p>
+    </div>
+
+    <!-- Card Expiration (only for card payments) -->
+    @if ($paymentMethod === 'card')
+        <div class="p-4 bg-gray-100 rounded-lg">
+            <h6 class="text-lg font-medium text-blue-gray-800">
+                <i class='bx bxs-calendar'></i> Card Expiration
+            </h6>
+            <p class="text-base font-light leading-relaxed">{{ $cardExpirationMonth }}/{{ $cardExpirationYear }}</p>
+        </div>
+    @endif
+
+    <!-- Receipt Link -->
+    <div class="p-4 bg-gray-100 rounded-lg">
+        <h6 class="text-lg font-medium text-blue-gray-800">
+            <i class='bx bx-link-external'></i> Receipt
+        </h6>
+        <a href="{{ $receiptLink }}" target="_blank" class="text-blue-600 underline">View Receipt</a>
+    </div>
+</div>
+
 
             <!-- Contact Information -->
             <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">

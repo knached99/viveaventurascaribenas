@@ -59,6 +59,7 @@ Route::group(['middleware' => 'auth', 'verified'], function () {
     Volt::route('/admin/createTrip', 'pages.create-trip')->name('admin.create-trip');
     Route::get('/admin/trip/{tripID}', [Admin::class, 'getTripDetails'])->name('admin.trip');
     Route::delete('/admin/trip/delete/{tripID}', [Admin::class, 'deleteTrip'])->name('admin.trip.delete');
+    Route::get('/admin/reservations/{reservationID}', [Admin::class, 'getReservationDetails'])->name('admin.reservations');
 });
 // Route::view('admin/dashboard', 'admin/dashboard')
 //     ->middleware(['auth', 'verified'])

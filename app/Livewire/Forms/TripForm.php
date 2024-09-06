@@ -40,10 +40,10 @@ class TripForm extends Form {
     #[Validate('required')]
     public string $tripActivities = '';
 
-    #[Validate('required|date|before_or_equal:tripEndDate')]
+    #[Validate('sometimes|date|before_or_equal:tripEndDate')]
     public string $tripStartDate = '';
 
-    #[Validate('required|date|after_or_equal:tripStartDate')]
+    #[Validate('sometimes|date|after_or_equal:tripStartDate')]
     public string $tripEndDate = '';
 
     #[Validate('required|numeric|min:1')]
