@@ -50,8 +50,6 @@
     <!-- Vendors CSS -->
     <link rel="stylesheet"
         href="{{ asset('assets/theme_assets/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
-    <!-- Quill -->
-    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet" />
 
     <!-- Page CSS -->
     <!-- Page -->
@@ -62,6 +60,10 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/theme_assets/assets/js/config.js') }}"></script>
+
+    <!-- CKEDITOR 5 CDN -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.3.1/classic/ckeditor.js"></script>
+
     @livewireStyles
 </head>
 

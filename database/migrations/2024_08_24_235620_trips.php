@@ -12,7 +12,7 @@ return new class extends Migration
             $table->uuid('tripID')->primary();
             $table->string('stripe_product_id')->unique();
             $table->string('tripLocation');
-            $table->string('tripPhoto');
+            $table->json('tripPhoto');
             $table->text('tripDescription');
             $table->longText('tripActivities')->nullable();
             $table->string('tripLandscape');

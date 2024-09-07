@@ -90,14 +90,14 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             <label for="tripDescription" class="form-label">Trip Description</label>
                             <textarea id="tripDescription" name="tripDescription" placeholder="Enter description of this trip"
                                 wire:model="form.tripDescription"
-                                class="form-control {{ $errors->has('form.tripDescription') ? 'is-invalid' : '' }}" rows="4"></textarea>
+                                class="form-control editor {{ $errors->has('form.tripDescription') ? 'is-invalid' : '' }}" rows="4"></textarea>
                             <x-input-error :messages="$errors->get('form.tripDescription')" class="invalid-feedback" />
                         </div>
 
                         <div class="mb-4">
                             <label for="tripActivities" class="form-label">Trip Activities</label>
                             <textarea id="tripActivities" name="tripActivities" placeholder="Enter trip activities" wire:model="form.tripActivities"
-                                class="form-control {{ $errors->has('form.tripActivities') ? 'is-invalid' : '' }}" rows="4"></textarea>
+                                class="form-control editor {{ $errors->has('form.tripActivities') ? 'is-invalid' : '' }}" rows="4"></textarea>
                             <x-input-error :messages="$errors->get('form.tripActivities')" class="invalid-feedback" />
                         </div>
 

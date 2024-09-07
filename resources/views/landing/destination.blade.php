@@ -197,7 +197,7 @@
                             </button>
                         </div>
                     @else
-                        <p style="font-size: 25px; color: #94a3b8; margin-left: 10px;">No reviews yet</p>
+                        <p style="font-size: 25px; color: #94a3b8; margin-left: 10px;">Be the first to leave a review!</p>
                     @endif
                 </div>
                 <!-- End Testimonials Slider -->

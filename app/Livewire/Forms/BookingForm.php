@@ -103,105 +103,193 @@ class BookingForm extends Component
         }
     }
 
+    // public function bookTrip()
+    // {
+    //     $this->validate();
+    //     $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+    //     $trip = TripsModel::findOrFail($this->tripID);
+    //     $reservationID = Str::uuid();
+    
+    //     // If trip is unavailable, redirect
+    //     if ($trip->tripAvailability === 'unavailable') {
+    //         return redirect('/');
+    //     }
+    
+    //     // If the trip is coming soon, handle reservation without Stripe
+    //     if ($trip->tripAvailability === 'coming soon') {
+
+    //         $reservationExists = Reservations::where('email', $this->email)->orWhere('phone_number', $this->phone_number)->first();
+
+    //         if(!empty($reservationExists)){
+    //             $this->error = 'A reservation for this trip has already been confirmed for you. Please check your email for further information and next steps';
+    //             return;
+    //         }
+    //         // Insert reservation into the Reservations model
+
+    //         Reservations::create([
+    //             'reservationID' => $reservationID,
+    //             'stripe_product_id' => $trip->stripe_product_id,
+    //             'name' => $this->name,
+    //             'email' => $this->email,
+    //             'phone_number' => $this->phone_number,
+    //             'address_line_1' => $this->address_line_1,
+    //             'address_line_2' => $this->address_line_2,
+    //             'city' => $this->city,
+    //             'state' => $this->state,
+    //             'zip_code' => $this->zipcode,
+    //         ]);
+    
+    //         // Send notifications to customer and admin
+    //         $data = [
+    //             'reservationID' => $reservationID,
+    //             'name' => $this->name,
+    //             'tripLocation'=>$trip->tripLocation
+    //         ];
+    
+    //         Notification::route('mail', $this->email)->notify(new BookingReservedCustomer($data));
+    //         Notification::route('mail', config('mail.mailers.smtp.to_email'))->notify(new BookingReservedAdmin($data));
+    
+    //         return redirect()->route('reservation-confirmed', ['reservationID' => $reservationID]);
+    //     }
+    
+    //     // Handle Stripe-related logic for available trips
+    //     $existingCustomer = null;
+    //     $customers = $stripe->customers->all(['email' => $this->email]);
+    
+    //     if (count($customers->data) > 0) {
+    //         $existingCustomer = $customers->data[0]; // Use the first customer found with this email
+    //     } else {
+    //         // Create a new customer if not found
+    //         $existingCustomer = $stripe->customers->create([
+    //             'email' => $this->email,
+    //             'name' => $this->name,
+    //             'metadata' => [
+    //                 'name' => $this->name,
+    //                 'email' => $this->email,
+    //                 'phone_number' => $this->phone_number,
+    //                 'address_line_1' => $this->address_line_1,
+    //                 'address_line_2' => $this->address_line_2,
+    //                 'city' => $this->city,
+    //                 'state' => $this->state,
+    //                 'zipcode' => $this->zipcode,
+    //             ],
+    //         ]);
+    //     }
+    
+    //     $stripe_session = $stripe->checkout->sessions->create([
+    //         'payment_method_types' => ['card', 'cashapp', 'affirm'],
+    //         'line_items' => [[
+    //             'price_data' => [
+    //                 'currency' => 'usd',
+    //                 'product' => $trip->stripe_product_id,
+    //                 'unit_amount' => $trip->tripPrice * 100,
+    //             ],
+    //             'quantity' => 1,
+    //         ]],
+    //         'customer' => $existingCustomer->id, // Use the existing or newly created customer ID
+    //         'mode' => 'payment',
+    //         'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID,
+    //         'cancel_url' => route('booking.cancel', [
+    //             'tripID' => $this->tripID,
+    //             'name' => $this->name,
+    //             'email' => $this->email,
+    //             'phone_number' => $this->phone_number,
+    //             'address_line_1' => $this->address_line_1,
+    //             'address_line_2' => $this->address_line_2,
+    //             'city' => $this->city,
+    //             'state' => $this->state,
+    //             'zipcode' => $this->zipcode
+    //         ]),
+    //         'metadata' => [
+    //             'tripID' => $this->tripID,
+    //             'name' => $this->name,
+    //             'email' => $this->email,
+    //             'phone_number' => $this->phone_number,
+    //             'address_line_1' => $this->address_line_1,
+    //             'address_line_2' => $this->address_line_2,
+    //             'city' => $this->city,
+    //             'state' => $this->state,
+    //             'zipcode' => $this->zipcode,
+    //             'stripe_product_id' => $trip->stripe_product_id
+    //         ],
+    //     ]);
+    
+    //     return redirect()->away($stripe_session->url);
+    // }
+    
+
     public function bookTrip()
-    {
-        $this->validate();
-        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
-        $trip = TripsModel::findOrFail($this->tripID);
-        $reservationID = Str::uuid();
-    
-        // If trip is unavailable, redirect
-        if ($trip->tripAvailability === 'unavailable') {
-            return redirect('/');
-        }
-    
-        // If the trip is coming soon, handle reservation without Stripe
-        if ($trip->tripAvailability === 'coming soon') {
+{
+    $this->validate();
 
-            $reservationExists = Reservations::where('email', $this->email)->orWhere('phone_number', $this->phone_number)->first();
+    $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+    $trip = TripsModel::findOrFail($this->tripID);
+    $reservationID = Str::uuid();
+    
+    // Ensure trip name is not empty and provide a fallback
+    $tripName = $trip->tripName ?? 'Trip Reservation'; // Default name if tripName is empty
 
-            if(!empty($reservationExists)){
-                $this->error = 'A reservation for this trip has already been confirmed for you. Please check your email for further information and next steps';
-                return;
-            }
-            // Insert reservation into the Reservations model
+    // If trip is unavailable, redirect
+    if ($trip->tripAvailability === 'unavailable') {
+        return redirect('/');
+    }
 
-            Reservations::create([
-                'reservationID' => $reservationID,
-                'stripe_product_id' => $trip->stripe_product_id,
-                'name' => $this->name,
-                'email' => $this->email,
-                'phone_number' => $this->phone_number,
-                'address_line_1' => $this->address_line_1,
-                'address_line_2' => $this->address_line_2,
-                'city' => $this->city,
-                'state' => $this->state,
-                'zip_code' => $this->zipcode,
-            ]);
-    
-            // Send notifications to customer and admin
-            $data = [
-                'reservationID' => $reservationID,
-                'name' => $this->name,
-                'tripLocation'=>$trip->tripLocation
-            ];
-    
-            Notification::route('mail', $this->email)->notify(new BookingReservedCustomer($data));
-            Notification::route('mail', config('mail.mailers.smtp.to_email'))->notify(new BookingReservedAdmin($data));
-    
-            return redirect()->route('reservation-confirmed', ['reservationID' => $reservationID]);
+    // If the trip is coming soon, handle reservation without Stripe
+    if ($trip->tripAvailability === 'coming soon') {
+        $reservationExists = Reservations::where('email', $this->email)
+            ->orWhere('phone_number', $this->phone_number)
+            ->first();
+
+        if (!empty($reservationExists)) {
+            $this->error = 'A reservation for this trip has already been confirmed for you. Please check your email for further information and next steps';
+            return;
         }
-    
-        // Handle Stripe-related logic for available trips
-        $existingCustomer = null;
-        $customers = $stripe->customers->all(['email' => $this->email]);
-    
-        if (count($customers->data) > 0) {
-            $existingCustomer = $customers->data[0]; // Use the first customer found with this email
-        } else {
-            // Create a new customer if not found
-            $existingCustomer = $stripe->customers->create([
-                'email' => $this->email,
-                'name' => $this->name,
-                'metadata' => [
-                    'name' => $this->name,
-                    'email' => $this->email,
-                    'phone_number' => $this->phone_number,
-                    'address_line_1' => $this->address_line_1,
-                    'address_line_2' => $this->address_line_2,
-                    'city' => $this->city,
-                    'state' => $this->state,
-                    'zipcode' => $this->zipcode,
-                ],
-            ]);
-        }
-    
-        $stripe_session = $stripe->checkout->sessions->create([
-            'payment_method_types' => ['card', 'cashapp', 'affirm'],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'usd',
-                    'product' => $trip->stripe_product_id,
-                    'unit_amount' => $trip->tripPrice * 100,
-                ],
-                'quantity' => 1,
-            ]],
-            'customer' => $existingCustomer->id, // Use the existing or newly created customer ID
-            'mode' => 'payment',
-            'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID,
-            'cancel_url' => route('booking.cancel', [
-                'tripID' => $this->tripID,
-                'name' => $this->name,
-                'email' => $this->email,
-                'phone_number' => $this->phone_number,
-                'address_line_1' => $this->address_line_1,
-                'address_line_2' => $this->address_line_2,
-                'city' => $this->city,
-                'state' => $this->state,
-                'zipcode' => $this->zipcode
-            ]),
+
+        // Insert reservation into the Reservations model
+        Reservations::create([
+            'reservationID' => $reservationID,
+            'stripe_product_id' => $trip->stripe_product_id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone_number' => $this->phone_number,
+            'address_line_1' => $this->address_line_1,
+            'address_line_2' => $this->address_line_2,
+            'city' => $this->city,
+            'state' => $this->state,
+            'zip_code' => $this->zipcode,
+        ]);
+
+        // Send notifications to customer and admin
+        $data = [
+            'reservationID' => $reservationID,
+            'name' => $this->name,
+            'tripLocation' => $trip->tripLocation,
+        ];
+
+        Notification::route('mail', $this->email)->notify(new BookingReservedCustomer($data));
+        Notification::route('mail', config('mail.mailers.smtp.to_email'))->notify(new BookingReservedAdmin($data));
+
+        return redirect()->route('reservation-confirmed', ['reservationID' => $reservationID]);
+    }
+
+    // Calculate subtotal, tax, and total price
+    $salesTaxRate = 0.07; // Example 7% sales tax
+    $subtotal = $trip->tripPrice;
+    $taxAmount = $subtotal * $salesTaxRate;
+    $totalAmount = $subtotal + $taxAmount;
+
+    // Handle Stripe-related logic for available trips
+    $existingCustomer = null;
+    $customers = $stripe->customers->all(['email' => $this->email]);
+
+    if (count($customers->data) > 0) {
+        $existingCustomer = $customers->data[0]; // Use the first customer found with this email
+    } else {
+        // Create a new customer if not found
+        $existingCustomer = $stripe->customers->create([
+            'email' => $this->email,
+            'name' => $this->name,
             'metadata' => [
-                'tripID' => $this->tripID,
                 'name' => $this->name,
                 'email' => $this->email,
                 'phone_number' => $this->phone_number,
@@ -210,13 +298,62 @@ class BookingForm extends Component
                 'city' => $this->city,
                 'state' => $this->state,
                 'zipcode' => $this->zipcode,
-                'stripe_product_id' => $trip->stripe_product_id
             ],
         ]);
-    
-        return redirect()->away($stripe_session->url);
     }
-    
+
+    $stripe_session = $stripe->checkout->sessions->create([
+        'payment_method_types' => ['card', 'cashapp', 'affirm'],
+        'line_items' => [[
+            'price_data' => [
+                'currency' => 'usd',
+                'product_data' => [
+                    'name' => $tripName, // Ensure this value is not empty
+                ],
+                'unit_amount' => $subtotal * 100, // Convert to cents
+            ],
+            'quantity' => 1,
+        ],[
+            'price_data' => [
+                'currency' => 'usd',
+                'product_data' => [
+                    'name' => 'Sales Tax',
+                ],
+                'unit_amount' => $taxAmount * 100, // Convert to cents
+            ],
+            'quantity' => 1,
+        ]],
+        'customer' => $existingCustomer->id, // Use the existing or newly created customer ID
+        'mode' => 'payment',
+        'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID,
+        'cancel_url' => route('booking.cancel', [
+            'tripID' => $this->tripID,
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone_number' => $this->phone_number,
+            'address_line_1' => $this->address_line_1,
+            'address_line_2' => $this->address_line_2,
+            'city' => $this->city,
+            'state' => $this->state,
+            'zipcode' => $this->zipcode
+        ]),
+        'metadata' => [
+            'tripID' => $this->tripID,
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone_number' => $this->phone_number,
+            'address_line_1' => $this->address_line_1,
+            'address_line_2' => $this->address_line_2,
+            'city' => $this->city,
+            'state' => $this->state,
+            'zipcode' => $this->zipcode,
+            'stripe_product_id' => $trip->stripe_product_id
+        ],
+    ]);
+
+    return redirect()->away($stripe_session->url);
+}
+
 
     public function render()
     {

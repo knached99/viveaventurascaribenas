@@ -18,11 +18,11 @@
 
         @if (auth()->user()->two_factor_confirmed_at)
             @method('DELETE')
-            <button type="submit" class="btn btn-danger">
+            <button type="submit" disabled class="btn btn-danger">
                 {{ __('disable two-step verification') }}
             </button>
         @else
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" disabled class="btn btn-primary">
                 {{ __('enable two-step verification') }}
             </button>
         @endif

@@ -41,7 +41,7 @@
                     <div class="mb-3">
                         <label for="tripDescription" class="form-label fw-semibold">Trip Description:</label>
                         <textarea wire:model="tripDescription" id="tripDescription"
-                            class="form-control rounded-3 {{ $errors->has('tripDescription') ? 'border-danger' : '' }}" rows="5"
+                            class="form-control rounded-3 editor {{ $errors->has('tripDescription') ? 'border-danger' : '' }}" rows="8" cols="10"
                             placeholder="Enter trip description...">{{ $trip->tripDescription }}</textarea>
                         <x-input-error :messages="$errors->get('tripDescription')" class="mt-2" />
                     </div>
@@ -49,7 +49,7 @@
                     <div class="mb-3">
                         <label for="tripActivities" class="form-label fw-semibold">Trip Activities:</label>
                         <textarea wire:model="tripActivities" id="tripActivities"
-                            class="form-control rounded-3 {{ $errors->has('tripActivities') ? 'border-danger' : '' }}" rows="5"
+                            class="form-control rounded-3 editor {{ $errors->has('tripActivities') ? 'border-danger' : '' }}" rows="8" cols="10"
                             placeholder="Enter trip activities...">{{ $trip->tripActivities }}</textarea>
                         <x-input-error :messages="$errors->get('tripActivities')" class="mt-2" />
                     </div>

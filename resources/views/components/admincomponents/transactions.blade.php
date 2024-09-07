@@ -88,25 +88,28 @@
                             }
                         @endphp
 
-                        <tr>
-                            <td>{{ $booking->name }}</td>
-                            <td>{{ $location }}</td>
-                            <td>{{ $paymentMethod }}</td>
-                            <td>{{ $paymentAmount }}</td>
-                            <td>{{ $paymentStatus }}</td>
-                            
-                            <!-- Show card details only if payment was made with card -->
-                            @if ($paymentMethod === 'card')
-                                <td>{{ $paymentMethodCard }}</td>
-                                <td>{{ $cardExpirationMonth . '/' . $cardExpirationYear }}</td>
-                                <td>{{ $cardLast4 }}</td>
-                            @else
-                                <td colspan="3">N/A</td>
-                            @endif
+                         <tr>
+                        <td>{{ $booking->name }}</td>
+                        <td>{{ $location }}</td>
+                        <td>{{ $paymentMethod }}</td>
+                        <td>{{ $paymentAmount }}</td>
+                        <td>{{ $paymentStatus }}</td>
 
-                            <td><a href="{{ $receiptLink }}" target="_blank" rel="noreferrer noopener">View Receipt</a></td>
-                            <td><a href="{{ route('admin.booking', ['bookingID' => $booking->bookingID]) }}">View Booking</a></td>
-                        </tr>
+                        <!-- Always show three columns for card details, even if they are N/A -->
+                        @if ($paymentMethod === 'card')
+                            <td>{{ $paymentMethodCard }}</td>
+                            <td>{{ $cardExpirationMonth . '/' . $cardExpirationYear }}</td>
+                            <td>{{ $cardLast4 }}</td>
+                        @else
+                            <td>N/A</td>
+                            <td>N/A</td>
+                            <td>N/A</td>
+                        @endif
+
+                        <td><a href="{{ $receiptLink }}" target="_blank" rel="noreferrer noopener">View Receipt</a></td>
+                        <td><a href="{{ route('admin.booking', ['bookingID' => $booking->bookingID]) }}">View Booking</a></td>
+                    </tr>
+
                     @endforeach
                 </tbody>
             </table>
