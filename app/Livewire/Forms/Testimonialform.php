@@ -38,6 +38,11 @@ class TestimonialForm extends Component
     #[Validate('required|uuid')]
     public string $tripID = ''; // Update to tripID
 
+   
+    #[Validate('required|string')]
+    public string $trip_date = '';
+
+
     #[Validate('required|integer')]
     public string $trip_rating = '';
 

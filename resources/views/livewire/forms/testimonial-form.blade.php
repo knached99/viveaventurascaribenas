@@ -60,17 +60,15 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label class="form-label">Travel Date</label>
-                                    <input wire:model="trip_date" type="month" max="{{ date('Y-m') }}"
-                                        value="{{ date('Y-m') }}"
-                                        class="form-control {{ $errors->has('trip_date') ? 'border border-danger' : '' }}">
-                                    @error('trip_date')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
+                              <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">Travel Date</label>
+                                <input wire:model="trip_date" type="month" max="{{date('Y-m')}}" value="{{date('Y-m')}}" class="form-control {{$errors->has('trip_date') ? 'border border-danger' : ''}}">
+                                @error('trip_date')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
+                        </div>
                             <div class="col-12">
                                 <div
                                     class="form-group {{ $errors->has('trip_rating') ? 'border border-danger' : '' }}">
