@@ -24,9 +24,9 @@
                     @if($tripPhotos && is_array($tripPhotos) && count($tripPhotos) > 1)
                         <div id="carousel-{{ $trip->tripID }}" class="carousel slide" data-bs-ride="carousel">
                             <div class="carousel-inner">
-                                @foreach ($tripPhotos as $index => $photo)
+                                @foreach($tripPhotos as $index => $photo)
                                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                        <img src="{{ $photo }}" class="d-block w-100" alt="Trip Image" />
+                                        <img src="{{ $photo }}" class="d-block w-100" alt="Photo">
                                     </div>
                                 @endforeach
                             </div>

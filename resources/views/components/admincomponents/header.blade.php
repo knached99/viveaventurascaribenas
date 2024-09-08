@@ -46,6 +46,8 @@
         class="template-customizer-theme-css" />
     <link rel="stylesheet" href="{{ asset('assets/theme_assets/assets/css/demo.css') }}" />
     {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css"/> --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.5/css/dataTables.bootstrap5.css" />
     <!-- Vendors CSS -->
     <link rel="stylesheet"
@@ -55,49 +57,7 @@
     <!-- Page -->
     <link rel="stylesheet" href="{{ asset('assets/theme_assets/assets/vendor/css/pages/page-auth.css') }}" />
 
-    @if(\Route::currentRouteName() === 'admin.all-trips')
-    <style>
-    /* Custom Carousel Styles */
-.custom-carousel {
-    position: relative;
-    width: 100%;
-    max-height: 200px; /* Adjust as needed */
-    overflow: hidden;
-}
 
-.carousel-item img {
-    width: 100%;
-    height: auto;
-}
-
-.carousel-control-prev,
-.carousel-control-next {
-    width: 5%;
-    height: 100%;
-    top: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-}
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    background-image: none;
-}
-
-.carousel-control-prev-icon::before {
-    content: '←'; /* Customize arrow */
-    font-size: 24px;
-}
-
-.carousel-control-next-icon::before {
-    content: '→'; /* Customize arrow */
-    font-size: 24px;
-}
-
-    </style>
-@endif 
     <!-- Helpers -->
     <script src="{{ asset('assets/theme_assets/assets/vendor/js/helpers.js') }}"></script>
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->

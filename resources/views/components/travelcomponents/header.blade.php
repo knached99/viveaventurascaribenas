@@ -8,7 +8,8 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/images/faviconIcon.png') }}">
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ asset('assets/css/open-iconic-bootstrap.min.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('assets/css/open-iconic-bootstrap.min.css') }}"> --}}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('assets/css/animate.css') }}">
 
     <link rel="stylesheet" href="{{ asset('assets/css/owl.carousel.min.css') }}">

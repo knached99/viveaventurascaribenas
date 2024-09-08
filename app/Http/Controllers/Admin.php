@@ -235,32 +235,49 @@ class Admin extends Controller
 
     }
     
-
-    public function deleteTrip($tripID){
+    public function deleteTrip($tripID) {
         try {
             $trip = TripsModel::findOrFail($tripID);
+            \Log::info('Logging trip details: ' . json_encode($trip));
+            \Log::info('Stripe Product ID: ' . $trip->stripe_product_id);
     
-            \Log::info('Logging trip details: '. json_encode($trip));
-    
-            \Log::info('Deleting trip details for trip ID: '.$tripID);
+            \Log::info('Deleting trip details for trip ID: ' . $tripID);
     
             \Log::info('Checking if photo exists');
     
-            // The correct file path relative to the 'public' disk
-            $filePath = $trip->tripPhoto;
+            // Assuming tripPhoto is an array of URLs, convert it back to its original format for deletion
+            $photos = json_decode($trip->tripPhoto, true);
     
-            // Check if the file exists
-            if (Storage::disk('public')->exists($filePath)) {
-                \Log::info('File exists: ' . $filePath);
+            if ($photos && is_array($photos)) {
+                foreach ($photos as $photoUrl) {
+                    $filePath = str_replace(asset(Storage::url('')), '', $photoUrl);
     
-                // Delete the file
-                Storage::disk('public')->delete($filePath);
-                \Log::info('File deleted: ' . $filePath);
-            } else {
-                \Log::info('File does not exist: ' . $filePath);
+                    // Check if the file exists
+                    if (Storage::disk('public')->exists($filePath)) {
+                        \Log::info('File exists: ' . $filePath);
+    
+                        // Delete the file
+                        Storage::disk('public')->delete($filePath);
+                        \Log::info('File deleted: ' . $filePath);
+                    } else {
+                        \Log::info('File does not exist: ' . $filePath);
+                    }
+                }
             }
     
-            // Delete the trip record
+            // Retrieve all prices associated with the Stripe product
+            $prices = $this->stripe->prices->all(['product' => $trip->stripe_product_id]);
+    
+            foreach ($prices->data as $price) {
+                \Log::info('Setting Stripe price inactive: ' . $price->id);
+                $this->stripe->prices->update($price->id, ['active' => false]);
+            }
+    
+            // Instead of deleting, archive the product in Stripe
+            \Log::info('Archiving product on Stripe');
+            $this->stripe->products->update($trip->stripe_product_id, ['active' => false]);
+    
+            // Delete the trip from the database
             $trip->delete();
             \Log::info('Deleted Trip.');
     
@@ -277,6 +294,9 @@ class Admin extends Controller
             \Log::error('Exception in class: ' . __CLASS__ . ' on line: ' . __LINE__ . ' Error: ' . $e->getMessage());
         }
     }
+    
+    
+    
 
     private function formatSize($bytes)
 {

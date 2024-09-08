@@ -25,7 +25,7 @@
                             @foreach($tripPhotos as $photo)
                                 <img src="{{ $photo }}"
                                     class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer hover:opacity-50 transition-opacity duration-300"
-                                    style="max-width: 100px; height: auto; margin: 5px;"
+                                    style="max-width: 300px; height: 300px; margin: 5px;"
                                     alt="Trip Image" />
                             @endforeach
                         </div>

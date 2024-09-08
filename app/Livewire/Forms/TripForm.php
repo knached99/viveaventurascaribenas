@@ -12,6 +12,7 @@ use Stripe\Product;
 use Stripe\StripeClient;
 use Illuminate\Support\Facades\Storage;
 use Stripe\Exception\InvalidRequestException;
+
 use Exception;
 
 class TripForm extends Form {
@@ -68,9 +69,16 @@ class TripForm extends Form {
 
         try {
             $imageURLs = [];
+            
             foreach ($this->tripPhoto as $photo) {
-                // Store the uploaded file in the 'booking_photos' directory under 'storage/app/public'
-                $filePath = $photo->store('booking_photos', 'public');
+                // Resize and store the uploaded file
+                $image = $photo->getRealPath();
+                $filePath = 'booking_photos/' . time() . '-' . $photo->hashName() . '.'.$photo->extension();
+                $fullPath = storage_path('app/public/' . $filePath);
+    
+                // Use GD to resize the image
+                $this->resizeImage($image, $fullPath, 350, 219);
+    
                 $imageURLs[] = asset(Storage::url($filePath));
             }
 
@@ -138,4 +146,31 @@ class TripForm extends Form {
     {
         return view('livewire.forms.create-trip');
     }
+
+    private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight) {
+        list($width, $height) = getimagesize($sourcePath);
+        $image = imagecreatefromjpeg($sourcePath); // Change to imagecreatefrompng or imagecreatefromgif as needed
+    
+        $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+    
+        // Preserve transparency if PNG
+        if (imageistruecolor($image)) {
+            imagealphablending($resizedImage, false);
+            imagesavealpha($resizedImage, true);
+            $transparent = imagecolorallocatealpha($resizedImage, 255, 255, 255, 127);
+            imagefill($resizedImage, 0, 0, $transparent);
+        }
+    
+        // Resize
+        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+    
+        // Save the image
+        imagejpeg($resizedImage, $destinationPath); // Change to imagepng or imagegif as needed
+    
+        // Cleanup
+        imagedestroy($image);
+        imagedestroy($resizedImage);
+    }
+        
+
 }

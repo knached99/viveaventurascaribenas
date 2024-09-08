@@ -1,5 +1,4 @@
 @props(['trips', 'mostPopularTripIds'])
-
 <section class="ftco-section ftco-no-pt">
     <div class="container">
         <div class="row justify-content-center pb-4">
@@ -11,13 +10,38 @@
             @foreach ($trips as $trip)
                 <div class="col-md-4 col-sm-6 ftco-animate">
                     <div class="project-wrap">
-                        <a href="{{ route('landing.destination', ['tripID' => $trip->tripID]) }}" class="img" style="background-image: url({{ $trip->tripPhoto ? asset('storage/' . $trip->tripPhoto) : asset('assets/images/image_placeholder.jpg') }});">
-                            @if(in_array($trip->tripID, $mostPopularTripIds))
+                        @php 
+                        $tripPhotos = json_decode($trip->tripPhoto, true);
+                        @endphp 
+                        <div id="carouselExampleControls{{$loop->index}}" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                @if(!empty($tripPhotos))
+                                    @foreach($tripPhotos as $index => $photo)
+                                    
+                                        <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                            <img src="{{$photo}}" class="d-block w-100" alt="Photo">
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="carousel-item">
+                                        <img src="{{ asset('assets/images/image_placeholder.jpg') }}" class="d-block w-100" alt="Placeholder">
+                                    </div>
+                                @endif
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls{{$loop->index}}" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls{{$loop->index}}" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                                 @if(in_array($trip->tripID, $mostPopularTripIds))
                                 <div class="popular-badge">
                                     <img src="{{ asset('assets/theme_assets/assets/img/popularBadge.webp') }}" alt="Popular" />
                                 </div>
                             @endif
-                        </a>
+                        </div>
                         <div class="text p-4">
                             <span class="price">${{ number_format($trip->tripPrice, 2) }}/person</span>
                             <span class="days">{{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }} Days</span>
