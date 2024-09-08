@@ -595,6 +595,43 @@
                 background-color: #000;
             }
         </style>
+
+        <style>
+        /* Container for the photo grid */
+.photo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Space between images */
+    margin: -7.5px; /* To compensate for gap space */
+}
+
+/* Each item in the grid */
+.photo-item {
+    flex: 1 1 calc(33.333% - 15px); /* Adjust percentage to control grid item size */
+    box-sizing: border-box;
+    margin: 7.5px; /* Space around each item */
+    border-radius: 10px; /* Rounded corners */
+    overflow: hidden; /* Clip overflow content */
+}
+
+/* Style for images */
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the entire container */
+    transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out; /* Smooth transition effects */
+}
+
+/* Hover effects for images */
+.photo-item:hover img {
+    transform: scale(1.1); /* Zoom in on hover */
+    filter: brightness(80%); /* Darken image on hover */
+}
+
+        </style>
+
+    <!-- Load SCSS for carousel --> 
+    <link rel="stylesheet" href="{{asset('assets/css/carousel.css')}}"/>
     @endif
 
     <!-- End Individual Trip Details css -->

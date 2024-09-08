@@ -36,9 +36,10 @@ class BookingModel extends Model
     ];
 
 
-public function trip()
-{
-    return $this->belongsTo(TripsModel::class, 'tripID', 'tripID');
-}
+    public function trip()
+    {
+        return $this->belongsTo(TripsModel::class, 'tripID', 'tripID');
+    }
+    
 
 }

@@ -3,6 +3,7 @@
 
     $startDate = Carbon::parse($trip->tripStartDate)->format('Y-m-d');
     $endDate = Carbon::parse($trip->tripEndDate)->format('Y-m-d');
+    $tripPhotos = json_decode($trip->tripPhoto, true);
 @endphp
 
 <div class="container mt-5">
@@ -16,18 +17,24 @@
                 </div>
 
                 <form wire:submit.prevent="editTrip" class="p-4" enctype="multipart/form-data">
-                    <!-- Editable Image -->
-                    <div class="text-center mb-4">
-                        <label for="tripPhoto" class="form-label fw-semibold d-block">
-                            <img src="{{ asset('storage/' . $trip->tripPhoto) }}"
-                                class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer hover:opacity-50 transition-opacity duration-300"
-                                style="max-width: 300px; height: auto;" alt="{{ $trip->tripLocation }}" />
+                   
+                      <!-- Editable Images -->
+                   <div class="text-center mb-4">
+                    <label for="tripPhotos" class="form-label fw-semibold d-block">
+                        <div class="d-flex flex-wrap justify-content-center">
+                            @foreach($tripPhotos as $photo)
+                                <img src="{{ $photo }}"
+                                    class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer hover:opacity-50 transition-opacity duration-300"
+                                    style="max-width: 100px; height: auto; margin: 5px;"
+                                    alt="Trip Image" />
+                            @endforeach
+                        </div>
+                    </label>
+                    <input type="file" wire:model="tripPhotos" id="tripPhotos"
+                        class="form-control-file d-none {{ $errors->has('tripPhotos.*') ? 'border-danger' : '' }}" multiple />
+                    <x-input-error :messages="$errors->get('tripPhotos.*')" class="mt-2" />
+                </div>
 
-                        </label>
-                        <input type="file" wire:model="tripPhoto" id="tripPhoto"
-                            class="form-control-file d-none {{ $errors->has('tripPhoto') ? 'border-danger' : '' }}" />
-                        <x-input-error :messages="$errors->get('tripPhoto')" class="mt-2" />
-                    </div>
 
                     <!-- Editable Trip Description -->
                     <div class="mb-3">

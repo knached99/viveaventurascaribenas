@@ -29,7 +29,7 @@ class TripsModel extends Model
 
     protected $casts = [
         'tripID' => 'string',
-        //'tripPhoto'=>'array',
+        'tripPhoto'=>'array',
     ];
 
     public function testimonial()

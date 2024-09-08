@@ -24,7 +24,7 @@
             <tr>
                 <td>{{ $testimonial->name }}</td>
                 <td>{{ $testimonial->email ? $testimonial->email : 'no email provided'}}</td>
-                <td>{{$testimonial->trip->tripLocation}}</td>
+                <td>{{ $testimonial->trip->tripLocation ?? 'Location not available' }}</td>
                 <td>{{ date('F, Y', strtotime($testimonial->trip_date)) }}</td>
                 <td>
                     <div class="d-flex">

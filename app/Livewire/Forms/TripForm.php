@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Livewire\Forms;
 
@@ -20,43 +20,39 @@ class TripForm extends Form {
 
     protected $stripe;
 
-    
-    
-    #[Validate('required|string')]
     public string $tripLocation = '';
-
-    #[Validate('required|image|mimes:jpeg,png,jpg|max:2048')]
-    public \Illuminate\Http\UploadedFile | null $tripPhoto = null;
-
-    #[Validate('required|string')]
     public string $tripLandscape = '';
-
-    #[Validate('required')]
     public string $tripAvailability = '';
-
-    #[Validate('required')]
     public string $tripDescription = '';
-
-    #[Validate('required')]
     public string $tripActivities = '';
-
-    #[Validate('sometimes|date|before_or_equal:tripEndDate')]
     public string $tripStartDate = '';
-
-    #[Validate('sometimes|date|after_or_equal:tripStartDate')]
     public string $tripEndDate = '';
-
-    #[Validate('required|numeric|min:1')]
     public string $tripPrice = '';
+    // Validate that 'tripPhoto' is an array of images with specific rules
+    #[Validate('required|array|max:3')]
+    public ?array $tripPhoto = [];
 
-    // Define the status and error properties
     public string $status = '';
     public string $error = '';
+
+    public function rules()
+    {
+        return [
+            'tripPhoto.*' => 'image|mimes:jpeg,png,jpg|max:2048', // Validation for each file
+            'tripLocation' => 'required|string',
+            'tripLandscape' => 'required|string',
+            'tripAvailability' => 'required|string',
+            'tripDescription' => 'required|string',
+            'tripActivities' => 'required|string',
+            'tripStartDate' => 'sometimes|date|before_or_equal:tripEndDate',
+            'tripEndDate' => 'sometimes|date|after_or_equal:tripStartDate',
+            'tripPrice' => 'required|numeric|min:1',
+        ];
+    }
 
     public function mount(){
         Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
         $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-    
     }
 
     public function submitTripForm(): void {
@@ -69,76 +65,67 @@ class TripForm extends Form {
             $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
             \Log::info('Stripe Initialized!');
         }
-    
+
         try {
-            // Store the uploaded file in the 'booking_photos' directory under 'storage/app/public'
-            $filePath = $this->tripPhoto->store('booking_photos', 'public');
-    
-            $imageURL = asset(Storage::url($filePath));
+            $imageURLs = [];
+            foreach ($this->tripPhoto as $photo) {
+                // Store the uploaded file in the 'booking_photos' directory under 'storage/app/public'
+                $filePath = $photo->store('booking_photos', 'public');
+                $imageURLs[] = asset(Storage::url($filePath));
+            }
 
-
-            // Create as a product in Stripe 
+            // Create a product in Stripe
             $product = $this->stripe->products->create([
-                'name'=>$this->tripLocation,
-                'description'=>$this->tripDescription,
-                'images' => [$imageURL]
+                'name' => $this->tripLocation,
+                'description' => $this->tripDescription,
+                'images' => $imageURLs
             ]);
 
             // Create price in Stripe after successful product creation
-
-            if($product){
-                
+            if ($product) {
                 $price = $this->stripe->prices->create([
-                    'unit_amount'=> $this->tripPrice * 100, // unit amount in stripe is stored in cents 
+                    'unit_amount' => $this->tripPrice * 100, // unit amount in stripe is stored in cents
                     'currency' => 'usd',
-                    'product'=>$product->id
+                    'product' => $product->id
                 ]);
 
-                if($price){
+                if ($price) {
                     // Reset the temporary file from Livewire
-
                     $data = [
                         'tripID' => Str::uuid(),
-                        'stripe_product_id'=>$product->id,
+                        'stripe_product_id' => $product->id,
                         'tripLocation' => $this->tripLocation,
                         'tripDescription' => $this->tripDescription,
-                        'tripActivities'=>$this->tripActivities,
+                        'tripActivities' => $this->tripActivities,
                         'tripLandscape' => $this->tripLandscape,
                         'tripAvailability' => $this->tripAvailability,
-                        'tripPhoto' => $filePath, // relative file path
+                        'tripPhoto' => json_encode($imageURLs),// Store image URLs as a JSON array
                         'tripStartDate' => $this->tripStartDate,
                         'tripEndDate' => $this->tripEndDate,
                         'tripPrice' => $this->tripPrice
                     ];
-        
-        
+
                     // Save trip data
                     TripsModel::create($data);
 
-                    
                     $this->resetForm();
-            
+
                     // Set success message
                     $this->status = 'Trip Successfully Created!';
                 }
             }
-
-          
-
-    
-            
         } catch (Exception $e) {
             $this->error = 'Something went wrong while creating this trip';
             \Log::error('Uncaught PHP exception on line: ' . __LINE__ . ' in function: ' . __FUNCTION__ . ' in class: ' . __CLASS__ . ' In file: ' . __FILE__ . ' Error: ' . $e->getMessage());
         }
     }
-    
+
     public function resetForm(): void {
         $this->tripLocation = '';
         $this->tripDescription = '';
         $this->tripLandscape = '';
         $this->tripAvailability = '';
-        $this->tripPhoto = null; // Reset file
+        $this->tripPhoto = []; // Reset file array
         $this->tripStartDate = '';
         $this->tripEndDate = '';
         $this->tripPrice = '';

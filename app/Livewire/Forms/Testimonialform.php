@@ -82,7 +82,6 @@ class TestimonialForm extends Component
         try {
 
             $booking = BookingModel::where('email', $this->email)->first();
-            \Log::info('Booking: ' . ($booking ? 'Found' : 'Not Found'));
 
             if(empty($booking)){
                 $this->error = 'You cannot submit a testimonial if you have not booked a trip with us';

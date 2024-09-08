@@ -41,22 +41,27 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             <x-input-error :messages="$errors->get('form.tripLocation')" class="invalid-feedback" />
                         </div>
 
-                        <div class="mb-4">
-                            <label for="tripPhoto" class="form-label">Trip Photo</label>
-                            <input type="file" id="tripPhoto" name="tripPhoto"
-                                class="form-control {{ $errors->has('form.tripPhoto') ? 'is-invalid' : '' }}"
-                                wire:model="form.tripPhoto" wire:loading.remove />
-                            <x-input-error :messages="$errors->get('form.tripPhoto')" class="invalid-feedback" />
-                            <div wire:loading wire:target="form.tripPhoto" class="mt-2">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
+                       <div class="mb-4">
+                        <label for="tripPhoto" class="form-label">Trip Photos</label>
+                        <input type="file" id="tripPhoto" name="tripPhoto"
+                            class="form-control {{ $errors->has('form.tripPhoto') ? 'is-invalid' : '' }}"
+                            wire:model="form.tripPhoto" multiple />
+                        <x-input-error :messages="$errors->get('form.tripPhoto')" class="invalid-feedback" />
+                        <div wire:loading wire:target="form.tripPhoto" class="mt-2">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-                            @if ($form->tripPhoto)
-                                <img src="{{ $form->tripPhoto->temporaryUrl() }}" class="img-fluid rounded mt-3"
-                                    style="max-width: 100%; height: auto;" />
-                            @endif
                         </div>
+                        @if ($form->tripPhoto)
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach ($form->tripPhoto as $photo)
+                                <img src="{{ $photo->temporaryUrl() }}" class="img-fluid rounded" style="max-width: 200px; height: 200px;" />
+                            @endforeach
+                        </div>
+                    @endif
+
+                    </div>
+
 
                         <div class="mb-4">
                             <label for="tripLandscape" class="form-label">Trip Landscape</label>

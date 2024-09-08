@@ -16,7 +16,7 @@ class EditTripForm extends Component
     public $trip;
 
     public string $tripLocation = '';
-    public ?UploadedFile $tripPhoto = null;
+    public array $tripPhotos = []; // Array to handle multiple image uploads
     public string $tripLandscape = ''; 
     public string $tripAvailability = ''; 
     public string $tripDescription = ''; 
@@ -30,7 +30,7 @@ class EditTripForm extends Component
     {
         return [
             'tripLocation' => 'required|string|max:255',
-            'tripPhoto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'tripPhotos.*' => 'nullable|image|mimes:jpeg,jpg,png|max:2048', // Validation for multiple images
             'tripLandscape' => 'required|string',
             'tripAvailability' => 'required|string',
             'tripDescription' => 'required|string',
@@ -59,39 +59,41 @@ class EditTripForm extends Component
     {
         $this->validate();
 
-    
-            Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
-            $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-        
+        Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
+        $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
         try {
             // Retrieve the Stripe product
             $product = $this->stripe->products->retrieve($this->trip->stripe_product_id);
             $tripModel = TripsModel::findOrFail($this->trip->tripID);
 
-
             if ($product) {
                 $product->name = $this->tripLocation;
                 $product->description = $this->tripDescription;
 
-                if ($this->tripPhoto) {
-                    $imagePath = $this->tripPhoto->store('booking_photos', 'public');
-                    $imageURL = asset(Storage::url($imagePath));
-
-                    // Check and delete the old image
-                    if (!empty($product->images[0])) {
-                        $existingImageURL = $product->images[0];
-                        $existingImageFile = basename($existingImageURL);
-
-                        if (Storage::disk('public')->exists('booking_photos/' . $existingImageFile)) {
-                            Storage::disk('public')->delete('booking_photos/' . $existingImageFile);
+                // Handle multiple image uploads
+                $imageURLs = [];
+                if ($this->tripPhotos) {
+                    // Delete old images
+                    if (!empty($product->images)) {
+                        foreach ($product->images as $existingImageURL) {
+                            $existingImageFile = basename($existingImageURL);
+                            if (Storage::disk('public')->exists('booking_photos/' . $existingImageFile)) {
+                                Storage::disk('public')->delete('booking_photos/' . $existingImageFile);
+                            }
                         }
                     }
 
-                    // Update the product's image
-                    $product->images = [$imageURL];
+                    // Store new images
+                    foreach ($this->tripPhotos as $photo) {
+                        $imagePath = $photo->store('booking_photos', 'public');
+                        $imageURL = asset(Storage::url($imagePath));
+                        $imageURLs[] = $imageURL;
+                    }
                 }
-                
+
+                // Update the product's images
+                $product->images = $imageURLs;
 
                 // Update the product
                 $this->stripe->products->update($product->id, [
@@ -100,10 +102,7 @@ class EditTripForm extends Component
                     'images' => $product->images,
                 ]);
 
-
-                // Update the Model 
-
-        
+                // Update the Model
                 $tripModel->tripLocation = $this->tripLocation;
                 $tripModel->tripLandscape = $this->tripLandscape;
                 $tripModel->tripAvailability = $this->tripAvailability;
@@ -115,9 +114,6 @@ class EditTripForm extends Component
                 $tripModel->save();
 
                 $this->success = 'Trip information updated successfully!';
-
-        
-            
             }
         } catch (Exception $e) {
             \Log::error('Uncaught exception occurred on line: ' . __LINE__ . ' in class: ' . __CLASS__ . ' Error Message: ' . $e->getMessage());

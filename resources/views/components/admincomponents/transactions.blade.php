@@ -1,12 +1,11 @@
-@props(['bookings'])
-<!-- Transactions -->
+@props(['bookings', 'productMap'])
+
 <div class="col order-2 mb-6">
     <div class="card h-100">
         <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="card-title m-0 me-2">Bookings</h5>
             <div class="dropdown">
-                <button class="btn text-muted p-0" type="button" id="transactionID" data-bs-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
+                <button class="btn text-muted p-0" type="button" id="transactionID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="bx bx-dots-vertical-rounded bx-lg"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">
@@ -35,11 +34,10 @@
                 <tbody>
                     @foreach ($bookings as $booking)
                         @php
-                            $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
-                            $checkoutSessionID = $booking->stripe_checkout_id;
-                            $product = $stripe->products->retrieve($booking->stripe_product_id);
-                            $location = $product->name;
+                            // Retrieve location from productMap
+                            $location = $productMap[$booking->stripe_product_id] ?? 'Unknown';
 
+                            // Initialize default values
                             $paymentMethod = 'N/A';
                             $paymentAmount = '$0.00';
                             $paymentStatus = 'N/A';
@@ -49,8 +47,10 @@
                             $paymentMethodCard = 'N/A';
                             $receiptLink = 'N/A';
 
-                            if (!empty($checkoutSessionID)) {
-                                $checkoutSession = $stripe->checkout->sessions->retrieve($checkoutSessionID);
+                            if (!empty($booking->stripe_checkout_id)) {
+                                $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+                                $checkoutSession = $stripe->checkout->sessions->retrieve($booking->stripe_checkout_id);
+
                                 if ($checkoutSession && !empty($checkoutSession->payment_intent)) {
                                     $paymentIntent = $checkoutSession->payment_intent;
                                     $charges = $stripe->charges->all(['payment_intent' => $paymentIntent]);
@@ -86,34 +86,26 @@
                                     }
                                 }
                             }
+
+                            // Handle case where trip is null
+                            $tripLocation = $booking->trip ? $booking->trip->tripLocation : 'Unknown Location';
                         @endphp
 
-                         <tr>
-                        <td>{{ $booking->name }}</td>
-                        <td>{{ $location }}</td>
-                        <td>{{ $paymentMethod }}</td>
-                        <td>{{ $paymentAmount }}</td>
-                        <td>{{ $paymentStatus }}</td>
-
-                        <!-- Always show three columns for card details, even if they are N/A -->
-                        @if ($paymentMethod === 'card')
+                        <tr>
+                            <td>{{ $booking->name }}</td>
+                            <td>{{ $tripLocation }}</td>
+                            <td>{{ $paymentMethod }}</td>
+                            <td>{{ $paymentAmount }}</td>
+                            <td>{{ $paymentStatus }}</td>
                             <td>{{ $paymentMethodCard }}</td>
                             <td>{{ $cardExpirationMonth . '/' . $cardExpirationYear }}</td>
                             <td>{{ $cardLast4 }}</td>
-                        @else
-                            <td>N/A</td>
-                            <td>N/A</td>
-                            <td>N/A</td>
-                        @endif
-
-                        <td><a href="{{ $receiptLink }}" target="_blank" rel="noreferrer noopener">View Receipt</a></td>
-                        <td><a href="{{ route('admin.booking', ['bookingID' => $booking->bookingID]) }}">View Booking</a></td>
-                    </tr>
-
+                            <td><a href="{{ $receiptLink }}" target="_blank" rel="noopener noreferrer">View Receipt</a></td>
+                            <td><a href="{{ route('admin.booking', ['bookingID' => $booking->bookingID]) }}">View Booking</a></td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-<!--/ Transactions -->

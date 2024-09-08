@@ -107,6 +107,7 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
 <script src="{{ asset('assets/js/google-map.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>
+    <script src="{{asset('assets/js/carousel.js')}}"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -194,6 +195,7 @@
             }
         });
     </script>
+
 @endif
 
 @livewireScripts

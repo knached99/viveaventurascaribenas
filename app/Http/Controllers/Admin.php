@@ -30,45 +30,72 @@ class Admin extends Controller
     {
         $directories = [
             storage_path('app/public/booking_photos'),
-            // Any other directories go here
         ];
     
         // Calculate storage usage
         $storageData = $this->calculateStorageUsage($directories);
     
         // Format storage values
-        $usedStorage = $this->formatSize($storageData['usedSpace']);     
-        $totalStorage = $this->formatSize($storageData['totalSpace']);      
-        $remainingStorage = $this->formatSize($storageData['freeSpace']);   
-        
+        $usedStorage = $this->formatSize($storageData['usedSpace']);
+        $totalStorage = $this->formatSize($storageData['totalSpace']);
+        $remainingStorage = $this->formatSize($storageData['freeSpace']);
+    
         $charges = $this->stripe->charges->all();
-
-        // Gets all transactions that aren't refunded 
-        $transactions = array_filter($charges->data, function($charge) {
-            return !$charge->refunded; // Filter out refunded transactions
+    
+        // Get all non-refunded transactions
+        $transactions = array_filter($charges->data, function ($charge) {
+            return !$charge->refunded;
         });
-
-        $bookings = BookingModel::select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id')->get();
-        $reservations = Reservations::select('reservationID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();
-
-        $mostPopularBooking = BookingModel::select('stripe_product_id')
-        ->selectRaw('COUNT(*) as booking_count') 
-        ->groupBy('stripe_product_id')
-        ->having('booking_count', '>', 1) //  only bookings with more than 1 entry are considered
-        ->orderByDesc('booking_count')
-        ->first();
-
-        $mostPopularTripName = null;
-
-        if($mostPopularBooking){
-            $product = $this->stripe->products->retrieve($mostPopularBooking->stripe_product_id);
-            $mostPopularTripName = $product->name;   
-        }
-
+    
+        // Fetch bookings and reservations
+        $bookings = BookingModel::with('trip')
+        ->select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id', 'tripID')
+        ->get();
         
-
-        return view('admin.dashboard', compact('storageData', 'usedStorage', 'totalStorage', 'remainingStorage', 'transactions', 'bookings', 'reservations', 'mostPopularBooking', 'mostPopularTripName'));
+            $reservations = Reservations::select('reservationID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();
+    
+        // Optimize Stripe API calls
+        $allProductIds = $bookings->pluck('stripe_product_id')
+        ->merge($reservations->pluck('stripe_product_id'))
+        ->unique()
+        ->values()  // This method resets the keys of the collection
+        ->toArray();
+    
+        // Fetch all products in a single call
+        $stripeProducts = $this->stripe->products->all(['ids' => $allProductIds]);
+    
+        // Map products by ID for easy access
+        $productMap = collect($stripeProducts->data)->mapWithKeys(function ($product) {
+            return [$product->id => $product->name];
+        });
+    
+        // Fetch the most popular booking based on the number of entries
+        $mostPopularBooking = BookingModel::select('stripe_product_id')
+            ->selectRaw('COUNT(*) as booking_count')
+            ->groupBy('stripe_product_id')
+            ->having('booking_count', '>', 1)
+            ->orderByDesc('booking_count')
+            ->first();
+    
+        $mostPopularTripName = null;
+        if ($mostPopularBooking && isset($productMap[$mostPopularBooking->stripe_product_id])) {
+            $mostPopularTripName = $productMap[$mostPopularBooking->stripe_product_id];
+        }
+    
+        return view('admin.dashboard', compact(
+            'storageData',
+            'usedStorage',
+            'totalStorage',
+            'remainingStorage',
+            'transactions',
+            'bookings',
+            'reservations',
+            'mostPopularBooking',
+            'mostPopularTripName',
+            'productMap' 
+        ));
     }
+
     
     public function profilePage(){
         return view('admin/profile');

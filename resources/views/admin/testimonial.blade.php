@@ -45,7 +45,7 @@
             <div class="flex items-center space-x-4">
                 <div class="flex items-center">
                     <i class='bx bx-map text-lg'></i>
-                    <span class="ml-2">{{ $testimonial->trip->tripLocation }}</span>
+                    <span class="ml-2">{{ $testimonial->trip ? $testimonial->trip->tripLocation : 'Location not available' }}</span>
                 </div>
                 <div class="flex items-center">
                     <i class='bx bx-calendar text-lg'></i>

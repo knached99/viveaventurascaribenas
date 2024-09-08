@@ -5,7 +5,7 @@
 
     $startDate = Carbon::parse($trip->tripStartDate);
     $endDate = Carbon::parse($trip->tripEndDate);
-
+    $tripPhotos = json_decode($trip->tripPhoto, true);
 @endphp
 
 <x-travelcomponents.header />
@@ -16,9 +16,15 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8">
-                <div class="trip-image"
-                    style="background-image: url('{{ $trip->tripPhoto ? asset('storage/' . $trip->tripPhoto) : asset('assets/images/image_placeholder.jpg') }}');">
-                </div>
+             <!-- Photo Grid Section -->
+            <div class="photo-grid">
+                @foreach($tripPhotos as $tripPhoto)
+                    <div class="photo-item">
+                        <img src="{{ $tripPhoto }}" alt="Trip Image" />
+                    </div>
+                @endforeach
+            </div>
+
                 <div class="trip-details">
                     <h2>{{ $trip->tripLocation }}
                         <!-- If this is the most popular booking, then dispaly the badge here-->

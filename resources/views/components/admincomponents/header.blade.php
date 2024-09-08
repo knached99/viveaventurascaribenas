@@ -55,6 +55,49 @@
     <!-- Page -->
     <link rel="stylesheet" href="{{ asset('assets/theme_assets/assets/vendor/css/pages/page-auth.css') }}" />
 
+    @if(\Route::currentRouteName() === 'admin.all-trips')
+    <style>
+    /* Custom Carousel Styles */
+.custom-carousel {
+    position: relative;
+    width: 100%;
+    max-height: 200px; /* Adjust as needed */
+    overflow: hidden;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: auto;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 5%;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-image: none;
+}
+
+.carousel-control-prev-icon::before {
+    content: '←'; /* Customize arrow */
+    font-size: 24px;
+}
+
+.carousel-control-next-icon::before {
+    content: '→'; /* Customize arrow */
+    font-size: 24px;
+}
+
+    </style>
+@endif 
     <!-- Helpers -->
     <script src="{{ asset('assets/theme_assets/assets/vendor/js/helpers.js') }}"></script>
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->

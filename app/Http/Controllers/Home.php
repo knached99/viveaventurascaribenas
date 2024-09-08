@@ -12,6 +12,7 @@ use App\Models\BookingModel;
 use App\Models\Reservations;
 use Illuminate\Database\Eloquent\ModelNotFoundException; 
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\BookingSubmittedAdmin;
 use App\Notifications\BookingSubmittedCustomer;
@@ -25,53 +26,53 @@ class Home extends Controller
          $this->bookingID = Str::uuid();
 
     }
-
+    
+    // Optimized for performance 
     public function homePage()
     {
-        // Fetch all trips
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->get();
         
-        // Fetch approved testimonials
         $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
     
         // Find the top 4 most popular bookings with more than one entry
-        $mostPopularBookings = BookingModel::select('stripe_product_id')
-            ->selectRaw('COUNT(*) as booking_count')
-            ->groupBy('stripe_product_id')
-            ->having('booking_count', '>', 1) // Ensure only bookings with more than 1 entry are considered
+        $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
+            ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
+            ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
+            ->having('booking_count', '>', 1)
             ->orderByDesc('booking_count')
-            ->take(4) // Get the top 4 most popular bookings
+            ->take(4)
             ->get();
     
         $popularTrips = [];
-        $mostPopularTripIds = [];
+        $mostPopularTripIds = []; 
     
         foreach ($mostPopularBookings as $booking) {
-            // Retrieve the product from Stripe using the stripe_product_id
+
             $product = $this->stripe->products->retrieve($booking->stripe_product_id);
-            
-            // Fetch the trip details based on the product ID
+    
             $trip = TripsModel::where('stripe_product_id', $booking->stripe_product_id)->first();
-            
+    
             if ($trip) {
                 $popularTrips[] = [
                     'id' => $trip->tripID,
                     'name' => $product->name,
                     'count' => $booking->booking_count,
-                    'image' => $trip->tripPhoto, // Use trip photo or default image
+                    'image' => $trip->tripPhoto,
                 ];
-                $mostPopularTripIds[] = $trip->tripID; // Collect trip IDs directly
+                $mostPopularTripIds[] = $trip->tripID; 
             }
         }
     
+        
         return view('landing.home', [
             'trips' => $trips,
             'testimonials' => $testimonials,
             'popularTrips' => $popularTrips,
-            'mostPopularTripIds' => $mostPopularTripIds
+            'mostPopularTripIds' => $mostPopularTripIds, 
         ]);
     }
     
+
     
 
     public function getDestinationDetails($tripID){
