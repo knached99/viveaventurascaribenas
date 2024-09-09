@@ -69,6 +69,14 @@ class TripForm extends Form {
 
         try {
             $imageURLs = [];
+
+            // Create booking_photos folder if it does not exist
+
+            $dirPath = storage_path('app/public/booking_photos');
+
+            if(!file_exists($dirPath)){
+                mkdir($dirPath, 0755, true);
+            }
             
             foreach ($this->tripPhoto as $photo) {
                 

@@ -43,17 +43,15 @@
                         <div class="card-body">
                             <h5 class="card-title text-primary mb-3">Storage Usage</h5>
                             <p class="mb-6">
-                                You have used <strong>{{ $usedStorage }}</strong> of your
-                                <strong>{{ $totalStorage }}</strong> storage capacity.
+                                You have used <strong>100 GB</strong> of your
+                                <strong>100 GB</strong> storage capacity.
                             </p>
                             <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar"
-                                    style="width: {{ ($storageData['usedSpace'] / $storageData['totalSpace']) * 100 }}%;"
-                                    aria-valuenow="{{ ($storageData['usedSpace'] / $storageData['totalSpace']) * 100 }}"
+                                <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100"
                                     aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                             <p class="mb-6">
-                                You have <strong>{{ $remainingStorage }}</strong> of storage remaining.
+                                You have <strong>0 GB</strong> of storage remaining.
                             </p>
 
                             <a href="javascript:;" class="btn btn-sm btn-outline-primary">Manage Storage</a>
@@ -446,7 +444,7 @@
         <!-- Transactions Go Here -->
         <x-admincomponents.transactions :bookings="$bookings" />
 
-        <!-- Reservations --> 
-        <x-admincomponents.reservations-table :reservations="$reservations"/>
+        <!-- Reservations -->
+        <x-admincomponents.reservations-table :reservations="$reservations" />
     </div>
 </x-authenticated-theme-layout>
