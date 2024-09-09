@@ -39,7 +39,7 @@ class TripForm extends Form {
     public function rules()
     {
         return [
-            'tripPhoto.*' => 'image|mimes:jpeg,png,jpg|max:2048', // Validation for each file
+            'tripPhoto.*' => 'image|mimes:jpeg,png,jpg', // Validation for each file
             'tripLocation' => 'required|string',
             'tripLandscape' => 'required|string',
             'tripAvailability' => 'required|string',
@@ -57,20 +57,21 @@ class TripForm extends Form {
     }
 
     public function submitTripForm(): void {
+
         $this->validate();
 
+      
+
         if(!$this->stripe){
-            \Log::info('Stripe not initialized');
-            \Log::info('Initializing Stripe...');
-            Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
             $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-            \Log::info('Stripe Initialized!');
+        
         }
 
         try {
             $imageURLs = [];
             
             foreach ($this->tripPhoto as $photo) {
+                
                 // Resize and store the uploaded file
                 $image = $photo->getRealPath();
                 $filePath = 'booking_photos/' . time() . '-' . $photo->hashName() . '.'.$photo->extension();
@@ -82,7 +83,8 @@ class TripForm extends Form {
                 $imageURLs[] = asset(Storage::url($filePath));
             }
 
-            // Create a product in Stripe
+         
+
             $product = $this->stripe->products->create([
                 'name' => $this->tripLocation,
                 'description' => $this->tripDescription,
@@ -91,6 +93,7 @@ class TripForm extends Form {
 
             // Create price in Stripe after successful product creation
             if ($product) {
+
                 $price = $this->stripe->prices->create([
                     'unit_amount' => $this->tripPrice * 100, // unit amount in stripe is stored in cents
                     'currency' => 'usd',
@@ -115,6 +118,7 @@ class TripForm extends Form {
 
                     // Save trip data
                     TripsModel::create($data);
+                    
 
                     $this->resetForm();
 
