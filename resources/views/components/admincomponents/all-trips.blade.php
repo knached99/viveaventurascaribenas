@@ -10,6 +10,8 @@
             <th scope="col">End Date</th>
             <th scope="col">Number of Days</th>
             <th scope="col">Price (per person)</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Updated At</th>
             <th scope="col">View</th>
             <th scope="col">Delete</th>
         </tr>
@@ -78,6 +80,8 @@
                 <td>{{ date('F jS, Y', strtotime($trip->tripEndDate)) }}</td>
                 <td>{{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}</td>
                 <td>${{ number_format($trip->tripPrice, 2) }}</td>
+                <td>{{ date('F jS, Y', strtotime($trip->created_at)) }}</td>
+                <td>{{ date('F jS, Y', strtotime($trip->updated_at)) }}</td>
                 <td>
                     <a href="{{ route('admin.trip', ['tripID' => $trip->tripID]) }}" class="text-decoration-underline">
                         View

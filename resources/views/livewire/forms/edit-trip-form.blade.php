@@ -11,134 +11,138 @@
         <div class="col-12 col-md-10 col-lg-8">
             <div class="card shadow-lg border-0 rounded-lg">
                 <!-- Card Header -->
-                <div
-                    class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center rounded-top">
+                <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center rounded-top">
                     <h3 class="mb-0 fw-bold">Trip Information for {{ $trip->tripLocation }}</h3>
                 </div>
 
                 <form wire:submit.prevent="editTrip" class="p-4" enctype="multipart/form-data">
-                   
-                      <!-- Editable Images -->
-                   <div class="text-center mb-4">
-                    <label for="tripPhotos" class="form-label fw-semibold d-block">
-                        <div class="d-flex flex-wrap justify-content-center">
-                            @foreach($tripPhotos as $photo)
-                                <img src="{{ $photo }}"
-                                    class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer hover:opacity-50 transition-opacity duration-300"
-                                    style="max-width: 300px; height: 300px; margin: 5px;"
-                                    alt="Trip Image" />
-                            @endforeach
-                        </div>
-                    </label>
-                    <input type="file" wire:model="tripPhotos" id="tripPhotos"
-                        class="form-control-file d-none {{ $errors->has('tripPhotos.*') ? 'border-danger' : '' }}" multiple />
-                    <x-input-error :messages="$errors->get('tripPhotos.*')" class="mt-2" />
-                </div>
+                    <!-- Editable Images --> 
+                    <div class="text-center mb-4">
+                        <label for="tripPhotos" class="form-label fw-semibold d-block">
+                            <div class="d-flex flex-wrap justify-content-center">
+                                <!-- Check if there are any trip photos -->
+                                @if($tripPhotos && count($tripPhotos) > 0)
+                                    <!-- Loop through each trip photo and display with delete or replace option -->
+                                    @foreach($tripPhotos as $index => $photo)
+                                        <div class="position-relative m-2">
+                                            @if(is_string($photo))
+                                                <!-- Display existing photo (URL stored in the database) -->
+                                                <img src="{{ $photo }}" 
+                                                    class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer hover:opacity-50 transition-opacity duration-300"
+                                                    style="max-width: 200px; height: 200px;" alt="Trip Image"
+                                                    wire:click="selectImageToReplace({{ $index }})" />
+                                            @elseif($photo instanceof \Livewire\TemporaryUploadedFile)
+                                                <!-- Display new uploaded photo -->
+                                                <img src="{{ $photo->temporaryUrl() }}" 
+                                                    class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer hover:opacity-50 transition-opacity duration-300"
+                                                    style="max-width: 200px; height: 200px;" alt="Trip Image"
+                                                    wire:click="selectImageToReplace({{ $index }})" />
+                                            @endif
 
-
-                    <!-- Editable Trip Description -->
-                    <div class="mb-3">
-                        <label for="tripLocation" class="form-label fw-semibold">Location:</label>
-                        <input type="text" wire:model="tripLocation" id="tripLocation"
-                            class="form-control rounded-3 p-2 {{ $errors->has('tripLocation') ? 'border-danger' : '' }}"
-                            placeholder="Trip Location" value="{{ $trip->tripLocation }}" />
-                        <x-input-error :messages="$errors->get('tripLocation')" class="mt-2" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="tripDescription" class="form-label fw-semibold">Trip Description:</label>
-                        <textarea wire:model="tripDescription" id="tripDescription"
-                            class="form-control rounded-3 editor {{ $errors->has('tripDescription') ? 'border-danger' : '' }}" rows="8" cols="10"
-                            placeholder="Enter trip description...">{{ $trip->tripDescription }}</textarea>
-                        <x-input-error :messages="$errors->get('tripDescription')" class="mt-2" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="tripActivities" class="form-label fw-semibold">Trip Activities:</label>
-                        <textarea wire:model="tripActivities" id="tripActivities"
-                            class="form-control rounded-3 editor {{ $errors->has('tripActivities') ? 'border-danger' : '' }}" rows="8" cols="10"
-                            placeholder="Enter trip activities...">{{ $trip->tripActivities }}</textarea>
-                        <x-input-error :messages="$errors->get('tripActivities')" class="mt-2" />
-                    </div>
-
-                    <div class="row">
-                        <!-- Landscape -->
-                        <div class="col-md-6 mb-3">
-                            <label for="tripLandscape" class="form-label fw-semibold">Landscape:</label>
-                            <select wire:model="tripLandscape" id="tripLandscape"
-                                class="form-select rounded-3 {{ $errors->has('tripLandscape') ? 'border-danger' : '' }}">
-                                <option disabled selected value="{{ $trip->tripLandscape }}">
-                                    {{ $trip->tripLandscape }}</option>
-                                <option value="Beach">Beach</option>
-                                <option value="City">City</option>
-                                <option value="Country Side">Country Side</option>
-                                <option value="Forested">Forested</option>
-                                <option value="Mountainous">Mountainous</option>
-                            </select>
-                            <x-input-error :messages="$errors->get('tripLandscape')" class="mt-2" />
-                        </div>
-
-                        <!-- Trip Availability -->
-                        <div class="col-md-6 mb-3">
-                            <label for="tripAvailability" class="form-label fw-semibold">Availability:</label>
-                            <select wire:model="tripAvailability" id="tripAvailability"
-                                class="form-select rounded-3 {{ $errors->has('tripAvailability') ? 'border-danger' : '' }}">
-                                <option disabled selected value="{{ $trip->tripAvailability }}">
-                                    {{ $trip->tripAvailability }}</option>
-                                <option value="available">Available</option>
-                                <option value="coming soon">Coming Soon</option>
-                                <option value="unavailable">Unavailable</option>
-                            </select>
-                            <x-input-error :messages="$errors->get('tripAvailability')" class="mt-2" />
-                        </div>
-
-                        <!-- Start Date -->
-                        <div class="col-md-6 mb-3">
-                            <label for="tripStartDate" class="form-label fw-semibold">Start Date:</label>
-                            <input type="date" wire:model="tripStartDate" id="tripStartDate"
-                                class="form-control rounded-3 {{ $errors->has('tripStartDate') ? 'border-danger' : '' }}"
-                                value="{{ $startDate }}" />
-                            <x-input-error :messages="$errors->get('tripStartDate')" class="mt-2" />
-                        </div>
-
-                        <!-- End Date -->
-                        <div class="col-md-6 mb-3">
-                            <label for="tripEndDate" class="form-label fw-semibold">End Date:</label>
-                            <input type="date" wire:model="tripEndDate" id="tripEndDate"
-                                class="form-control rounded-3 {{ $errors->has('tripEndDate') ? 'border-danger' : '' }}"
-                                value="{{ $endDate }}" />
-                            <x-input-error :messages="$errors->get('tripEndDate')" class="mt-2" />
-                        </div>
-
-                        <!-- Price -->
-                        <div class="col-md-6 mb-3">
-                            <label for="tripPrice" class="form-label fw-semibold">Price:</label>
-                            <input type="text" wire:model="tripPrice" id="tripPrice"
-                                class="form-control rounded-3 {{ $errors->has('tripPrice') ? 'border-danger' : '' }}"
-                                value="{{ $trip->tripPrice }}" />
-                            <x-input-error :messages="$errors->get('tripPrice')" class="mt-2" />
-                        </div>
-                    </div>
-
-                    <!-- Save Button -->
-                    <div class="text-end m-3">
-                        <button type="submit" class="btn btn-primary mt-3 px-4 py-2 rounded-pill"
-                            wire:loading.remove>Save Changes</button>
-
-                        <div class="spinner-border text-primary" role="status" wire:loading>
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-
-                        @if ($success)
-                            <div class="mb-4 text-success">
-                                {{ $success }}
+                                            <!-- Delete button to remove image -->
+                                            <button type="button" wire:click="removeImage({{ $index }})" 
+                                                class="btn btn-danger btn-sm position-absolute top-0 end-0 mt-1 me-1">
+                                               <i class='bx bx-trash-alt'></i>
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <!-- Default message when no images are available -->
+                                    <p>No images available.</p>
+                                @endif
                             </div>
-                        @elseif($error)
-                            <div class="mb-4 text-danger">
-                                {{ $error }}
-                            </div>
-                        @endif
+                        </label>
+
+                    <!-- Replace image input -->
+                    @if(!is_null($replaceIndex))
+                        <div class="mb-3">
+                            <input type="file" wire:model="tripPhotos.{{ $replaceIndex }}" class="form-control" />
+                            @error('tripPhotos.' . $replaceIndex) <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        <button type="button" wire:click="replaceImage({{ $replaceIndex }})" class="btn btn-primary">
+                            Replace Image
+                        </button>
+                    @else
+                        <!-- Button to add new image -->
+                        <div class="mb-3">
+                            <input type="file" wire:model="tripPhotos" class="form-control" multiple />
+                            @error('tripPhotos.*') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                    @endif
+
                     </div>
+
+                    <!-- Form Fields -->
+                    <!-- Location -->
+                    <div class="mb-3">
+                        <label for="tripLocation" class="form-label">Trip Location</label>
+                        <input type="text" id="tripLocation" wire:model="tripLocation" class="form-control" />
+                        @error('tripLocation') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="tripDescription" class="form-label">Trip Description</label>
+                        <textarea id="tripDescription" wire:model="tripDescription" class="form-control" rows="4"></textarea>
+                        @error('tripDescription') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Activities -->
+                    <div class="mb-3">
+                        <label for="tripActivities" class="form-label">Trip Activities</label>
+                        <textarea id="tripActivities" wire:model="tripActivities" class="form-control" rows="4"></textarea>
+                        @error('tripActivities') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Dates -->
+                    <div class="mb-3">
+                        <label for="tripStartDate" class="form-label">Trip Start Date</label>
+                        <input type="date" id="tripStartDate" wire:model="tripStartDate" class="form-control" />
+                        @error('tripStartDate') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tripEndDate" class="form-label">Trip End Date</label>
+                        <input type="date" id="tripEndDate" wire:model="tripEndDate" class="form-control" />
+                        @error('tripEndDate') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Landscape -->
+                    <div class="mb-3">
+                        <label for="tripLandscape" class="form-label">Trip Landscape</label>
+                        <input type="text" id="tripLandscape" wire:model="tripLandscape" class="form-control" />
+                        @error('tripLandscape') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Availability -->
+                    <div class="mb-3">
+                        <label for="tripAvailability" class="form-label">Trip Availability</label>
+                        <select id="tripAvailability" wire:model="tripAvailability" class="form-select">
+                            <option value="">Select Availability</option>
+                            <option value="available">Available</option>
+                            <option value="coming_soon">Coming Soon</option>
+                            <option value="unavailable">Unavailable</option>
+                        </select>
+                        @error('tripAvailability') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="mb-3 text-center">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+
+                    <!-- Success and Error Messages -->
+                    @if ($success)
+                        <div class="alert alert-success">
+                            {{ $success }}
+                        </div>
+                    @endif
+
+                    @if ($error)
+                        <div class="alert alert-danger">
+                            {{ $error }}
+                        </div>
+                    @endif
                 </form>
             </div>
         </div>

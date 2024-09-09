@@ -18,7 +18,7 @@
           <ul class="menu-inner py-1">
             <!-- Dashboards -->
             <li class="menu-item active open">
-              <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bxs-dashboard"></i>
                 
                 <div class="text-truncate" data-i18n="Dashboards">Dashboard</div>
@@ -26,21 +26,21 @@
               </a>
               <ul class="menu-sub"> 
                 <li class="menu-item {{request()->routeIs('admin.dashboard') ? 'active' : ''}}">
-                  <a href="{{route('admin.dashboard')}}" class="menu-link">
+                  <a href="{{route('admin.dashboard')}}" class="menu-link text-decoration-none">
                     <div class="text-truncate" data-i18n="Home"><i class="menu-icon tf-icons bx bx-home-smile"></i> Home</div>
                   </a>
                 </li>
                 <li class="menu-item {{request()->routeIs('admin.profile') ? 'active ' : ''}}">
                   <a
                     href="{{route('admin.profile')}}"
-                    class="menu-link">
+                    class="menu-link text-decoration-none">
                     <div class="text-truncate" data-i18n="Profile"><i class="menu-icon tf-icons bx bx-user"></i>  Profile</div>
                    
                   </a>
                 </li>
 
                 <li class="menu-item {{request()->routeIs('admin.testimonials') ? 'active' : ''}}">
-                <a href="{{route('admin.testimonials')}}" class="menu-link">
+                <a href="{{route('admin.testimonials')}}" class="menu-link text-decoration-none">
                 <div class="text-truncate" data-i18n="testimonials"><i class='menu-icon tf-icons bx bx-paper-plane'></i> Testimonials</div>
                 </a>
                 </li>
@@ -50,7 +50,7 @@
 
             <!-- Layouts -->
             <li class="menu-item">
-              <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bx-map-alt"></i>
                 <div class="text-truncate" data-i18n="Trips">Trips</div>
               </a>
@@ -60,13 +60,13 @@
                   <a
                     href="{{route('admin.create-trip')}}"
                  
-                    class="menu-link">
+                    class="menu-link text-decoration-none">
                     <div class="text-truncate" data-i18n="trips"><i class="menu-icon tf-icons bx bx-plus"></i> Create Trip</div>
                     {{-- <div class="badge rounded-pill bg-label-primary text-uppercase fs-tiny ms-auto">Pro</div> --}}
                   </a>
                 </li>
                 <li class="menu-item {{request()->routeIs('admin.all-trips') ? 'active' : ''}}">
-                  <a href="{{route('admin.all-trips')}}" class="menu-link">
+                  <a href="{{route('admin.all-trips')}}" class="menu-link text-decoration-none">
                     <div class="text-truncate" data-i18n="Without navbar"><i class='menu-icon tf-icons bx bx-briefcase' ></i> All Trips</div>
                   </a>
                 </li>
@@ -76,7 +76,7 @@
 
             {{-- <!-- Front Pages -->
             <li class="menu-item">
-              <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bx-store"></i>
                 <div class="text-truncate" data-i18n="Front Pages">Front Pages</div>
                 <div class="badge rounded-pill bg-label-primary text-uppercase fs-tiny ms-auto">Pro</div>
@@ -171,7 +171,7 @@
             </li>
             <!-- Pages -->
             <li class="menu-item">
-              <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bx-dock-top"></i>
                 <div class="text-truncate" data-i18n="Account Settings">Account Settings</div>
               </a>
@@ -194,7 +194,7 @@
               </ul>
             </li>
             <li class="menu-item">
-              <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bx-lock-open-alt"></i>
                 <div class="text-truncate" data-i18n="Authentications">Authentications</div>
               </a>
@@ -217,7 +217,7 @@
               </ul>
             </li>
             <li class="menu-item">
-              <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bx-cube-alt"></i>
                 <div class="text-truncate" data-i18n="Misc">Misc</div>
               </a>
@@ -245,7 +245,7 @@
             </li>
             <!-- User interface -->
             <li class="menu-item">
-              <a href="javascript:void(0)" class="menu-link menu-toggle">
+              <a href="javascript:void(0)" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bx-box"></i>
                 <div class="text-truncate" data-i18n="User interface">User interface</div>
               </a>
@@ -350,7 +350,7 @@
 
             <!-- Extended components -->
             <li class="menu-item">
-              <a href="javascript:void(0)" class="menu-link menu-toggle">
+              <a href="javascript:void(0)" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bx-copy"></i>
                 <div class="text-truncate" data-i18n="Extended UI">Extended UI</div>
               </a>
@@ -379,7 +379,7 @@
             <li class="menu-header small text-uppercase"><span class="menu-header-text">Forms &amp; Tables</span></li>
             <!-- Forms -->
             <li class="menu-item">
-              <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bx-detail"></i>
                 <div class="text-truncate" data-i18n="Form Elements">Form Elements</div>
               </a>
@@ -397,7 +397,7 @@
               </ul>
             </li>
             <li class="menu-item">
-              <a href="javascript:void(0);" class="menu-link menu-toggle">
+              <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bx-detail"></i>
                 <div class="text-truncate" data-i18n="Form Layouts">Form Layouts</div>
               </a>
