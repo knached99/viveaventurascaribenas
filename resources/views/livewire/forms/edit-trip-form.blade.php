@@ -153,12 +153,20 @@
                     </div>
 
                     <!-- Landscape -->
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label for="tripLandscape" class="form-label">Trip Landscape</label>
-                        <input type="text" id="tripLandscape" wire:model="tripLandscape" class="form-control" />
-                        @error('tripLandscape')
-                            <span class="text-danger">{{ $message }}</span>
-                        @enderror
+                        <select id="tripLandscape" name="form.tripLandscape"
+                            class="form-select {{ $errors->has('form.tripLandscape') ? 'is-invalid' : '' }}"
+                            wire:model="form.tripLandscape">
+                            <option value="{{ $this->tripLandscape }}" selected disabled>{{ $this->tripLandscape }}
+                            </option>
+                            <option value="Beach">Beach</option>
+                            <option value="City">City</option>
+                            <option value="Country Side">Country Side</option>
+                            <option value="Forested">Forested</option>
+                            <option value="Mountainous">Mountainous</option>
+                        </select>
+                        <x-input-error :messages="$errors->get('form.tripLandscape')" class="invalid-feedback" />
                     </div>
 
                     <!-- Availability -->
