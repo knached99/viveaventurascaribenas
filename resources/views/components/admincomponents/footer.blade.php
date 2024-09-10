@@ -67,12 +67,20 @@
     <script src="https://cdn.datatables.net/2.1.5/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.1.5/js/dataTables.bootstrap5.js"></script>
     <script>
-    new DataTable('.dataTable', {
-    scrollY: '400px',
-    scrollCollapse: true,
-    paging: true
+    // Initialize DataTable with loading animation
+    $(document).ready(function () {
+        $('.dataTable').DataTable({
+            scrollY: '400px',
+            scrollCollapse: true,
+            paging: true,
+            language: {
+                processing: 'Loading Data...'
+            },
+            processing: true,
+        });
     });
-    </script>
+</script>
+
 
 
     <!-- endbuild -->
