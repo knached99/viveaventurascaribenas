@@ -91,7 +91,7 @@ class EditTripForm extends Component
                     }
 
                     foreach ($this->tripPhotos as $photo) {
-                        if ($photo instanceof  \Livewire\TemporaryUploadedFile) {
+                        if ($photo instanceof  \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
                             $imagePath = 'booking_photos/' . time() . '-' . $photo->hashName() .'.'.$photo->extension();
                             $photo->storeAs('public', $imagePath); // Save the new image
                             $newImageURLs[] = asset('storage/' . $imagePath); // Store new image URL
