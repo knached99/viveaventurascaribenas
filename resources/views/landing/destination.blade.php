@@ -18,11 +18,17 @@
             <div class="col-md-8">
              <!-- Photo Grid Section -->
             <div class="photo-grid">
+                @if(!empty($tripPhotos))
                 @foreach($tripPhotos as $tripPhoto)
                     <div class="photo-item">
                         <img src="{{ $tripPhoto }}" alt="Trip Image" />
                     </div>
                 @endforeach
+                @else 
+                 <div class="photo-item">
+                 <img src="{{asset('assets/images/image_placeholder.jpg')}}" class="d-block w-100" style="height: 300px;"/>
+                 </div>
+                @endif 
             </div>
 
                 <div class="trip-details">

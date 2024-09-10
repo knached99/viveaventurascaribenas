@@ -79,9 +79,28 @@
 
     <!-- Vendors JS -->
     <script src="{{asset('assets/theme_assets/assets/vendor/libs/apex-charts/apexcharts.js')}}"></script>
+
+    <!-- ALPINE EDITOR -->
+    {{-- <script src="https://cdn.jsdelivr.net/gh/maxeckel/alpine-editor@0.3.1/dist/alpine-editor.min.js"></script> --}}
+
     
-    <!-- CKEDTITOR 5 -->
-    <x-admincomponents.ckeditor-script/>
+  {{-- <script src="https://cdn.ckeditor.com/ckeditor5/41.3.1/classic/ckeditor.js"></script>
+
+       <!-- CKEDTITOR 5 -->
+      <x-admincomponents.ckeditor-script/> --}}
+
+   <!-- Initialize Quill editor -->
+{{-- <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+  <!-- Initialize Quill editor -->
+  <script>
+      const quill = new Quill('#editor', {
+          theme: 'snow'
+      });
+  </script> --}}
+
+
+
  
     <!-- Main JS -->
     <script src="{{asset('assets/theme_assets/assets/js/main.js')}}"></script>

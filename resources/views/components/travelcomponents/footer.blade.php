@@ -1,4 +1,4 @@
-<footer class="ftco-footer bg-bottom" style="background-image: url(images/footer-bg.jpg);">
+<footer class="ftco-footer bg-bottom" style="background-image: url({{asset('assets/images/footer-bg.jpg')}});">
     <div class="container">
         <div class="row mb-5">
             <div class="col-md">

@@ -28,6 +28,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
         </div>
     @endif
 
+
     <div class="row">
         <div class="col-12 col-xl-8 mb-4">
             <div class="card shadow-sm border-0">
@@ -41,26 +42,27 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             <x-input-error :messages="$errors->get('form.tripLocation')" class="invalid-feedback" />
                         </div>
 
-                       <div class="mb-4">
-                        <label for="tripPhoto" class="form-label">Trip Photos</label>
-                        <input type="file" id="tripPhoto" name="tripPhoto"
-                            class="form-control {{ $errors->has('form.tripPhoto') ? 'is-invalid' : '' }}"
-                            wire:model="form.tripPhoto" multiple />
-                        <x-input-error :messages="$errors->get('form.tripPhoto')" class="invalid-feedback" />
-                        <div wire:loading wire:target="form.tripPhoto" class="mt-2">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                        <div class="mb-4">
+                            <label for="tripPhoto" class="form-label">Trip Photos</label>
+                            <input type="file" id="tripPhoto" name="tripPhoto"
+                                class="form-control {{ $errors->has('form.tripPhoto') ? 'is-invalid' : '' }}"
+                                wire:model="form.tripPhoto" multiple />
+                            <x-input-error :messages="$errors->get('form.tripPhoto')" class="invalid-feedback" />
+                            <div wire:loading wire:target="form.tripPhoto" class="mt-2">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
                             </div>
-                        </div>
-                        @if ($form->tripPhoto)
-                        <div class="d-flex flex-wrap gap-2">
-                            @foreach ($form->tripPhoto as $photo)
-                                <img src="{{ $photo->temporaryUrl() }}" class="img-fluid rounded" style="max-width: 200px; height: 200px;" />
-                            @endforeach
-                        </div>
-                    @endif
+                            @if ($form->tripPhoto)
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach ($form->tripPhoto as $photo)
+                                        <img src="{{ $photo->temporaryUrl() }}" class="img-fluid rounded"
+                                            style="max-width: 200px; height: 200px;" />
+                                    @endforeach
+                                </div>
+                            @endif
 
-                    </div>
+                        </div>
 
 
                         <div class="mb-4">
@@ -93,16 +95,16 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
                         <div class="mb-4">
                             <label for="tripDescription" class="form-label">Trip Description</label>
-                            <textarea id="tripDescription" name="tripDescription" placeholder="Enter description of this trip"
+                            <textarea id="tripDescription"  name="tripDescription" placeholder="Enter description of this trip"
                                 wire:model="form.tripDescription"
-                                class="form-control editor {{ $errors->has('form.tripDescription') ? 'is-invalid' : '' }}" rows="4"></textarea>
+                                class="form-control ckeditor {{ $errors->has('form.tripDescription') ? 'is-invalid' : '' }}" rows="4"></textarea>
                             <x-input-error :messages="$errors->get('form.tripDescription')" class="invalid-feedback" />
                         </div>
 
                         <div class="mb-4">
                             <label for="tripActivities" class="form-label">Trip Activities</label>
-                            <textarea id="tripActivities" name="tripActivities" placeholder="Enter trip activities" wire:model="form.tripActivities"
-                                class="form-control editor {{ $errors->has('form.tripActivities') ? 'is-invalid' : '' }}" rows="4"></textarea>
+                            <textarea id="tripActivities"  name="tripActivities" placeholder="Enter trip activities" wire:model="form.tripActivities"
+                                class="form-control ckeditor {{ $errors->has('form.tripActivities') ? 'is-invalid' : '' }}" rows="4"></textarea>
                             <x-input-error :messages="$errors->get('form.tripActivities')" class="invalid-feedback" />
                         </div>
 

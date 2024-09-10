@@ -65,7 +65,14 @@
     <script src="{{ asset('assets/theme_assets/assets/js/config.js') }}"></script>
 
     <!-- CKEDITOR 5 CDN -->
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.3.1/classic/ckeditor.js"></script>
+	{{-- <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.1.0/ckeditor5.css">     --}}
+   
+        <!-- Quill Editor Styles -->
+    {{-- <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet"> --}}
+
+        <!-- Quill Editor Script -->
+        {{-- <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> --}}
+
 
     @livewireStyles
 </head>

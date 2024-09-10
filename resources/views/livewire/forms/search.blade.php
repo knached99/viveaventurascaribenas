@@ -28,19 +28,10 @@
                                         <li
                                             class="list-group-item p-2 border-bottom hover:bg-light cursor-pointer d-flex align-items-center">
                                             <div class="me-2">
-                                                <h5 class="mb-1">{{ $result['tripLocation'] ?? 'No Location' }}</h5>
-                                                <small
-                                                    class="text-muted text-truncate">{{ $result['tripDescription'] ?? 'No Description' }}</small>
+                                                <h5 class="mb-1">{{ $result['tripLocation'] ?? 'No Location' }} - Trip</h5>
+                                              
                                             </div>
-                                            @if (!empty($result['tripPhoto']))
-                                                <img src="{{ asset('storage/' . $result['tripPhoto']) }}"
-                                                    class="img-thumbnail rounded" style="width: 50px; height: 50px;" />
-                                            @else
-                                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded"
-                                                    style="width: 50px; height: 50px;">
-                                                    No Image
-                                                </div>
-                                            @endif
+                                         
                                         </li>
                                     </a>
                                 @elseif(isset($result['bookingID']))

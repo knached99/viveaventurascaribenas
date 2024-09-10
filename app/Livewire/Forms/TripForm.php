@@ -39,7 +39,7 @@ class TripForm extends Form {
     public function rules()
     {
         return [
-            'tripPhoto.*' => 'image|mimes:jpeg,png,jpg|max:2048', // Validation for each file
+            'tripPhoto.*' => 'image|mimes:jpeg,png,jpg', // Validation for each file
             'tripLocation' => 'required|string',
             'tripLandscape' => 'required|string',
             'tripAvailability' => 'required|string',
@@ -51,26 +51,52 @@ class TripForm extends Form {
         ];
     }
 
+    public function updateProperty($data)
+        {
+            $this->{$data['property']} = $data['value'];
+        }
+
+
     public function mount(){
         Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
         $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+        $this->emit('setEditorContent', [
+            'property' => 'form.tripDescription',
+            'value' => $this->tripDescription,
+        ]);
+    
+        $this->emit('setEditorContent', [
+            'property' => 'form.tripActivities',
+            'value' => $this->tripActivities,
+        ]);
+        
     }
 
     public function submitTripForm(): void {
+
         $this->validate();
 
+      
+
         if(!$this->stripe){
-            \Log::info('Stripe not initialized');
-            \Log::info('Initializing Stripe...');
-            Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
             $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-            \Log::info('Stripe Initialized!');
+        
         }
 
         try {
             $imageURLs = [];
+
+            // Create booking_photos folder if it does not exist
+
+            $dirPath = storage_path('app/public/booking_photos');
+
+            if(!file_exists($dirPath)){
+                mkdir($dirPath, 0755, true);
+            }
             
             foreach ($this->tripPhoto as $photo) {
+                
                 // Resize and store the uploaded file
                 $image = $photo->getRealPath();
                 $filePath = 'booking_photos/' . time() . '-' . $photo->hashName() . '.'.$photo->extension();
@@ -82,7 +108,8 @@ class TripForm extends Form {
                 $imageURLs[] = asset(Storage::url($filePath));
             }
 
-            // Create a product in Stripe
+         
+
             $product = $this->stripe->products->create([
                 'name' => $this->tripLocation,
                 'description' => $this->tripDescription,
@@ -91,6 +118,7 @@ class TripForm extends Form {
 
             // Create price in Stripe after successful product creation
             if ($product) {
+
                 $price = $this->stripe->prices->create([
                     'unit_amount' => $this->tripPrice * 100, // unit amount in stripe is stored in cents
                     'currency' => 'usd',
@@ -115,6 +143,7 @@ class TripForm extends Form {
 
                     // Save trip data
                     TripsModel::create($data);
+                    
 
                     $this->resetForm();
 
@@ -148,29 +177,49 @@ class TripForm extends Form {
     }
 
     private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight) {
-        list($width, $height) = getimagesize($sourcePath);
-        $image = imagecreatefromjpeg($sourcePath); // Change to imagecreatefrompng or imagecreatefromgif as needed
+        $imageType = exif_imagetype($sourcePath);
+    
+        switch ($imageType) {
+            case IMAGETYPE_JPEG:
+                $image = imagecreatefromjpeg($sourcePath);
+                break;
+            case IMAGETYPE_PNG:
+                $image = imagecreatefrompng($sourcePath);
+                break;
+            case IMAGETYPE_GIF:
+                $image = imagecreatefromgif($sourcePath);
+                break;
+            default:
+                throw new Exception('Unsupported image type');
+        }
     
         $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
     
-        // Preserve transparency if PNG
-        if (imageistruecolor($image)) {
+        if ($imageType == IMAGETYPE_PNG || $imageType == IMAGETYPE_GIF) {
             imagealphablending($resizedImage, false);
             imagesavealpha($resizedImage, true);
             $transparent = imagecolorallocatealpha($resizedImage, 255, 255, 255, 127);
             imagefill($resizedImage, 0, 0, $transparent);
         }
     
-        // Resize
-        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, imagesx($image), imagesy($image));
     
-        // Save the image
-        imagejpeg($resizedImage, $destinationPath); // Change to imagepng or imagegif as needed
+        switch ($imageType) {
+            case IMAGETYPE_JPEG:
+                imagejpeg($resizedImage, $destinationPath);
+                break;
+            case IMAGETYPE_PNG:
+                imagepng($resizedImage, $destinationPath);
+                break;
+            case IMAGETYPE_GIF:
+                imagegif($resizedImage, $destinationPath);
+                break;
+        }
     
-        // Cleanup
         imagedestroy($image);
         imagedestroy($resizedImage);
     }
+    
         
 
 }

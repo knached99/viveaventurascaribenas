@@ -23,8 +23,8 @@
                                         </div>
                                     @endforeach
                                 @else
-                                    <div class="carousel-item">
-                                        <img src="{{ asset('assets/images/image_placeholder.jpg') }}" class="d-block w-100" alt="Placeholder">
+                                    <div class="carousel-item active">
+                                        <img src="{{ asset('assets/images/image_placeholder.jpg') }}" class="d-block w-100" style="height: 200px;" alt="Placeholder">
                                     </div>
                                 @endif
                             </div>

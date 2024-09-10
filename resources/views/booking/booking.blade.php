@@ -1,5 +1,5 @@
 @php
-    $heading = $trip->tripAvailability === 'unavailable' ? 'Trip unavailable!' : 'Finish booking your trip';
+    $heading = $trip->tripAvailability === 'unavailable' ? 'Trip unavailable!' : 'Finish booking your trip to '.$trip->tripLocation;
     $message = $trip->tripAvailability === 'unavailable' ? 'You cannot book this trip as it is currently unavailable.' : 'Fill out the form to complete booking your trip!';
 @endphp
 

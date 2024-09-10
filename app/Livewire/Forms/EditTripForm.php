@@ -16,30 +16,22 @@ class EditTripForm extends Component
 
     public $trip;
     public string $tripLocation = '';
-    public ?array $tripPhotos = []; // Array to handle multiple image uploads
     public string $tripLandscape = ''; 
+    public ?array $tripPhotos = [];
     public string $tripAvailability = ''; 
     public string $tripDescription = ''; 
     public string $tripActivities = ''; 
     public string $tripStartDate = ''; 
     public string $tripEndDate = ''; 
+    public string $tripPrice = '';
     public string $success = '';
+    public string $imageReplaceSuccess = '';
+    public string $imageReplaceError = '';
     public string $error = '';
     public ?int $replaceIndex = null;
 
-    protected function rules()
-    {
-        return [
-            'tripLocation' => 'required|string|max:255',
-            'tripPhotos.*' => 'sometimes|image|mimes:jpeg,jpg,png|max:2048', // Multiple image validation
-            'tripLandscape' => 'required|string',
-            'tripAvailability' => 'required|string',
-            'tripDescription' => 'required|string',
-            'tripActivities' => 'required|string',
-            'tripStartDate' => 'required|date|before_or_equal:tripEndDate',
-            'tripEndDate' => 'required|date|after_or_equal:tripStartDate',
-        ];
-    }
+
+
 
     public function mount($trip)
     {
@@ -54,11 +46,27 @@ class EditTripForm extends Component
         $this->tripActivities = $trip->tripActivities;
         $this->tripStartDate = Carbon::parse($trip->tripStartDate)->format('Y-m-d');
         $this->tripEndDate = Carbon::parse($trip->tripEndDate)->format('Y-m-d');
+        $this->tripPrice = $trip->tripPrice;
     }
 
     public function editTrip(): void
     {
-        $this->validate();
+        $rules = [
+            'tripLocation' => 'required|string|max:255',
+            'tripLandscape' => 'required|string',
+            'tripAvailability' => 'required|string',
+            'tripDescription' => 'required|string',
+            'tripActivities' => 'required|string',
+            'tripStartDate' => 'required|date|before_or_equal:tripEndDate',
+            'tripEndDate' => 'required|date|after_or_equal:tripStartDate',
+            'tripPrice'=>'required|numeric|min:1'
+        ];
+
+        // if (!empty($this->tripPhotos)) {
+        //     $rules['tripPhotos.*'] = 'image|mimes:jpeg,jpg,png';
+        // }
+
+        $this->validate($rules);
 
         try {
             $stripe = new StripeClient(env('STRIPE_SECRET_KEY')); // Initialize Stripe client here
@@ -77,9 +85,14 @@ class EditTripForm extends Component
 
                 // Handle new image uploads
                 if ($this->tripPhotos) {
+                    if(count($this->tripPhotos) > 3){
+                        $this->error = 'You cannot upload more than 3 pictures';
+                        return;
+                    }
+
                     foreach ($this->tripPhotos as $photo) {
                         if ($photo instanceof UploadedFile) {
-                            $imagePath = 'booking_photos/' . time() . '-' . $photo->hashName();
+                            $imagePath = 'booking_photos/' . time() . '-' . $photo->hashName() .'.'.$photo->extension();
                             $photo->storeAs('public', $imagePath); // Save the new image
                             $newImageURLs[] = asset('storage/' . $imagePath); // Store new image URL
                         }
@@ -102,8 +115,10 @@ class EditTripForm extends Component
                 $tripModel->tripLandscape = $this->tripLandscape;
                 $tripModel->tripAvailability = $this->tripAvailability;
                 $tripModel->tripDescription = $this->tripDescription;
+                $tripModel->tripActivities = $this->tripActivities;
                 $tripModel->tripStartDate = $this->tripStartDate;
                 $tripModel->tripEndDate = $this->tripEndDate;
+                $tripModel->tripPrice = $this->tripPrice;
                 $tripModel->save();
 
                 $this->success = 'Trip updated successfully!';
@@ -117,41 +132,43 @@ class EditTripForm extends Component
     {
         // Ensure the index is valid
         if ($index === null || !isset($this->tripPhotos[$index])) {
-            $this->error = 'Invalid image index.';
+            $this->addError('tripPhotos.' . $index, 'Invalid image index.');
             return;
         }
     
-        // Retrieve existing photos from trip
-        $tripPhotos = json_decode($this->trip->tripPhoto, true);
+        $file = $this->tripPhotos[$index];
     
-        // Check if the image at the given index is an instance of UploadedFile
-        if ($this->tripPhotos[$index] instanceof UploadedFile) {
-            // Remove the old image file
-            $oldImage = $tripPhotos[$index];
-            $oldImagePath = basename($oldImage);
-            
-            // Check if old image exists before deleting
-            if (Storage::exists('public/' . $oldImagePath)) {
-                Storage::delete('public/' . $oldImagePath);
+        // Validate the uploaded file
+        $this->validate([
+            'tripPhotos.' . $index => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+    
+        if ($file instanceof \Livewire\TemporaryUploadedFile) {
+            // Generate a unique name and store the file
+            $path = $file->storeAs('public/booking_photos', time() . '-' . $file->getClientOriginalName());
+    
+            // Remove the old image if exists
+            $tripPhotos = json_decode($this->trip->tripPhoto, true);
+            $oldImage = basename($tripPhotos[$index]);
+    
+            if (\Storage::exists('public/booking_photos/' . $oldImage)) {
+                \Storage::delete('public/booking_photos/' . $oldImage);
             }
     
-            // Upload new image
-            $newImagePath = 'booking_photos/' . time() . '-' . $this->tripPhotos[$index]->hashName();
-            $this->tripPhotos[$index]->storeAs('public', $newImagePath);
-    
-            // Replace image in the array
-            $tripPhotos[$index] = asset('storage/' . $newImagePath);
-    
-            // Save updated images
+            // Update the image path
+            $tripPhotos[$index] = \Storage::url($path);
             $this->trip->tripPhoto = json_encode($tripPhotos);
             $this->trip->save();
-            $this->tripPhotos = $tripPhotos;
     
-            $this->success = 'Image replaced successfully!';
+            // Update component property
+            $this->tripPhotos = $tripPhotos;
+            $this->emit('imageReplaced');
         } else {
-            $this->error = 'Selected image is not valid.';
+            $this->addError('tripPhotos.' . $index, 'Uploaded file is not valid.');
         }
     }
+    
+    
     
 
     public function setReplaceIndex($index)
