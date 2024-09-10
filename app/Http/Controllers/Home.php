@@ -31,7 +31,7 @@ class Home extends Controller
     public function homePage()
     {
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->get();
-        
+        \Log::info('TRIPS: '.$trips);
         $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
     
         // Find the top 4 most popular bookings with more than one entry

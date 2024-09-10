@@ -6,10 +6,16 @@
             </div>
         </div>
         <div class="row">
-            @foreach($popularTrips as $trip)
+            @foreach ($popularTrips as $trip)
+                @php
+                    // Decode tripPhoto if it exists
+                    $tripPhotos = isset($trip['tripPhoto']) ? json_decode($trip['tripPhoto'], true) : [];
+                @endphp
+
                 <div class="col-md-3 ftco-animate">
                     <div class="project-destination">
-                        <a href="{{ url('/landing/destination/' . $trip['id']) }}" class="img" style="background-image: url({{ asset('storage/' . $trip['image']) }});">
+                        <a href="{{ url('/landing/destination/' . $trip['id']) }}" class="img"
+                            style="background-image: url({{ !empty($tripPhotos) ? $tripPhotos[0] : asset('assets/images/image_placeholder.jpg') }});">
                             <div class="text">
                                 <h3 style="font-weight: 900; color: #f8fafc;">{{ $trip['name'] }}</h3>
                                 <span>{{ $trip['count'] }} bookings</span>
