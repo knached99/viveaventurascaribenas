@@ -74,23 +74,15 @@
                 </h6>
                 <p class="text-base font-light leading-relaxed">{{ $location }}</p>
 
-                {{-- <h5>Customer's Address</h5>
-                <!-- OpenStreetMap Embed -->
-                @if ($latitude && $longitude)
-                    <div class="mt-4">
-                        <iframe
-                            width="100%"
-                            height="300"
-                            frameborder="0"
-                            scrolling="no"
-                            marginheight="0"
-                            marginwidth="0"
-                            src="https://www.openstreetmap.org/export/embed.html?bbox={{ $longitude - 0.005 }},{{ $latitude - 0.005 }},{{ $longitude + 0.005 }},{{ $latitude + 0.005 }}&layer=mapnik&marker={{ $latitude }},{{ $longitude }}"></iframe>
-                        <small><a href="https://www.openstreetmap.org/?mlat={{ $latitude }}&mlon={{ $longitude }}#map=15/{{ $latitude }}/{{ $longitude }}" target="_blank">View Larger Map</a></small>
-                    </div>
-                @else
-                    <p class="text-red-500">Location could not be determined for this address.</p>
-                @endif --}}
+
+            </div>
+
+            <div class="mb-6">
+                <h6 class="text-lg font-medium text-blue-gray-800">
+                    <i class='bx bxs-calendar'></i> Booked At
+                </h6>
+                <p class="text-base font-light leading-relaxed">
+                    {{ date('F jS, Y \a\t g:iA', strtotime($booking->created_at)) }}</p>
             </div>
 
             <!-- Payment Status -->
@@ -122,52 +114,53 @@
                 </span>
             </div>
 
-           <!-- Payment Details -->
-<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-    <!-- Payment Method -->
-    <div class="p-4 bg-gray-100 rounded-lg">
-        <h6 class="text-lg font-medium text-blue-gray-800">
-            <i class='bx bxs-credit-card'></i> Payment Method
-        </h6>
-        <p class="text-base font-light leading-relaxed">
-            @if ($paymentMethod === 'card')
-                {{ $paymentMethodCard }} (**** {{ $cardLast4 }})
-            @elseif ($paymentMethod === 'cashapp')
-                CashApp
-            @elseif ($paymentMethod === 'affirm')
-                Affirm
-            @else
-                Unknown Payment Method
-            @endif
-        </p>
-    </div>
+            <!-- Payment Details -->
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <!-- Payment Method -->
+                <div class="p-4 bg-gray-100 rounded-lg">
+                    <h6 class="text-lg font-medium text-blue-gray-800">
+                        <i class='bx bxs-credit-card'></i> Payment Method
+                    </h6>
+                    <p class="text-base font-light leading-relaxed">
+                        @if ($paymentMethod === 'card')
+                            {{ $paymentMethodCard }} (**** {{ $cardLast4 }})
+                        @elseif ($paymentMethod === 'cashapp')
+                            CashApp
+                        @elseif ($paymentMethod === 'affirm')
+                            Affirm
+                        @else
+                            Unknown Payment Method
+                        @endif
+                    </p>
+                </div>
 
-    <!-- Payment Amount -->
-    <div class="p-4 bg-gray-100 rounded-lg">
-        <h6 class="text-lg font-medium text-blue-gray-800">
-            <i class='bx bx-dollar-circle'></i> Payment Amount
-        </h6>
-        <p class="text-base font-light leading-relaxed">{{ $paymentAmount }}</p>
-    </div>
+                <!-- Payment Amount -->
+                <div class="p-4 bg-gray-100 rounded-lg">
+                    <h6 class="text-lg font-medium text-blue-gray-800">
+                        <i class='bx bx-dollar-circle'></i> Payment Amount
+                    </h6>
+                    <p class="text-base font-light leading-relaxed">{{ $paymentAmount }}</p>
+                </div>
 
-    <!-- Card Expiration (only for card payments) -->
-    @if ($paymentMethod === 'card')
-        <div class="p-4 bg-gray-100 rounded-lg">
-            <h6 class="text-lg font-medium text-blue-gray-800">
-                <i class='bx bxs-calendar'></i> Card Expiration
-            </h6>
-            <p class="text-base font-light leading-relaxed">{{ $cardExpirationMonth }}/{{ $cardExpirationYear }}</p>
-        </div>
-    @endif
+                <!-- Card Expiration (only for card payments) -->
+                @if ($paymentMethod === 'card')
+                    <div class="p-4 bg-gray-100 rounded-lg">
+                        <h6 class="text-lg font-medium text-blue-gray-800">
+                            <i class='bx bxs-calendar'></i> Card Expiration
+                        </h6>
+                        <p class="text-base font-light leading-relaxed">
+                            {{ $cardExpirationMonth }}/{{ $cardExpirationYear }}</p>
+                    </div>
+                @endif
 
-    <!-- Receipt Link -->
-    <div class="p-4 bg-gray-100 rounded-lg">
-        <h6 class="text-lg font-medium text-blue-gray-800">
-            <i class='bx bx-link-external'></i> Receipt
-        </h6>
-        <a href="{{ $receiptLink }}" target="_blank" class="text-blue-600 underline">View Receipt</a>
-    </div>
-</div>
+                <!-- Receipt Link -->
+                <div class="p-4 bg-gray-100 rounded-lg">
+                    <h6 class="text-lg font-medium text-blue-gray-800">
+                        <i class='bx bx-link-external'></i> Receipt
+                    </h6>
+                    <a href="{{ $receiptLink }}" target="_blank" class="text-blue-600 underline">View Receipt</a>
+                </div>
+            </div>
 
 
             <!-- Contact Information -->

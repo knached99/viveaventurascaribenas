@@ -49,7 +49,7 @@ class Admin extends Controller
     
         // Fetch bookings and reservations
         $bookings = BookingModel::with('trip')
-        ->select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id', 'tripID')
+        ->select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id', 'tripID', 'created_at')
         ->get();
         
             $reservations = Reservations::select('reservationID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();

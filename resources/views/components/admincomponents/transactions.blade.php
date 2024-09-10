@@ -5,7 +5,8 @@
         <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="card-title m-0 me-2">Bookings</h5>
             <div class="dropdown">
-                <button class="btn text-muted p-0" type="button" id="transactionID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn text-muted p-0" type="button" id="transactionID" data-bs-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
                     <i class="bx bx-dots-vertical-rounded bx-lg"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">
@@ -29,6 +30,7 @@
                         <th>Card Last 4</th>
                         <th>Receipt Link</th>
                         <th>Booking Link</th>
+                        <th>Booked At</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,8 +102,11 @@
                             <td>{{ $paymentMethodCard }}</td>
                             <td>{{ $cardExpirationMonth . '/' . $cardExpirationYear }}</td>
                             <td>{{ $cardLast4 }}</td>
-                            <td><a href="{{ $receiptLink }}" target="_blank" rel="noopener noreferrer">View Receipt</a></td>
-                            <td><a href="{{ route('admin.booking', ['bookingID' => $booking->bookingID]) }}">View Booking</a></td>
+                            <td><a href="{{ $receiptLink }}" target="_blank" rel="noopener noreferrer">View Receipt</a>
+                            </td>
+                            <td><a href="{{ route('admin.booking', ['bookingID' => $booking->bookingID]) }}">View
+                                    Booking</a></td>
+                            <td>{{ date('F jS, Y \a\t g:iA', strtotime($booking->created_at)) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
