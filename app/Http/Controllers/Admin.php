@@ -28,17 +28,17 @@ class Admin extends Controller
     
     public function dashboardPage()
     {
-        $directories = [
-            storage_path('app/public/booking_photos'),
-        ];
+        // $directories = [
+        //     storage_path('app/public/booking_photos'),
+        // ];
     
-        // Calculate storage usage
-        $storageData = $this->calculateStorageUsage($directories);
+        // // Calculate storage usage
+        // $storageData = $this->calculateStorageUsage($directories);
     
-        // Format storage values
-        $usedStorage = $this->formatSize($storageData['usedSpace']);
-        $totalStorage = $this->formatSize($storageData['totalSpace']);
-        $remainingStorage = $this->formatSize($storageData['freeSpace']);
+        // // Format storage values
+        // $usedStorage = $this->formatSize($storageData['usedSpace']);
+        // $totalStorage = $this->formatSize($storageData['totalSpace']);
+        // $remainingStorage = $this->formatSize($storageData['freeSpace']);
     
         $charges = $this->stripe->charges->all();
     
@@ -83,10 +83,10 @@ class Admin extends Controller
         }
     
         return view('admin.dashboard', compact(
-            'storageData',
-            'usedStorage',
-            'totalStorage',
-            'remainingStorage',
+            // 'storageData',
+            // 'usedStorage',
+            // 'totalStorage',
+            // 'remainingStorage',
             'transactions',
             'bookings',
             'reservations',
