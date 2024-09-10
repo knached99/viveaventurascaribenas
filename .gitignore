@@ -3,7 +3,6 @@
 /public/build
 /public/hot
 /public/storage
-/storage/*
 /storage/*.key
 /vendor
 .env
@@ -19,3 +18,11 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# Ignore all files in storage/ and public/storage/
+storage/*
+public/storage/*
+
+# But not the directories
+!/storage/**/
+!/public/storage/**/
