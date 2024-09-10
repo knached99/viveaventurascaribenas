@@ -91,14 +91,10 @@ class EditTripForm extends Component
                     }
 
                     foreach ($this->tripPhotos as $photo) {
-                        if ($photo instanceof  \Livewire\TemporaryUploadedFile) {
+                        if ($photo instanceof UploadedFile) {
                             $imagePath = 'booking_photos/' . time() . '-' . $photo->hashName() .'.'.$photo->extension();
                             $photo->storeAs('public', $imagePath); // Save the new image
                             $newImageURLs[] = asset('storage/' . $imagePath); // Store new image URL
-                        }
-                        else{
-                            \Log::error('File is not a valid instance of Livewire TemporaryUploadedFile');
-                            $this->addError('tripPhotos.' . $index, 'Uploaded file is not valid.');
                         }
                     }
                 }
@@ -133,99 +129,57 @@ class EditTripForm extends Component
     }
 
     public function replaceImage($index)
-{
-    \Log::info('Ensuring that index ' . $index . ' is valid..');
-
-    // Ensure the index is valid
-    if ($index === null || !isset($this->tripPhotos[$index])) {
-        $this->addError('tripPhotos.' . $index, 'Invalid image index.');
-        \Log::info('Index ' . $index . ' is not valid');
-        return;
-    }
-
-    \Log::info('Index ' . $index . ' is valid!');
-
-    // Validate the uploaded file
-    $file = $this->tripPhotos[$index];
-    \Log::info('Validating file...');
-
-
-
-    $this->validate([
-        'tripPhotos.' . $index => 'required|image|mimes:jpeg,png,jpg|max:5120',
-    ]);
-
-    \Log::info('File validated successfully!');
-    \Log::info('File type after validation: ' . (is_object($file) ? get_class($file) : gettype($file)));
-
-
-    // Check if image exists before processing
-    if (isset($this->tripPhotos[$index])) {
-        $file = $this->tripPhotos[$index];
-    }
-
-    \Log::info('Generating file...');
-
-    if ($file instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-
-        // Generate file path
-        $filePath = 'booking_photos/' . time() . '-' . $file->hashName();
-        $fullPath = storage_path('app/public/' . $filePath);
-
-        \Log::info('File Path: ' . $filePath);
-        \Log::info('Full Path: ' . $fullPath);
-
-        // Resize the image using GD or another method
-        $this->resizeImage($file->getRealPath(), $fullPath, 350, 219);
-
-        \Log::info('Image resized!');
-
-        // Store the new image URL
-        $imageURLs[] = asset(Storage::url($filePath));
-        \Log::info('Appended image to the imageURLs array: ' . json_encode($imageURLs));
-
-        // Remove the old image if it exists
-        $tripPhotos = json_decode($this->trip->tripPhoto, true);
-        $oldImage = basename($tripPhotos[$index]);
-
-        if (\Storage::exists('public/booking_photos/' . $oldImage)) {
-            \Log::info('Found old image! Deleting old image...');
-            \Storage::delete('public/booking_photos/' . $oldImage);
-            \Log::info('Image deleted from the server!');
+    {
+        // Ensure the index is valid
+        if ($index === null || !isset($this->tripPhotos[$index])) {
+            $this->addError('tripPhotos.' . $index, 'Invalid image index.');
+            return;
         }
-
-        // Update image path in the database
-        $tripPhotos[$index] = \Storage::url($filePath);
-        $this->trip->tripPhoto = json_encode($tripPhotos);
-        $this->trip->save();
-
-        \Log::info('Image updated!');
-
-        // Update the component property with the new image
-        $this->tripPhotos = $tripPhotos;
-
-        // Emit an event to notify that the image was replaced successfully
-        $this->imageReplaceSuccess = 'Image replaced!';
-
-        // Clear the input after successful replacement (optional)
-        unset($this->tripPhotos[$index]);
-    } else {
-        \Log::error('File is not a valid instance of Livewire TemporaryUploadedFile');
-        $this->addError('tripPhotos.' . $index, 'Uploaded file is not valid.');
-    }
-}
-
     
+        $file = $this->tripPhotos[$index];
+    
+        // Validate the uploaded file
+        $this->validate([
+            'tripPhotos.' . $index => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+    
+        if ($file instanceof \Livewire\TemporaryUploadedFile) {
+            // Generate a unique name and store the file
+            $path = $file->storeAs('public/booking_photos', time() . '-' . $file->getClientOriginalName());
+    
+            // Remove the old image if exists
+            $tripPhotos = json_decode($this->trip->tripPhoto, true);
+            $oldImage = basename($tripPhotos[$index]);
+    
+            if (\Storage::exists('public/booking_photos/' . $oldImage)) {
+                \Storage::delete('public/booking_photos/' . $oldImage);
+            }
+    
+            // Update the image path
+            $tripPhotos[$index] = \Storage::url($path);
+            $this->trip->tripPhoto = json_encode($tripPhotos);
+            $this->trip->save();
+    
+            // Update component property
+            $this->tripPhotos = $tripPhotos;
+            $this->emit('imageReplaced');
+        } else {
+            $this->addError('tripPhotos.' . $index, 'Uploaded file is not valid.');
+        }
+    }
+    
+    
+    
+
     public function setReplaceIndex($index)
     {
         $this->replaceIndex = $index;
     }
-    
+
     public function selectImageToReplace($index)
     {
         $this->setReplaceIndex($index);
     }
-    
 
     public function removeImage($index)
     {
@@ -247,50 +201,6 @@ class EditTripForm extends Component
 
             $this->success = 'Image removed successfully!';
         }
-    }
-
-    private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight) {
-        $imageType = exif_imagetype($sourcePath);
-    
-        switch ($imageType) {
-            case IMAGETYPE_JPEG:
-                $image = imagecreatefromjpeg($sourcePath);
-                break;
-            case IMAGETYPE_PNG:
-                $image = imagecreatefrompng($sourcePath);
-                break;
-            case IMAGETYPE_GIF:
-                $image = imagecreatefromgif($sourcePath);
-                break;
-            default:
-                throw new Exception('Unsupported image type');
-        }
-    
-        $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
-    
-        if ($imageType == IMAGETYPE_PNG || $imageType == IMAGETYPE_GIF) {
-            imagealphablending($resizedImage, false);
-            imagesavealpha($resizedImage, true);
-            $transparent = imagecolorallocatealpha($resizedImage, 255, 255, 255, 127);
-            imagefill($resizedImage, 0, 0, $transparent);
-        }
-    
-        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, imagesx($image), imagesy($image));
-    
-        switch ($imageType) {
-            case IMAGETYPE_JPEG:
-                imagejpeg($resizedImage, $destinationPath);
-                break;
-            case IMAGETYPE_PNG:
-                imagepng($resizedImage, $destinationPath);
-                break;
-            case IMAGETYPE_GIF:
-                imagegif($resizedImage, $destinationPath);
-                break;
-        }
-    
-        imagedestroy($image);
-        imagedestroy($resizedImage);
     }
 
     public function render()
