@@ -33,7 +33,15 @@ class Home extends Controller
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->get();
         $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
     
-        // Find the top 4 most popular bookings with more than one entry
+         /*
+        The query retrieves the top 4 most popular trips based on the number of bookings.
+         It joins the bookings table with the trips table to get additional trip details, 
+         groups the results by trip and booking counts, 
+         filters to include only trips with more than 2 bookings, 
+         orders the trips by the number of bookings in descending order,
+          and limits the results to the top 4 most popular trips.
+        */
+        
         $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
             ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
             ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
@@ -122,8 +130,15 @@ class Home extends Controller
        // Fetch approved testimonials
        $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
    
-       // Find the top 4 most popular bookings with more than one entry
-       // Find the top 4 most popular bookings with more than one entry
+        /*
+        The query retrieves the top 4 most popular trips based on the number of bookings.
+         It joins the bookings table with the trips table to get additional trip details, 
+         groups the results by trip and booking counts, 
+         filters to include only trips with more than 2 bookings, 
+         orders the trips by the number of bookings in descending order,
+          and limits the results to the top 4 most popular trips.
+        */
+
        $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
        ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
        ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
