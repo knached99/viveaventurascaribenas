@@ -155,13 +155,28 @@
                 img.src = activeItem.src;
 
                 img.onload = () => {
+                    // Extract the dominant color
                     const dominantColor = colorThief.getColor(img);
                     const dominantColorRgb = `rgb(${dominantColor.join(',')})`;
-                    const fadeColor = 'rgba(255, 255, 255, 0.3)'; // Faint white for gradient effect
+
+                    // Optionally extract a palette of colors for more variety
+                    const palette = colorThief.getPalette(img, 6); // Get 6 colors from the image
+                    const secondColor = palette[1] || dominantColor; // Use the second color for variation
+
+                    // Create a gradient using the dominant color and an additional color from the palette
+                    const fadeColor =
+                        `rgba(${secondColor.join(',')}, 0.3)`; // Optional: Faint color for gradient effect
                     const backgroundColor = `linear-gradient(to bottom, ${dominantColorRgb}, ${fadeColor})`;
 
                     sectionElement.style.transition = 'background 0.5s ease'; // Smooth transition
                     sectionElement.style.background = backgroundColor;
+                };
+
+                img.onerror = () => {
+                    // Handle image loading errors
+                    console.error('Failed to load image for color extraction.');
+                    sectionElement.style.background =
+                        'linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.3))';
                 };
             }
         }
@@ -171,6 +186,8 @@
         carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
     });
 </script>
+
+
 
 
 
