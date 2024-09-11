@@ -196,8 +196,8 @@
 
                 <!-- Activities Section -->
                 <div class="border-bottom-1 border-secondary"> </div>
-                <div style="border-bottom: 1px solid #000"></div>
-                <h2 class="m-3" style="font-weight: 900; color: #000;">Trip Activities</h2>
+                <div style="border-bottom: 1px solid #1e293b"></div>
+                <h2 class="m-3" style="font-weight: 900;">Trip Activities</h2>
                 <p class="trip-description" style="color: #000;">{{ $trip->tripActivities }}</p>
                 <!-- End Activities Section -->
 

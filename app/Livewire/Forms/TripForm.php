@@ -160,6 +160,7 @@ class TripForm extends Form {
     public function resetForm(): void {
         $this->tripLocation = '';
         $this->tripDescription = '';
+        $this->tripActivities = '';
         $this->tripLandscape = '';
         $this->tripAvailability = '';
         $this->tripPhoto = []; // Reset file array

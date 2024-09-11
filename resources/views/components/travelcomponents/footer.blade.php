@@ -113,7 +113,7 @@
 <script src="{{ asset('assets/js/carousel.js') }}"></script>
 <!-- Color Extraction Algorithm Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
-<script>
+{{-- <script>
     document.addEventListener('DOMContentLoaded', () => {
         const colorThief = new ColorThief();
         const carouselElement = document.getElementById('carouselExample');
@@ -139,7 +139,39 @@
         updateBackgroundColor(); // Initial call
         carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
     });
+</script> --}}
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const colorThief = new ColorThief();
+        const carouselElement = document.getElementById('carouselExample');
+        const sectionElement = document.querySelector('.trip-section');
+
+        function updateBackgroundColor() {
+            const activeItem = carouselElement.querySelector('.carousel-item.active img');
+            if (activeItem) {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous'; // To avoid CORS issues
+                img.src = activeItem.src;
+
+                img.onload = () => {
+                    const dominantColor = colorThief.getColor(img);
+                    const dominantColorRgb = `rgb(${dominantColor.join(',')})`;
+                    const fadeColor = 'rgba(255, 255, 255, 0.3)'; // Faint white for gradient effect
+                    const backgroundColor = `linear-gradient(to bottom, ${dominantColorRgb}, ${fadeColor})`;
+
+                    sectionElement.style.transition = 'background 0.5s ease'; // Smooth transition
+                    sectionElement.style.background = backgroundColor;
+                };
+            }
+        }
+
+        // Update background color on carousel slide change
+        updateBackgroundColor(); // Initial call
+        carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
+    });
 </script>
+
 
 
 

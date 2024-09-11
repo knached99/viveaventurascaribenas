@@ -9,6 +9,8 @@
             : 'Fill out the form to complete booking your trip!';
 
     $tripPhotos = json_decode($trip->tripPhoto, true);
+    $firstPhotoUrl = !empty($tripPhotos) ? asset($tripPhotos[0]) : null;
+
 @endphp
 
 <x-travelcomponents.header />
@@ -20,8 +22,9 @@
             <div class="row">
                 <div class="col-md-7 col-md-push-5">
                     <div class="booking-cta">
-                        <h1>{{ $heading }}</h1>
-                        <p style="font-size: 30px;">{{ $message }}</p>
+                        <h1 class="{{ isset($firstPhotoUrl) ? 'text-white' : 'text-dark' }}">{{ $heading }}</h1>
+                        <p style="font-size: 30px;" class="{{ isset($firstPhotoUrl) ? 'text-white' : 'text-dark' }}">
+                            {{ $message }}</p>
                     </div>
                 </div>
                 <div class="col-md-4 col-md-pull-7">
@@ -44,9 +47,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         const colorThief = new ColorThief();
         const sectionElement = document.getElementById('booking-section');
-        const imageUrl = "{{ asset($tripPhotos[0]) }}";
+        const imageUrl = "{{ $firstPhotoUrl }}"; // PHP variable embedded here
 
-        function updateBackground() {
+        if (imageUrl) {
             const img = new Image();
             img.crossOrigin = 'Anonymous'; // To avoid CORS issues
             img.src = imageUrl;
@@ -65,8 +68,9 @@
                 sectionElement.style.backgroundBlendMode =
                     'overlay'; // Ensures the color blends with the image
             };
+        } else {
+            // Handle the case where no image URL is available
+            sectionElement.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'; // Faint white background
         }
-
-        updateBackground();
     });
 </script>
