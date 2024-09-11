@@ -16,20 +16,43 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8">
-             <!-- Photo Grid Section -->
-            <div class="photo-grid">
-                @if(!empty($tripPhotos))
-                @foreach($tripPhotos as $tripPhoto)
-                    <div class="photo-item">
-                        <img src="{{ $tripPhoto }}" alt="Trip Image" />
-                    </div>
-                @endforeach
-                @else 
-                 <div class="photo-item">
-                 <img src="{{asset('assets/images/image_placeholder.jpg')}}" class="d-block w-100" style="height: 300px;"/>
-                 </div>
-                @endif 
-            </div>
+                <!-- Photo Grid Section -->
+                <div class="photo-grid">
+                    @if (!empty($tripPhotos))
+                        <div id="carouselExample" class="carousel slide" data-bs-ride="carousel"
+                            style="border-radius: 8px;">
+                            <div class="carousel-inner">
+                                @foreach ($tripPhotos as $index => $photo)
+                                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                        <img src="{{ $photo }}" class="d-block w-100"
+                                            alt="Photo {{ $index + 1 }}">
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            {{-- Carousel navigation buttons --}}
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"
+                                data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselExample"
+                                data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    @else
+                        <div class="photo-item">
+                            <img src="{{ asset('assets/images/image_placeholder.jpg') }}" class="d-block w-100"
+                                style="height: 300px;" />
+                        </div>
+                    @endif
+                </div>
+
+                <!-- End Photo Grid Section -->
+
+
 
                 <div class="trip-details">
                     <h2>{{ $trip->tripLocation }}
@@ -209,7 +232,8 @@
                             </button>
                         </div>
                     @else
-                        <p style="font-size: 25px; color: #94a3b8; margin-left: 10px;">Be the first to leave a review!</p>
+                        <p style="font-size: 25px; color: #94a3b8; margin-left: 10px;">Be the first to leave a review!
+                        </p>
                     @endif
                 </div>
                 <!-- End Testimonials Slider -->
@@ -229,9 +253,13 @@
                 <div class="col-md-4">
                     <!-- Booking Widget -->
                     <div class="booking-widget">
-                        <h3>{{$trip->tripAvailability === 'coming soon' ? 'Reserve this Trip' : 'Book this Trip'}}</h3>
-                        <a href="{{ route('booking', ['tripID' => $tripID]) }}" type="submit" class="btn">{{$trip->tripAvailability === 'coming soon' ? 'Reserve Now' : 'Book
-                            Now'}}</a>
+                        <h3>{{ $trip->tripAvailability === 'coming soon' ? 'Reserve this Trip' : 'Book this Trip' }}
+                        </h3>
+                        <a href="{{ route('booking', ['tripID' => $tripID]) }}" type="submit"
+                            class="btn">{{ $trip->tripAvailability === 'coming soon'
+                                ? 'Reserve Now'
+                                : 'Book
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Now' }}</a>
 
                     </div>
                 </div>

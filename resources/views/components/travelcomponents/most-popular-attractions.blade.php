@@ -1,3 +1,4 @@
+@props(['popularTrips'])
 <section class="ftco-section">
     <div class="container">
         <div class="row justify-content-center pb-4">
@@ -8,8 +9,8 @@
         <div class="row">
             @foreach ($popularTrips as $trip)
                 @php
-                    // Decode tripPhoto if it exists
-                    $tripPhotos = isset($trip['tripPhoto']) ? json_decode($trip['tripPhoto'], true) : [];
+
+                    $tripPhotos = isset($trip['image']) ? json_decode($trip['image'], true) : [];
                 @endphp
 
                 <div class="col-md-3 ftco-animate">

@@ -1,4 +1,4 @@
-@props(['trips', 'mostPopularTripIds'])
+@props(['trips', 'mostPopularTripId'])
 <section class="ftco-section ftco-no-pt">
     <div class="container">
         <div class="row justify-content-center pb-4">
@@ -13,20 +13,21 @@
                     $tripPhotos = isset($trip->tripPhoto) ? json_decode($trip->tripPhoto, true) : [];
                 @endphp
                 <div class="col-md-4 col-sm-6 ftco-animate">
-                    <div class="project-wrap">
+                    <div class="project-wrap card">
                         <div id="carouselExampleControls{{ $loop->index }}" class="carousel slide"
                             data-bs-ride="carousel">
-                            <div class="carousel-inner">
+                            <div class="carousel-inner fixed-carousel-height">
                                 @if (!empty($tripPhotos))
                                     @foreach ($tripPhotos as $index => $photo)
                                         <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                            <img src="{{ $photo }}" class="d-block w-100" alt="Photo">
+                                            <img src="{{ $photo }}" class="d-block w-100 card-img-top"
+                                                alt="Photo">
                                         </div>
                                     @endforeach
                                 @else
                                     <div class="carousel-item active">
                                         <img src="{{ asset('assets/images/image_placeholder.jpg') }}"
-                                            class="d-block w-100" style="height: 200px;" alt="Placeholder">
+                                            class="d-block w-100 card-img-top" alt="Placeholder">
                                     </div>
                                 @endif
                             </div>
@@ -40,14 +41,14 @@
                                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                 <span class="visually-hidden">Next</span>
                             </button>
-                            @if (in_array($trip->tripID, $mostPopularTripIds))
+                            @if ($trip->tripID == $mostPopularTripId)
                                 <div class="popular-badge">
                                     <img src="{{ asset('assets/theme_assets/assets/img/popularBadge.webp') }}"
                                         alt="Popular" />
                                 </div>
                             @endif
                         </div>
-                        <div class="text p-4">
+                        <div class="text p-4 card-body">
                             <span class="price">${{ number_format($trip->tripPrice, 2) }}/person</span>
                             <span
                                 class="days">{{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}

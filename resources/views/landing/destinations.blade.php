@@ -98,8 +98,8 @@
 	    </div>
     </section> --}}
 
-@if (!empty($trips) || !empty($mostPopularTripIds))
-    <x-travelcomponents.available-bookings :trips="$trips" :mostPopularTripIds="$mostPopularTripIds" />
+@if (!empty($trips) || !empty($mostPopularTripId))
+    <x-travelcomponents.available-bookings :trips="$trips" :mostPopularTripId="$mostPopularTripId" />
 @else
 @endif
 <x-travelcomponents.footer />

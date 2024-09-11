@@ -9,7 +9,8 @@
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
 
     {{-- <link rel="stylesheet" href="{{ asset('assets/css/open-iconic-bootstrap.min.css') }}"> --}}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('assets/css/animate.css') }}">
 
     <link rel="stylesheet" href="{{ asset('assets/css/owl.carousel.min.css') }}">
@@ -30,8 +31,41 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/theme_assets/assets/vendor/fonts/boxicons.css') }}" />
 
-    @if (\Route::currentRouteName() === 'booking.success' || \Route::currentRouteName() === 'booking.cancel' || \Route::currentRouteName() === 'reservation-confirmed')
+    @if (
+        \Route::currentRouteName() === 'booking.success' ||
+            \Route::currentRouteName() === 'booking.cancel' ||
+            \Route::currentRouteName() === 'reservation-confirmed')
         <link rel="stylesheet" href="{{ asset('assets/css/booking_success.css') }}" />
+    @endif
+
+    @if (\Route::currentRouteName() === '/' || \Route::currentRouteName() === 'destinations')
+        <style>
+            .card {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .card-body {
+                flex-grow: 1;
+            }
+
+            .fixed-carousel-height img {
+                height: 200px;
+                /* Set the same height for carousel images */
+                object-fit: cover;
+                /* Ensure images fit without stretching */
+            }
+
+            .project-wrap {
+                height: 100%;
+            }
+
+            .carousel-inner {
+                max-height: 200px;
+                /* Ensure carousel height remains fixed */
+            }
+        </style>
     @endif
 
     <style>
@@ -454,95 +488,94 @@
 
     <!-- Booking Cards -->
     <style>
-    .project-wrap {
-    position: relative;
-    overflow: hidden;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+        .project-wrap {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
-.project-wrap:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
+        .project-wrap:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
 
-.project-wrap .img {
-    position: relative;
-    display: block;
-    height: 250px;
-    background-size: cover;
-    background-position: center;
-    border-radius: 8px 8px 0 0;
-    transition: opacity 0.3s ease;
-}
+        .project-wrap .img {
+            position: relative;
+            display: block;
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px 8px 0 0;
+            transition: opacity 0.3s ease;
+        }
 
-.project-wrap .text {
-    background: white;
-    padding: 20px;
-    border-radius: 0 0 8px 8px;
-}
+        .project-wrap .text {
+            background: white;
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+        }
 
-.project-wrap .text .price {
-    font-size: 20px;
-    font-weight: bold;
-    display: block;
-    margin-bottom: 10px;
-}
+        .project-wrap .text .price {
+            font-size: 20px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
 
-.project-wrap .text .days {
-    display: block;
-    margin-bottom: 10px;
-    color: #888;
-    font-size: 18px;
-}
+        .project-wrap .text .days {
+            display: block;
+            margin-bottom: 10px;
+            color: #888;
+            font-size: 18px;
+        }
 
-.project-wrap .text h3 {
-    margin-bottom: 15px;
-}
+        .project-wrap .text h3 {
+            margin-bottom: 15px;
+        }
 
-.project-wrap .text h3 a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-    transition: color 0.3s ease;
-}
+        .project-wrap .text h3 a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
 
-.project-wrap .text h3 a:hover {
-    color: #007bff;
-}
+        .project-wrap .text h3 a:hover {
+            color: #007bff;
+        }
 
-.project-wrap .text ul {
-    list-style: none;
-    padding: 0;
-}
+        .project-wrap .text ul {
+            list-style: none;
+            padding: 0;
+        }
 
-.project-wrap .text ul li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
+        .project-wrap .text ul li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
 
-.project-wrap .text ul li img {
-    margin-right: 10px;
-}
+        .project-wrap .text ul li img {
+            margin-right: 10px;
+        }
 
-.popular-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 10;
-    border-radius: 50%;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
+        .popular-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            border-radius: 50%;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
 
-.popular-badge img {
-    width: 80px;
-    height: auto;
-}
-
+        .popular-badge img {
+            width: 80px;
+            height: auto;
+        }
     </style>
 
     @if (\Route::currentRouteName() === 'landing.destination')
@@ -598,42 +631,53 @@
         </style>
 
         <style>
-        /* Container for the photo grid */
-.photo-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px; /* Space between images */
-    margin: -7.5px; /* To compensate for gap space */
-}
+            /* Container for the photo grid */
+            .photo-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+                /* Space between images */
+                margin: -7.5px;
+                /* To compensate for gap space */
+            }
 
-/* Each item in the grid */
-.photo-item {
-    flex: 1 1 calc(33.333% - 15px); /* Adjust percentage to control grid item size */
-    box-sizing: border-box;
-    margin: 7.5px; /* Space around each item */
-    border-radius: 10px; /* Rounded corners */
-    overflow: hidden; /* Clip overflow content */
-}
+            /* Each item in the grid */
+            .photo-item {
+                flex: 1 1 calc(33.333% - 15px);
+                /* Adjust percentage to control grid item size */
+                box-sizing: border-box;
+                margin: 7.5px;
+                /* Space around each item */
+                border-radius: 10px;
+                /* Rounded corners */
+                overflow: hidden;
+                /* Clip overflow content */
+            }
 
-/* Style for images */
-.photo-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Cover the entire container */
-    transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out; /* Smooth transition effects */
-}
+            /* Style for images */
+            .photo-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                /* Cover the entire container */
+                transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
+                /* Smooth transition effects */
+            }
 
-/* Hover effects for images */
-.photo-item:hover img {
-    transform: scale(1.1); /* Zoom in on hover */
-    filter: brightness(80%); /* Darken image on hover */
-}
-
+            /* Hover effects for images */
+            .photo-item:hover img {
+                transform: scale(1.1);
+                /* Zoom in on hover */
+                filter: brightness(80%);
+                /* Darken image on hover */
+            }
         </style>
 
-    <!-- Load SCSS for carousel --> 
-    <link rel="stylesheet" href="{{asset('assets/css/carousel.css')}}"/>
+        <!-- Load SCSS for carousel -->
+        <link rel="stylesheet" href="{{ asset('assets/css/carousel.css') }}" />
     @endif
+
+
 
     <!-- End Individual Trip Details css -->
 
