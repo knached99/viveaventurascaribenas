@@ -66,7 +66,7 @@
 
 
                     <!-- Average Star Rating -->
-                    <div class="star-rating mb-3">
+                    <div class="star-rating mb-3 text-dark">
                         @php
                             // Calculate the number of full stars
                             $fullStars = floor($averageTestimonialRating);
@@ -101,8 +101,8 @@
 
 
                         <!-- Display the average rating -->
-                        <span class="text-muted">({{ number_format($averageTestimonialRating, 1) }} / 5.0)</span>
-                        <span class="mt-3 block">
+                        <span class="text-dark">({{ number_format($averageTestimonialRating, 1) }} / 5.0)</span>
+                        <span class="mt-3 block text-dark">
                             <br />
                             @if ($testimonials->isEmpty())
                                 Be among the first to experience this trip and share your review! Your feedback will
@@ -113,14 +113,14 @@
 
 
 
-                    <span class="trip-price">${{ number_format($trip->tripPrice, 2) }} /person</span>
-                    <p class="trip-duration">
+                    <span class="trip-price text-dark">${{ number_format($trip->tripPrice, 2) }} /person</span>
+                    <p class="trip-duration text-dark">
                         <!-- End Average Star Rating -->
 
 
                         {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }} Days Tour
                     </p>
-                    <p class="trip-availability">
+                    <p class="trip-availability text-dark">
                         @switch($trip->tripAvailability)
                             @case('available')
                                 <span class="success-badge">{{ $trip->tripAvailability }}</span>
@@ -130,7 +130,7 @@
                                 <span class="warning-badge">{{ $trip->tripAvailability }}</span>
                                 <!-- Add a disclaimer -->
                                 <br />
-                                <span class="text-gray-800 mt-3" style="font-style: italic; ">This trip will be available soon!
+                                <span class="text-dark mt-3" style="font-style: italic; ">This trip will be available soon!
                                     Once
                                     we have enough travelers,
                                     dates will be released. Let us know your preferred month to travel, and we’ll do our best to
@@ -142,42 +142,48 @@
                             @break
                         @endswitch
                     </p>
-                    <p class="trip-description">{{ $trip->tripDescription }}</p>
+                    <p class="trip-description" style="color: #000;">{{ $trip->tripDescription }}</p>
                     <ul class="trip-info">
-                        <li><img src="{{ asset('assets/images/calendar.png') }}" class="icon" />
+                        <li style="color: #000; font-weight: bold;"><img
+                                src="{{ asset('assets/images/calendar.png') }}" class="icon" />
                             {{ date('F jS, Y', strtotime($trip->tripStartDate)) }} -
                             {{ date('F jS, Y', strtotime($trip->tripEndDate)) }}
                         </li>
                         @switch($trip->tripLandscape)
                             @case('Beach')
-                                <li><img src="{{ asset('assets/images/beach.png') }}" class="icon" />
+                                <li class="text-dark" style="font-weight:bold;"><img
+                                        src="{{ asset('assets/images/beach.png') }}" class="icon" />
                                     {{ $trip->tripLandscape }}</li>
                             @break
 
                             @case('City')
-                                <li><img src="{{ asset('assets/images/buildings.png') }}" class="icon" />
+                                <li class="text-dark" style="font-weight:bold;"><img
+                                        src="{{ asset('assets/images/buildings.png') }}" class="icon" />
                                     {{ $trip->tripLandscape }}</li>
                             @break
 
                             @case('Country Side')
-                                <li><img src="{{ asset('assets/images/farm.png') }}" class="icon" />
+                                <li class="text-dark" style="font-weight:bold;"><img
+                                        src="{{ asset('assets/images/farm.png') }}" class="icon" />
                                     {{ $trip->tripLandscape }}</li>
                             @break
 
                             @case('Mountainous')
-                                <li><img src="{{ asset('assets/images/mountain.png') }}" class="icon" />
+                                <li class="text-dark" style="font-weight:bold;"><img
+                                        src="{{ asset('assets/images/mountain.png') }}" class="icon" />
                                     {{ $trip->tripLandscape }}</li>
                             @break
 
                             @case('Forested')
-                                <li><img src="{{ asset('assets/images/forest.png') }}" class="icon" />
+                                <li class="text-dark" style="font-weight:bold;"><img
+                                        src="{{ asset('assets/images/forest.png') }}" class="icon" />
                                     {{ $trip->tripLandscape }}</li>
                             @break
                         @endswitch
                     </ul>
 
                     <!-- No refunds disclaimer -->
-                    <div class="mt-4 text-lg text-gray-800" style="font-weight: bold;">
+                    <div class="mt-4 text-lg" style="font-weight: normal; font-style: italic; color: #000;">
                         <p>
                             Please note that due to the time-sensitive nature and significant costs involved in
                             organizing our trips, we are unable to offer refunds once the booking is confirmed. We
@@ -190,9 +196,9 @@
 
                 <!-- Activities Section -->
                 <div class="border-bottom-1 border-secondary"> </div>
-                <div style="border-bottom: 1px solid #1e293b"></div>
-                <h2 class="m-3" style="font-weight: 900;">Trip Activities</h2>
-                <p class="trip-description">{{ $trip->tripActivities }}</p>
+                <div style="border-bottom: 1px solid #000"></div>
+                <h2 class="m-3" style="font-weight: 900; color: #000;">Trip Activities</h2>
+                <p class="trip-description" style="color: #000;">{{ $trip->tripActivities }}</p>
                 <!-- End Activities Section -->
 
                 <!-- Testimonials Slider -->
@@ -222,17 +228,17 @@
                                 @endforeach
                             </div>
                             <!-- Custom buttons -->
-                            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialsCarousel"
-                                data-bs-slide="prev">
+                            <button class="carousel-control-prev" type="button"
+                                data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
                                 <span class="visually-hidden"><i class='bx bx-left-arrow-alt'></i></span>
                             </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#testimonialsCarousel"
-                                data-bs-slide="next">
+                            <button class="carousel-control-next" type="button"
+                                data-bs-target="#testimonialsCarousel" data-bs-slide="next">
                                 <span class="visually-hidden"><i class='bx bx-right-arrow-alt'></i></span>
                             </button>
                         </div>
                     @else
-                        <p style="font-size: 25px; color: #94a3b8; margin-left: 10px;">Be the first to leave a review!
+                        <p style="font-size: 25px; color: #000; margin-left: 10px;">Be the first to leave a review!
                         </p>
                     @endif
                 </div>
@@ -259,7 +265,7 @@
                             class="btn">{{ $trip->tripAvailability === 'coming soon'
                                 ? 'Reserve Now'
                                 : 'Book
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Now' }}</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                Now' }}</a>
 
                     </div>
                 </div>
