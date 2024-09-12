@@ -23,7 +23,8 @@ class Reservations extends Model
         'address_line_2',
         'city',
         'state',
-        'zip_code'
+        'zip_code',
+        'preferred_date_range'
     ];
 
     protected $casts = [

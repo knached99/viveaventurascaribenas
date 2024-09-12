@@ -9,6 +9,21 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
     public TripForm $form;
     use WithFileUploads;
 
+    public function addCost(): void
+    {
+        // Explicitly set the next index based on the current number of costs
+        $index = count($this->form->tripCosts);
+        $this->form->tripCosts[$index] = ['name' => '', 'amount' => 0];
+    }
+
+    public function removeCost(int $index): void
+    {
+        unset($this->form->tripCosts[$index]);
+
+        // Reset array keys to avoid gaps and string keys
+        $this->form->tripCosts = array_values($this->form->tripCosts);
+    }
+
     public function submitTripForm(): void
     {
         $this->form->submitTripForm();
@@ -17,6 +32,14 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 ?>
 
 <div class="container-fluid p-4">
+    <h6 style="font-weight: 800;">
+        When you create your trip, the changes are automatically reflected on the <a href="/">home</a> and <a
+            href="{{ route('destinations') }}">destinations</a> pages
+    </h6>
+    <p class="text-slate-500 font-medium">You may also add your expenses accrued for this trip which will be used to
+        calculate the net cost.
+        <span class="text-indigo-600 block">That information will not be displayed to your users</span>
+    </p>
     @if ($form->status)
         <div class="alert alert-success d-flex justify-content-between align-items-center mb-4">
             {{ $form->status }}
@@ -95,7 +118,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
                         <div class="mb-4">
                             <label for="tripDescription" class="form-label">Trip Description</label>
-                            <textarea id="tripDescription"  name="tripDescription" placeholder="Enter description of this trip"
+                            <textarea id="tripDescription" name="tripDescription" placeholder="Enter description of this trip"
                                 wire:model="form.tripDescription"
                                 class="form-control ckeditor {{ $errors->has('form.tripDescription') ? 'is-invalid' : '' }}" rows="4"></textarea>
                             <x-input-error :messages="$errors->get('form.tripDescription')" class="invalid-feedback" />
@@ -103,7 +126,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
                         <div class="mb-4">
                             <label for="tripActivities" class="form-label">Trip Activities</label>
-                            <textarea id="tripActivities"  name="tripActivities" placeholder="Enter trip activities" wire:model="form.tripActivities"
+                            <textarea id="tripActivities" name="tripActivities" placeholder="Enter trip activities" wire:model="form.tripActivities"
                                 class="form-control ckeditor {{ $errors->has('form.tripActivities') ? 'is-invalid' : '' }}" rows="4"></textarea>
                             <x-input-error :messages="$errors->get('form.tripActivities')" class="invalid-feedback" />
                         </div>
@@ -131,6 +154,33 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                 wire:model="form.tripPrice" placeholder="$1.00" />
                             <x-input-error :messages="$errors->get('form.tripPrice')" class="invalid-feedback" />
                         </div>
+
+                        <div class="mb-4">
+                            <label for="tripCosts" class="form-label">Trip Costs</label>
+                            @foreach ($form->tripCosts as $index => $cost)
+                                @php
+                                    $index = (int) $index; // Ensure $index is an integer
+                                @endphp
+                                <div class="input-group mb-2">
+                                    <input type="text" placeholder="Cost Name" class="form-control"
+                                        wire:model="form.tripCosts.{{ $index }}.name" aria-label="Cost Name">
+
+                                    <input type="number" placeholder="Cost Amount" class="form-control"
+                                        wire:model="form.tripCosts.{{ $index }}.amount"
+                                        aria-label="Cost Amount">
+
+                                    <button type="button" class="btn btn-danger"
+                                        wire:click="removeCost({{ $index }})">Remove</button>
+                                </div>
+                            @endforeach
+
+
+                            <button type="button" class="btn btn-success" wire:click="addCost">Add Cost</button>
+
+                            <x-input-error :messages="$errors->get('form.tripCosts')" class="invalid-feedback" />
+                        </div>
+
+
 
                         <div class="d-flex align-items-center">
                             <button type="submit" class="btn btn-primary me-3" wire:loading.remove>Create

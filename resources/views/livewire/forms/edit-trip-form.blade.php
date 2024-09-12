@@ -9,74 +9,62 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
-            <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card shadow-sm border-0 rounded-lg">
                 <!-- Card Header -->
                 <div
-                    class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center rounded-top">
-                    <h3 class="mb-0 fw-bold">Trip Information for {{ $trip->tripLocation }}</h3>
+                    class="card-header bg-slate-200 text-white d-flex justify-content-between align-items-center rounded-top">
+                    <h3 class="mb-0">Trip Information for {{ $trip->tripLocation }}</h3>
                 </div>
 
                 <form wire:submit.prevent="editTrip" class="p-4" enctype="multipart/form-data">
                     <!-- Editable Images -->
                     <div class="text-center mb-4">
-                        <label for="tripPhotos" class="form-label fw-semibold d-block">
-                            <div class="d-flex flex-wrap justify-content-center">
-                                <!-- Check if there are any trip photos -->
-                                @if ($tripPhotos && count($tripPhotos) > 0)
-                                    <!-- Loop through each trip photo and display with delete or replace option -->
-                                    @foreach ($tripPhotos as $index => $photo)
-                                        <div class="position-relative m-2">
-                                            @if (is_string($photo))
-                                                <!-- Display existing photo (URL stored in the database) -->
-                                                <img src="{{ $photo }}"
-                                                    class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer hover:opacity-50 transition-opacity duration-300"
-                                                    style="max-width: 200px; height: 200px;" alt="Trip Image"
-                                                    wire:click="selectImageToReplace({{ $index }})" />
-                                            @elseif($photo instanceof \Livewire\TemporaryUploadedFile)
-                                                <!-- Display new uploaded photo -->
-                                                <img src="{{ $photo->temporaryUrl() }}"
-                                                    class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer hover:opacity-50 transition-opacity duration-300"
-                                                    style="max-width: 200px; height: 200px;" alt="Trip Image"
-                                                    wire:click="selectImageToReplace({{ $index }})" />
-                                            @endif
+                        <label for="tripPhotos" class="form-label fw-semibold d-block mb-2">Trip Photos</label>
+                        <div class="d-flex flex-wrap justify-content-center">
+                            @if ($tripPhotos && count($tripPhotos) > 0)
+                                @foreach ($tripPhotos as $index => $photo)
+                                    <div class="position-relative m-2">
+                                        @if (is_string($photo))
+                                            <img src="{{ $photo }}"
+                                                class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer"
+                                                style="max-width: 150px; height: 150px;" alt="Trip Image"
+                                                wire:click="selectImageToReplace({{ $index }})" />
+                                        @elseif($photo instanceof \Livewire\TemporaryUploadedFile)
+                                            <img src="{{ $photo->temporaryUrl() }}"
+                                                class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer"
+                                                style="max-width: 150px; height: 150px;" alt="Trip Image"
+                                                wire:click="selectImageToReplace({{ $index }})" />
+                                        @endif
 
-                                            <!-- Delete button to remove image -->
-                                            <button type="button" wire:click="removeImage({{ $index }})"
-                                                class="btn btn-danger btn-sm position-absolute top-0 end-0 mt-1 me-1">
-                                                <i class='bx bx-trash-alt'></i>
-                                            </button>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    <!-- Default message when no images are available -->
-                                    <p>No images available.</p>
-                                @endif
-                            </div>
-                        </label>
+                                        <button type="button" wire:click="removeImage({{ $index }})"
+                                            class="btn btn-danger btn-sm position-absolute top-0 end-0 mt-1 me-1">
+                                            <i class='bx bx-trash-alt'></i>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            @else
+                                <p>No images available.</p>
+                            @endif
+                        </div>
 
                         @if (!is_null($replaceIndex))
                             <div class="mb-3">
                                 <input type="file" wire:model="tripPhotos.{{ $replaceIndex }}"
                                     class="form-control" />
-
                                 @error('tripPhotos.' . $replaceIndex)
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-
-                                <!-- Display loading message or spinner when uploading -->
                                 <div wire:loading wire:target="tripPhotos.{{ $replaceIndex }}">
-                                    Uploading...
+                                    <span>Uploading...</span>
                                 </div>
                             </div>
 
-                            <!-- Disable button when loading -->
                             <button type="button" wire:loading.attr="disabled"
                                 wire:target="tripPhotos.{{ $replaceIndex }}"
                                 wire:click="replaceImage({{ $replaceIndex }})" class="btn btn-primary">
                                 Replace Image
                             </button>
                         @else
-                            <!-- Button to add new image -->
                             <div class="mb-3">
                                 <input type="file" wire:model="tripPhotos" class="form-control" multiple />
                                 @error('tripPhotos.*')
@@ -85,7 +73,6 @@
                             </div>
                         @endif
 
-                        <!-- Success and Error Messages -->
                         @if ($imageReplaceSuccess)
                             <div class="alert alert-success">
                                 {{ $imageReplaceSuccess }}
@@ -97,7 +84,6 @@
                                 {{ $imageReplaceError }}
                             </div>
                         @endif
-
                     </div>
 
                     <!-- Form Fields -->
@@ -112,8 +98,6 @@
 
                     <!-- Description -->
                     <div class="mb-3">
-                        {{-- @livewire('admincomponents.quill', ['value' => $this->tripDescription]) --}}
-
                         <label for="tripDescription" class="form-label">Trip Description</label>
                         <textarea id="tripDescription" name="tripDescription" wire:model="tripDescription" class="form-control ckeditor"
                             rows="4">{{ $this->tripDescription }}</textarea>
@@ -124,7 +108,6 @@
 
                     <!-- Activities -->
                     <div class="mb-3">
-                        {{-- @livewire('admincomponents.quill', ['value' => $this->tripActivities]) --}}
                         <label for="tripActivities" class="form-label">Trip Activities</label>
                         <textarea id="tripActivities" name="tripActivities" wire:model="tripActivities" class="form-control ckeditor"
                             rows="4">{{ $this->tripActivities }}</textarea>
@@ -132,8 +115,6 @@
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
-
-
 
                     <!-- Dates -->
                     <div class="mb-3">
@@ -155,25 +136,24 @@
                     <!-- Landscape -->
                     <div class="mb-4">
                         <label for="tripLandscape" class="form-label">Trip Landscape</label>
-                        <select id="tripLandscape" name="form.tripLandscape"
-                            class="form-select {{ $errors->has('form.tripLandscape') ? 'is-invalid' : '' }}"
-                            wire:model="form.tripLandscape">
-                            <option value="{{ $this->tripLandscape }}" selected disabled>{{ $this->tripLandscape }}
-                            </option>
+                        <select id="tripLandscape" wire:model="tripLandscape" class="form-select">
+                            <option value="" disabled>Select Landscape</option>
                             <option value="Beach">Beach</option>
                             <option value="City">City</option>
                             <option value="Country Side">Country Side</option>
                             <option value="Forested">Forested</option>
                             <option value="Mountainous">Mountainous</option>
                         </select>
-                        <x-input-error :messages="$errors->get('form.tripLandscape')" class="invalid-feedback" />
+                        @error('tripLandscape')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     <!-- Availability -->
                     <div class="mb-3">
                         <label for="tripAvailability" class="form-label">Trip Availability</label>
                         <select id="tripAvailability" wire:model="tripAvailability" class="form-select">
-                            <option value="">Select Availability</option>
+                            <option value="" disabled>Select Availability</option>
                             <option value="available">Available</option>
                             <option value="coming_soon">Coming Soon</option>
                             <option value="unavailable">Unavailable</option>
@@ -181,6 +161,60 @@
                         @error('tripAvailability')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
+                    </div>
+
+                    <!-- Trip Price -->
+                    <div class="mb-3">
+                        <label for="tripPrice" class="form-label">Trip Price</label>
+                        <input id="tripPrice" wire:model="tripPrice" class="form-control" placeholder="$1.00" />
+                        @error('tripPrice')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <!-- Trip Costs -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Trip Costs</h5>
+                        @forelse ($tripCosts as $index => $cost)
+                            <div class="input-group mb-2">
+                                <input type="text" placeholder="Cost Name" class="form-control"
+                                    wire:model.defer="tripCosts.{{ $index }}.name">
+                                <input type="number" placeholder="Cost Amount" class="form-control"
+                                    wire:model.defer="tripCosts.{{ $index }}.amount">
+                                <button type="button" class="btn btn-danger"
+                                    wire:click="removeCost({{ $index }})">
+                                    Remove
+                                </button>
+                            </div>
+                        @empty
+                            <p>No costs added yet.</p>
+                        @endforelse
+
+                        <!-- Button to add new cost -->
+                        <button type="button" class="btn btn-success" wire:click="addCost">
+                            Add Cost
+                        </button>
+                    </div>
+                    <!-- / Trip Costs -->
+
+
+                    <!-- Summary Section -->
+                    <div class="mb-4">
+                        <h4 class="mb-3">Financial Summary</h4>
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>Total Net Cost:</strong>
+                            <span>${{ number_format($totalNetCost, 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>Gross Profit:</strong>
+                            <span>${{ number_format($grossProfit, 2) }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong>Net Profit:</strong>
+                            <span class="{{ $netProfit < 0 ? 'text-danger' : 'text-success' }}">
+                                ${{ number_format($netProfit, 2) }}
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Buttons -->

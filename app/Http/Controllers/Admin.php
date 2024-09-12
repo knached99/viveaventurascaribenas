@@ -218,22 +218,40 @@ class Admin extends Controller
        }
     }
 
-    public function getTripDetails($tripID){
-        
-        try{
+    public function getTripDetails($tripID) {
+        try {
+            // Retrieve trip details
+            $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
+    
+            // Parse the tripCosts JSON and calculate the total net cost
+            $tripCosts = json_decode($trip->tripCosts, true); // Convert JSON string to an associative array
+    
+            $totalNetCost = array_reduce($tripCosts, function ($carry, $cost) {
+                return $carry + (float) $cost['amount']; // Convert amount to float and sum up
+            }, 0);
 
-        $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
-        
-        return view('admin/trip', ['tripId'=>$tripID, 'trip'=>$trip]);
-
-        }
-        
-        catch(ModelNotFoundException $e){
+    
+            // Assume you have a field for gross profit or calculate it here
+            $grossProfit = $trip->tripPrice; // Replace with actual gross profit calculation if different
+            // Calculate net profit
+            $netProfit = $grossProfit - $totalNetCost;
+    
+            // Pass these values to the view
+            return view('admin/trip', [
+                'tripId' => $tripID,
+                'trip' => $trip,
+                'totalNetCost' => $totalNetCost,
+                'grossProfit' => $grossProfit,
+                'netProfit' => $netProfit
+            ]);
+    
+        } catch (ModelNotFoundException $e) {
             \Log::error('Unable to get trip details for method: '.__FUNCTION__.' on line: '.__LINE__.' '.$e->getMessage());
             abort(404);
         }
-
     }
+    
+    
     
     public function deleteTrip($tripID) {
         try {

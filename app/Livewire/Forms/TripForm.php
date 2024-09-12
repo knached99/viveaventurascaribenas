@@ -29,6 +29,7 @@ class TripForm extends Form {
     public string $tripStartDate = '';
     public string $tripEndDate = '';
     public string $tripPrice = '';
+    public array $tripCosts = ['name'=> '', 'amount' => ''];
     // Validate that 'tripPhoto' is an array of images with specific rules
     #[Validate('required|array|max:3')]
     public ?array $tripPhoto = [];
@@ -48,7 +49,19 @@ class TripForm extends Form {
             'tripStartDate' => 'sometimes|date|before_or_equal:tripEndDate',
             'tripEndDate' => 'sometimes|date|after_or_equal:tripStartDate',
             'tripPrice' => 'required|numeric|min:1',
+            'tripCosts.*.name' => 'sometimes|string',
+            'tripCosts.*.amount'=>'sometimes|numeric|min:1',
         ];
+    }
+
+    public function addCost(){
+        $this->tripCosts[] = ['name'=>'', 'amount'=>''];
+    }
+
+    public function removeCost($index){
+        unset($this->tripCosts[$index]);
+        // Reindexes array 
+        $this->tripCosts = array_values($this->tripCosts); 
     }
 
     public function updateProperty($data)
@@ -77,7 +90,7 @@ class TripForm extends Form {
 
         $this->validate();
 
-      
+        $tripCostsJson = json_encode($this->tripCosts);
 
         if(!$this->stripe){
             $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
@@ -138,7 +151,8 @@ class TripForm extends Form {
                         'tripPhoto' => json_encode($imageURLs),// Store image URLs as a JSON array
                         'tripStartDate' => $this->tripStartDate,
                         'tripEndDate' => $this->tripEndDate,
-                        'tripPrice' => $this->tripPrice
+                        'tripPrice' => $this->tripPrice,
+                        'tripCosts'=>$tripCostsJson,
                     ];
 
                     // Save trip data
@@ -167,6 +181,7 @@ class TripForm extends Form {
         $this->tripStartDate = '';
         $this->tripEndDate = '';
         $this->tripPrice = '';
+        $this->tripCosts = [];
 
         $this->status = ''; // Reset status
         $this->error = '';  // Reset error

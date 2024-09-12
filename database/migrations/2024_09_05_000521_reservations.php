@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('address_line_2')->nullable();
             $table->string('city');
             $table->string('state');
+            $table->string('preferred_date_range');
             $table->string('zip_code');
             $table->timestamps();
         });
