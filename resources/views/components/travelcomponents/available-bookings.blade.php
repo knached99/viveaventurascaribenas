@@ -14,7 +14,7 @@
                 @endphp
                 <div class="col-md-4 col-sm-6 ftco-animate">
                     <div class="project-wrap card">
-                        <div id="carouselExampleControls{{ $loop->index }}" class="carousel slide">
+                        <div id="carouselExampleControls{{ $loop->index }}" class="carousel slide" data-bs-interval="false">
                             <div class="carousel-inner fixed-carousel-height">
                                 @if (!empty($tripPhotos))
                                     @foreach ($tripPhotos as $index => $photo)

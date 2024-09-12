@@ -19,7 +19,7 @@
                 <!-- Photo Grid Section -->
                 <div class="photo-grid">
                     @if (!empty($tripPhotos))
-                        <div id="carouselExample" class="carousel slide" data-bs-ride="carousel"
+                        <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false"
                             style="border-radius: 8px;">
                             <div class="carousel-inner">
                                 @foreach ($tripPhotos as $index => $photo)
