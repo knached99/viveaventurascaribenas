@@ -33,8 +33,8 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
 <div class="container-fluid p-4">
     <h6 style="font-weight: 800;">
-        When you create your trip, the changes are automatically reflected on the <a href="/">home</a> and <a
-            href="{{ route('destinations') }}">destinations</a> pages
+        When you create your trip, the changes are automatically reflected on the <a href="/" target="_blank">home</a> and <a
+            href="{{ route('destinations') }}" target="_blank">destinations</a> pages
     </h6>
     <p class="text-slate-500 font-medium">You may also add your expenses accrued for this trip which will be used to
         calculate the net cost.

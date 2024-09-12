@@ -172,30 +172,56 @@
                         @enderror
                     </div>
 
-                    <!-- Trip Costs -->
-                    <div class="mb-4">
-                        <h5 class="mb-3">Trip Costs</h5>
-                        @forelse ($tripCosts as $index => $cost)
-                            <div class="input-group mb-2">
-                                <input type="text" placeholder="Cost Name" class="form-control"
-                                    wire:model.defer="tripCosts.{{ $index }}.name">
-                                <input type="number" placeholder="Cost Amount" class="form-control"
-                                    wire:model.defer="tripCosts.{{ $index }}.amount">
-                                <button type="button" class="btn btn-danger"
-                                    wire:click="removeCost({{ $index }})">
-                                    Remove
+                     <!-- Trip Costs Section -->
+                            {{-- <div class="mb-4">
+                                <h5 class="mb-3">Trip Costs</h5>
+                                @forelse ($tripCosts as $index => $cost)
+                                    <div class="input-group mb-2">
+                                        <input type="text" placeholder="Cost Name" class="form-control" wire:model.defer="tripCosts.{{ $index }}.name">
+                                        <input type="number" placeholder="Cost Amount" class="form-control" wire:model.defer="tripCosts.{{ $index }}.amount">
+                                        <button type="button" class="btn btn-danger" wire:click="removeCost({{ $index }})">
+                                            Remove
+                                        </button>
+                                    </div>
+                                @empty
+                                    <div class="input-group mb-2">
+                                        <input type="text" placeholder="Cost Name" class="form-control" wire:model.defer="tripCosts.0.name">
+                                        <input type="number" placeholder="Cost Amount" class="form-control" wire:model.defer="tripCosts.0.amount">
+                                        <button type="button" class="btn btn-danger" wire:click="removeCost(0)">
+                                            Remove
+                                        </button>
+                                    </div>
+                                @endforelse
+                                <button type="button" class="btn btn-success" wire:click="addCost">
+                                    Add Cost
                                 </button>
-                            </div>
-                        @empty
-                            <p>No costs added yet.</p>
-                        @endforelse
+                            </div> --}}
 
-                        <!-- Button to add new cost -->
-                        <button type="button" class="btn btn-success" wire:click="addCost">
-                            Add Cost
-                        </button>
-                    </div>
-                    <!-- / Trip Costs -->
+
+                        <div class="mb-4">
+                            <label for="tripCosts" class="form-label">Trip Costs</label>
+                            @foreach ($tripCosts as $index => $cost)
+                                @php
+                                    $index = (int) $index; // Ensure $index is an integer
+                                @endphp
+                                <div class="input-group mb-2">
+                                    <input type="text" placeholder="Cost Name" class="form-control"
+                                        wire:model="tripCosts.{{ $index }}.name" aria-label="Cost Name">
+
+                                    <input type="number" placeholder="Cost Amount" class="form-control"
+                                        wire:model="tripCosts.{{ $index }}.amount"
+                                        aria-label="Cost Amount">
+
+                                    <button type="button" class="btn btn-danger"
+                                        wire:click="removeCost({{ $index }})">Remove</button>
+                                </div>
+                            @endforeach
+
+
+                            <button type="button" class="btn btn-success" wire:click="addCost">Add Cost</button>
+
+                            <x-input-error :messages="$errors->get('form.tripCosts')" class="invalid-feedback" />
+                        </div>
 
 
                     <!-- Summary Section -->

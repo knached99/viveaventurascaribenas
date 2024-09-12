@@ -275,3 +275,54 @@
 </section>
 
 <x-travelcomponents.footer />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const colorThief = new ColorThief();
+        const carouselElement = document.getElementById('carouselExample');
+        const sectionElement = document.querySelector('.trip-section');
+
+        function updateBackgroundColor() {
+            const activeItem = carouselElement.querySelector('.carousel-item.active img');
+            if (activeItem) {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous'; // To avoid CORS issues
+                img.src = activeItem.src;
+
+                img.onload = () => {
+                    try {
+                        // Extract the dominant color and the palette
+                        const dominantColor = colorThief.getColor(img);
+                        const palette = colorThief.getPalette(img, 2); // Get 2 colors from the image
+
+                        // Use the dominant color and a secondary color from the palette
+                        const dominantColorRgb = `rgb(${dominantColor.join(',')})`;
+                        const secondaryColor = palette[1] || dominantColor; // Fallback to dominant color if palette is too small
+                        const secondaryColorRgb = `rgb(${secondaryColor.join(',')})`;
+
+                        // Create a gradient using the dominant and secondary colors
+                        const backgroundColor = `linear-gradient(to bottom, ${dominantColorRgb}, ${secondaryColorRgb})`;
+
+                        sectionElement.style.transition = 'background 0.5s ease'; // Smooth transition
+                        sectionElement.style.background = backgroundColor;
+                    } catch (error) {
+                        console.error('Color extraction failed:', error);
+                        sectionElement.style.background = 'linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.3))';
+                    }
+                };
+
+                img.onerror = () => {
+                    console.error('Failed to load image for color extraction.');
+                    sectionElement.style.background = 'linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.3))';
+                };
+            }
+        }
+
+        // Update background color on carousel slide change
+        updateBackgroundColor(); // Initial call
+        carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
+    });
+</script>
+
+

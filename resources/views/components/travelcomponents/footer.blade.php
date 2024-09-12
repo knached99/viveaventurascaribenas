@@ -111,85 +111,6 @@
 <script src="{{ asset('assets/js/google-map.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>
 <script src="{{ asset('assets/js/carousel.js') }}"></script>
-<!-- Color Extraction Algorithm Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
-{{-- <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const colorThief = new ColorThief();
-        const carouselElement = document.getElementById('carouselExample');
-
-        function updateBackgroundColor() {
-            const activeItem = carouselElement.querySelector('.carousel-item.active img');
-            if (activeItem) {
-                const img = new Image();
-                img.crossOrigin = 'Anonymous'; // To avoid CORS issues
-                img.src = activeItem.src;
-                img.onload = () => {
-                    const dominantColor = colorThief.getColor(img);
-                    const dominantColorRgb = `rgb(${dominantColor.join(',')})`;
-                    const fadeColor =
-                    'rgba(255, 255, 255, 0.2)'; // Optional: Faint white for extra gradient effect
-                    const backgroundColor = `linear-gradient(to bottom, ${dominantColorRgb}, ${fadeColor})`;
-                    document.querySelector('.trip-section').style.background = backgroundColor;
-                };
-            }
-        }
-
-        // Update background color on carousel slide change
-        updateBackgroundColor(); // Initial call
-        carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
-    });
-</script> --}}
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const colorThief = new ColorThief();
-        const carouselElement = document.getElementById('carouselExample');
-        const sectionElement = document.querySelector('.trip-section');
-
-        function updateBackgroundColor() {
-            const activeItem = carouselElement.querySelector('.carousel-item.active img');
-            if (activeItem) {
-                const img = new Image();
-                img.crossOrigin = 'Anonymous'; // To avoid CORS issues
-                img.src = activeItem.src;
-
-                img.onload = () => {
-                    // Extract the dominant color
-                    const dominantColor = colorThief.getColor(img);
-                    const dominantColorRgb = `rgb(${dominantColor.join(',')})`;
-
-                    // Optionally extract a palette of colors for more variety
-                    const palette = colorThief.getPalette(img, 6); // Get 6 colors from the image
-                    const secondColor = palette[1] || dominantColor; // Use the second color for variation
-
-                    // Create a gradient using the dominant color and an additional color from the palette
-                    const fadeColor =
-                        `rgba(${secondColor.join(',')}, 0.3)`; // Optional: Faint color for gradient effect
-                    const backgroundColor = `linear-gradient(to bottom, ${dominantColorRgb}, ${fadeColor})`;
-
-                    sectionElement.style.transition = 'background 0.5s ease'; // Smooth transition
-                    sectionElement.style.background = backgroundColor;
-                };
-
-                img.onerror = () => {
-                    // Handle image loading errors
-                    console.error('Failed to load image for color extraction.');
-                    sectionElement.style.background =
-                        'linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.3))';
-                };
-            }
-        }
-
-        // Update background color on carousel slide change
-        updateBackgroundColor(); // Initial call
-        carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
-    });
-</script>
-
-
-
-
 
 
 
@@ -279,6 +200,51 @@
             }
         });
     </script>
+
+
+    <!-- Color Extraction Algorithm using ColorTheif --> 
+{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const colorThief = new ColorThief();
+        const carouselElement = document.getElementById('carouselExample');
+        const sectionElement = document.querySelector('.trip-section');
+
+        function updateBackgroundColor() {
+            const activeItem = carouselElement.querySelector('.carousel-item .active img');
+            if (activeItem) {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous'; // To avoid CORS issues
+                img.src = activeItem.src;
+
+                img.onload = () => {
+                    // Extract dominant and second dominant colors
+                    const dominantColor = colorThief.getColor(img);
+                    const palette = colorThief.getPalette(img, 6);
+                    const secondColor = palette[1] || dominantColor;
+
+                    // Create gradient background
+                    const dominantColorRgb = `rgb(${dominantColor.join(',')})`;
+                    const fadeColor = `rgba(${secondColor.join(',')}, 0.3)`;
+                    const backgroundColor = `linear-gradient(to bottom, ${dominantColorRgb}, ${fadeColor})`;
+
+                    // Apply background color with smooth transition
+                    sectionElement.style.transition = 'background 0.5s ease';
+                    sectionElement.style.background = backgroundColor;
+                };
+
+                img.onerror = () => {
+                    console.error('Failed to load image for color extraction.');
+                    sectionElement.style.background = 'linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.3))';
+                };
+            }
+        }
+
+        updateBackgroundColor(); // Initial call
+        carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
+    });
+</script> --}}
+
 @endif
 
 @livewireScripts
