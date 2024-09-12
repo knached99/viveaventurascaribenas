@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Stripe\Stripe;
 use Stripe\Product;
 use Stripe\StripeClient;
+use Carbon\Carbon;
 
 class Admin extends Controller
 {
@@ -217,39 +218,100 @@ class Admin extends Controller
         return redirect()->route('admin.testimonials')->With('testimonial_delete_error', 'Unable to delete testimony. Something went wrong and if this error persists, please contact the developer');
        }
     }
-
     public function getTripDetails($tripID) {
         try {
             // Retrieve trip details
             $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
     
             // Parse the tripCosts JSON and calculate the total net cost
-            $tripCosts = json_decode($trip->tripCosts, true); // Convert JSON string to an associative array
-    
+            $tripCosts = json_decode($trip->tripCosts, true) ?: [];
             $totalNetCost = array_reduce($tripCosts, function ($carry, $cost) {
-                return $carry + (float) $cost['amount']; // Convert amount to float and sum up
+                return $carry + (float) $cost['amount'];
             }, 0);
+   
+                $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+                $stripeProductID = $trip->stripe_product_id;  // Product ID for the specific trip
+            
+                // Use Stripe's search API to retrieve charges with succeeded status
+                $charges = $stripe->charges->search([
+                    'query' => "status:'succeeded'",
+                    'limit' => 100, // Adjust the limit if needed
+                ]);
+            
+           
+            
+                $filteredCharges = [];
+            
+                // Loop through each charge and filter based on the product ID
+                foreach ($charges->data as $charge) {
+                    // Make sure the charge is succeeded and not refunded
+                    if ($charge->amount_refunded == 0 && $charge->amount_captured > 0) {
+                        // Check if the charge has an associated invoice
+                        if ($charge->invoice) {
+                            // Retrieve the invoice and expand the line items to check for product ID
+                            $invoice = $stripe->invoices->retrieve($charge->invoice, ['expand' => ['lines']]);
+            
+                            foreach ($invoice->lines->data as $lineItem) {
+                                // Check if the product ID matches
+                                if ($lineItem->price->product === $stripeProductID) {
+                                    $filteredCharges[] = $charge;  // Add this charge to the filtered array
+                                    break;  // No need to check further line items once we have a match
+                                }
+                            }
+                        }
+                    }
+                }
+            
+                // Log filtered charges for debugging
+                \Log::info('Filtered Charges: ' . json_encode($filteredCharges));
+            
+                // Calculate gross profit based on the captured amount
+                $grossProfit = array_reduce($filteredCharges, function ($carry, $charge) {
+                    return $carry + (float) $charge->amount_captured / 100; // Convert from cents to dollars
+                }, 0);
+            
+                // Calculate net profit
+                $netProfit = $grossProfit - $totalNetCost;
+            
+                // Log calculated values for debugging
+                \Log::info('Total Net Cost: ' . $totalNetCost);
+                \Log::info('Gross Profit: ' . $grossProfit);
+                \Log::info('Net Profit: ' . $netProfit);
+            
+                // Pass the calculated values to the frontend
+                $this->grossProfit = $grossProfit;
+                $this->netProfit = $netProfit;
+            
+           
+            
+            
+        
+            
 
     
-            // Assume you have a field for gross profit or calculate it here
-            $grossProfit = $trip->tripPrice; // Replace with actual gross profit calculation if different
-            // Calculate net profit
-            $netProfit = $grossProfit - $totalNetCost;
-    
             // Pass these values to the view
-            return view('admin/trip', [
+            return view('admin.trip', [
                 'tripId' => $tripID,
                 'trip' => $trip,
                 'totalNetCost' => $totalNetCost,
                 'grossProfit' => $grossProfit,
                 'netProfit' => $netProfit
             ]);
+
+            \Log::info('Total Net Cost'.$totalNetCost);
+            \Log::info('Gross Profit'.$grossProfit);
+            \Log::info('Net Profit'.$netProfit);
     
         } catch (ModelNotFoundException $e) {
-            \Log::error('Unable to get trip details for method: '.__FUNCTION__.' on line: '.__LINE__.' '.$e->getMessage());
+            \Log::error('Unable to get trip details: ' . $e->getMessage());
             abort(404);
+        } catch (Exception $e) {
+            \Log::error('Error retrieving Stripe charges: ' . $e->getMessage());
+            abort(500);
         }
     }
+    
+    
     
     
     

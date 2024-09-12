@@ -54,30 +54,52 @@ class EditTripForm extends Component
         $this->tripStartDate = Carbon::parse($trip->tripStartDate)->format('Y-m-d');
         $this->tripEndDate = Carbon::parse($trip->tripEndDate)->format('Y-m-d');
         $this->tripPrice = $trip->tripPrice;
-       // $this->tripCosts = json_decode($trip->tripCosts, true) ?: [];     // Initialize as empty array if null
-       $this->tripCosts = json_decode($this->trip->tripCosts, true) ?? [];
 
-        // Calculate total net cost
-        $this->totalNetCost = array_reduce($this->tripCosts, function ($carry, $cost) {
-            return $carry + (float) $cost['amount']; // Convert amount to float and sum up
-        }, 0);
-    
-        // Calculate financial summary
+        $this->stripe_product_id = $trip->stripe_product_id;
+
+        $this->tripCosts = json_decode($trip->tripCosts, true);
+        
+        $totalNetCost = array_reduce($this->tripCosts, function($carry, $cost){
+            return $carry + (float) $cost['amount'];
+        });
+        
         try {
             $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-            $charges = $stripe->charges->all(['limit' => 100]); // Adjust limit as needed
-            $tripCharges = array_filter($charges->data, function ($charge) {
-                return !$charge->refunded && $charge->description === $this->trip->tripLocation;
+            $stripeProductID = $this->stripe_product_id;
+        
+            // Use Stripe's search API to retrieve charges with succeeded status
+            $charges = $stripe->charges->search([
+                'query' => "status:'succeeded'",
+                'limit' => 100, // Adjust the limit if needed
+            ]);
+        
+         
+        
+            // Filter the charges by product ID and ensure they are not refunded
+            $filteredCharges = array_filter($charges->data, function ($charge) use ($stripeProductID) {
+                // Ensure charge is not refunded and matches the product ID
+                return $charge->amount_refunded == 0 && isset($charge->amount_captured) && $charge->amount_captured > 0;
             });
-    
-            $this->grossProfit = array_reduce($tripCharges, function ($carry, $charge) {
-                return $carry + (float) $charge->amount / 100;
+        
+        
+            // Calculate gross profit based on the captured amount
+            $grossProfit = array_reduce($filteredCharges, function ($carry, $charge) {
+                return $carry + (float) $charge->amount_captured / 100; // Convert from cents to dollars
             }, 0);
-    
-            $this->netProfit = $this->grossProfit - $this->totalNetCost;
-        } catch (Exception $e) {
-            $this->error = 'Error retrieving charge data: ' . $e->getMessage();
+        
+            // Calculate net profit
+            $netProfit = $grossProfit - $totalNetCost;
+        
+         
+        
+            // Pass the calculated values to the frontend
+            $this->grossProfit = $grossProfit;
+            $this->netProfit = $netProfit;
+        
+        } catch (\Exception $e) {
+            \Log::error('Something went wrong! ' . $e->getMessage());
         }
+     
     }
     
     

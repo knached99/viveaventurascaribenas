@@ -196,6 +196,9 @@ class BookingForm extends Component
                 'currency' => 'usd',
                 'product_data' => [
                     'name' => $tripName, // Ensure this value is not empty
+                    'metadata' => [
+                        'stripe_product_id' => $trip->stripe_product_id // Add the product ID here
+                    ],
                 ],
                 'unit_amount' => $subtotal * 100, // Convert to cents
             ],
@@ -234,9 +237,10 @@ class BookingForm extends Component
             'city' => $this->city,
             'state' => $this->state,
             'zipcode' => $this->zipcode,
-            'stripe_product_id' => $trip->stripe_product_id
+            'stripe_product_id' => $trip->stripe_product_id // Keep the product ID here too, for metadata
         ],
     ]);
+    
 
     return redirect()->away($stripe_session->url);
 }
