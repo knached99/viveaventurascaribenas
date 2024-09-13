@@ -25,6 +25,8 @@ class TripsModel extends Model
         'tripEndDate',
         'tripPrice',
         'tripCosts',
+        'num_trips',
+        'active',
         'testimonial_id' // Ensure this field is fillable
     ];
 

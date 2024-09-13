@@ -24,6 +24,8 @@ class EditTripForm extends Component
     public string $tripStartDate = ''; 
     public string $tripEndDate = ''; 
     public string $tripPrice = '';
+    public string $num_trips = '';
+    public bool $active = false;
     //public array $tripCosts = ['name'=> '', 'amount'=>''];
     public $tripCosts = [];
 
@@ -36,6 +38,7 @@ class EditTripForm extends Component
     public string $totalNetCost = '';
     public string $grossProfit = '';
     public string $netProfit = '';
+    
 
  
 
@@ -58,6 +61,10 @@ class EditTripForm extends Component
         $this->stripe_product_id = $trip->stripe_product_id;
 
         $this->tripCosts = json_decode($trip->tripCosts, true);
+
+        $this->num_trips = $trip->num_trips;
+        $this->active = (bool) $trip->active;
+
         
         $totalNetCost = array_reduce($this->tripCosts, function($carry, $cost){
             return $carry + (float) $cost['amount'];
@@ -97,7 +104,6 @@ class EditTripForm extends Component
             $this->netProfit = $netProfit;
         
         } catch (\Exception $e) {
-            \Log::error('Something went wrong! ' . $e->getMessage());
         }
      
     }
@@ -119,7 +125,6 @@ class EditTripForm extends Component
             // Remove the cost from the Livewire component
             unset($this->tripCosts[$index]);
             $this->tripCosts = array_values($this->tripCosts);
-            \Log::info('Updated trip costs after removal: ' . json_encode($this->tripCosts));
     
             // Remove the cost from the database
             try {
@@ -127,7 +132,6 @@ class EditTripForm extends Component
                 $tripModel->tripCosts = $this->tripCosts;
                 $tripModel->save();
     
-                \Log::info('Trip costs updated in the database.');
             } catch (\Exception $e) {
                 \Log::error('Error updating trip costs in the database: ' . $e->getMessage());
             }
@@ -160,6 +164,7 @@ class EditTripForm extends Component
             'tripCosts' => 'nullable|array',
             'tripCosts.*.name' => 'required|string|max:255',
             'tripCosts.*.amount' => 'required|numeric|min:0',
+            'num_trips'=>'required|min:1',
         ];
     
         $this->validate($rules);
@@ -219,6 +224,9 @@ class EditTripForm extends Component
     
                 // Ensure tripCosts is an array and properly converted to JSON
                 $tripModel->tripCosts = json_encode($this->tripCosts);
+                $tripModel->num_trips = $this->num_trips;
+
+                $tripModel->active = $this->active;
     
                 $tripModel->save();
     
@@ -343,6 +351,7 @@ public function replaceImage($index)
     private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight) {
         $imageType = exif_imagetype($sourcePath);
     
+        // Create the original image based on its type
         switch ($imageType) {
             case IMAGETYPE_JPEG:
                 $image = imagecreatefromjpeg($sourcePath);
@@ -357,6 +366,11 @@ public function replaceImage($index)
                 throw new Exception('Unsupported image type');
         }
     
+        // Get the original image dimensions
+        $originalWidth = imagesx($image);
+        $originalHeight = imagesy($image);
+    
+        // Create the resized image canvas with transparency support for PNG and GIF
         $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
     
         if ($imageType == IMAGETYPE_PNG || $imageType == IMAGETYPE_GIF) {
@@ -366,23 +380,29 @@ public function replaceImage($index)
             imagefill($resizedImage, 0, 0, $transparent);
         }
     
-        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, imagesx($image), imagesy($image));
+        // Resample the image to the new dimensions
+        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
     
+        // Save the resized image with the appropriate quality/compression settings
         switch ($imageType) {
             case IMAGETYPE_JPEG:
-                imagejpeg($resizedImage, $destinationPath);
+                $quality = 90; // Adjust the quality level (90 is high quality, can go up to 100)
+                imagejpeg($resizedImage, $destinationPath, $quality);
                 break;
             case IMAGETYPE_PNG:
-                imagepng($resizedImage, $destinationPath);
+                $compression = 2; // Adjust the compression level (0 for no compression, 9 for max compression)
+                imagepng($resizedImage, $destinationPath, $compression);
                 break;
             case IMAGETYPE_GIF:
                 imagegif($resizedImage, $destinationPath);
                 break;
         }
     
+        // Free up memory
         imagedestroy($image);
         imagedestroy($resizedImage);
     }
+    
 
     public function render()
     {

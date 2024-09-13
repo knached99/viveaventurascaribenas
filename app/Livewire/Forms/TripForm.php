@@ -29,7 +29,9 @@ class TripForm extends Form {
     public string $tripStartDate = '';
     public string $tripEndDate = '';
     public string $tripPrice = '';
-    public array $tripCosts = ['name'=> '', 'amount' => ''];
+    public array $tripCosts = [];
+    public string $num_trips = '';
+    public bool $active = false;
     // Validate that 'tripPhoto' is an array of images with specific rules
     #[Validate('required|array|max:3')]
     public ?array $tripPhoto = [];
@@ -51,6 +53,7 @@ class TripForm extends Form {
             'tripPrice' => 'required|numeric|min:1',
             'tripCosts.*.name' => 'sometimes|string',
             'tripCosts.*.amount'=>'sometimes|numeric|min:1',
+            'num_trips'=>'required|min:1',
         ];
     }
 
@@ -83,6 +86,13 @@ class TripForm extends Form {
             'property' => 'form.tripActivities',
             'value' => $this->tripActivities,
         ]);
+
+        if (empty($this->tripCosts)) {
+            $this->tripCosts = [];
+        }
+
+        $this->active = (bool) $this->active ?? false;
+
         
     }
 
@@ -153,6 +163,8 @@ class TripForm extends Form {
                         'tripEndDate' => $this->tripEndDate,
                         'tripPrice' => $this->tripPrice,
                         'tripCosts'=>$tripCostsJson,
+                        'num_trips'=>intval($this->num_trips),
+                        'active' => $this->active ? true : false,
                     ];
 
                     // Save trip data
@@ -182,6 +194,8 @@ class TripForm extends Form {
         $this->tripEndDate = '';
         $this->tripPrice = '';
         $this->tripCosts = [];
+        $this->num_trips = '';
+        $this->active = false;
 
         $this->status = ''; // Reset status
         $this->error = '';  // Reset error
@@ -195,6 +209,7 @@ class TripForm extends Form {
     private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight) {
         $imageType = exif_imagetype($sourcePath);
     
+        // Create the original image based on its type
         switch ($imageType) {
             case IMAGETYPE_JPEG:
                 $image = imagecreatefromjpeg($sourcePath);
@@ -209,6 +224,11 @@ class TripForm extends Form {
                 throw new Exception('Unsupported image type');
         }
     
+        // Get the original image dimensions
+        $originalWidth = imagesx($image);
+        $originalHeight = imagesy($image);
+    
+        // Create the resized image canvas with transparency support for PNG and GIF
         $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
     
         if ($imageType == IMAGETYPE_PNG || $imageType == IMAGETYPE_GIF) {
@@ -218,23 +238,29 @@ class TripForm extends Form {
             imagefill($resizedImage, 0, 0, $transparent);
         }
     
-        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, imagesx($image), imagesy($image));
+        // Resample the image to the new dimensions
+        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
     
+        // Save the resized image with the appropriate quality/compression settings
         switch ($imageType) {
             case IMAGETYPE_JPEG:
-                imagejpeg($resizedImage, $destinationPath);
+                $quality = 90; // Adjust the quality level (90 is high quality, can go up to 100)
+                imagejpeg($resizedImage, $destinationPath, $quality);
                 break;
             case IMAGETYPE_PNG:
-                imagepng($resizedImage, $destinationPath);
+                $compression = 2; // Adjust the compression level (0 for no compression, 9 for max compression)
+                imagepng($resizedImage, $destinationPath, $compression);
                 break;
             case IMAGETYPE_GIF:
                 imagegif($resizedImage, $destinationPath);
                 break;
         }
     
+        // Free up memory
         imagedestroy($image);
         imagedestroy($resizedImage);
     }
+    
     
         
 

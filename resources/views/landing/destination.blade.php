@@ -276,25 +276,32 @@
 
 <x-travelcomponents.footer />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const colorThief = new ColorThief();
+        console.log('Initialized Colortheif object: ' + colorThief);
         const carouselElement = document.getElementById('carouselExample');
+        console.log('Carousel Element: ' + carouselElement);
         const sectionElement = document.querySelector('.trip-section');
+        console.log('Section Element: ' + sectionElement);
 
         function updateBackgroundColor() {
             const activeItem = carouselElement.querySelector('.carousel-item.active img');
+            console.log('Active Item: ' + activeItem);
             if (activeItem) {
                 const img = new Image();
                 img.crossOrigin = 'Anonymous'; // To avoid CORS issues
                 img.src = activeItem.src;
+                console.log('Image Source: ' + img.src);
 
                 img.onload = () => {
                     try {
                         // Extract the dominant color and the palette
                         const dominantColor = colorThief.getColor(img);
                         const palette = colorThief.getPalette(img, 2); // Get 2 colors from the image
+                        console.log('Dominant Color: ' + dominantColor);
+                        console.log('Palette: ' + palette);
 
                         // Use the dominant color and a secondary color from the palette
                         const dominantColorRgb = `rgb(${dominantColor.join(',')})`;
@@ -306,6 +313,8 @@
 
                         sectionElement.style.transition = 'background 0.5s ease'; // Smooth transition
                         sectionElement.style.background = backgroundColor;
+                        console.log('Section Element: ' + sectionElement);
+
                     } catch (error) {
                         console.error('Color extraction failed:', error);
                         sectionElement.style.background = 'linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.3))';
@@ -323,6 +332,6 @@
         updateBackgroundColor(); // Initial call
         carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
     });
-</script>
+</script> --}}
 
 

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->datetime('tripStartDate')->nullable(); 
             $table->datetime('tripEndDate')->nullable();
             $table->string('tripPrice');
+            $table->integer('num_trips')->default(1);
+            $table->boolean('active')->default(false);
             $table->json('tripCosts')->nullable();
            // $table->uuid('testimonial_id')->nullable();
 

@@ -1,0 +1,30 @@
+[2024-09-13 05:49:38] local.INFO: {"tripID":"6880dd2f-d39a-41fe-b424-98b3d439294a","stripe_product_id":"prod_Qq88rDEP9BEmCO","tripLocation":"Barbados","tripPhoto":"[\"http:\\\/\\\/localhost:8000\\\/storage\\\/booking_photos\\\/1726204622-roOwtMZbKnEJTn0LImJkt3injHM2O6oJBbF638pg.jpg.jpg\",\"http:\\\/\\\/localhost:8000\\\/storage\\\/booking_photos\\\/1726204622-pJ4JTPXV3XqdoRxirL05QoX5z6WcxhnN7FN5PoDR.jpg.jpg\",\"http:\\\/\\\/localhost:8000\\\/storage\\\/booking_photos\\\/1726204622-T0eB0GhEFndeqwt6il9lEonXRC3fdmyHcBcHi6eQ.jpg.jpg\"]","tripDescription":"Barbados is a very special place, and Barbadians are very special people who have many stories to tell. A few you might have already heard, like the one about our hometown sweetheart and mega-star Rihanna, or about cricketing legend, our very own Sir Garfield Sobers. But we have so much more to share with the world and here is where you can read more!","tripActivities":"Surfing, Canoeing, Paragliding, Jet Skiing","tripLandscape":"Beach","tripAvailability":"available","tripStartDate":"2024-09-15 00:00:00","tripEndDate":"2024-09-22 00:00:00","tripPrice":"800","num_trips":5,"active":0,"tripCosts":"[{\"name\":\"Watersports Activities\",\"amount\":\"100\"},{\"name\":\"Flights\",\"amount\":\"300\"}]","created_at":"2024-09-13T05:17:03.000000Z","updated_at":"2024-09-13T05:17:03.000000Z"}  
+[2024-09-13 05:49:40] local.INFO: Filtered Charges: []  
+[2024-09-13 05:49:40] local.INFO: Total Net Cost: 400  
+[2024-09-13 05:49:40] local.INFO: Gross Profit: 0  
+[2024-09-13 05:49:40] local.INFO: Net Profit: -400  
+[2024-09-13 05:49:40] local.INFO: Number of trips: 5  
+[2024-09-13 05:50:26] local.INFO: Editing trip with costs: [{"name":"Watersports Activities","amount":"100"},{"name":"Flights","amount":"300"}]  
+[2024-09-13 05:50:27] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:50:27] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:50:27] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:50:32] local.INFO: Editing trip with costs: [{"name":"Watersports Activities","amount":"100"},{"name":"Flights","amount":"300"}]  
+[2024-09-13 05:50:33] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:50:33] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:50:33] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:50:41] local.INFO: Editing trip with costs: [{"name":"Watersports Activities","amount":"100"},{"name":"Flights","amount":"300"}]  
+[2024-09-13 05:50:41] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:50:41] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:50:41] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:50:54] local.INFO: Editing trip with costs: [{"name":"Watersports Activities","amount":"100"},{"name":"Flights","amount":"300"}]  
+[2024-09-13 05:50:55] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:50:55] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:50:55] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:52:49] local.INFO: Editing trip with costs: [{"name":"Watersports Activities","amount":"100"},{"name":"Flights","amount":"300"}]  
+[2024-09-13 05:52:49] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:52:49] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:52:49] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:57:23] local.INFO: Editing trip with costs: [{"name":"Watersports Activities","amount":"100"},{"name":"Flights","amount":"300"}]  
+[2024-09-13 05:57:24] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:57:24] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  
+[2024-09-13 05:57:24] local.ERROR: File is not a valid instance of Livewire TemporaryUploadedFile  

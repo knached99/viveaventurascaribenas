@@ -1,5 +1,5 @@
 @php
-    $heading = $trip->tripAvailability === 'unavailable' ? 'Trip unavailable!' : 'Finish booking your trip';
+    $heading = $trip->tripAvailability === 'unavailable' ? 'Trip unavailable!' : 'Finish booking your trip to '.$trip->tripLocation;
     $message = $trip->tripAvailability === 'unavailable' ? 'You cannot book this trip as it is currently unavailable.' : 'Fill out the form to complete booking your trip!';
     $tripPhotos = json_decode($trip->tripPhoto, true);
     $firstPhotoURL = !empty($tripPhotos) ? asset($tripPhotos[0]) : asset('assets/images/booking_page_bg.webp');
@@ -7,31 +7,32 @@
 
 <x-travelcomponents.header />
 <x-travelcomponents.navbar />
-<div id="booking" class="section" style="
-    background-image: url({{$firstPhotoURL}});
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;">
-    <div class="section-center">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-7 col-md-push-5">
-                    <div class="booking-cta">
-                        <h1>{{ $heading }}</h1>
-                        <p style="font-size: 30px;">{{ $message }}</p>
 
+<div id="booking" class="section" style="background-image: url({{ $firstPhotoURL }}); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    {{-- <div class="section-center py-5" style="background: rgba(0, 0, 0, 0.6);"> --}}
+    <div class="section-center py-5">
+        <div class="container">
+            <div class="row d-flex justify-content-center align-items-center">
+                <div class="col-lg-7 text-center text-white mb-4">
+                    <div class="booking-cta">
+                        <h1 class="display-4">{{ $heading }}</h1>
+                        <p class="lead">{{ $message }}</p>
                     </div>
                 </div>
-                <div class="col-md-4 col-md-pull-7">
+                <div class="col-lg-5">
                     <!-- Form Start -->
                     @if($trip->tripAvailability === 'unavailable')
+                        <div class="alert alert-warning">
+                            This trip is unavailable at the moment.
+                        </div>
                     @else
-                    <livewire:forms.booking-form :tripID="$tripID" />
-                    <!-- Form End -->
+                        <livewire:forms.booking-form :tripID="$tripID" />
                     @endif
+                    <!-- Form End -->
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <x-travelcomponents.footer />

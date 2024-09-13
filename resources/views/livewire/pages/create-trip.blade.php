@@ -9,6 +9,8 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
     public TripForm $form;
     use WithFileUploads;
 
+
+
     public function addCost(): void
     {
         // Explicitly set the next index based on the current number of costs
@@ -50,6 +52,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
             {{ $form->error }}
         </div>
     @endif
+
 
 
     <div class="row">
@@ -157,6 +160,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
                         <div class="mb-4">
                             <label for="tripCosts" class="form-label">Trip Costs</label>
+
                             @foreach ($form->tripCosts as $index => $cost)
                                 @php
                                     $index = (int) $index; // Ensure $index is an integer
@@ -173,6 +177,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                         wire:click="removeCost({{ $index }})">Remove</button>
                                 </div>
                             @endforeach
+                           
 
 
                             <button type="button" class="btn btn-success" wire:click="addCost">Add Cost</button>
@@ -180,6 +185,21 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             <x-input-error :messages="$errors->get('form.tripCosts')" class="invalid-feedback" />
                         </div>
 
+                        <!-- Slots Available -->
+                        <div class="mb-4">
+                        <input type="text" name="num_trips" placeholder="Enter number of available slots" class="form-control {{ $errors->has('form.num_trips') ? 'is-invalid' : '' }}" wire:model="form.num_trips" />
+                            <x-input-error :messages="$errors->get('form.num_trips')" class="invalid-feedback" />
+                        </div>
+
+                       <!-- Active or Inactive --> 
+                        <div class="mb-4">
+                            <span class="text-secondary">This trip will be visible publicly only when it is switched to <b>active</b></span>
+
+                            <div class="form-check form-switch mt-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="active" name="active" wire:model="form.active">
+                                <label class="form-check-label" for="active">{{ $active ? 'Active' : 'Inactive' }}</label>
+                            </div>
+                        </div>
 
 
                         <div class="d-flex align-items-center">

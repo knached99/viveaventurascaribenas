@@ -263,7 +263,6 @@ class Admin extends Controller
                 }
             
                 // Log filtered charges for debugging
-                \Log::info('Filtered Charges: ' . json_encode($filteredCharges));
             
                 // Calculate gross profit based on the captured amount
                 $grossProfit = array_reduce($filteredCharges, function ($carry, $charge) {
@@ -273,10 +272,6 @@ class Admin extends Controller
                 // Calculate net profit
                 $netProfit = $grossProfit - $totalNetCost;
             
-                // Log calculated values for debugging
-                \Log::info('Total Net Cost: ' . $totalNetCost);
-                \Log::info('Gross Profit: ' . $grossProfit);
-                \Log::info('Net Profit: ' . $netProfit);
             
                 // Pass the calculated values to the frontend
                 $this->grossProfit = $grossProfit;
@@ -298,9 +293,7 @@ class Admin extends Controller
                 'netProfit' => $netProfit
             ]);
 
-            \Log::info('Total Net Cost'.$totalNetCost);
-            \Log::info('Gross Profit'.$grossProfit);
-            \Log::info('Net Profit'.$netProfit);
+        
     
         } catch (ModelNotFoundException $e) {
             \Log::error('Unable to get trip details: ' . $e->getMessage());

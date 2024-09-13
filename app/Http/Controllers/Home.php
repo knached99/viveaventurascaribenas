@@ -28,19 +28,139 @@ class Home extends Controller
     }
     
     // Optimized for performance 
+    // public function homePage()
+    // {
+    //     $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->get();
+    //     $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
+    
+    //      /*
+    //     The query retrieves the top 4 most popular trips based on the number of bookings.
+    //      It joins the bookings table with the trips table to get additional trip details, 
+    //      groups the results by trip and booking counts, 
+    //      filters to include only trips with more than 2 bookings, 
+    //      orders the trips by the number of bookings in descending order,
+    //       and limits the results to the top 4 most popular trips.
+    //     */
+        
+    //     $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
+    //         ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
+    //         ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
+    //         ->having('booking_count', '>', 2)
+    //         ->orderByDesc('booking_count')
+    //         ->take(4)
+    //         ->get();
+
+    //         \Log::info('Most Popular Bookings '.json_encode($mostPopularBookings));
+    
+    //     $popularTrips = [];
+    //     $mostPopularTripId = null;
+    //     $highestBookingCount = 0;
+    
+    //     foreach ($mostPopularBookings as $booking) {
+    //         $product = $this->stripe->products->retrieve($booking->stripe_product_id);
+    
+    //         $trip = TripsModel::where('stripe_product_id', $booking->stripe_product_id)->first();
+    
+    //         if ($trip) {
+    //             $popularTrips[] = [
+    //                 'id' => $trip->tripID,
+    //                 'name' => $product->name,
+    //                 'count' => $booking->booking_count,
+    //                 'image' => $trip->tripPhoto,
+    //             ];
+    
+    //             if ($booking->booking_count > $highestBookingCount) {
+    //                 $mostPopularTripId = $trip->tripID; // Update to use trip ID directly
+    //                 $highestBookingCount = $booking->booking_count;
+    //             }
+    //         }
+    //     }
+
+    //     \Log::info('Popular Trips: '. json_encode($popularTrips));
+    
+    //     return view('landing.home', [
+    //         'trips' => $trips,
+    //         'testimonials' => $testimonials,
+    //         'popularTrips' => $popularTrips,
+    //         'mostPopularTripId' => $mostPopularTripId, // Pass the most popular trip ID
+    //     ]);
+    // }
+
+    // Optimized for performance 
+    // public function homePage()
+    // {
+    //     $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->get();
+    //     $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
+    
+    //      /*
+    //     The query retrieves the top 4 most popular trips based on the number of bookings.
+    //      It joins the bookings table with the trips table to get additional trip details, 
+    //      groups the results by trip and booking counts, 
+    //      filters to include only trips with more than 2 bookings, 
+    //      orders the trips by the number of bookings in descending order,
+    //       and limits the results to the top 4 most popular trips.
+    //     */
+
+    //     \Log::info('Getting the top 4 most popular bookings: ');
+       
+        
+    //     $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
+    //     ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
+    //     ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
+    //     ->having('booking_count', '>', 2)
+    //     ->orderByDesc('booking_count')
+    //     ->take(4)
+    //     ->get();
+    
+    // \Log::info('Most Popular Bookings Query: '. json_encode($mostPopularBookings));
+    
+    //         \Log::info(json_encode($mostPopularBookings));
+    
+    //     $popularTrips = [];
+    //     $mostPopularTripId = null;
+    //     $highestBookingCount = 0;
+
+    //     \Log::info('Getting the most popular trips. Current array: '.json_encode($popularTrips));
+    
+    //     foreach ($mostPopularBookings as $booking) {
+    //         $product = $this->stripe->products->retrieve($booking->stripe_product_id);
+    
+    //         $trip = TripsModel::where('stripe_product_id', $booking->stripe_product_id)->first();
+    
+    //         if ($trip) {
+    //             $popularTrips[] = [
+    //                 'id' => $trip->tripID,
+    //                 'name' => $product->name,
+    //                 'count' => $booking->booking_count,
+    //                 'image' => $trip->tripPhoto,
+    //             ];
+    //             \Log::info('Most Popular trips: ');
+    //             \Log::info(json_encode($popularTrips));
+                
+    //             \Log::info('Checking if the booking count: '.$booking->booking_count.' is greater than the highest booking count: '.$highestBookingCount);
+    //             if ($booking->booking_count > $highestBookingCount) {
+    //                 $mostPopularTripId = $trip->tripID; // Update to use trip ID directly
+    //                 $highestBookingCount = $booking->booking_count;
+
+    //                 \Log::info('Highest booking count is: '.$highestBookingCount);
+    //             }
+    //         }
+    //     }
+    
+    //     return view('landing.home', [
+    //         'trips' => $trips,
+    //         'testimonials' => $testimonials,
+    //         'popularTrips' => $popularTrips,
+    //         'mostPopularTripId' => $mostPopularTripId, // Pass the most popular trip ID
+    //     ]);
+    // }
+    
+    // Optimized for performance 
     public function homePage()
     {
-        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->get();
+        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->where('active', true)->get();
         $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
     
-         /*
-        The query retrieves the top 4 most popular trips based on the number of bookings.
-         It joins the bookings table with the trips table to get additional trip details, 
-         groups the results by trip and booking counts, 
-         filters to include only trips with more than 2 bookings, 
-         orders the trips by the number of bookings in descending order,
-          and limits the results to the top 4 most popular trips.
-        */
         
         $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
             ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
@@ -81,6 +201,8 @@ class Home extends Controller
             'mostPopularTripId' => $mostPopularTripId, // Pass the most popular trip ID
         ]);
     }
+
+    
     
     
     
@@ -88,7 +210,7 @@ class Home extends Controller
     
 
     public function getDestinationDetails($tripID){
-        $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
+        $trip = TripsModel::where('tripID', $tripID)->where('active', true)->firstOrFail();
         $testimonials = Testimonials::with('trip')
             ->where('tripID', $tripID)
             ->where('testimonial_approval_status', 'approved')
@@ -99,18 +221,18 @@ class Home extends Controller
         $mostPopularBooking = BookingModel::select('stripe_product_id')
             ->selectRaw('COUNT(*) as booking_count') 
             ->groupBy('stripe_product_id')
-            ->having('booking_count', '>', 1) // only bookings with more than 1 entry are considered
+            ->having('booking_count', '>', 2) // only bookings with more than 1 entry are considered
             ->orderByDesc('booking_count')
             ->first();
         
         $isMostPopular = false;
-    
         if ($mostPopularBooking) {
             // Retrieve the product from Stripe
             $product = $this->stripe->products->retrieve($mostPopularBooking->stripe_product_id);
     
             // Check if the current trip is the most popular
             $isMostPopular = $trip->stripe_product_id === $mostPopularBooking->stripe_product_id;
+
         }
     
         return view('/landing/destination', [
@@ -125,7 +247,7 @@ class Home extends Controller
 
     public function destinationsPage(){
        // Fetch all trips
-       $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->get();
+       $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->where('active', true)->get();
         
        // Fetch approved testimonials
        $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
