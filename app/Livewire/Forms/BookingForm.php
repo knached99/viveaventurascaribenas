@@ -51,6 +51,8 @@ class BookingForm extends Component
     public function mount($tripID)
     {
         $this->tripID = $tripID;
+        $trip = TripsModel::findOrFail($this->tripID);
+        $this->num_trips = $trip->num_trips;
         $statesJson = file_get_contents(resource_path('js/states.json'));
         $statesArray = json_decode($statesJson, true);
 
@@ -145,6 +147,11 @@ class BookingForm extends Component
             'state' => $this->state,
             'zip_code' => $this->zipcode,
         ]);
+
+        if($this->num_trips !==0){
+            $this->num_trips -=1;
+            $trip->save();
+        }
 
         // Send notifications to customer and admin
         $data = [

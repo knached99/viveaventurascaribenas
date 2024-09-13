@@ -9,6 +9,7 @@ use App\Models\BookingModel;
 use App\Models\Testimonials;
 use App\Models\Reservations;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\ModelNotFoundException; 
@@ -29,38 +30,72 @@ class Admin extends Controller
     
     public function dashboardPage()
     {
-        // $directories = [
-        //     storage_path('app/public/booking_photos'),
-        // ];
+        $totalNetCosts = 0;
+        $netProfit = 0;
+        $popularTrips = [];
+        $mostPopularTripId = null;
+        $highestBookingCount = 0;
+        $mostPopularTripName = null;
+        $mostPopularTripPhoto = null;
     
-        // // Calculate storage usage
-        // $storageData = $this->calculateStorageUsage($directories);
-    
-        // // Format storage values
-        // $usedStorage = $this->formatSize($storageData['usedSpace']);
-        // $totalStorage = $this->formatSize($storageData['totalSpace']);
-        // $remainingStorage = $this->formatSize($storageData['freeSpace']);
-    
-        $charges = $this->stripe->charges->all();
+        // Fetch Stripe charges
+        $charges = $this->stripe->charges->search([
+            'query' => "status:'succeeded'",
+        ]);
     
         // Get all non-refunded transactions
         $transactions = array_filter($charges->data, function ($charge) {
-            return !$charge->refunded;
+            return !$charge->refunded && isset($charge->amount_captured) && $charge->amount_captured > 0;
         });
+    
+        // Group transactions by day
+        $transactionsPerDay = [];
+        foreach ($transactions as $charge) {
+            $date = Carbon::parse($charge->created)->format('Y-m-d');
+            $transactionsPerDay[$date] = ($transactionsPerDay[$date] ?? 0) + (float) $charge->amount_captured / 100;
+        }
+    
+        // Format the transactions data for the current year
+        $transactionData = [];
+        foreach ($transactionsPerDay as $date => $amount) {
+            $transactionData[] = [
+                'date' => $date,
+                'amount' => $amount
+            ];
+        }
+    
+        // Calculate gross profit
+        $grossProfit = array_reduce($transactions, function ($carry, $charge) {
+            return $carry + (float) $charge->amount_captured / 100; // Convert from cents to dollars
+        }, 0);
+    
+        // Calculate total net costs
+        $trips = TripsModel::select('tripCosts')->where('active', true)->get();
+        foreach ($trips as $trip) {
+            // Decode the tripCosts JSON array for each trip
+            $tripCostsArray = json_decode($trip->tripCosts, true);
+    
+            // Sum the amounts in the tripCosts array
+            foreach ($tripCostsArray as $cost) {
+                $totalNetCosts += isset($cost['amount']) ? (float)$cost['amount'] : 0;
+            }
+        }
+    
+        $netProfit = $grossProfit - $totalNetCosts;
     
         // Fetch bookings and reservations
         $bookings = BookingModel::with('trip')
-        ->select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id', 'tripID', 'created_at')
-        ->get();
-        
-            $reservations = Reservations::select('reservationID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();
+            ->select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id', 'tripID', 'created_at')
+            ->get();
+    
+        $reservations = Reservations::select('reservationID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();
     
         // Optimize Stripe API calls
         $allProductIds = $bookings->pluck('stripe_product_id')
-        ->merge($reservations->pluck('stripe_product_id'))
-        ->unique()
-        ->values()  // This method resets the keys of the collection
-        ->toArray();
+            ->merge($reservations->pluck('stripe_product_id'))
+            ->unique()
+            ->values()
+            ->toArray();
     
         // Fetch all products in a single call
         $stripeProducts = $this->stripe->products->all(['ids' => $allProductIds]);
@@ -71,31 +106,47 @@ class Admin extends Controller
         });
     
         // Fetch the most popular booking based on the number of entries
-        $mostPopularBooking = BookingModel::select('stripe_product_id')
-            ->selectRaw('COUNT(*) as booking_count')
-            ->groupBy('stripe_product_id')
-            ->having('booking_count', '>', 1)
+        $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
+            ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
+            ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
+            ->having('booking_count', '>', 2)
             ->orderByDesc('booking_count')
-            ->first();
+            ->first(); // Fetch the most popular booking
     
-        $mostPopularTripName = null;
-        if ($mostPopularBooking && isset($productMap[$mostPopularBooking->stripe_product_id])) {
-            $mostPopularTripName = $productMap[$mostPopularBooking->stripe_product_id];
+        if ($mostPopularBookings) {
+            $product = $this->stripe->products->retrieve($mostPopularBookings->stripe_product_id);
+            $trip = TripsModel::where('stripe_product_id', $mostPopularBookings->stripe_product_id)->first();
+    
+            if ($trip) {
+                $mostPopularTripName = $product->name;
+                $mostPopularTripPhoto = json_decode($trip->tripPhoto, true)[0] ?? null; // Extract the first photo URL
+    
+                $popularTrips[] = [
+                    'id' => $trip->tripID,
+                    'name' => $mostPopularTripName,
+                    'count' => $mostPopularBookings->booking_count,
+                    'image' => $mostPopularTripPhoto
+                ];
+                
+            }
         }
     
+        // Return the view with the necessary data
         return view('admin.dashboard', compact(
-            // 'storageData',
-            // 'usedStorage',
-            // 'totalStorage',
-            // 'remainingStorage',
-            'transactions',
+            'transactionData',
             'bookings',
             'reservations',
-            'mostPopularBooking',
             'mostPopularTripName',
-            'productMap' 
+            'mostPopularTripPhoto',
+            'productMap',
+            'grossProfit',
+            'totalNetCosts',
+            'netProfit',
+            'popularTrips'
         ));
     }
+    
+    
 
     
     public function profilePage(){
@@ -429,6 +480,11 @@ class Admin extends Controller
     }
     
     
+    private function isJson($data) {
+        return ((is_string($data) &&
+                (is_object(json_decode($data)) ||
+                is_array(json_decode($data))))) ? true : false;
+    }
     
 
 
