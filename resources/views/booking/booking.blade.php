@@ -1,6 +1,12 @@
 @php
-    $heading = $trip->tripAvailability === 'unavailable' ? 'Trip unavailable!' : 'Finish booking your trip to '.$trip->tripLocation;
-    $message = $trip->tripAvailability === 'unavailable' ? 'You cannot book this trip as it is currently unavailable.' : 'Fill out the form to complete booking your trip!';
+    $heading =
+        $trip->tripAvailability === 'unavailable'
+            ? 'Trip unavailable!'
+            : 'Finish booking your trip to ' . $trip->tripLocation;
+    $message =
+        $trip->tripAvailability === 'unavailable'
+            ? 'You cannot book this trip as it is currently unavailable.'
+            : 'Fill out the form to complete booking your trip!';
     $tripPhotos = json_decode($trip->tripPhoto, true);
     $firstPhotoURL = !empty($tripPhotos) ? asset($tripPhotos[0]) : asset('assets/images/booking_page_bg.webp');
 @endphp
@@ -8,8 +14,8 @@
 <x-travelcomponents.header />
 <x-travelcomponents.navbar />
 
-<div id="booking" class="section" style="background-image: url({{ $firstPhotoURL }}); background-size: cover; background-position: center; background-repeat: no-repeat;">
-    {{-- <div class="section-center py-5" style="background: rgba(0, 0, 0, 0.6);"> --}}
+<div id="booking" class="section"
+    style="background-image: url({{ $firstPhotoURL }}); background-size: cover; background-position: center; background-repeat: no-repeat;">
     <div class="section-center py-5">
         <div class="container">
             <div class="row d-flex justify-content-center align-items-center">
@@ -19,9 +25,9 @@
                         <p class="lead">{{ $message }}</p>
                     </div>
                 </div>
-                <div class="col-lg-5">
+                <div class="col-lg-5 col-md-8 col-sm-10">
                     <!-- Form Start -->
-                    @if($trip->tripAvailability === 'unavailable')
+                    @if ($trip->tripAvailability === 'unavailable')
                         <div class="alert alert-warning">
                             This trip is unavailable at the moment.
                         </div>
@@ -34,5 +40,6 @@
         </div>
     </div>
 </div>
+
 
 <x-travelcomponents.footer />

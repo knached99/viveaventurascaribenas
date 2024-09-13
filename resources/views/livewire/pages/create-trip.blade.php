@@ -9,8 +9,6 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
     public TripForm $form;
     use WithFileUploads;
 
-
-
     public function addCost(): void
     {
         // Explicitly set the next index based on the current number of costs
@@ -35,12 +33,13 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
 <div class="container-fluid p-4">
     <h6 style="font-weight: 800;">
-        When you create your trip, the changes are automatically reflected on the <a href="/" target="_blank">home</a> and <a
-            href="{{ route('destinations') }}" target="_blank">destinations</a> pages
+        When you create your trip, the changes are automatically reflected on the <a href="/"
+            target="_blank">home</a> and <a href="{{ route('destinations') }}" target="_blank">destinations</a> pages
     </h6>
     <p class="text-slate-500 font-medium">You may also add your expenses accrued for this trip which will be used to
         calculate the net cost.
         <span class="text-indigo-600 block">That information will not be displayed to your users</span>
+
     </p>
     @if ($form->status)
         <div class="alert alert-success d-flex justify-content-between align-items-center mb-4">
@@ -177,7 +176,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                         wire:click="removeCost({{ $index }})">Remove</button>
                                 </div>
                             @endforeach
-                           
+
 
 
                             <button type="button" class="btn btn-success" wire:click="addCost">Add Cost</button>
@@ -187,17 +186,22 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
                         <!-- Slots Available -->
                         <div class="mb-4">
-                        <input type="text" name="num_trips" placeholder="Enter number of available slots" class="form-control {{ $errors->has('form.num_trips') ? 'is-invalid' : '' }}" wire:model="form.num_trips" />
+                            <input type="text" name="num_trips" placeholder="Enter number of available slots"
+                                class="form-control {{ $errors->has('form.num_trips') ? 'is-invalid' : '' }}"
+                                wire:model="form.num_trips" />
                             <x-input-error :messages="$errors->get('form.num_trips')" class="invalid-feedback" />
                         </div>
 
-                       <!-- Active or Inactive --> 
+                        <!-- Active or Inactive -->
                         <div class="mb-4">
-                            <span class="text-secondary">This trip will be visible publicly only when it is switched to <b>active</b></span>
+                            <span class="text-secondary">This trip will be visible publicly only when it is switched to
+                                <b>active</b></span>
 
                             <div class="form-check form-switch mt-3">
-                                <input class="form-check-input" type="checkbox" role="switch" id="active" name="active" wire:model="form.active">
-                                <label class="form-check-label" for="active">{{ $active ? 'Active' : 'Inactive' }}</label>
+                                <input class="form-check-input" type="checkbox" role="switch" id="active"
+                                    name="active" wire:model="form.active">
+                                <label class="form-check-label" for="active">Switch between active or
+                                    inactive</label>
                             </div>
                         </div>
 
