@@ -32,14 +32,15 @@
             </div>
         </div>
 
-        <!-- 2FA Configuration -->
+        <!-- Stripe Sales Tax S4ettings -->
         {{-- Uncomment if needed --}}
         <div class="col-12 mb-6 order-2">
             <div class="card">
                 <div class="row g-0">
                     <div class="col-lg-12">
                         <div class="card-header d-flex align-items-center justify-content-between">
-                            <livewire:profile.configure2fa />
+                            <!-- Configure Sales Tax Origin -->
+                            <livewire:profile.update-tax-settings />
                         </div>
                     </div>
                 </div>

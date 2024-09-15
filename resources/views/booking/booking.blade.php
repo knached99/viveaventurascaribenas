@@ -25,14 +25,16 @@
                         <p class="lead">{{ $message }}</p>
                     </div>
                 </div>
-                <div class="col-lg-5 col-md-8 col-sm-10">
+                <div class="col-lg-7 col-md-10 col-sm-12 d-flex justify-content-center">
                     <!-- Form Start -->
                     @if ($trip->tripAvailability === 'unavailable')
                         <div class="alert alert-warning">
                             This trip is unavailable at the moment.
                         </div>
                     @else
-                        <livewire:forms.booking-form :tripID="$tripID" />
+                        <div class="container-fluid">
+                            <livewire:forms.booking-form :tripID="$tripID" />
+                        </div>
                     @endif
                     <!-- Form End -->
                 </div>
@@ -40,6 +42,5 @@
         </div>
     </div>
 </div>
-
 
 <x-travelcomponents.footer />

@@ -145,7 +145,7 @@ class TripForm extends Form {
                 $price = $this->stripe->prices->create([
                     'unit_amount' => $this->tripPrice * 100, // unit amount in stripe is stored in cents
                     'currency' => 'usd',
-                    'product' => $product->id
+                    'product' => $product->id,                    
                 ]);
 
                 if ($price) {

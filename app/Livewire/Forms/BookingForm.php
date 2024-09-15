@@ -167,10 +167,10 @@ class BookingForm extends Component
     }
 
     // Calculate subtotal, tax, and total price
-    $salesTaxRate = 0.07; // Example 7% sales tax
-    $subtotal = $trip->tripPrice;
-    $taxAmount = $subtotal * $salesTaxRate;
-    $totalAmount = $subtotal + $taxAmount;
+    // $salesTaxRate = 0.07; // Example 7% sales tax
+    // $subtotal = $trip->tripPrice;
+    // $taxAmount = $subtotal * $salesTaxRate;
+    // $totalAmount = $subtotal + $taxAmount;
 
     // Handle Stripe-related logic for available trips
     $existingCustomer = null;
@@ -196,31 +196,81 @@ class BookingForm extends Component
         ]);
     }
 
+    // $stripe_session = $stripe->checkout->sessions->create([
+    //     'payment_method_types' => ['card', 'cashapp', 'affirm'],
+    //     'line_items' => [[
+    //         'price_data' => [
+    //             'currency' => 'usd',
+    //             'product_data' => [
+    //                 'name' => $tripName, // Ensure this value is not empty
+    //                 'metadata' => [
+    //                     'stripe_product_id' => $trip->stripe_product_id // Add the product ID here
+    //                 ],
+    //             ],
+    //             'unit_amount' => $trip->tripPrice * 100, // Convert to cents
+    //         ],
+    //         'quantity' => 1,
+    //     ]],
+    //     'automatic_tax' => ['enabled' => true], // Enable automatic tax calculation
+    //      'shipping_address_collection' => [
+    //         'allowed_countries' => ['US'],
+    //     ],
+    //     'customer' => $existingCustomer->id, // Use the existing or newly created customer ID
+    //     'customer_update' => [
+    //         'address' => 'auto', // Automatically update customer address during checkout
+    //         'shipping' => 'auto' // Automatically update customer shipping address during checkout
+    //     ],
+    //     'mode' => 'payment',
+    //     'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID,
+    //     'cancel_url' => route('booking.cancel', [
+    //         'tripID' => $this->tripID,
+    //         'name' => $this->name,
+    //         'email' => $this->email,
+    //         'phone_number' => $this->phone_number,
+    //         'address_line_1' => $this->address_line_1,
+    //         'address_line_2' => $this->address_line_2,
+    //         'city' => $this->city,
+    //         'state' => $this->state,
+    //         'zipcode' => $this->zipcode
+    //     ]),
+    //     'metadata' => [
+    //         'tripID' => $this->tripID,
+    //         'name' => $this->name,
+    //         'email' => $this->email,
+    //         'phone_number' => $this->phone_number,
+    //         'address_line_1' => $this->address_line_1,
+    //         'address_line_2' => $this->address_line_2,
+    //         'city' => $this->city,
+    //         'state' => $this->state,
+    //         'zipcode' => $this->zipcode,
+    //         'stripe_product_id' => $trip->stripe_product_id // Keep the product ID in metadata for reference
+    //     ],
+    // ]);
+    
     $stripe_session = $stripe->checkout->sessions->create([
         'payment_method_types' => ['card', 'cashapp', 'affirm'],
         'line_items' => [[
             'price_data' => [
                 'currency' => 'usd',
                 'product_data' => [
-                    'name' => $tripName, // Ensure this value is not empty
+                    'name' => $tripName,
                     'metadata' => [
-                        'stripe_product_id' => $trip->stripe_product_id // Add the product ID here
+                        'stripe_product_id' => $trip->stripe_product_id
                     ],
                 ],
-                'unit_amount' => $subtotal * 100, // Convert to cents
-            ],
-            'quantity' => 1,
-        ],[
-            'price_data' => [
-                'currency' => 'usd',
-                'product_data' => [
-                    'name' => 'Sales Tax',
-                ],
-                'unit_amount' => $taxAmount * 100, // Convert to cents
+                'unit_amount' => $trip->tripPrice * 100,
             ],
             'quantity' => 1,
         ]],
-        'customer' => $existingCustomer->id, // Use the existing or newly created customer ID
+        'automatic_tax' => ['enabled' => true],
+        'shipping_address_collection' => [
+            'allowed_countries' => ['US'],
+        ],
+        'customer' => $existingCustomer->id,
+        'customer_update' => [
+            'address' => 'auto',
+            'shipping' => 'auto'
+        ],
         'mode' => 'payment',
         'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID,
         'cancel_url' => route('booking.cancel', [
@@ -244,9 +294,10 @@ class BookingForm extends Component
             'city' => $this->city,
             'state' => $this->state,
             'zipcode' => $this->zipcode,
-            'stripe_product_id' => $trip->stripe_product_id // Keep the product ID here too, for metadata
+            'stripe_product_id' => $trip->stripe_product_id
         ],
     ]);
+    
     
 
     return redirect()->away($stripe_session->url);
