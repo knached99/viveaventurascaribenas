@@ -244,16 +244,14 @@ class TripForm extends Form {
         // Save the resized image with the appropriate quality/compression settings
         switch ($imageType) {
             case IMAGETYPE_JPEG:
-                $quality = 90; // Adjust the quality level (90 is high quality, can go up to 100)
+                $quality = 100; // Adjust the quality level (90 is high quality, can go up to 100)
                 imagejpeg($resizedImage, $destinationPath, $quality);
                 break;
             case IMAGETYPE_PNG:
-                $compression = 2; // Adjust the compression level (0 for no compression, 9 for max compression)
+                $compression = 1; // Adjust the compression level (0 for no compression, 9 for max compression)
                 imagepng($resizedImage, $destinationPath, $compression);
                 break;
-            case IMAGETYPE_GIF:
-                imagegif($resizedImage, $destinationPath);
-                break;
+           
         }
     
         // Free up memory

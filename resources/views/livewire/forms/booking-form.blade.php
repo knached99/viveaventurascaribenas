@@ -27,7 +27,7 @@
                 </div>
 
                 <div class="d-flex justify-content-end">
-                    <button type="button" class="next__button" style="border-radius: 0;"
+                    <button type="button" class="next-btn" style="border-radius: 0;"
                         wire:click="nextStep">Next</button>
                 </div>
             </div>
@@ -61,8 +61,8 @@
 
                 <div class="form-group mb-3">
                     <label for="state" class="form-label">State</label>
-                    <select name="state" id="state" wire:model="state" class="form-control"
-                        style="border-color: {{ $errors->has('state') ? '#dc2626' : '#4f46e5' }};">
+                    <select name="state" id="state" wire:model="state" class="form-control" 
+                        style="border-width: 5px; border-color: {{ $errors->has('state') ? '#cbd5e1' : '#4f46e5' }};">
                         <option value="" disabled>Select a State</option>
                         @foreach ($states as $state)
                             <option value="{{ $state['code'] }}">{{ $state['name'] }}</option>
@@ -80,8 +80,8 @@
                 </div>
 
                 <div class="d-flex justify-content-between">
-                    <button type="button" class="previous__button" wire:click="previousStep">Previous</button>
-                    <button type="button" class="next__button" wire:click="nextStep">Next</button>
+                    <button type="button" class="previous-btn" wire:click="previousStep">Previous</button>
+                    <button type="button" class="next-btn" wire:click="nextStep">Next</button>
                 </div>
             </div>
         @endif
@@ -95,8 +95,8 @@
             @endif
             <div class="step text-center">
                 <div class="form-btn">
-                    <button type="button" class="previous__button" wire:click="previousStep">Previous</button>
-                    <button class="btn btn-success" wire:loading.remove type="submit">Book</button>
+                    <button type="button" class="previous-btn" wire:click="previousStep">Previous</button>
+                    <button class="submit-btn" wire:loading.remove type="submit">Book</button>
                 </div>
 
                 <div class="spinner-border text-primary mt-3" role="status" wire:loading></div>

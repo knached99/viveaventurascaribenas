@@ -9,6 +9,9 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
     public TripForm $form;
     use WithFileUploads;
 
+    public $tripDescription = '';
+    public $tripActivities = '';
+
     public function addCost(): void
     {
         // Explicitly set the next index based on the current number of costs
@@ -118,7 +121,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             <x-input-error :messages="$errors->get('form.tripAvailability')" class="invalid-feedback" />
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-4" wire:ignore>
                             <label for="tripDescription" class="form-label">Trip Description</label>
                             <textarea id="tripDescription" name="tripDescription" placeholder="Enter description of this trip"
                                 wire:model="form.tripDescription"
@@ -126,7 +129,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             <x-input-error :messages="$errors->get('form.tripDescription')" class="invalid-feedback" />
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-4" wire:ignore>
                             <label for="tripActivities" class="form-label">Trip Activities</label>
                             <textarea id="tripActivities" name="tripActivities" placeholder="Enter trip activities" wire:model="form.tripActivities"
                                 class="form-control ckeditor {{ $errors->has('form.tripActivities') ? 'is-invalid' : '' }}" rows="4"></textarea>
@@ -158,7 +161,6 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                         </div>
 
                         <div class="mb-4">
-                            <label for="tripCosts" class="form-label">Trip Costs</label>
 
                             @foreach ($form->tripCosts as $index => $cost)
                                 @php
@@ -179,7 +181,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
 
 
-                            <button type="button" class="btn btn-success" wire:click="addCost">Add Cost</button>
+                            <button type="button" class="btn btn-outline-success" wire:click="addCost">Add Cost</button>
 
                             <x-input-error :messages="$errors->get('form.tripCosts')" class="invalid-feedback" />
                         </div>

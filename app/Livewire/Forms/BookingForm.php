@@ -24,6 +24,7 @@ class BookingForm extends Component
     public string $state = '';
     public string $zipcode = '';
     public string $tripID;
+    public string $num_trips = '';
     public array $states = [];
     public string $error = '';
 
@@ -118,10 +119,14 @@ class BookingForm extends Component
     // Ensure trip name is not empty and provide a fallback
     $tripName = $trip->tripName ?? 'Trip Reservation'; // Default name if tripName is empty
 
+    if($trip->num_trips === 0){
+        return redirect('/');
+    }
     // If trip is unavailable, redirect
     if ($trip->tripAvailability === 'unavailable') {
         return redirect('/');
     }
+
 
     // If the trip is coming soon, handle reservation without Stripe
     if ($trip->tripAvailability === 'coming soon') {

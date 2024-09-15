@@ -74,6 +74,98 @@
      });
  </script>
 
+{{-- @if(\Route::currentRouteName() === 'admin.create-trip'  || \Route::currentRouteName() === 'admin.trip')
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize CKEditor for all elements with the class "ckeditor"
+        document.querySelectorAll('.ckeditor').forEach(element => {
+            ClassicEditor
+                .create(element)
+                .then(editor => {
+                    console.log('Editor was initialized', editor);
+
+                    // Set initial data if needed (this assumes you have Livewire data or other source)
+                    const initialData = element.getAttribute('data-initial-content');
+                    if (initialData) {
+                        editor.setData(initialData);
+                    }
+
+                    // Sync the CKEditor content with Livewire or other backend models
+                    editor.model.document.on('change:data', () => {
+                        const editorData = editor.getData();
+                        
+                        // Sync the CKEditor content with Livewire
+                        if (window.Livewire) {
+                            const livewireElement = element.closest('[wire\\:id]');
+                            if (livewireElement) {
+                                const componentId = livewireElement.getAttribute('wire:id');
+                                window.Livewire.find(componentId).set(element.getAttribute('name'), editorData);
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error during initialization of the editor', error);
+                });
+        });
+    });
+</script>
+
+@endif --}}
+
+@if(\Route::currentRouteName() === 'admin.create-trip'  || \Route::currentRouteName() === 'admin.trip')
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize CKEditor for all elements with the class "ckeditor"
+        document.querySelectorAll('.ckeditor').forEach(element => {
+            ClassicEditor
+                .create(element)
+                .then(editor => {
+
+                    // Set initial data if needed
+                    const initialData = element.getAttribute('data-initial-content');
+                    if (initialData) {
+                        editor.setData(initialData);
+                    }
+
+                    // Sync the CKEditor content with Livewire or other backend models
+                    editor.model.document.on('change:data', () => {
+                        const editorData = editor.getData();
+
+                        // Sync the CKEditor content with Livewire
+                        if (window.Livewire) {
+                            const livewireElement = element.closest('[wire\\:id]');
+                            if (livewireElement) {
+                                const componentId = livewireElement.getAttribute('wire:id');
+                                const propertyName = element.getAttribute('name');
+
+
+                                // Ensure propertyName is correct
+                                if (propertyName) {
+                                    window.Livewire.find(componentId).set(`form.${propertyName}`, editorData);
+                                } else {
+                                    console.error('Property name not found on element:', element);
+                                }
+                            } else {
+                                console.error('Livewire element not found for:', element);
+                            }
+                        } else {
+                            console.error('Livewire is not available.');
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error during initialization of the editor', error);
+                });
+        });
+    });
+</script>
+
+@endif
+
+
 
 
  <!-- endbuild -->

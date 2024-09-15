@@ -22,10 +22,12 @@
         <!-- Password Update -->
         <div class="col-12 mb-6 order-2">
             <div class="card">
-                <div class="row g-0">
+                <div class="d-flex align-items-start row">
                     <div class="col-lg-12">
-                        <div class="card-header d-flex align-items-center justify-content-between">
+                        <div class="card-body">
+                        {{-- <div class="d-flex align-items-center justify-content-between"> --}}
                             <livewire:profile.update-password-form />
+                        {{-- </div> --}}
                         </div>
                     </div>
                 </div>
@@ -36,9 +38,9 @@
         {{-- Uncomment if needed --}}
         <div class="col-12 mb-6 order-2">
             <div class="card">
-                <div class="row g-0">
+                <div class="d-flex align-items-start row">
                     <div class="col-lg-12">
-                        <div class="card-header d-flex align-items-center justify-content-between">
+                        <div class="card-body">
                             <!-- Configure Sales Tax Origin -->
                             <livewire:profile.update-tax-settings />
                         </div>

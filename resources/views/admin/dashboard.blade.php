@@ -189,7 +189,10 @@
             </div>
         </div>
         <!-- Total Revenue Chart -->
+        @if(!empty($transactionData))
         <x-admincomponents.total-revenue-chart :transactionData="$transactionData" />
+        @else 
+        @endif
         <!-- / Total Revenue Chart -->
 
         <!-- Most Popular Booking -->

@@ -142,7 +142,7 @@
                             @break
                         @endswitch
                     </p>
-                    <p class="trip-description" style="color: #000;">{{ $trip->tripDescription }}</p>
+                    <p class="trip-description" style="color: #000;"> {!! $trip->tripDescription !!}.</p>
                     <ul class="trip-info">
                         <li style="color: #000; font-weight: bold;"><img
                                 src="{{ asset('assets/images/calendar.png') }}" class="icon" />
@@ -198,7 +198,7 @@
                 <div class="border-bottom-1 border-secondary"> </div>
                 <div style="border-bottom: 1px solid #1e293b"></div>
                 <h2 class="m-3" style="font-weight: 900;">Trip Activities</h2>
-                <p class="trip-description" style="color: #000;">{{ $trip->tripActivities }}</p>
+                <p class="trip-description" style="color: #000;">{!!$trip->tripActivities!!}</p>
                 <!-- End Activities Section -->
 
                 <!-- Testimonials Slider -->
@@ -255,6 +255,13 @@
 
                     </div>
                 </div>
+            @elseif($trip->num_trips === 0)
+            <div class="col-md-4">
+            <div class="booking-widget">
+            <h3 class="text-secondary">Unfortunately, this trip is fully booked at the moment.</h3>
+            </div>
+            </div>
+
             @else
                 <div class="col-md-4">
                     <!-- Booking Widget -->

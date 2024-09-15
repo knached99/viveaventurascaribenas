@@ -89,7 +89,7 @@
 
                     <!-- Form Fields -->
                     <!-- Location -->
-                    <div class="mb-3">
+                    <div class="mb-3" >
                         <label for="tripLocation" class="form-label">Trip Location</label>
                         <input type="text" id="tripLocation" wire:model="tripLocation"
                             class="form-control {{ $errors->has('tripLocation') ? 'is-invalid' : '' }}" />
@@ -97,7 +97,7 @@
                     </div>
 
                     <!-- Description -->
-                    <div class="mb-3">
+                    <div class="mb-3" wire:ignore>
                         <label for="tripDescription" class="form-label">Trip Description</label>
                         <textarea id="tripDescription" name="tripDescription" wire:model="tripDescription"
                             class="form-control ckeditor {{ $errors->has('tripDescription') ? 'is-invalid' : '' }}" rows="4">{{ $this->tripDescription }}</textarea>
@@ -105,7 +105,7 @@
                     </div>
 
                     <!-- Activities -->
-                    <div class="mb-3">
+                    <div class="mb-3" wire:ignore>
                         <label for="tripActivities" class="form-label">Trip Activities</label>
                         <textarea id="tripActivities" name="tripActivities" wire:model="tripActivities"
                             class="form-control ckeditor {{ $errors->has('tripActivities') ? 'is-invalid' : '' }}" rows="4">{{ $this->tripActivities }}</textarea>

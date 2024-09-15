@@ -77,6 +77,8 @@
         <!-- Quill Editor Script -->
         {{-- <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> --}}
 
+    <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
+
 
     @livewireStyles
 </head>
