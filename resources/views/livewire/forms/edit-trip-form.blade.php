@@ -16,6 +16,12 @@
                     class="card-header bg-slate-200 text-white d-flex justify-content-between align-items-center rounded-top">
                     <h3 class="mb-0">Trip Information for {{ $trip->tripLocation }}</h3>
                 </div>
+                @if (session('status'))
+                    <div class="alert alert-success">
+                        {{ session('status') }}
+                    </div>
+                @endif
+
 
                 <form wire:submit.prevent="editTrip" class="p-4" enctype="multipart/form-data">
                     <!-- Editable Images -->
@@ -89,7 +95,7 @@
 
                     <!-- Form Fields -->
                     <!-- Location -->
-                    <div class="mb-3" >
+                    <div class="mb-3">
                         <label for="tripLocation" class="form-label">Trip Location</label>
                         <input type="text" id="tripLocation" wire:model="tripLocation"
                             class="form-control {{ $errors->has('tripLocation') ? 'is-invalid' : '' }}" />

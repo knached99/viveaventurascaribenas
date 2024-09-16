@@ -29,7 +29,7 @@ class EditTripForm extends Component
     //public array $tripCosts = ['name'=> '', 'amount'=>''];
     public $tripCosts = [];
 
-
+    public string $status = ''; // Trip Creation Flash Message
     public string $success = '';
     public string $imageReplaceSuccess = '';
     public string $imageReplaceError = '';
@@ -373,7 +373,7 @@ public function replaceImage($index)
     
         if ($imageType == IMAGETYPE_PNG || $imageType == IMAGETYPE_GIF) {
             imagealphablending($resizedImage, false);
-            imagesavealpha($resizedImage, true);
+            imagesavealpha($resizedImage, true); 
             $transparent = imagecolorallocatealpha($resizedImage, 255, 255, 255, 127);
             imagefill($resizedImage, 0, 0, $transparent);
         }

@@ -21,6 +21,7 @@ class TripForm extends Form {
 
     protected $stripe;
 
+    public string $tripID = '';
     public string $tripLocation = '';
     public string $tripLandscape = '';
     public string $tripAvailability = '';
@@ -76,7 +77,13 @@ class TripForm extends Form {
     public function mount(){
         Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
         $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        
 
+          // Log to see if Str::uuid() is being executed
+        \Log::info('Generating UUID in mount method.');
+
+        
+        
         $this->emit('setEditorContent', [
             'property' => 'form.tripDescription',
             'value' => $this->tripDescription,
@@ -96,7 +103,7 @@ class TripForm extends Form {
         
     }
 
-    public function submitTripForm(): void {
+    public function submitTripForm(){
 
         $this->validate();
 
@@ -150,8 +157,9 @@ class TripForm extends Form {
 
                 if ($price) {
                     // Reset the temporary file from Livewire
+                    $this->tripID = Str::uuid();
                     $data = [
-                        'tripID' => Str::uuid(),
+                        'tripID' => $this->tripID,
                         'stripe_product_id' => $product->id,
                         'tripLocation' => $this->tripLocation,
                         'tripDescription' => $this->tripDescription,
@@ -175,6 +183,7 @@ class TripForm extends Form {
 
                     // Set success message
                     $this->status = 'Trip Successfully Created!';
+                    return redirect('/admin/trip/'.$this->tripID)->with('status',$this->status);
                 }
             }
         } catch (Exception $e) {

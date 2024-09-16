@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\BookingSubmittedAdmin;
 use App\Notifications\BookingSubmittedCustomer;
+use Illuminate\Support\Facades\URL;
+
 class Home extends Controller
 {
 
@@ -243,6 +245,15 @@ class Home extends Controller
                 if (!empty($session->metadata->stripe_product_id)) {
                     $product = $stripe->products->retrieve($session->metadata->stripe_product_id);
                 }
+
+                // Temporary Signed URL is valid for 2 minutes 
+                $signedURLSuccess = URL::temporarySignedRoute(
+                    'booking.success', now()->addMinutes(2), ['tripID' => $tripID]
+                );
+
+                $signedURLCancel = URL::temporarySignedRoute(
+                    'booking.cancel', now()->addMinutes(2), ['tripID' => $tripID]
+                );
     
                 // Send notifications
                 Notification::route('mail', config('mail.mailers.smtp.to_email'))
@@ -251,15 +262,17 @@ class Home extends Controller
                 Notification::route('mail', $session->metadata->email)
                     ->notify(new BookingSubmittedCustomer($session->metadata->name, $this->bookingID, $receiptLink));
     
+                
                 // Pass the metadata to the view
                 return view('booking.success', [
                     'customerName' => $session->metadata->name,
                     'customerEmail' => $session->metadata->email,
                     'tripID' => $tripID,
+                    'signedURL'=>$signedURLSuccess
                 ]);
             } else {
                 // Handle the case where the payment was not successful or the session is invalid
-                return redirect()->route('booking.cancel', ['tripID' => $tripID]);
+                return redirect()->route('booking.cancel', ['tripID' => $tripID, 'signedURL'=>$signedURLCancel]);
             }
         } catch (\Exception $e) {
             \Log::error('Uncaught database or stripe exception in class: ' . __CLASS__ . ' On line: ' . __LINE__ . ' Error Message: ' . $e->getMessage());

@@ -20,8 +20,12 @@
                             @endfor
                         </div>
                         <div class="inline-block">
-                            <span class="m-3 text-secondary"><i class='bx bx-map'
-                                    style="font-size: 30px;"></i>{{ $testimony->trip->tripLocation }}</span>
+
+                            <span class="m-3 text-secondary"><i class='bx bx-map' style="font-size: 30px;"></i>
+                                <a style="border-bottom: 1px solid blue;"
+                                    href="{{ route('landing.destination', ['tripID' => $testimony->trip->tripID]) }}">
+                                    {{ $testimony->trip->tripLocation }}</span>
+                            </a>
                             <span class="m-3 text-secondary"><i class='bx bx-calendar'
                                     style="font-size: 30px;"></i>{{ date('F jS, Y', strtotime($testimony->created_at)) }}</span>
                         </div>

@@ -181,7 +181,8 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
 
 
-                            <button type="button" class="btn btn-outline-success" wire:click="addCost">Add Cost</button>
+                            <button type="button" class="btn btn-outline-success" wire:click="addCost">Add
+                                Cost</button>
 
                             <x-input-error :messages="$errors->get('form.tripCosts')" class="invalid-feedback" />
                         </div>
@@ -209,14 +210,18 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
 
                         <div class="d-flex align-items-center">
-                            <button type="submit" class="btn btn-primary me-3" wire:loading.remove>Create
-                                Trip</button>
+                            <!-- The submit button will be hidden while the form is submitting -->
+                            <button type="submit" class="btn btn-primary me-3" wire:loading.remove
+                                wire:target="submitTripForm">Create Trip</button>
+
+                            <!-- Show the loading spinner while the form is being submitted -->
                             <div wire:loading wire:target="submitTripForm">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </div>
                         </div>
+
                     </form>
                 </div>
             </div>

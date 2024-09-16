@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Home;
+use App\Http\Controllers\Analytics;
 use App\Http\Controllers\Admin;
 use Livewire\Volt\Volt;
 use App\Http\Livewire\TripInfoForm;
@@ -49,6 +50,7 @@ Route::post('/two-factor-challenge', function(Request $request){
 Route::group(['middleware' => 'auth', 'verified'], function () {
     Route::get('/admin/dashboard', [Admin::class, 'dashboardPage'])->name('admin.dashboard');
     Route::get('/admin/profile', [Admin::class, 'profilePage'])->name('admin.profile');
+    Route::get('/admin/analytics', [Analytics::class, 'showAnalytics'])->name('admin.analytics');
     Route::get('/admin/{bookingID}/booking', [Admin::class, 'bookingInfo'])->name('admin.booking');
     Route::get('/admin/all-trips', [Admin::class, 'allTripsPage'])->name('admin.all-trips');
     Route::get('/admin/testimonials', [Admin::class, 'testimonialsPage'])->name('admin.testimonials');

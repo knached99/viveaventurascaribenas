@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\TrackVisitors;
+// use App\Http\Middleware\VisitorMiddleware; // Import your middleware
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -11,7 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Add your VisitorMiddleware here
+        $middleware->append(TrackVisitors::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

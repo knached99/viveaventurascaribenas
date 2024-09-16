@@ -1,24 +1,23 @@
 .section {
     position: relative;
     height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .section .section-center {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%);
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
 }
 
 #booking {
-    /* font-family: "Montserrat", sans-serif;
-    background-image: url("../images/booking_page_bg.webp");
-    /* background-image: url("https://images.pexels.com/photos/1010657/pexels-photo-1010657.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"); 
+    position: relative;
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat; */
+    background-repeat: no-repeat;
 }
 
 #booking::before {
@@ -34,11 +33,10 @@
 .booking-form {
     background-color: #fff;
     padding: 50px 20px;
-    -webkit-box-shadow: 0px 5px 20px -5px rgba(0, 0, 0, 0.3);
     box-shadow: 0px 5px 20px -5px rgba(0, 0, 0, 0.3);
     border-radius: 4px;
-    width: 200%;
-    height: auto;
+    width: 100%;
+    max-width: 600px;
 }
 
 .booking-form .form-group {
@@ -51,37 +49,22 @@
     border-radius: 4px;
     border: none;
     height: 40px;
-    -webkit-box-shadow: none;
     box-shadow: none;
     color: #3e485c;
     font-size: 14px;
-}
-
-.booking-form .form-control::-webkit-input-placeholder {
-    color: rgba(62, 72, 92, 0.3);
-}
-
-.booking-form .form-control:-ms-input-placeholder {
-    color: rgba(62, 72, 92, 0.3);
 }
 
 .booking-form .form-control::placeholder {
     color: rgba(62, 72, 92, 0.3);
 }
 
-.booking-form input[type="date"].form-control:invalid {
-    color: rgba(62, 72, 92, 0.3);
-}
-
 .booking-form select.form-control {
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
 }
 
 .booking-form select.form-control + .select-arrow {
     position: absolute;
-    right: 0px;
+    right: 0;
     bottom: 4px;
     width: 32px;
     line-height: 32px;
@@ -92,77 +75,47 @@
     font-size: 14px;
 }
 
-.booking-form select.form-control + .select-arrow:after {
-    content: "\279C";
-    display: block;
-    -webkit-transform: rotate(90deg);
-    transform: rotate(90deg);
-}
-
-.booking-form .form-label {
-    display: inline-block;
-    color: #3e485c;
-    font-weight: 700;
-    margin-bottom: 6px;
-    margin-left: 7px;
-}
-
-.booking-form .submit-btn {
-    display: inline-block;
-    color: #fff;
-    background-color: #94a3b8;
-    font-weight: 700;
-    padding: 14px 30px;
-    border-radius: 10px;
-    border: none;
-    width: 50%;
-    margin-left: 10px;
-    -webkit-transition: 0.2s all;
-    transition: 0.2s all;
-}
-
-.booking-form .next-btn {
-    display: inline-block;
-    color: #fff;
-    background-color: #ffc107;
-    font-weight: 700;
-    padding: 14px 30px;
-    border-radius: 10px;
-    border: none;
-    width: 20%;
-    margin-left: 10px;
-    -webkit-transition: 0.2s all;
-    transition: 0.2s all;
-}
-
+.booking-form .submit-btn,
+.booking-form .next-btn,
 .booking-form .previous-btn {
     display: inline-block;
     color: #fff;
-    background-color: #cbd5e1;
     font-weight: 700;
     padding: 14px 30px;
     border-radius: 10px;
     border: none;
-    width: 20%;
     margin-left: 10px;
-    -webkit-transition: 0.2s all;
     transition: 0.2s all;
+    width: auto;
+    min-width: 120px;
+}
+
+.booking-form .submit-btn {
+    background-color: #94a3b8;
+}
+
+.booking-form .next-btn {
+    background-color: #ffc107;
+}
+
+.booking-form .previous-btn {
+    background-color: #cbd5e1;
 }
 
 .booking-form .submit-btn:hover,
 .booking-form .submit-btn:focus {
-    /* opacity: 0.9; */
     background-color: #1e293b;
     cursor: pointer;
 }
 
 .booking-cta {
+    text-align: center;
     margin-top: 80px;
     margin-bottom: 30px;
 }
 
 .booking-cta h1 {
-    font-size: 52px;
+    font-size: 3.5rem;
     text-transform: uppercase;
     color: #fff;
     font-weight: 700;
@@ -171,4 +124,14 @@
 .booking-cta p {
     font-size: 16px;
     color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 768px) {
+    .booking-cta h1 {
+        font-size: 2.5rem;
+    }
+
+    .booking-form {
+        padding: 30px 15px;
+    }
 }
