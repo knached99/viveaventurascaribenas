@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('visitors', function(Blueprint $table){
             $table->uuid('visitor_uuid')->primary();
-            $table->string('visitor_ip_address');
+            $table->longText('visitor_ip_address');
             $table->string('visitor_user_agent');
             $table->text('visited_url')->nullable();
             $table->text('visitor_referrer')->nullable();
