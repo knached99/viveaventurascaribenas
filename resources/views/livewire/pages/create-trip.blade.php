@@ -44,6 +44,8 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
         <span class="text-indigo-600 block">That information will not be displayed to your users</span>
 
     </p>
+
+
     @if ($form->status)
         <div class="alert alert-success d-flex justify-content-between align-items-center mb-4">
             {{ $form->status }}
@@ -71,7 +73,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                         </div>
 
                         <div class="mb-4">
-                            <label for="tripPhoto" class="form-label">Trip Photos</label>
+                            <label for="tripPhoto" class="form-label">Trip Photos (Choose up to 3 photos)</label>
                             <input type="file" id="tripPhoto" name="tripPhoto"
                                 class="form-control {{ $errors->has('form.tripPhoto') ? 'is-invalid' : '' }}"
                                 wire:model="form.tripPhoto" multiple />
@@ -95,7 +97,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
                         <div class="mb-4">
                             <label for="tripLandscape" class="form-label">Trip Landscape</label>
-                            <select id="tripLandscape" name="form.tripLandscape"
+                            <select id="tripLandscape" name="form.tripLandscape" multiple
                                 class="form-select {{ $errors->has('form.tripLandscape') ? 'is-invalid' : '' }}"
                                 wire:model="form.tripLandscape">
                                 <option value="" selected disabled>Select Landscape</option>

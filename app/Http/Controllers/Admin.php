@@ -17,6 +17,8 @@ use Stripe\Stripe;
 use Stripe\Product;
 use Stripe\StripeClient;
 use Carbon\Carbon;
+use App\Jobs\ProcessStripeCharges;
+use Illuminate\Support\Facades\Cache;
 
 class Admin extends Controller
 {
@@ -30,20 +32,21 @@ class Admin extends Controller
     
     public function dashboardPage()
     {
-        $totalNetCosts = 0;
-        $netProfit = 0;
+        // Cache Stripe products and charges
+        $cacheKeyProducts = 'stripe_products';
+        $cacheKeyCharges = 'stripe_charges';
         $popularTrips = [];
-        $mostPopularTripId = null;
-        $highestBookingCount = 0;
-        $mostPopularTripName = null;
-        $mostPopularTripPhoto = null;
+        $stripeProducts = Cache::remember($cacheKeyProducts, 3600, function () {
+            return $this->stripe->products->all(['limit' => 100]); // Adjust the limit as needed
+        });
     
-        // Fetch Stripe charges
-        $charges = $this->stripe->charges->search([
-            'query' => "status:'succeeded'",
-        ]);
+        $charges = Cache::remember($cacheKeyCharges, 3600, function () {
+            return $this->stripe->charges->search([
+                'query' => "status:'succeeded'",
+            ]);
+        });
     
-        // Get all non-refunded transactions
+        // Filter non-refunded transactions
         $transactions = array_filter($charges->data, function ($charge) {
             return !$charge->refunded && isset($charge->amount_captured) && $charge->amount_captured > 0;
         });
@@ -55,14 +58,13 @@ class Admin extends Controller
             $transactionsPerDay[$date] = ($transactionsPerDay[$date] ?? 0) + (float) $charge->amount_captured / 100;
         }
     
-        // Format the transactions data for the current year
-        $transactionData = [];
-        foreach ($transactionsPerDay as $date => $amount) {
-            $transactionData[] = [
+        // Format transaction data for the current year
+        $transactionData = array_map(function ($date, $amount) {
+            return [
                 'date' => $date,
                 'amount' => $amount
             ];
-        }
+        }, array_keys($transactionsPerDay), $transactionsPerDay);
     
         // Calculate gross profit
         $grossProfit = array_reduce($transactions, function ($carry, $charge) {
@@ -70,16 +72,13 @@ class Admin extends Controller
         }, 0);
     
         // Calculate total net costs
-        $trips = TripsModel::select('tripCosts')->where('active', true)->get();
-        foreach ($trips as $trip) {
-            // Decode the tripCosts JSON array for each trip
-            $tripCostsArray = json_decode($trip->tripCosts, true);
-    
-            // Sum the amounts in the tripCosts array
-            foreach ($tripCostsArray as $cost) {
-                $totalNetCosts += isset($cost['amount']) ? (float)$cost['amount'] : 0;
-            }
-        }
+        $totalNetCosts = TripsModel::select('tripCosts')->where('active', true)->get()
+            ->flatMap(function ($trip) {
+                return json_decode($trip->tripCosts, true) ?? [];
+            })
+            ->sum(function ($cost) {
+                return isset($cost['amount']) ? (float)$cost['amount'] : 0;
+            });
     
         $netProfit = $grossProfit - $totalNetCosts;
     
@@ -97,29 +96,27 @@ class Admin extends Controller
             ->values()
             ->toArray();
     
-        // Fetch all products in a single call
-        $stripeProducts = $this->stripe->products->all(['ids' => $allProductIds]);
+        $productMap = collect($stripeProducts->data)
+            ->mapWithKeys(function ($product) {
+                return [$product->id => $product->name];
+            });
     
-        // Map products by ID for easy access
-        $productMap = collect($stripeProducts->data)->mapWithKeys(function ($product) {
-            return [$product->id => $product->name];
-        });
-    
-        // Fetch the most popular booking based on the number of entries
+        // Fetch the most popular booking
         $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
             ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
             ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
             ->having('booking_count', '>', 2)
             ->orderByDesc('booking_count')
-            ->first(); // Fetch the most popular booking
+            ->first();
     
+        $mostPopularTripName = $mostPopularTripPhoto = null;
         if ($mostPopularBookings) {
             $product = $this->stripe->products->retrieve($mostPopularBookings->stripe_product_id);
             $trip = TripsModel::where('stripe_product_id', $mostPopularBookings->stripe_product_id)->first();
     
             if ($trip) {
                 $mostPopularTripName = $product->name;
-                $mostPopularTripPhoto = json_decode($trip->tripPhoto, true)[0] ?? null; // Extract the first photo URL
+                $mostPopularTripPhoto = json_decode($trip->tripPhoto, true)[0] ?? null;
     
                 $popularTrips[] = [
                     'id' => $trip->tripID,
@@ -127,7 +124,6 @@ class Admin extends Controller
                     'count' => $mostPopularBookings->booking_count,
                     'image' => $mostPopularTripPhoto
                 ];
-                
             }
         }
     
@@ -269,7 +265,19 @@ class Admin extends Controller
         return redirect()->route('admin.testimonials')->With('testimonial_delete_error', 'Unable to delete testimony. Something went wrong and if this error persists, please contact the developer');
        }
     }
-    public function getTripDetails($tripID) {
+    public function getTripDetails($tripID)
+    {
+        // Define the cache key based on the trip ID
+        $cacheKey = "trip_details_{$tripID}";
+    
+        // Attempt to get the cached data
+        $cachedData = Cache::get($cacheKey);
+    
+        if ($cachedData) {
+            // Return the cached data if available
+            return view('admin.trip', $cachedData);
+        }
+    
         try {
             // Retrieve trip details
             $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
@@ -279,72 +287,60 @@ class Admin extends Controller
             $totalNetCost = array_reduce($tripCosts, function ($carry, $cost) {
                 return $carry + (float) $cost['amount'];
             }, 0);
-   
-                $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-                $stripeProductID = $trip->stripe_product_id;  // Product ID for the specific trip
-            
-                // Use Stripe's search API to retrieve charges with succeeded status
-                $charges = $stripe->charges->search([
-                    'query' => "status:'succeeded'",
-                    'limit' => 100, // Adjust the limit if needed
-                ]);
-            
-           
-            
-                $filteredCharges = [];
-            
-                // Loop through each charge and filter based on the product ID
-                foreach ($charges->data as $charge) {
-                    // Make sure the charge is succeeded and not refunded
-                    if ($charge->amount_refunded == 0 && $charge->amount_captured > 0) {
-                        // Check if the charge has an associated invoice
-                        if ($charge->invoice) {
-                            // Retrieve the invoice and expand the line items to check for product ID
-                            $invoice = $stripe->invoices->retrieve($charge->invoice, ['expand' => ['lines']]);
-            
-                            foreach ($invoice->lines->data as $lineItem) {
-                                // Check if the product ID matches
-                                if ($lineItem->price->product === $stripeProductID) {
-                                    $filteredCharges[] = $charge;  // Add this charge to the filtered array
-                                    break;  // No need to check further line items once we have a match
-                                }
+    
+            $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+            $stripeProductID = $trip->stripe_product_id;  // Product ID for the specific trip
+    
+            // Use Stripe's search API to retrieve charges with succeeded status
+            $charges = $stripe->charges->search([
+                'query' => "status:'succeeded'",
+                'limit' => 100, // Adjust the limit if needed
+            ]);
+    
+            $filteredCharges = [];
+    
+            // Loop through each charge and filter based on the product ID
+            foreach ($charges->data as $charge) {
+                // Make sure the charge is succeeded and not refunded
+                if ($charge->amount_refunded == 0 && $charge->amount_captured > 0) {
+                    // Check if the charge has an associated invoice
+                    if ($charge->invoice) {
+                        // Retrieve the invoice and expand the line items to check for product ID
+                        $invoice = $stripe->invoices->retrieve($charge->invoice, ['expand' => ['lines']]);
+    
+                        foreach ($invoice->lines->data as $lineItem) {
+                            // Check if the product ID matches
+                            if ($lineItem->price->product === $stripeProductID) {
+                                $filteredCharges[] = $charge;  // Add this charge to the filtered array
+                                break;  // No need to check further line items once we have a match
                             }
                         }
                     }
                 }
-            
-                // Log filtered charges for debugging
-            
-                // Calculate gross profit based on the captured amount
-                $grossProfit = array_reduce($filteredCharges, function ($carry, $charge) {
-                    return $carry + (float) $charge->amount_captured / 100; // Convert from cents to dollars
-                }, 0);
-            
-                // Calculate net profit
-                $netProfit = $grossProfit - $totalNetCost;
-            
-            
-                // Pass the calculated values to the frontend
-                $this->grossProfit = $grossProfit;
-                $this->netProfit = $netProfit;
-            
-           
-            
-            
-        
-            
-
+            }
     
-            // Pass these values to the view
-            return view('admin.trip', [
+            // Calculate gross profit based on the captured amount
+            $grossProfit = array_reduce($filteredCharges, function ($carry, $charge) {
+                return $carry + (float) $charge->amount_captured / 100; // Convert from cents to dollars
+            }, 0);
+    
+            // Calculate net profit
+            $netProfit = $grossProfit - $totalNetCost;
+    
+            // Prepare data for caching
+            $dataToCache = [
                 'tripId' => $tripID,
                 'trip' => $trip,
                 'totalNetCost' => $totalNetCost,
                 'grossProfit' => $grossProfit,
                 'netProfit' => $netProfit
-            ]);
-
-        
+            ];
+    
+            // Cache the data for a specific duration (e.g., 60 minutes)
+            Cache::put($cacheKey, $dataToCache, 60);
+    
+            // Pass these values to the view
+            return view('admin.trip', $dataToCache);
     
         } catch (ModelNotFoundException $e) {
             \Log::error('Unable to get trip details: ' . $e->getMessage());
@@ -354,7 +350,6 @@ class Admin extends Controller
             abort(500);
         }
     }
-    
     
     
     
@@ -378,13 +373,11 @@ class Admin extends Controller
     
                     // Check if the file exists
                     if (Storage::disk('public')->exists($filePath)) {
-                        \Log::info('File exists: ' . $filePath);
     
                         // Delete the file
                         Storage::disk('public')->delete($filePath);
-                        \Log::info('File deleted: ' . $filePath);
                     } else {
-                        \Log::info('File does not exist: ' . $filePath);
+                        throw new \Exception('Cannot delete Image!');
                     }
                 }
             }
@@ -397,18 +390,14 @@ class Admin extends Controller
                 $this->stripe->prices->update($price->id, ['active' => false]);
             }
     
-            // Instead of deleting, archive the product in Stripe
-            \Log::info('Archiving product on Stripe');
             $this->stripe->products->update($trip->stripe_product_id, ['active' => false]);
-    
+            // $this->stripe->products->delete($trip->stripe_product_id);
             // Delete the trip from the database
             $trip->delete();
             \Log::info('Deleted Trip.');
     
-            \Log::info('Verifying deletion');
     
             if (!$trip->exists) {
-                \Log::info('Verified, trip is deleted');
             }
     
             return redirect()->back()->with('trip_deleted', 'That trip was successfully deleted');

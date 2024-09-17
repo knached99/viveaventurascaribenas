@@ -69,15 +69,22 @@
     <script src="{{ asset('assets/theme_assets/assets/js/config.js') }}"></script>
 
     <!-- CKEDITOR 5 CDN -->
-	{{-- <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.1.0/ckeditor5.css">     --}}
-   
-        <!-- Quill Editor Styles -->
+    {{-- <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.1.0/ckeditor5.css">     --}}
+
+    <!-- Quill Editor Styles -->
     {{-- <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet"> --}}
 
-        <!-- Quill Editor Script -->
-        {{-- <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> --}}
+    <!-- Quill Editor Script -->
+    {{-- <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> --}}
 
     <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
+
+    <!-- Loading Apex Chart Library -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- Load Leaflet.js and its Heatmap plugin -->
+    {{-- <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-heat/dist/leaflet-heat.js"></script> --}}
 
 
     @livewireStyles

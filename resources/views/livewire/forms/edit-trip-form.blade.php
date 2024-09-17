@@ -136,14 +136,19 @@
                     <!-- Landscape -->
                     <div class="mb-4">
                         <label for="tripLandscape" class="form-label">Trip Landscape</label>
-                        <select id="tripLandscape" wire:model="tripLandscape"
+                        <select id="tripLandscape" wire:model="tripLandscape" multiple
                             class="form-select {{ $errors->has('tripLandscape') ? 'is-invalid' : '' }}">
                             <option value="" disabled>Select Landscape</option>
-                            <option value="Beach">Beach</option>
-                            <option value="City">City</option>
-                            <option value="Country Side">Country Side</option>
-                            <option value="Forested">Forested</option>
-                            <option value="Mountainous">Mountainous</option>
+                            <option value="Beach" {{ in_array('Beach', $tripLandscape) ? 'selected' : '' }}>Beach
+                            </option>
+                            <option value="City" {{ in_array('City', $tripLandscape) ? 'selected' : '' }}>City
+                            </option>
+                            <option value="Country Side"
+                                {{ in_array('Country Side', $tripLandscape) ? 'selected' : '' }}>Country Side</option>
+                            <option value="Forested" {{ in_array('Forested', $tripLandscape) ? 'selected' : '' }}>
+                                Forested</option>
+                            <option value="Mountainous"
+                                {{ in_array('Mountainous', $tripLandscape) ? 'selected' : '' }}>Mountainous</option>
                         </select>
                         <x-input-error :messages="$errors->get('tripLandscape')" class="invalid-feedback" />
                     </div>
@@ -195,7 +200,7 @@
                         <button type="button" class="btn btn-outline-success mt-4" wire:click="addCost">Add
                             Cost</button>
 
-                        <x-input-error :messages="$errors->get('form.tripCosts')" class="invalid-feedback" />
+                        <x-input-error :messages="$errors->get('tripCosts')" class="invalid-feedback" />
                     </div>
 
                     <div class="mb-4">

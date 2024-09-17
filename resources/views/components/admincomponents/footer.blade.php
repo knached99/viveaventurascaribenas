@@ -74,7 +74,7 @@
      });
  </script>
 
-{{-- @if(\Route::currentRouteName() === 'admin.create-trip'  || \Route::currentRouteName() === 'admin.trip')
+ {{-- @if (\Route::currentRouteName() === 'admin.create-trip' || \Route::currentRouteName() === 'admin.trip')
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -114,56 +114,103 @@
 
 @endif --}}
 
-@if(\Route::currentRouteName() === 'admin.create-trip'  || \Route::currentRouteName() === 'admin.trip')
+ @if (\Route::currentRouteName() === 'admin.create-trip')
+     <script>
+         document.addEventListener('DOMContentLoaded', function() {
+             // Initialize CKEditor for all elements with the class "ckeditor"
+             document.querySelectorAll('.ckeditor').forEach(element => {
+                 ClassicEditor
+                     .create(element)
+                     .then(editor => {
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initialize CKEditor for all elements with the class "ckeditor"
-        document.querySelectorAll('.ckeditor').forEach(element => {
-            ClassicEditor
-                .create(element)
-                .then(editor => {
+                         // Set initial data if needed
+                         const initialData = element.getAttribute('data-initial-content');
+                         if (initialData) {
+                             editor.setData(initialData);
+                         }
 
-                    // Set initial data if needed
-                    const initialData = element.getAttribute('data-initial-content');
-                    if (initialData) {
-                        editor.setData(initialData);
-                    }
+                         // Sync the CKEditor content with Livewire or other backend models
+                         editor.model.document.on('change:data', () => {
+                             const editorData = editor.getData();
 
-                    // Sync the CKEditor content with Livewire or other backend models
-                    editor.model.document.on('change:data', () => {
-                        const editorData = editor.getData();
-
-                        // Sync the CKEditor content with Livewire
-                        if (window.Livewire) {
-                            const livewireElement = element.closest('[wire\\:id]');
-                            if (livewireElement) {
-                                const componentId = livewireElement.getAttribute('wire:id');
-                                const propertyName = element.getAttribute('name');
+                             // Sync the CKEditor content with Livewire
+                             if (window.Livewire) {
+                                 const livewireElement = element.closest('[wire\\:id]');
+                                 if (livewireElement) {
+                                     const componentId = livewireElement.getAttribute('wire:id');
+                                     const propertyName = element.getAttribute('name');
 
 
-                                // Ensure propertyName is correct
-                                if (propertyName) {
-                                    window.Livewire.find(componentId).set(`form.${propertyName}`, editorData);
-                                } else {
-                                    console.error('Property name not found on element:', element);
-                                }
-                            } else {
-                                console.error('Livewire element not found for:', element);
-                            }
-                        } else {
-                            console.error('Livewire is not available.');
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error during initialization of the editor', error);
-                });
-        });
-    });
-</script>
+                                     // Ensure propertyName is correct
+                                     if (propertyName) {
+                                         window.Livewire.find(componentId).set(
+                                             `form.${propertyName}`, editorData);
+                                     } else {
+                                         console.error('Property name not found on element:',
+                                             element);
+                                     }
+                                 } else {
+                                     console.error('Livewire element not found for:', element);
+                                 }
+                             } else {
+                                 console.error('Livewire is not available.');
+                             }
+                         });
+                     })
+                     .catch(error => {
+                         console.error('Error during initialization of the editor', error);
+                     });
+             });
+         });
+     </script>
+ @elseif(\Route::currentRouteName() === 'admin.trip')
+     <script>
+         document.addEventListener('DOMContentLoaded', function() {
+             // Initialize CKEditor for all elements with the class "ckeditor"
+             document.querySelectorAll('.ckeditor').forEach(element => {
+                 ClassicEditor
+                     .create(element)
+                     .then(editor => {
 
-@endif
+                         // Set initial data if needed
+                         const initialData = element.getAttribute('data-initial-content');
+                         if (initialData) {
+                             editor.setData(initialData);
+                         }
+
+                         // Sync the CKEditor content with Livewire or other backend models
+                         editor.model.document.on('change:data', () => {
+                             const editorData = editor.getData();
+                             const name = element.getAttribute('name');
+
+                             // Sync the CKEditor content with Livewire
+                             if (window.Livewire) {
+                                 const livewireElement = element.closest('[wire\\:id]');
+                                 if (livewireElement) {
+                                     const componentId = livewireElement.getAttribute('wire:id');
+
+                                     // Ensure the property name matches the public properties in the Livewire component
+                                     if (name === 'tripDescription' || name ===
+                                         'tripActivities') {
+                                         window.Livewire.find(componentId).set(name, editorData);
+                                     } else {
+                                         console.error('Unexpected property name:', name);
+                                     }
+                                 } else {
+                                     console.error('Livewire element not found for:', element);
+                                 }
+                             } else {
+                                 console.error('Livewire is not available.');
+                             }
+                         });
+                     })
+                     .catch(error => {
+                         console.error('Error during initialization of the editor:', error);
+                     });
+             });
+         });
+     </script>
+ @endif
 
 
 
@@ -171,7 +218,9 @@
  <!-- endbuild -->
 
  <!-- Vendors JS -->
- <script src="{{ asset('assets/theme_assets/assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
+
+
+ {{-- <script src="{{ asset('assets/theme_assets/assets/vendor/libs/apex-charts/apexcharts.js') }}"></script> --}}
 
  <!-- ALPINE EDITOR -->
  {{-- <script src="https://cdn.jsdelivr.net/gh/maxeckel/alpine-editor@0.3.1/dist/alpine-editor.min.js"></script> --}}
@@ -201,6 +250,8 @@
  <!-- Page JS -->
  {{-- <script src="{{asset('assets/theme_assets/assets/js/dashboards-analytics.js')}}"></script> --}}
 
+ {{-- <script src="../../../../../node_modules/preline/dist/preline.js"></script> --}}
+ <script src="{{ asset('node_modules/preline/dist/preline.js') }}"></script>
 
  <!-- Place this tag before closing body tag for github widget button. -->
  <script async defer src="https://buttons.github.io/buttons.js"></script>

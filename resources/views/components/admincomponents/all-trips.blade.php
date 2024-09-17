@@ -54,37 +54,52 @@
                     @endif
                 </td>
                 <td>{{ $trip->tripLocation }}</td>
-                @switch($trip->tripLandscape)
-                    @case('Beach')
-                        <td data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{{ $trip->tripLandscape }}"><img
-                                src="{{ asset('assets/images/beach.png') }}" style="width: 40px; height: 40px; margin: 5px;" />
-                        </td>
-                    @break
+                @php
+                    $landscapes = json_decode($trip->tripLandscape, true); // Assuming tripLandscape is a JSON array
+                @endphp
 
-                    @case('City')
-                        <td data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{{ $trip->tripLandscape }}"><img
-                                src="{{ asset('assets/images/buildings.png') }}"
-                                style="width: 40px; height: 40px; margin: 5px;" /></td>
-                    @break
+                <td>
+                    @if (is_array($landscapes))
+                        <div class="d-flex align-items-center">
+                            @foreach ($landscapes as $landscape)
+                                @switch($landscape)
+                                    @case('Beach')
+                                        <img src="{{ asset('assets/images/beach.png') }}" data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                            style="width: 40px; height: 40px; margin: 5px;" />
+                                    @break
 
-                    @case('Country Side')
-                        <td data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{{ $trip->tripLandscape }}"><img
-                                src="{{ asset('assets/images/farm.png') }}" style="width: 40px; height: 40px; margin: 5px;" />
-                        </td>
-                    @break
+                                    @case('City')
+                                        <img src="{{ asset('assets/images/buildings.png') }}" data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                            style="width: 40px; height: 40px; margin: 5px;" />
+                                    @break
 
-                    @case('Mountainous')
-                        <td data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{{ $trip->tripLandscape }}"><img
-                                src="{{ asset('assets/images/mountain.png') }}"
-                                style="width: 40px; height: 40px; margin: 5px;" /></td>
-                    @break
+                                    @case('Country Side')
+                                        <img src="{{ asset('assets/images/farm.png') }}" data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                            style="width: 40px; height: 40px; margin: 5px;" />
+                                    @break
 
-                    @case('Forested')
-                        <td data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{{ $trip->tripLandscape }}"><img
-                                src="{{ asset('assets/images/forest.png') }}"
-                                style="width: 40px; height: 40px; margin: 5px;" /></td>
-                    @break
-                @endswitch
+                                    @case('Mountainous')
+                                        <img src="{{ asset('assets/images/mountain.png') }}" data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                            style="width: 40px; height: 40px; margin: 5px;" />
+                                    @break
+
+                                    @case('Forested')
+                                        <img src="{{ asset('assets/images/forest.png') }}" data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                            style="width: 40px; height: 40px; margin: 5px;" />
+                                    @break
+                                @endswitch
+                            @endforeach
+                        </div>
+                    @else
+                        <span>No landscape information available</span>
+                    @endif
+                </td>
+
                 @switch($trip->tripAvailability)
                     @case('available')
                         <td class="m-3 text-white badge rounded-pill bg-success">{{ $trip->tripAvailability }}</td>

@@ -6,6 +6,7 @@
     $startDate = Carbon::parse($trip->tripStartDate);
     $endDate = Carbon::parse($trip->tripEndDate);
     $tripPhotos = json_decode($trip->tripPhoto, true);
+    $landscapes = isset($trip->tripLandscape) ? json_decode($trip->tripLandscape, true) : [];
 @endphp
 
 <x-travelcomponents.header />
@@ -149,37 +150,62 @@
                             {{ date('F jS, Y', strtotime($trip->tripStartDate)) }} -
                             {{ date('F jS, Y', strtotime($trip->tripEndDate)) }}
                         </li>
-                        @switch($trip->tripLandscape)
-                            @case('Beach')
-                                <li class="text-dark" style="font-weight:bold;"><img
-                                        src="{{ asset('assets/images/beach.png') }}" class="icon" />
-                                    {{ $trip->tripLandscape }}</li>
-                            @break
 
-                            @case('City')
-                                <li class="text-dark" style="font-weight:bold;"><img
-                                        src="{{ asset('assets/images/buildings.png') }}" class="icon" />
-                                    {{ $trip->tripLandscape }}</li>
-                            @break
 
-                            @case('Country Side')
-                                <li class="text-dark" style="font-weight:bold;"><img
-                                        src="{{ asset('assets/images/farm.png') }}" class="icon" />
-                                    {{ $trip->tripLandscape }}</li>
-                            @break
+                        @if (is_array($landscapes))
+                            <div class="d-flex align-items-center">
+                                @foreach ($landscapes as $landscape)
+                                    @switch($landscape)
+                                        @case('Beach')
+                                            <div style="text-align: center;">
+                                                <img src="{{ asset('assets/images/beach.png') }}" data-bs-toggle="tooltip"
+                                                    data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                                    style="height: 40px; width: 40px; margin: 5px;" />
+                                                <span style="display: block;">Beach</span>
+                                            </div>
+                                        @break
 
-                            @case('Mountainous')
-                                <li class="text-dark" style="font-weight:bold;"><img
-                                        src="{{ asset('assets/images/mountain.png') }}" class="icon" />
-                                    {{ $trip->tripLandscape }}</li>
-                            @break
+                                        @case('City')
+                                            <div style="text-align: center;">
+                                                <img src="{{ asset('assets/images/buildings.png') }}" data-bs-toggle="tooltip"
+                                                    data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                                    style="height: 40px; width: 40px; margin: 5px;" />
+                                                <span style="display: block;">City</span>
+                                            </div>
+                                        @break
 
-                            @case('Forested')
-                                <li class="text-dark" style="font-weight:bold;"><img
-                                        src="{{ asset('assets/images/forest.png') }}" class="icon" />
-                                    {{ $trip->tripLandscape }}</li>
-                            @break
-                        @endswitch
+                                        @case('Country Side')
+                                            <div style="text-align: center;">
+                                                <img src="{{ asset('assets/images/farm.png') }}" data-bs-toggle="tooltip"
+                                                    data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                                    style="height: 40px; width: 40px; margin: 5px;" />
+                                                <span style="display: block;">Country Side</span>
+                                            </div>
+                                        @break
+
+                                        @case('Mountainous')
+                                            <div style="text-align: center;">
+                                                <img src="{{ asset('assets/images/mountain.png') }}" data-bs-toggle="tooltip"
+                                                    data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                                    style="height: 40px; width: 40px; margin: 5px;" />
+                                                <span style="display: block;">Mountainous</span>
+                                            </div>
+                                        @break
+
+                                        @case('Forested')
+                                            <div style="text-align: center;">
+                                                <img src="{{ asset('assets/images/forest.png') }}" data-bs-toggle="tooltip"
+                                                    data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                                    style="height: 40px; width: 40px; margin: 5px;" />
+                                                <span style="display: block;">Forested</span>
+                                            </div>
+                                        @break
+                                    @endswitch
+                                @endforeach
+                            </div>
+                        @else
+                            <!-- Don't display anything-->
+                        @endif
                     </ul>
 
                     <!-- No refunds disclaimer -->
@@ -198,7 +224,7 @@
                 <div class="border-bottom-1 border-secondary"> </div>
                 <div style="border-bottom: 1px solid #1e293b"></div>
                 <h2 class="m-3" style="font-weight: 900;">Trip Activities</h2>
-                <p class="trip-description" style="color: #000;">{!!$trip->tripActivities!!}</p>
+                <p class="trip-description" style="color: #000;">{!! $trip->tripActivities !!}</p>
                 <!-- End Activities Section -->
 
                 <!-- Testimonials Slider -->
@@ -256,12 +282,11 @@
                     </div>
                 </div>
             @elseif($trip->num_trips === 0)
-            <div class="col-md-4">
-            <div class="booking-widget">
-            <h3 class="text-secondary">Unfortunately, this trip is fully booked at the moment.</h3>
-            </div>
-            </div>
-
+                <div class="col-md-4">
+                    <div class="booking-widget">
+                        <h3 class="text-secondary">Unfortunately, this trip is fully booked at the moment.</h3>
+                    </div>
+                </div>
             @else
                 <div class="col-md-4">
                     <!-- Booking Widget -->
@@ -272,7 +297,7 @@
                             class="btn">{{ $trip->tripAvailability === 'coming soon'
                                 ? 'Reserve Now'
                                 : 'Book
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Now' }}</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            Now' }}</a>
 
                     </div>
                 </div>
@@ -340,5 +365,3 @@
         carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
     });
 </script> --}}
-
-

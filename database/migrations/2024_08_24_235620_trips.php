@@ -15,7 +15,7 @@ return new class extends Migration
             $table->json('tripPhoto');
             $table->text('tripDescription');
             $table->longText('tripActivities')->nullable();
-            $table->string('tripLandscape');
+            $table->json('tripLandscape');
             $table->string('tripAvailability');
             $table->datetime('tripStartDate')->nullable(); 
             $table->datetime('tripEndDate')->nullable();

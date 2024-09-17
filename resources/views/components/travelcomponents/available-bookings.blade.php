@@ -11,10 +11,12 @@
                 @php
                     // Decode tripPhoto if it exists
                     $tripPhotos = isset($trip->tripPhoto) ? json_decode($trip->tripPhoto, true) : [];
+                    $landscapes = isset($trip->tripLandscape) ? json_decode($trip->tripLandscape) : [];
                 @endphp
                 <div class="col-md-4 col-sm-6 ftco-animate">
                     <div class="project-wrap card">
-                        <div id="carouselExampleControls{{ $loop->index }}" class="carousel slide" data-bs-interval="false">
+                        <div id="carouselExampleControls{{ $loop->index }}" class="carousel slide"
+                            data-bs-interval="false">
                             <div class="carousel-inner fixed-carousel-height">
                                 @if (!empty($tripPhotos))
                                     @foreach ($tripPhotos as $index => $photo)
@@ -75,7 +77,7 @@
                                     {{ date('F jS, Y', strtotime($trip->tripStartDate)) }} -
                                     {{ date('F jS, Y', strtotime($trip->tripEndDate)) }}
                                 </li>
-                                @switch($trip->tripLandscape)
+                                {{-- @switch($trip->tripLandscape)
                                     @case('Beach')
                                         <li><img src="{{ asset('assets/images/beach.png') }}"
                                                 style="width: 40px; height: 40px; margin: 5px;" /> {{ $trip->tripLandscape }}
@@ -105,7 +107,49 @@
                                                 style="width: 40px; height: 40px; margin: 5px;" />{{ $trip->tripLandscape }}
                                         </li>
                                     @break
-                                @endswitch
+                                @endswitch --}}
+
+                                @if (is_array($landscapes))
+                                    <div class="d-flex align-items-center">
+                                        @foreach ($landscapes as $landscape)
+                                            @switch($landscape)
+                                                @case('Beach')
+                                                    <img src="{{ asset('assets/images/beach.png') }}" data-bs-toggle="tooltip"
+                                                        data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                                        style="height: 40px; width: 40px; margin: 5px;" />
+                                                @break
+
+                                                @case('City')
+                                                    <img src="{{ asset('assets/images/buildings.png') }}"
+                                                        data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                                        data-bs-title="{{ $landscape }}"
+                                                        style="height: 40px; width: 40px; margin: 5px;" />
+                                                @break
+
+                                                @case('Country Side')
+                                                    <img src="{{ asset('assets/images/farm.png') }}" data-bs-toggle="tooltip"
+                                                        data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                                        style="height: 40px; width: 40px; margin: 5px;" />
+                                                @break
+
+                                                @case('Mountainous')
+                                                    <img src="{{ asset('assets/images/mountain.png') }}"
+                                                        data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                                        data-bs-title="{{ $landscape }}"
+                                                        style="height: 40px; width: 40px; margin: 5px;" />
+                                                @break
+
+                                                @case('Forested')
+                                                    <img src="{{ asset('assets/images/forest.png') }}" data-bs-toggle="tooltip"
+                                                        data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
+                                                        style="width: 40px; height: 40px; margin: 5px;" />
+                                                @break
+                                            @endswitch
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <!-- Don't display anything -->
+                                @endif
                             </ul>
                         </div>
                     </div>
