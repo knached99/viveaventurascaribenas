@@ -203,6 +203,9 @@ class EditTripForm extends Component
         $this->validate([
             'tripPhotos.' . $index => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ]);
+
+        $this->invalidateCache((string) $this->trip->tripID);
+
     
         \Log::info('File validated successfully!');
         \Log::info('File type after validation: ' . get_class($file));
@@ -237,6 +240,9 @@ class EditTripForm extends Component
         $tripPhotos[$index] = \Storage::url($filePath);
         $this->trip->tripPhoto = json_encode($tripPhotos);
         $this->trip->save();
+        Cache::put($this->cacheKey, [
+            'tripPhotos'=>$tripPhotos 
+        ]);
     
         \Log::info('Image updated!');
     
@@ -265,6 +271,7 @@ class EditTripForm extends Component
     
         public function removeImage($index)
         {
+            
             $tripPhotos = json_decode($this->trip->tripPhoto, true);
     
             // Remove the selected image
@@ -276,11 +283,17 @@ class EditTripForm extends Component
                 unset($tripPhotos[$index]);
                 $tripPhotos = array_values($tripPhotos); // Re-index the array
     
+                $this->invalidateCache((string) $this->trip->tripID);
+
                 // Update trip photos and save
                 $this->trip->tripPhoto = json_encode($tripPhotos);
                 $this->trip->save();
                 $this->tripPhotos = $tripPhotos;
-    
+                
+                Cache::put($this->cacheKey, [
+                    'tripPhotos'=>$tripPhotos 
+                ]);
+
                 $this->success = 'Image removed successfully!';
             }
         }
@@ -339,7 +352,7 @@ class EditTripForm extends Component
                 //     }
                 // }
 
-                if (!empty($this->tripPhotos)) {
+                if (!isset($this->tripPhotos)) {
                     foreach($this->tripPhotos as $photo) {
                         if ($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
                             $image = $photo->getRealPath();

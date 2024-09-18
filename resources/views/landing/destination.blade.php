@@ -158,7 +158,7 @@
                                 @foreach ($landscapes as $landscape)
                                     @switch($landscape)
                                         @case('Beach')
-                                            <div style="text-align: center;">
+                                            <div style="text-align: center; margin: 5px;">
                                                 <img src="{{ asset('assets/images/beach.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
                                                     style="height: 40px; width: 40px; margin: 5px;" />
@@ -167,7 +167,7 @@
                                         @break
 
                                         @case('City')
-                                            <div style="text-align: center;">
+                                            <div style="text-align: center; margin: 5px;">
                                                 <img src="{{ asset('assets/images/buildings.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
                                                     style="height: 40px; width: 40px; margin: 5px;" />
@@ -176,7 +176,7 @@
                                         @break
 
                                         @case('Country Side')
-                                            <div style="text-align: center;">
+                                            <div style="text-align: center; margin: 5px;">
                                                 <img src="{{ asset('assets/images/farm.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
                                                     style="height: 40px; width: 40px; margin: 5px;" />
@@ -185,7 +185,7 @@
                                         @break
 
                                         @case('Mountainous')
-                                            <div style="text-align: center;">
+                                            <div style="text-align: center; margin: 5px;">
                                                 <img src="{{ asset('assets/images/mountain.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
                                                     style="height: 40px; width: 40px; margin: 5px;" />
@@ -194,7 +194,7 @@
                                         @break
 
                                         @case('Forested')
-                                            <div style="text-align: center;">
+                                            <div style="text-align: center; margin: 5px;">
                                                 <img src="{{ asset('assets/images/forest.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
                                                     style="height: 40px; width: 40px; margin: 5px;" />
@@ -298,7 +298,7 @@
                             class="btn">{{ $trip->tripAvailability === 'coming soon'
                                 ? 'Reserve Now'
                                 : 'Book
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    Now' }}</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                Now' }}</a>
 
                     </div>
                 </div>

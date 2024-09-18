@@ -45,7 +45,6 @@ class TrackVisitors
         }
      
 
-
         // Retrieve or create the UUID for the visitor
         $uuid = $request->hasCookie('uuid') ? $request->cookie('uuid') : Str::uuid()->toString();
         Cookie::queue('uuid', $uuid, 60 * 24 * 30);
