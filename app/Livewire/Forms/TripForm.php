@@ -27,7 +27,7 @@ class TripForm extends Form {
 
     public string $tripID = '';
     public string $tripLocation = '';
-    public array $tripLandscape = [];
+    public ?array $tripLandscape = [];
     public string $tripAvailability = '';
     public string $tripDescription = '';
     public string $tripActivities = '';
@@ -166,6 +166,7 @@ class TripForm extends Form {
                         'tripCosts' => $tripCostsJson,
                         'num_trips' => intval($this->num_trips),
                         'active' => $this->active ? true : false,
+                        'slug'=>Str::slug($this->tripLocation)
                     ];
 
                     // Save trip data
@@ -248,10 +249,10 @@ class TripForm extends Form {
         // Save the resized image with the appropriate quality/compression settings
         switch ($imageType) {
             case IMAGETYPE_JPEG:
-                imagejpeg($resizedImage, $destinationPath, 85); // Quality for JPEG (0-100)
+                imagejpeg($resizedImage, $destinationPath, 100); // Quality for JPEG (0-100)
                 break;
             case IMAGETYPE_PNG:
-                imagepng($resizedImage, $destinationPath, 5); // Compression for PNG (0-9)
+                imagepng($resizedImage, $destinationPath, 1); // Compression for PNG (0-9)
                 break;
             case IMAGETYPE_GIF:
                 imagegif($resizedImage, $destinationPath);

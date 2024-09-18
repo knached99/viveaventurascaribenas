@@ -36,7 +36,7 @@
                     <!-- Form Start -->
                     @if ($trip->tripAvailability === 'unavailable' || $trip->num_trips === 0)
                     @else
-                        <div class="booking-form-wrapper p-4 rounded shadow">
+                        <div class="booking-form-wrapper p-4 rounded">
                             <livewire:forms.booking-form :tripID="$tripID" />
                         </div>
                     @endif

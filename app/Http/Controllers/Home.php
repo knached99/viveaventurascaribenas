@@ -13,6 +13,7 @@ use App\Models\Reservations;
 use Illuminate\Database\Eloquent\ModelNotFoundException; 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\BookingSubmittedAdmin;
 use App\Notifications\BookingSubmittedCustomer;
@@ -33,13 +34,13 @@ class Home extends Controller
     // Optimized for performance 
     public function homePage()
     {
-        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->where('active', true)->get();
+        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'slug', 'stripe_product_id')->where('active', true)->get();
         $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
     
         
         $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
             ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
-            ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
+            ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.slug',  'trips.tripPhoto')
             ->having('booking_count', '>', 2)
             ->orderByDesc('booking_count')
             ->take(4)
@@ -57,9 +58,11 @@ class Home extends Controller
             if ($trip) {
                 $popularTrips[] = [
                     'id' => $trip->tripID,
+                    'slug'=>$trip->slug,
                     'name' => $product->name,
                     'count' => $booking->booking_count,
                     'image' => $trip->tripPhoto,
+                    
                 ];
     
                 if ($booking->booking_count > $highestBookingCount) {
@@ -84,8 +87,11 @@ class Home extends Controller
 
     
 
-    public function getDestinationDetails($tripID){
-        $trip = TripsModel::where('tripID', $tripID)->where('active', true)->firstOrFail();
+    public function getDestinationDetails($slug){
+        $trip = TripsModel::where('slug', $slug)->where('active', true)->firstOrFail();
+       
+        $tripID = $trip->tripID;
+
         $testimonials = Testimonials::with('trip')
             ->where('tripID', $tripID)
             ->where('testimonial_approval_status', 'approved')
@@ -122,7 +128,7 @@ class Home extends Controller
 
     public function destinationsPage(){
        // Fetch all trips
-       $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'stripe_product_id')->where('active', true)->get();
+       $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'slug', 'stripe_product_id')->where('active', true)->get();
         
        // Fetch approved testimonials
        $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
@@ -138,7 +144,7 @@ class Home extends Controller
 
        $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
        ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
-       ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
+       ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.slug', 'trips.tripPhoto')
        ->having('booking_count', '>', 2)
        ->orderByDesc('booking_count')
        ->take(4)
@@ -156,6 +162,7 @@ class Home extends Controller
        if ($trip) {
            $popularTrips[] = [
                'id' => $trip->tripID,
+               'slug'=>$trip->slug,
                'name' => $product->name,
                'count' => $booking->booking_count,
                'image' => $trip->tripPhoto,
@@ -172,15 +179,16 @@ class Home extends Controller
         
     }
 
-    public function bookingPage($tripID){
+    public function bookingPage($slug){
         try{
         
-            $trip = TripsModel::findOrFail($tripID);
-        
+            $trip = TripsModel::where('slug', $slug)->firstOrFail();
+            $tripID = $trip->tripID;
+           
         return view('booking/booking', ['tripID'=>$tripID, 'trip'=>$trip]);
         }
         
-        catch(\Exception $e){
+        catch(\ModelNotFoundException $e){
             \Log::error($e->getMessage());
         return redirect('/');
         }

@@ -55,7 +55,7 @@
                                 class="days">{{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}
                                 Days</span>
                             <h3><a
-                                    href="{{ route('landing.destination', ['tripID' => $trip->tripID]) }}">{{ $trip->tripLocation }}</a>
+                                    href="{{ route('landing.destination', ['slug' => $trip->slug]) }}">{{ $trip->tripLocation }}</a>
                             </h3>
                             @switch($trip->tripAvailability)
                                 @case('available')

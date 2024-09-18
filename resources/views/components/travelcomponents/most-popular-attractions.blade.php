@@ -15,7 +15,7 @@
 
                 <div class="col-md-3 ftco-animate">
                     <div class="project-destination">
-                        <a href="{{ url('/landing/destination/' . $trip['id']) }}" class="img"
+                        <a href="{{ url('/landing/destination/' . $trip['slug']) }}" class="img"
                             style="background-image: url({{ !empty($tripPhotos) ? $tripPhotos[0] : asset('assets/images/image_placeholder.jpg') }});">
                             <div class="text">
                                 <h3 style="font-weight: 900; color: #fff;">{{ $trip['name'] }}</h3>

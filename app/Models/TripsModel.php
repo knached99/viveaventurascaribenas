@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class TripsModel extends Model
 {
@@ -11,6 +12,15 @@ class TripsModel extends Model
 
     protected $primaryKey = 'tripID';
     protected $table = 'trips';
+
+    protected static function boot(){
+    
+        parent::boot();
+
+        static::creating(function($trip){
+            $trip->slug = Str::slug($trip->tripLocation);
+        });
+    }
 
     protected $fillable = [
         'tripID',
@@ -27,6 +37,7 @@ class TripsModel extends Model
         'tripCosts',
         'num_trips',
         'active',
+        'slug',
         'testimonial_id' // Ensure this field is fillable
     ];
 

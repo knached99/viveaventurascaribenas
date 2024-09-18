@@ -11,7 +11,7 @@ use App\Http\Livewire\TripInfoForm;
 
 Route::get('/', [Home::class, 'homePage'])->name('/');
 
-Route::get('/landing/destination/{tripID}', [Home::class, 'getDestinationDetails'])->name('landing.destination');
+Route::get('/landing/destination/{slug}', [Home::class, 'getDestinationDetails'])->name('landing.destination');
 Route::get('/about', [Home::class, 'aboutPage'])->name('about');
 
 Route::get('/destinations', [Home::class, 'destinationsPage'])->name('destinations');
@@ -20,7 +20,7 @@ Route::get('/gallery', [Home::class, 'galleryPage'])->name('gallery');
 
 Route::get('/contact', [Home::class, 'contactPage'])->name('contact');
 
-Route::get('/booking/{tripID}', [Home::class, 'bookingPage'])->name('booking');
+Route::get('/booking/{slug}', [Home::class, 'bookingPage'])->name('booking');
 Route::get('/success', [Home::class, 'bookingSuccess'])->name('booking.success');
 Route::get('/booking/{tripID}/cancel', [Home::class, 'bookingCancel'])->name('booking.cancel');
 Route::get('/reservation-confirmed/{reservationID}', [Home::class, 'reservationConfirmed'])->name('reservation-confirmed');

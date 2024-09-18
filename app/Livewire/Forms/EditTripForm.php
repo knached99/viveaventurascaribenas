@@ -18,7 +18,7 @@ class EditTripForm extends Component
     public $trip;
     public string $tripLocation = '';
     public array $tripLandscape = []; 
-    public ?array $tripPhotos = [];
+    public array $tripPhotos = [];
     public string $tripAvailability = ''; 
     public string $tripDescription = ''; 
     public string $tripActivities = ''; 
@@ -60,7 +60,7 @@ class EditTripForm extends Component
     {
         // Assuming tripPhotos contain URLs or paths, not TemporaryUploadedFile objects
         $this->tripLocation = $cachedTrip['tripLocation'];
-        $this->tripPhotos = $cachedTrip['tripPhotos']; // This should be an array of URLs or paths
+        $this->tripPhotos = isset($cachedTrip['tripPhotos']) ? json_decode($cachedTrip['tripPhotos'], true) : []; // This should be an array of URLs or paths
         $this->tripLandscape = $cachedTrip['tripLandscape'];
         $this->tripAvailability = $cachedTrip['tripAvailability'];
         $this->tripDescription = $cachedTrip['tripDescription'];
@@ -81,7 +81,10 @@ class EditTripForm extends Component
         $trip = TripsModel::findOrFail($this->trip->tripID);
         
         $this->tripLocation = $trip->tripLocation;
-        $this->tripPhotos = $trip->tripPhoto ? json_decode($trip->tripPhoto, true) : []; // This should be an array of URLs or paths
+        $this->tripPhotos = json_decode($trip->tripPhoto, true); // true converts JSON to array
+
+        // $this->tripPhotos = isset($trip->tripPhoto) ? json_decode($trip->tripPhoto, true) : [];
+       // $this->tripPhotos = $trip->tripPhoto ? json_decode($trip->tripPhoto, true) : []; // This should be an array of URLs or paths
         $this->tripLandscape = $trip->tripLandscape ? json_decode($trip->tripLandscape, true) : [];
         $this->tripAvailability = $trip->tripAvailability;
         $this->tripDescription = $trip->tripDescription;
@@ -97,7 +100,7 @@ class EditTripForm extends Component
         // Cache trip data excluding TemporaryUploadedFile objects
         Cache::put($this->cacheKey, [
             'tripLocation' => $this->tripLocation,
-            'tripPhotos' => $this->tripPhotos, // Store URLs or paths
+            'tripPhotos'=>json_encode($this->tripPhotos),
             'tripLandscape' => $this->tripLandscape,
             'tripAvailability' => $this->tripAvailability,
             'tripDescription' => $this->tripDescription,
@@ -165,7 +168,7 @@ class EditTripForm extends Component
                 $tripModel = TripsModel::findOrFail($this->trip->tripID);
                 $tripModel->tripCosts = $this->tripCosts;
                 $tripModel->save();
-                $this->invalidateCache((int) $this->trip->tripID);
+                $this->invalidateCache((string) $this->trip->tripID);
             } catch (\Exception $e) {
                 \Log::error('Error updating trip costs in the database: ' . $e->getMessage());
             }
@@ -314,7 +317,7 @@ class EditTripForm extends Component
         $this->validate($rules);
         
         try {
-            $this->invalidateCache((int) $this->trip->tripID);
+            $this->invalidateCache((string) $this->trip->tripID);
             
             $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
             $product = $stripe->products->retrieve($this->trip->stripe_product_id);
@@ -324,23 +327,67 @@ class EditTripForm extends Component
                 $product->name = $this->tripLocation;
                 $product->description = $this->tripDescription;
         
-                if ($this->tripPhotos) {
-                    if (count($this->tripPhotos) > 3) {
-                        $this->error = 'You cannot upload more than 3 pictures';
-                        return;
-                    }
-        
-                    $newImageURLs = [];
-                    foreach ($this->tripPhotos as $photo) {
+                $newImageURLs = [];
+
+                // if(isset($this->tripPhotos)){
+                //     foreach($this->tripPhotos as $photo){
+                //         $image = $photo->getRealPath();
+                //         $filePath = 'booking_photos/'.$photo->hashName(). '.'.$photo->extension();
+                //         $fullPath = storage_path('app/public/'.$filePath);
+                //         $this->resizeImage($image, $fullPath, 350, 219);
+                //         $newImageURLs[] = asset(Storage::url($filePath));
+                //     }
+                // }
+
+                if (!empty($this->tripPhotos)) {
+                    foreach($this->tripPhotos as $photo) {
                         if ($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-                            $path = $photo->store('public/trip_photos');
-                            $newImageURLs[] = Storage::url($path);
+                            $image = $photo->getRealPath();
+                            $filePath = 'booking_photos/'.time().'-'.$photo->hashName();
+                            $fullPath = storage_path('app/public/'.$filePath);
+                            $this->resizeImage($image, $fullPath, 350, 219);
+                            $newImageURLs[] = asset(Storage::url($filePath));
+                        } else {
+                            $this->error = 'Invalid file type.';
+                            \Log::error('File is not a valid instance of Livewire TemporaryUploadedFile');
+                            return;
                         }
                     }
-                    $tripModel->tripPhoto = json_encode($newImageURLs);
                 }
         
+                // if(isset($this->tripPhotos)){
+                //     if(count($this->tripPhotos) > 3){
+                //         $this->error = 'You can only upload a max of 3 images';
+                //         return; // terminate php 
+                //     }
+
+                //     foreach($this->tripPhotos as $photos){
+                //         $image = $photos->getRealPath();
+                //         $filePath = 'booking_photos/'.time().'-'.$photos->hashName().'.'.$photos->extension();
+                //         $fullPath = storage_path('app/public/'.$filePath);
+                //         $this->resizeImage($image, $fullPath, 350, 219);
+
+                //         $newImageURLs = asset(Storage::url($filePath));
+                //     }
+                // }
+                // if ($this->tripPhotos) {
+                //     if (count($this->tripPhotos) > 3) {
+                //         $this->error = 'You cannot upload more than 3 pictures';
+                //         return;
+                //     }
+        
+                //     $newImageURLs = [];
+                //     foreach ($this->tripPhotos as $photo) {
+                //         if ($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                //             $path = $photo->store('public/trip_photos');
+                //             $newImageURLs[] = Storage::url($path);
+                //         }
+                //     }
+                //     $tripModel->tripPhoto = json_encode($newImageURLs);
+                // }
+        
                 $tripModel->tripLocation = $this->tripLocation;
+                $tripModel->tripPhoto = json_encode($newImageURLs);
                 $tripModel->tripLandscape = json_encode($this->tripLandscape);
                 $tripModel->tripAvailability = $this->tripAvailability;
                 $tripModel->tripDescription = $this->tripDescription;
@@ -350,13 +397,14 @@ class EditTripForm extends Component
                 $tripModel->tripPrice = $this->tripPrice;
                 $tripModel->num_trips = $this->num_trips;
                 $tripModel->active = $this->active;
+                $tripModel->slug = $this->tripLocation;
                 $tripModel->tripCosts = json_encode($this->tripCosts);
         
                 $tripModel->save();
         
                 Cache::put($this->cacheKey, [
                     'tripLocation' => $this->tripLocation,
-                    'tripPhotos' => $this->tripPhotos, // Only store URLs or paths
+                    'tripPhotos' => $newImageURLs,
                     'tripLandscape' => $this->tripLandscape,
                     'tripAvailability' => $this->tripAvailability,
                     'tripDescription' => $this->tripDescription,
@@ -381,7 +429,7 @@ class EditTripForm extends Component
     }
     
 
-    private function invalidateCache(int $tripId): void
+    private function invalidateCache(string $tripId): void
     {
         \Log::info('Invalidating cache for trip ID: ' . $tripId);
         Cache::forget('trip_' . $tripId);

@@ -45,7 +45,7 @@
                                 <span class="visually-hidden">Next</span>
                             </button>
                         </div>
-                    @elseif($tripPhotos && is_array($tripPhotos) && count($tripPhotos) === 1)
+                    @elseif(isset($tripPhotos) && is_array($tripPhotos) && count($tripPhotos) === 1)
                         <img src="{{ $tripPhotos[0] }}" class="img-thumbnail rounded"
                             style="width: 100px; height: 100px;" />
                     @else

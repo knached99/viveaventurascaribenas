@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('num_trips')->default(1);
             $table->boolean('active')->default(false);
             $table->json('tripCosts')->nullable();
+            $table->string('slug')->unique()->nullable(); // URL slug replacing uuid for SEO
            // $table->uuid('testimonial_id')->nullable();
 
             // $table->foreign('testimonial_id')
