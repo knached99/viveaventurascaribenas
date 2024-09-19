@@ -3,9 +3,11 @@ namespace App\Livewire\Forms;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Livewire\TemporaryUploadedFile;
 use App\Models\TripsModel;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Stripe\StripeClient;
 use Exception;
@@ -27,6 +29,7 @@ class EditTripForm extends Component
     public string $tripPrice = '';
     public string $num_trips = '';
     public bool $active = false;
+    public string $slug = '';
     public $tripCosts = [];
 
     public string $status = ''; // Trip Creation Flash Message
@@ -49,8 +52,13 @@ class EditTripForm extends Component
         // Load trip data from cache or database
         $cachedTrip = Cache::get($this->cacheKey);
         
+        \Log::info('Is this data cached?');
         if ($cachedTrip) {
+            \Log::info('Yes, loading data from cache...');
             $this->loadFromCache($cachedTrip);
+            \Log::info('Data loaded!');
+
+            \Log::info(json_encode($cachedTrip));
         } else {
             $this->loadFromDatabase();
         }
@@ -72,6 +80,7 @@ class EditTripForm extends Component
         $this->tripCosts = $cachedTrip['tripCosts'];
         $this->num_trips = $cachedTrip['num_trips'];
         $this->active = $cachedTrip['active'];
+        $this->slug = $cachedTrip['slug'] ?? '';
     
         $this->calculateFinancials();
     }
@@ -96,6 +105,7 @@ class EditTripForm extends Component
         $this->tripCosts = json_decode($trip->tripCosts, true);
         $this->num_trips = $trip->num_trips;
         $this->active = (bool) $trip->active;
+        $this->slug = $trip->slug;
     
         // Cache trip data excluding TemporaryUploadedFile objects
         Cache::put($this->cacheKey, [
@@ -211,14 +221,14 @@ class EditTripForm extends Component
         \Log::info('File type after validation: ' . get_class($file));
     
         // Generate file path and process
-        $filePath = 'booking_photos/' . time() . '-' . $file->hashName();
+        $filePath = 'booking_photos/' . time() . '-' . $file->hashName(). '.'.$file->extension();
         $fullPath = storage_path('app/public/' . $filePath);
     
         \Log::info('File Path: ' . $filePath);
         \Log::info('Full Path: ' . $fullPath);
     
         // Resize the image using GD or another method
-        $this->resizeImage($file->getRealPath(), $fullPath, 350, 219);
+        $this->resizeImage($file->getRealPath(), $fullPath,  525, 351);
     
         \Log::info('Image resized!');
     
@@ -283,12 +293,17 @@ class EditTripForm extends Component
                 unset($tripPhotos[$index]);
                 $tripPhotos = array_values($tripPhotos); // Re-index the array
     
+                \Log::info('Invalidating cache..');
+
                 $this->invalidateCache((string) $this->trip->tripID);
+                \Log::info('Cache invalidated!');
 
                 // Update trip photos and save
                 $this->trip->tripPhoto = json_encode($tripPhotos);
                 $this->trip->save();
                 $this->tripPhotos = $tripPhotos;
+
+                \Log::info('Adding new photos to cache');
                 
                 Cache::put($this->cacheKey, [
                     'tripPhotos'=>$tripPhotos 
@@ -314,6 +329,9 @@ class EditTripForm extends Component
         
         $rules = [
             'tripLocation' => 'required|string|max:255',
+            // 'tripPhotos.*'=>'sometimes|array|max:3',
+            'tripPhotos' => 'nullable|array|max:3', // Ensure tripPhotos is an array with a max of 3 items
+            'tripPhotos.*' => 'image|mimes:jpg,jpeg,png|max:5120', // Validate image types and max size (2MB
             'tripLandscape' => 'required|array',
             'tripAvailability' => 'required|string',
             'tripDescription' => 'required|string',
@@ -342,62 +360,41 @@ class EditTripForm extends Component
         
                 $newImageURLs = [];
 
-                // if(isset($this->tripPhotos)){
-                //     foreach($this->tripPhotos as $photo){
-                //         $image = $photo->getRealPath();
-                //         $filePath = 'booking_photos/'.$photo->hashName(). '.'.$photo->extension();
-                //         $fullPath = storage_path('app/public/'.$filePath);
-                //         $this->resizeImage($image, $fullPath, 350, 219);
-                //         $newImageURLs[] = asset(Storage::url($filePath));
-                //     }
-                // }
+                \Log::info('Current Image URLs array: '.json_encode($newImageURLs));
 
-                if (!isset($this->tripPhotos)) {
-                    foreach($this->tripPhotos as $photo) {
-                        if ($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-                            $image = $photo->getRealPath();
-                            $filePath = 'booking_photos/'.time().'-'.$photo->hashName();
-                            $fullPath = storage_path('app/public/'.$filePath);
-                            $this->resizeImage($image, $fullPath, 350, 219);
-                            $newImageURLs[] = asset(Storage::url($filePath));
-                        } else {
-                            $this->error = 'Invalid file type.';
-                            \Log::error('File is not a valid instance of Livewire TemporaryUploadedFile');
-                            return;
-                        }
+                \Log::info('Checking if user selected pictures');
+                if(isset($this->tripPhotos)){
+                    
+                    \Log::info('User selected pictures for upload. Iterating over pictures..');
+                    foreach ($this->tripPhotos as $photo) {
+                        $image = $photo->getRealPath();
+                        $fileName = $photo->hashName(). '.'.$photo->extension();
+                        $filePath = 'booking_photos/' . $fileName;
+                        $fullPath = storage_path('app/public/' . $filePath);
+                    
+                        \Log::info('Resizing Image..');
+                        $this->resizeImage($image, $fullPath, 525, 351);
+                    
+                        // Save the image to the file system
+                        $photo->storeAs('public/booking_photos', $fileName); // Save the original image
+                    
+                        $newImageURLs[] = asset(Storage::url($filePath)); // Add URL to array
+                        \Log::info('Current image URLs array: ' . json_encode($newImageURLs));
                     }
-                }
-        
-                // if(isset($this->tripPhotos)){
-                //     if(count($this->tripPhotos) > 3){
-                //         $this->error = 'You can only upload a max of 3 images';
-                //         return; // terminate php 
-                //     }
+                    
 
-                //     foreach($this->tripPhotos as $photos){
-                //         $image = $photos->getRealPath();
-                //         $filePath = 'booking_photos/'.time().'-'.$photos->hashName().'.'.$photos->extension();
-                //         $fullPath = storage_path('app/public/'.$filePath);
-                //         $this->resizeImage($image, $fullPath, 350, 219);
-
-                //         $newImageURLs = asset(Storage::url($filePath));
-                //     }
-                // }
-                // if ($this->tripPhotos) {
-                //     if (count($this->tripPhotos) > 3) {
-                //         $this->error = 'You cannot upload more than 3 pictures';
-                //         return;
-                //     }
+                        // else{
+                        //     \Log::error('File is not a valid instance of Livewire TemporaryUploadedFile');
+                        //     $this->error = 'Cannot upload files. Something went wrong';
+                        //     return;
+                        // }
+                    }
+                   
+            
+                
+                \Log::info('Current newImageURLs array: '.json_encode($newImageURLs));
+               
         
-                //     $newImageURLs = [];
-                //     foreach ($this->tripPhotos as $photo) {
-                //         if ($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-                //             $path = $photo->store('public/trip_photos');
-                //             $newImageURLs[] = Storage::url($path);
-                //         }
-                //     }
-                //     $tripModel->tripPhoto = json_encode($newImageURLs);
-                // }
         
                 $tripModel->tripLocation = $this->tripLocation;
                 $tripModel->tripPhoto = json_encode($newImageURLs);
@@ -410,7 +407,7 @@ class EditTripForm extends Component
                 $tripModel->tripPrice = $this->tripPrice;
                 $tripModel->num_trips = $this->num_trips;
                 $tripModel->active = $this->active;
-                $tripModel->slug = $this->tripLocation;
+                $tripModel->slug = Str::slug($this->tripLocation);
                 $tripModel->tripCosts = json_encode($this->tripCosts);
         
                 $tripModel->save();
@@ -429,6 +426,7 @@ class EditTripForm extends Component
                     'tripCosts' => $this->tripCosts,
                     'num_trips' => $this->num_trips,
                     'active' => $this->active,
+                    'slug'=> Str::slug($this->slug),
                 ], 600); // Cache for 10 minutes
         
                 $this->success = 'Trip details have been updated successfully.';
@@ -448,55 +446,68 @@ class EditTripForm extends Component
         Cache::forget('trip_' . $tripId);
     }
 
-    private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight) {
+    private function resizeImage(string $sourcePath, string $destinationPath, int $newWidth, int $newHeight){
+
         $imageType = exif_imagetype($sourcePath);
-    
-        // Create the original image based on its type
-        switch ($imageType) {
-            case IMAGETYPE_JPEG:
-                $image = imagecreatefromjpeg($sourcePath);
-                break;
+
+        switch($imageType){
+
+            case IMAGETYPE_JPEG: 
+            $image = imagecreatefromjpeg($sourcePath);
+            break;
+
             case IMAGETYPE_PNG:
                 $image = imagecreatefrompng($sourcePath);
                 break;
-          
+
             default:
-                throw new Exception('Unsupported image type');
+
+                throw new Exception('The image you selected is not supported. Please select a JPEG or PNG image');
         }
-    
-        // Get the original image dimensions
+
         $originalWidth = imagesx($image);
         $originalHeight = imagesy($image);
-    
-        // Create the resized image canvas with transparency support for PNG and GIF
+
+        $aspectRatio = $originalWidth / $originalHeight;
+
+        if($newWidth / $newHeight > $aspectRatio){
+            $newWidth = $newHeight * $aspectRatio;
+        }
+
+        else{
+            $newHeight = $newWidth / $aspectRatio;
+        }
+
         $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
-    
-        if ($imageType == IMAGETYPE_PNG || $imageType == IMAGETYPE_GIF) {
+
+        if($imageType == IMAGETYPE_PNG){
+
             imagealphablending($resizedImage, false);
-            imagesavealpha($resizedImage, true); 
+            imagesavealpha($resizedImage, true);
             $transparent = imagecolorallocatealpha($resizedImage, 255, 255, 255, 127);
             imagefill($resizedImage, 0, 0, $transparent);
+
+            imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
+
+            switch($imageType){
+                
+                case IMAGETYPE_JPEG:
+                    $quality = 90; 
+                    imagejpeg($resizedImage, $destinationPath, $quality);
+                    break;
+                
+                case IMAGETYPE_PNG:
+                    $compression = 1; // Loweset compression setting 
+                    imagepng($resizedImage, $destinationPath, $compression);
+                    break; 
+                
+            }
+
+            // Freeing up memory 
+
+            imagedestroy($image);
+            imagedestroy($resizedImage);
         }
-    
-        // Resample the image to the new dimensions
-        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
-    
-        // Save the resized image with the appropriate quality/compression settings
-        switch ($imageType) {
-            case IMAGETYPE_JPEG:
-                $quality = 100; // Adjust the quality level (90 is high quality, can go up to 100)
-                imagejpeg($resizedImage, $destinationPath, $quality);
-                break;
-            case IMAGETYPE_PNG:
-                $compression = 1; // Adjust the compression level (0 for no compression, 9 for max compression)
-                imagepng($resizedImage, $destinationPath, $compression);
-                break;
-          
-        }
-    
-        // Free up memory
-        imagedestroy($image);
-        imagedestroy($resizedImage);
     }
     
     

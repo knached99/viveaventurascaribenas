@@ -31,6 +31,7 @@ class TrackVisitors
             'admin/*',
             'assets/*',
             'storage/*',
+            'livewire/*',
             'api/*',
             'login',
             'register',

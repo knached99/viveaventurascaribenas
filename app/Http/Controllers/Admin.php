@@ -152,7 +152,7 @@ class Admin extends Controller
     public function bookingInfo($bookingID)
     {
         try {
-            $booking = BookingModel::findOrFail($bookingID);
+            $booking = BookingModel::with('trip')->findOrFail($bookingID);
     
             return view('admin.booking', [
                 'bookingID' => $bookingID,
@@ -336,7 +336,7 @@ class Admin extends Controller
                 'netProfit' => $netProfit
             ];
     
-            // Cache the data for a specific duration (e.g., 60 minutes)
+            // Caching data for 1 minute for testing purposes 
             Cache::put($cacheKey, $dataToCache, 60);
     
             // Pass these values to the view

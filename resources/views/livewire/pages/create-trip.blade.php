@@ -46,16 +46,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
     </p>
 
 
-    @if ($form->status)
-        <div class="alert alert-success d-flex justify-content-between align-items-center mb-4">
-            {{ $form->status }}
-            <a href="{{ route('admin.all-trips') }}" class="btn btn-primary">See Trips</a>
-        </div>
-    @elseif($form->error)
-        <div class="alert alert-danger mb-4">
-            {{ $form->error }}
-        </div>
-    @endif
+
 
 
 
@@ -222,7 +213,21 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </div>
+
                         </div>
+
+                        <!-- Status Messages -->
+                        @if ($form->status)
+                            <div class="alert alert-success d-flex justify-content-between align-items-center mb-4">
+                                {{ $form->status }}
+                                <a href="{{ route('admin.all-trips') }}" class="btn btn-primary">See Trips</a>
+                            </div>
+                        @elseif($form->error)
+                            <div class="alert alert-danger mb-4">
+                                {{ $form->error }}
+                            </div>
+                        @endif
+                        <!-- / Status Messages -->
 
                     </form>
                 </div>

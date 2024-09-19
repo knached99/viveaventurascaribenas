@@ -4,6 +4,9 @@
     $product = $stripe->products->retrieve($booking->stripe_product_id);
     $location = $product->name;
 
+    $photos = json_decode($booking->trip->tripPhotos, true);
+    $firstPhoto = !empty($photos) ? asset($photos[0]) : asset('assets/images/booking_page_bg.webp');
+
     if (!empty($stripeCheckoutID)) {
         $stripeCheckoutSession = $stripe->checkout->sessions->retrieve($stripeCheckoutID);
 
@@ -58,12 +61,10 @@
         }
     }
 @endphp
-
-
 <x-authenticated-theme-layout>
-    <div class="relative w-full mt-6 text-gray-700 bg-white shadow-md rounded-xl">
+    <div class="relative w-full mt-6 text-gray-700 bg-white shadow-sm rounded-lg">
         <div class="p-6">
-            <h5 class="mb-4 text-2xl font-semibold text-blue-gray-900">
+            <h5 class="mb-4 text-3xl font-semibold text-gray-900">
                 <i class='bx bxs-user'></i> {{ $booking->name }}'s Booking Information
             </h5>
 
@@ -72,17 +73,22 @@
                 <h6 class="text-lg font-medium text-blue-gray-800">
                     <i class='bx bxs-map'></i> Booked Location
                 </h6>
-                <p class="text-base font-light leading-relaxed">{{ $location }}</p>
+                <p class="text-base font-light leading-relaxed mb-3">{{ $location }}</p>
 
-
+                <div class="block">
+                    <img src="{{ $firstPhoto }}" alt="Location Image"
+                        class="w-full max-w-sm h-auto rounded-lg shadow-md object-cover" />
+                </div>
             </div>
 
+            <!-- Booking Time -->
             <div class="mb-6">
                 <h6 class="text-lg font-medium text-blue-gray-800">
                     <i class='bx bxs-calendar'></i> Booked At
                 </h6>
                 <p class="text-base font-light leading-relaxed">
-                    {{ date('F jS, Y \a\t g:iA', strtotime($booking->created_at)) }}</p>
+                    {{ date('F jS, Y \a\t g:iA', strtotime($booking->created_at)) }}
+                </p>
             </div>
 
             <!-- Payment Status -->
@@ -91,37 +97,27 @@
                     <i class='bx bxs-check-shield'></i> Payment Status
                 </h6>
                 <span
-                    class="inline-block px-3 py-1 mt-2 text-xs font-semibold 
-                @switch($paymentStatus)
-                    @case('succeeded')
-                        bg-emerald-500
-                        @break
-                    @case('incomplete')
-                        bg-indigo-100
-                        @break 
-                    @case('failed')
-                        bg-red-500
-                        @break 
-                    @case('unpactured')
-                        bg-yellow-600
-                        @break 
-                    @case('canceled')
-                        bg-orange-500
-                        @break 
-                @endswitch
-                text-white rounded-full">
+                    class="inline-block px-3 py-1 mt-2 text-xs font-semibold rounded-full
+                    @switch($paymentStatus)
+                        @case('succeeded') bg-emerald-500 @break
+                        @case('incomplete') bg-indigo-500 @break
+                        @case('failed') bg-red-500 @break
+                        @case('uncaptured') bg-yellow-600 @break
+                        @case('canceled') bg-orange-500 @break
+                    @endswitch
+                    text-white">
                     {{ $paymentStatus }}
                 </span>
             </div>
 
             <!-- Payment Details -->
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <!-- Payment Method -->
-                <div class="p-4 bg-gray-100 rounded-lg">
+                <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
                     <h6 class="text-lg font-medium text-blue-gray-800">
                         <i class='bx bxs-credit-card'></i> Payment Method
                     </h6>
-                    <p class="text-base font-light leading-relaxed">
+                    <p class="text-base font-light leading-relaxed mt-2">
                         @if ($paymentMethod === 'card')
                             {{ $paymentMethodCard }} (**** {{ $cardLast4 }})
                         @elseif ($paymentMethod === 'cashapp')
@@ -135,53 +131,55 @@
                 </div>
 
                 <!-- Payment Amount -->
-                <div class="p-4 bg-gray-100 rounded-lg">
+                <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
                     <h6 class="text-lg font-medium text-blue-gray-800">
                         <i class='bx bx-dollar-circle'></i> Payment Amount
                     </h6>
-                    <p class="text-base font-light leading-relaxed">{{ $paymentAmount }}</p>
+                    <p class="text-base font-light leading-relaxed mt-2">{{ $paymentAmount }}</p>
                 </div>
 
                 <!-- Card Expiration (only for card payments) -->
                 @if ($paymentMethod === 'card')
-                    <div class="p-4 bg-gray-100 rounded-lg">
+                    <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
                         <h6 class="text-lg font-medium text-blue-gray-800">
                             <i class='bx bxs-calendar'></i> Card Expiration
                         </h6>
-                        <p class="text-base font-light leading-relaxed">
-                            {{ $cardExpirationMonth }}/{{ $cardExpirationYear }}</p>
+                        <p class="text-base font-light leading-relaxed mt-2">
+                            {{ $cardExpirationMonth }}/{{ $cardExpirationYear }}
+                        </p>
                     </div>
                 @endif
 
                 <!-- Receipt Link -->
-                <div class="p-4 bg-gray-100 rounded-lg">
+                <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
                     <h6 class="text-lg font-medium text-blue-gray-800">
                         <i class='bx bx-link-external'></i> Receipt
                     </h6>
-                    <a href="{{ $receiptLink }}" target="_blank" class="text-blue-600 underline">View Receipt</a>
+                    <a href="{{ $receiptLink }}" target="_blank" class="text-blue-600 underline mt-2 block">
+                        View Receipt
+                    </a>
                 </div>
             </div>
 
-
             <!-- Contact Information -->
-            <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div class="p-4 bg-gray-100 rounded-lg">
+            <div class="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
                     <h6 class="text-lg font-medium text-blue-gray-800">
                         <i class='bx bxs-envelope'></i> Email
                     </h6>
-                    <p class="text-base font-light leading-relaxed">{{ $booking->email }}</p>
+                    <p class="text-base font-light leading-relaxed mt-2">{{ $booking->email }}</p>
                 </div>
-                <div class="p-4 bg-gray-100 rounded-lg">
+                <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
                     <h6 class="text-lg font-medium text-blue-gray-800">
                         <i class='bx bxs-phone'></i> Phone
                     </h6>
-                    <p class="text-base font-light leading-relaxed">{{ $booking->phone_number }}</p>
+                    <p class="text-base font-light leading-relaxed mt-2">{{ $booking->phone_number }}</p>
                 </div>
-                <div class="p-4 bg-gray-100 rounded-lg col-span-2">
+                <div class="p-4 bg-gray-50 rounded-lg shadow-sm col-span-2">
                     <h6 class="text-lg font-medium text-blue-gray-800">
                         <i class='bx bxs-map-pin'></i> Customer's Address
                     </h6>
-                    <p class="text-base font-light leading-relaxed">
+                    <p class="text-base font-light leading-relaxed mt-2">
                         {{ $booking->address_line_1 }}<br>
                         {{ $booking->address_line_2 }}<br>
                         {{ $booking->city }}, {{ $booking->state }} {{ $booking->zip_code }}
@@ -191,7 +189,7 @@
         </div>
 
         <!-- Optional Buttons Section -->
-        <div class="flex items-center justify-between p-6 border-t border-gray-200">
+        <div class="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50 rounded-b-lg">
             <!-- Add buttons or additional actions here if needed -->
         </div>
     </div>

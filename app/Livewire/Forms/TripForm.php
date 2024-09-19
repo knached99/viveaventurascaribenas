@@ -129,7 +129,7 @@ class TripForm extends Form {
                 $fullPath = storage_path('app/public/' . $filePath);
 
                 // Use GD to resize the image
-                $this->resizeImage($image, $fullPath, 350, 219);
+                $this->resizeImage($file->getRealPath(), $fullPath,  525, 351);
 
                 $imageURLs[] = asset(Storage::url($filePath));
             }
@@ -214,56 +214,55 @@ class TripForm extends Form {
     private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight) {
         $imageType = exif_imagetype($sourcePath);
     
-        // Create the original image based on its type
         switch ($imageType) {
-            case IMAGETYPE_JPEG:
+            case IMAGETYPE_JPEG: 
                 $image = imagecreatefromjpeg($sourcePath);
                 break;
             case IMAGETYPE_PNG:
                 $image = imagecreatefrompng($sourcePath);
                 break;
-            case IMAGETYPE_GIF:
-                $image = imagecreatefromgif($sourcePath);
-                break;
             default:
-                throw new Exception('Unsupported image type');
+                throw new Exception('The image you selected is not supported. Please select a JPEG or PNG image');
         }
     
-        // Get the original image dimensions
         $originalWidth = imagesx($image);
         $originalHeight = imagesy($image);
     
-        // Create the resized image canvas with transparency support for PNG and GIF
+        $aspectRatio = $originalWidth / $originalHeight;
+    
+        if ($newWidth / $newHeight > $aspectRatio) {
+            $newWidth = $newHeight * $aspectRatio;
+        } else {
+            $newHeight = $newWidth / $aspectRatio;
+        }
+    
         $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
     
-        if ($imageType == IMAGETYPE_PNG || $imageType == IMAGETYPE_GIF) {
+        if ($imageType == IMAGETYPE_PNG) {
             imagealphablending($resizedImage, false);
             imagesavealpha($resizedImage, true);
             $transparent = imagecolorallocatealpha($resizedImage, 255, 255, 255, 127);
             imagefill($resizedImage, 0, 0, $transparent);
         }
     
-        // Resample the image to the new dimensions
         imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
     
-        // Save the resized image with the appropriate quality/compression settings
         switch ($imageType) {
             case IMAGETYPE_JPEG:
-                imagejpeg($resizedImage, $destinationPath, 100); // Quality for JPEG (0-100)
+                $quality = 90; 
+                imagejpeg($resizedImage, $destinationPath, $quality);
                 break;
             case IMAGETYPE_PNG:
-                imagepng($resizedImage, $destinationPath, 1); // Compression for PNG (0-9)
+                $compression = 1; // Lowest compression setting
+                imagepng($resizedImage, $destinationPath, $compression);
                 break;
-            case IMAGETYPE_GIF:
-                imagegif($resizedImage, $destinationPath);
-                break;
-            default:
-                throw new Exception('Unsupported image type');
         }
     
         // Free up memory
         imagedestroy($image);
         imagedestroy($resizedImage);
     }
+
+    
 }
 

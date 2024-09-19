@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\BookingReservedCustomer;
 use App\Notifications\BookingReservedAdmin;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class BookingForm extends Component
 {
@@ -25,6 +26,7 @@ class BookingForm extends Component
     public string $zipcode = '';
     public string $tripID;
     public string $num_trips = '';
+    public string $payment_option = '';
     public array $states = [];
     public string $error = '';
 
@@ -36,6 +38,7 @@ class BookingForm extends Component
         'city' => ['required'],
         'state' => ['required'],
         'zipcode' => ['required', 'regex:/^\d{5}(-\d{4})?$/'],
+        'payment_option'=>['required'],
     ];
 
     protected $validationAttributes = [
@@ -47,6 +50,7 @@ class BookingForm extends Component
         'city' => 'City',
         'state' => 'State',
         'zipcode' => 'Zipcode',
+        'payment_option' => 'Payment Option',
     ];
 
     public function mount($tripID)
@@ -102,9 +106,114 @@ class BookingForm extends Component
                 'city' => $this->rules['city'],
                 'state' => $this->rules['state'],
                 'zipcode' => $this->rules['zipcode'],
+                'payment_option'=>$this->rules['payment_option'],
+                
             ]);
         }
     }
+
+    protected function getPriceIDForProduct($productID){
+        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+
+        $prices = $stripe->prices->all([
+            'product'=>$productID,
+        ]);
+
+        if(isset($prices->data[0])){
+            return $prices->data[0]->id;
+        }
+        else{
+            throw new \Exception('No prices found for product '.$productID);
+            \Log::error('Cannot find Stripe Product ID: '.$productID. ' in function: '.__FUNCTION__. ' in class: '.__CLASS__. ' on line: '.__LINE__);
+        }
+    }
+
+    protected function createInstallmentInvoices($stripe, $customer, $priceID, $installments, $dueDates)
+{
+    foreach ($installments as $index => $amount) {
+        // Create an invoice item for each installment
+        $stripe->invoiceItems->create([
+            'customer' => $customer->id,
+            'price' => $priceID,
+            'quantity' => 1,
+            'description' => 'Installment ' . ($index + 1),
+        ]);
+
+        // Create an invoice with 'send_invoice' and set the due date
+        $invoice = $stripe->invoices->create([
+            'customer' => $customer->id,
+            'collection_method' => 'send_invoice', // Customer will pay manually
+            'due_date' => $dueDates[$index]->timestamp, // Set due date for installment
+            'auto_advance' => true // Automatically finalize the invoice after it's created
+        ]);
+
+        // Finalize the invoice
+        $stripe->invoices->finalizeInvoice($invoice->id);
+    }
+}
+
+protected function createFullPaymentInvoice($stripe, $customer, $priceID, $totalAmount)
+{
+    // Create an invoice item for the full payment
+    $stripe->invoiceItems->create([
+        'customer' => $customer->id,
+        'price' => $priceID,
+        'quantity' => 1,
+        'description' => 'Full Payment',
+    ]);
+
+    // Create a single invoice for full payment
+    $invoice = $stripe->invoices->create([
+        'customer' => $customer->id,
+        'collection_method' => 'send_invoice', // Customer will pay manually
+        'auto_advance' => true // Automatically finalize the invoice after it's created
+    ]);
+
+    // Finalize the invoice
+    $stripe->invoices->finalizeInvoice($invoice->id);
+}
+
+protected function createPartialPayments($productID, $totalAmount, $installments, $dueDates, $payment_option)
+{
+    \Log::info('Initializing Stripe...');
+    
+    $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+
+    \Log::info('Retreiving Price ID...');
+    $priceID = $this->getPriceIDForProduct($productID);
+    
+    \Log::info('Price ID: '.$priceID);
+
+    // Create a customer
+    \Log::info('Creating Customer in Stripe..');
+
+    $customer = $stripe->customers->create([
+        'name' => $this->name,
+        'email' => $this->email,
+        'phone' => $this->phone_number
+    ]);
+
+    \Log::info(['Customer ', $customer]);
+
+    \Log::info('Customer defined payment option: ');
+    if ($payment_option == 'pay_in_full') {
+        \Log::info('Customer is choosing to pay in full.');
+        \Log::info('Creating full payment invoice...');
+        // Create an invoice for full payment
+        $this->createFullPaymentInvoice($stripe, $customer, $priceID, $totalAmount);
+    } elseif ($payment_option == 'installments') {
+        \Log::info('Customer opted to pay installments towards full price');
+        // Create invoices for installments (initial payment and final payment)
+        \Log::info('Creating installment invoice...');
+        $this->createInstallmentInvoices($stripe, $customer, $priceID, $installments, $dueDates);
+    }
+
+    \Log::info('Created Invoices');
+    return $stripe->invoices->all(['customer' => $customer->id]); // Return all invoices for the customer
+}
+
+
+
 
  
 
@@ -177,7 +286,25 @@ class BookingForm extends Component
     // $taxAmount = $subtotal * $salesTaxRate;
     // $totalAmount = $subtotal + $taxAmount;
 
-    // Handle Stripe-related logic for available trips
+    // Handle Stripe-related logic for available trips 
+    $totalAmount = $trip->tripAmount * 100;
+    $initialDownPaymentpercentage = 0.60; // 60 % initial downpayment 
+    $finalDownpaymentPercentage = 0.40; // Remaining 40 % 
+
+    $downPaymentAmount = round($totalAmount * $initialDownPaymentpercentage, 2);
+    $finalDownpaymentPercentage = round($totalAmount * $finalDownpaymentPercentage, 2);
+
+    $installments = [
+        $downPaymentAmount,
+        $finalDownpaymentPercentage
+    ];
+    $now = Carbon::now();
+    $nextWeek = $now->addWeek();
+    $dueDates = [
+        $now,  // Initial payment is due now 
+        $nextWeek // Final payment is due a week from initial payment 
+    ];
+
     $existingCustomer = null;
     $customers = $stripe->customers->all(['email' => $this->email]);
 
@@ -201,57 +328,7 @@ class BookingForm extends Component
         ]);
     }
 
-    // $stripe_session = $stripe->checkout->sessions->create([
-    //     'payment_method_types' => ['card', 'cashapp', 'affirm'],
-    //     'line_items' => [[
-    //         'price_data' => [
-    //             'currency' => 'usd',
-    //             'product_data' => [
-    //                 'name' => $tripName, // Ensure this value is not empty
-    //                 'metadata' => [
-    //                     'stripe_product_id' => $trip->stripe_product_id // Add the product ID here
-    //                 ],
-    //             ],
-    //             'unit_amount' => $trip->tripPrice * 100, // Convert to cents
-    //         ],
-    //         'quantity' => 1,
-    //     ]],
-    //     'automatic_tax' => ['enabled' => true], // Enable automatic tax calculation
-    //      'shipping_address_collection' => [
-    //         'allowed_countries' => ['US'],
-    //     ],
-    //     'customer' => $existingCustomer->id, // Use the existing or newly created customer ID
-    //     'customer_update' => [
-    //         'address' => 'auto', // Automatically update customer address during checkout
-    //         'shipping' => 'auto' // Automatically update customer shipping address during checkout
-    //     ],
-    //     'mode' => 'payment',
-    //     'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID,
-    //     'cancel_url' => route('booking.cancel', [
-    //         'tripID' => $this->tripID,
-    //         'name' => $this->name,
-    //         'email' => $this->email,
-    //         'phone_number' => $this->phone_number,
-    //         'address_line_1' => $this->address_line_1,
-    //         'address_line_2' => $this->address_line_2,
-    //         'city' => $this->city,
-    //         'state' => $this->state,
-    //         'zipcode' => $this->zipcode
-    //     ]),
-    //     'metadata' => [
-    //         'tripID' => $this->tripID,
-    //         'name' => $this->name,
-    //         'email' => $this->email,
-    //         'phone_number' => $this->phone_number,
-    //         'address_line_1' => $this->address_line_1,
-    //         'address_line_2' => $this->address_line_2,
-    //         'city' => $this->city,
-    //         'state' => $this->state,
-    //         'zipcode' => $this->zipcode,
-    //         'stripe_product_id' => $trip->stripe_product_id // Keep the product ID in metadata for reference
-    //     ],
-    // ]);
-    
+   
     $stripe_session = $stripe->checkout->sessions->create([
         'payment_method_types' => ['card', 'cashapp', 'affirm'],
         'line_items' => [[
@@ -302,6 +379,8 @@ class BookingForm extends Component
             'stripe_product_id' => $trip->stripe_product_id
         ],
     ]);
+
+    $this->createPartialPayments($trip->stripe_product_id, $totalAmount, $installments, $dueDates, $this->payment_option);
     
     
 

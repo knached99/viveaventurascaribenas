@@ -5,17 +5,7 @@
                 <h2 class="mb-4">Share Your Travel Experience with Us!</h2>
                 <p class="text-secondary">Your feedback helps us improve and inspires other travelers. We'd love to hear
                     about your journey!</p>
-                <div>
-                    @if ($status)
-                        <div class="mb-4 alert alert-success" role="alert">
-                            {{ $status }}
-                        </div>
-                    @elseif($error)
-                        <div class="mb-4 alert alert-danger" role="alert">
-                            {{ $error }}
-                        </div>
-                    @endif
-                </div>
+
 
             </div>
             <div class="row justify-content-center">
@@ -46,7 +36,7 @@
                             <div class="col-12">
                                 <div class="form-group">
                                     <select
-                                    class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
+                                        class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
                                         wire:model="tripID">
                                         <option value="" disabled selected>Where did you travel with us?</option>
                                         @foreach ($trips as $trip)
@@ -60,15 +50,17 @@
                                     @enderror
                                 </div>
                             </div>
-                              <div class="col-12">
-                            <div class="form-group">
-                                <label class="form-label">Travel Date</label>
-                                <input wire:model="trip_date" type="month" max="{{date('Y-m')}}" value="{{date('Y-m')}}" class="form-control {{$errors->has('trip_date') ? 'border border-danger' : ''}}">
-                                @error('trip_date')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-label">Travel Date</label>
+                                    <input wire:model="trip_date" type="month" max="{{ date('Y-m') }}"
+                                        value="{{ date('Y-m') }}"
+                                        class="form-control {{ $errors->has('trip_date') ? 'border border-danger' : '' }}">
+                                    @error('trip_date')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
                             </div>
-                        </div>
                             <div class="col-12">
                                 <div
                                     class="form-group {{ $errors->has('trip_rating') ? 'border border-danger' : '' }}">
@@ -120,11 +112,26 @@
                             </div>
                             <div class="col-12">
                                 <div class="form-group">
-                                    <button type="submit" class="btn btn-primary w-100 py-3"
-                                        wire:loading.remove>Submit Testimonial</button>
+                                    <button type="submit" class="btn btn-primary w-100 py-3" wire:loading.remove>Submit
+                                        Testimonial</button>
                                     <div class="spinner-border text-primary" role="status" wire:loading></div>
                                 </div>
+
                             </div>
+
+                            <!-- Status Messages -->
+                            <div>
+                                @if ($status)
+                                    <div class="mb-4 alert alert-success" role="alert">
+                                        {{ $status }}
+                                    </div>
+                                @elseif($error)
+                                    <div class="mb-4 alert alert-danger" role="alert">
+                                        {{ $error }}
+                                    </div>
+                                @endif
+                            </div>
+                            <!-- / Status Messages -->
                         </form>
                     </div>
                 </div>

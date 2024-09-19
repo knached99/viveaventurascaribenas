@@ -77,6 +77,21 @@
                     <x-input-error :messages="$errors->get('zipcode')" class="mt-2 text-danger" />
                 </div>
 
+                <span class="fw-bold mt-3">Choose how you'd like to pay for this booking</span>
+
+                <div class="form-check form-check-inline mb-3 mt-3">
+                    <input class="form-check-input" wire:model="payment_option" type="radio" name="payment_option"
+                        id="payment_option" value="installments">
+                    <label class="form-check-label" for="payment_option">Installments</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="payment_option" id="payment_option"
+                        value="pay_in_full">
+                    <label class="form-check-label" for="payment_option">Pay In Full</label>
+                </div>
+                <x-input-error :messages="$errors->get('payment_option')" class="mt-2 text-danger" />
+
+
                 <div class="d-flex justify-content-between">
                     <button type="button" class="previous-btn" wire:click="previousStep">Previous</button>
                     <button type="button" class="next-btn" wire:click="nextStep">Next</button>

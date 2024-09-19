@@ -102,15 +102,15 @@
 
                 @switch($trip->tripAvailability)
                     @case('available')
-                        <td class="m-3 text-white badge rounded-pill bg-success">{{ $trip->tripAvailability }}</td>
+                        <td class="m-5 text-white badge rounded-pill bg-success">{{ $trip->tripAvailability }}</td>
                     @break
 
                     @case('coming soon')
-                        <td class="m-3 text-white badge rounded-pill bg-warning">{{ $trip->tripAvailability }}</td>
+                        <td class="m-5 text-white badge rounded-pill bg-warning">{{ $trip->tripAvailability }}</td>
                     @break
 
                     @case('unavailable')
-                        <td class="m-3 text-white badge rounded-pill bg-danger">{{ $trip->tripAvailability }}</td>
+                        <td class="m-5 text-white badge rounded-pill bg-danger">{{ $trip->tripAvailability }}</td>
                     @break
                 @endswitch
                 <td>{{ date('F jS, Y', strtotime($trip->tripStartDate)) }}</td>

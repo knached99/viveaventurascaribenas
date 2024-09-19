@@ -1,7 +1,7 @@
 <x-authenticated-theme-layout>
     <div class="row">
         <div class="card-body">
-            <div class="col-sm-7">        
+            <div class="col-sm-7">
                 <div class="m-3">
                     <a class="btn btn-primary text-white w-100 w-sm-50" href="{{ route('admin.create-trip') }}">
                         Create Trip
@@ -12,18 +12,18 @@
     </div>
 
     <!-- Trips Table -->
-    @if(!$trips->isEmpty())
+    @if (!$trips->isEmpty())
         <div class="card shadow-sm bg-white rounded">
-            <h5 class="m-3">Here are all of your bookings</h5>
+            <h5 class="m-3">Here are all of your created trips</h5>
 
-            @if(session('trip_deleted'))
+            @if (session('trip_deleted'))
                 <div class="alert alert-success" role="alert">
-                    {{session('trip_deleted')}}
+                    {{ session('trip_deleted') }}
                 </div>
-            @endif 
+            @endif
 
             <div class="table-responsive">
-                <x-admincomponents.all-trips :trips="$trips"/>
+                <x-admincomponents.all-trips :trips="$trips" />
             </div>
         </div>
     @else

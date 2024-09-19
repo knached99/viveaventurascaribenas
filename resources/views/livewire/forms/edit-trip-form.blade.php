@@ -24,6 +24,16 @@
 
 
                 <form wire:submit.prevent="editTrip" class="p-4" enctype="multipart/form-data">
+
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <!-- Editable Images -->
                     <div class="text-center mb-4">
                         <label for="tripPhotos" class="form-label fw-semibold d-block mb-2">Trip Photos</label>
@@ -76,7 +86,8 @@
                                 <input type="file" wire:model="tripPhotos"
                                     class="form-control  {{ $errors->has('tripPhotos.*') ? 'is-invalid' : '' }}"
                                     multiple />
-                                <x-input-error :messages="$errors->get('tripPhotos.*')" class="invalid-feedback" />
+                                {{-- <x-input-error :messages="$errors->get('tripPhotos.*')" class="invalid-feedback" /> --}}
+                                <x-input-error :messages="$errors->get('tripPhotos')" class="invalid-feedback" />
                             </div>
                         @endif
 
