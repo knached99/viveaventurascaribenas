@@ -129,7 +129,7 @@ class TripForm extends Form {
                 $fullPath = storage_path('app/public/' . $filePath);
 
                 // Use GD to resize the image
-                $this->resizeImage($file->getRealPath(), $fullPath,  525, 351);
+                $this->resizeImage($photo->getRealPath(), $fullPath,  525, 351);
 
                 $imageURLs[] = asset(Storage::url($filePath));
             }

@@ -213,7 +213,7 @@
 <!-- / Most Popular Attractions -->
 
 <!-- Available Bookings Component -->
-@if (!empty($trips) || !empty($mostPopularTripId))
+@if (!$trips->isEmpty())
     <x-travelcomponents.available-bookings :trips="$trips" :mostPopularTripId="$mostPopularTripId" />
 @else
 @endif
@@ -221,12 +221,14 @@
 
 
 <!-- Start Testimonials -->
-@if (!empty($testimonials))
+@if (!$testimonials->isEmpty())
     <x-travelcomponents.testimonials :testimonials="$testimonials" />
+    <!-- End Testimonials -->
 @else
 @endif
-<!-- End Testimonials -->
+
 
 <livewire:forms.testimonial-form />
 <!-- Testimonial Submission -->
+
 <x-travelcomponents.footer />

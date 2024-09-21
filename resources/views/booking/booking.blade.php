@@ -28,7 +28,7 @@
             <div class="row d-flex justify-content-center">
                 <div class="col-lg-7 col-md-10 text-center text-white mb-4">
                     <div class="booking-cta">
-                        <h1 class="display-4">{{ $heading }}</h1>
+                        <h1>{{ $heading }}</h1>
                         <p class="lead">{{ $message }}</p>
                     </div>
                 </div>

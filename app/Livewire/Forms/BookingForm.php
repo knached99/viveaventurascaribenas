@@ -26,7 +26,7 @@ class BookingForm extends Component
     public string $zipcode = '';
     public string $tripID;
     public string $num_trips = '';
-    public string $payment_option = '';
+    // public string $payment_option = '';
     public array $states = [];
     public string $error = '';
 
@@ -38,7 +38,7 @@ class BookingForm extends Component
         'city' => ['required'],
         'state' => ['required'],
         'zipcode' => ['required', 'regex:/^\d{5}(-\d{4})?$/'],
-        'payment_option'=>['required'],
+        // 'payment_option'=>['required'],
     ];
 
     protected $validationAttributes = [
@@ -50,7 +50,7 @@ class BookingForm extends Component
         'city' => 'City',
         'state' => 'State',
         'zipcode' => 'Zipcode',
-        'payment_option' => 'Payment Option',
+        // 'payment_option' => 'Payment Option',
     ];
 
     public function mount($tripID)
@@ -106,13 +106,13 @@ class BookingForm extends Component
                 'city' => $this->rules['city'],
                 'state' => $this->rules['state'],
                 'zipcode' => $this->rules['zipcode'],
-                'payment_option'=>$this->rules['payment_option'],
+                // 'payment_option'=>$this->rules['payment_option'],
                 
             ]);
         }
     }
 
-    protected function getPriceIDForProduct($productID){
+    private function getPriceIDForProduct($productID){
         $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
 
         $prices = $stripe->prices->all([
@@ -128,7 +128,7 @@ class BookingForm extends Component
         }
     }
 
-    protected function createInstallmentInvoices($stripe, $customer, $priceID, $installments, $dueDates)
+    private function createInstallmentInvoices($stripe, $customer, $priceID, $installments, $dueDates)
 {
     foreach ($installments as $index => $amount) {
         // Create an invoice item for each installment
@@ -149,10 +149,11 @@ class BookingForm extends Component
 
         // Finalize the invoice
         $stripe->invoices->finalizeInvoice($invoice->id);
+        
     }
 }
 
-protected function createFullPaymentInvoice($stripe, $customer, $priceID, $totalAmount)
+private function createFullPaymentInvoice($stripe, $customer, $priceID, $totalAmount)
 {
     // Create an invoice item for the full payment
     $stripe->invoiceItems->create([
@@ -173,49 +174,52 @@ protected function createFullPaymentInvoice($stripe, $customer, $priceID, $total
     $stripe->invoices->finalizeInvoice($invoice->id);
 }
 
-protected function createPartialPayments($productID, $totalAmount, $installments, $dueDates, $payment_option)
+
+public function createPartialPayments($productID, $totalAmount, $installments, $dueDates, $payment_option)
 {
     \Log::info('Initializing Stripe...');
     
     $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
 
-    \Log::info('Retreiving Price ID...');
+    \Log::info('Retrieving Price ID...');
     $priceID = $this->getPriceIDForProduct($productID);
     
     \Log::info('Price ID: '.$priceID);
 
-    // Create a customer
-    \Log::info('Creating Customer in Stripe..');
+    // Create or retrieve customer
+    \Log::info('Creating or retrieving customer in Stripe..');
 
-    $customer = $stripe->customers->create([
-        'name' => $this->name,
-        'email' => $this->email,
-        'phone' => $this->phone_number
-    ]);
+    $customer = null;
+    $customers = $stripe->customers->all(['email' => $this->email]);
 
-    \Log::info(['Customer ', $customer]);
+    if (count($customers->data) > 0) {
+        $customer = $customers->data[0]; // Use the first customer found with this email
+    } else {
+        // Create new customer if none exists
+        $customer = $stripe->customers->create([
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone_number
+        ]);
+        \Log::info('Customer created: ' . $customer->id);
+    }
 
-    \Log::info('Customer defined payment option: ');
-    if ($payment_option == 'pay_in_full') {
+    // Handle payment options
+    if ($payment_option === 'pay_in_full') {
         \Log::info('Customer is choosing to pay in full.');
-        \Log::info('Creating full payment invoice...');
-        // Create an invoice for full payment
         $this->createFullPaymentInvoice($stripe, $customer, $priceID, $totalAmount);
-    } elseif ($payment_option == 'installments') {
-        \Log::info('Customer opted to pay installments towards full price');
-        // Create invoices for installments (initial payment and final payment)
-        \Log::info('Creating installment invoice...');
+    } elseif ($payment_option === 'installments') {
+        \Log::info('Customer opted to pay in installments.');
         $this->createInstallmentInvoices($stripe, $customer, $priceID, $installments, $dueDates);
     }
 
-    \Log::info('Created Invoices');
+    \Log::info('Invoices created successfully.');
     return $stripe->invoices->all(['customer' => $customer->id]); // Return all invoices for the customer
 }
 
 
 
 
- 
 
     public function bookTrip()
 {
@@ -287,23 +291,23 @@ protected function createPartialPayments($productID, $totalAmount, $installments
     // $totalAmount = $subtotal + $taxAmount;
 
     // Handle Stripe-related logic for available trips 
-    $totalAmount = $trip->tripAmount * 100;
-    $initialDownPaymentpercentage = 0.60; // 60 % initial downpayment 
-    $finalDownpaymentPercentage = 0.40; // Remaining 40 % 
+    // $totalAmount = $trip->tripAmount * 100;
+    // $initialDownPaymentpercentage = 0.60; // 60 % initial downpayment 
+    // $finalDownpaymentPercentage = 0.40; // Remaining 40 % 
 
-    $downPaymentAmount = round($totalAmount * $initialDownPaymentpercentage, 2);
-    $finalDownpaymentPercentage = round($totalAmount * $finalDownpaymentPercentage, 2);
+    // $downPaymentAmount = round($totalAmount * $initialDownPaymentpercentage, 2);
+    // $finalDownpaymentPercentage = round($totalAmount * $finalDownpaymentPercentage, 2);
 
-    $installments = [
-        $downPaymentAmount,
-        $finalDownpaymentPercentage
-    ];
-    $now = Carbon::now();
-    $nextWeek = $now->addWeek();
-    $dueDates = [
-        $now,  // Initial payment is due now 
-        $nextWeek // Final payment is due a week from initial payment 
-    ];
+    // $installments = [
+    //     $downPaymentAmount,
+    //     $finalDownpaymentPercentage
+    // ];
+    // $now = Carbon::now();
+    // $nextWeek = $now->addWeek();
+    // $dueDates = [
+    //     $now,  // Initial payment is due now 
+    //     $nextWeek // Final payment is due a week from initial payment 
+    // ];
 
     $existingCustomer = null;
     $customers = $stripe->customers->all(['email' => $this->email]);
@@ -380,7 +384,7 @@ protected function createPartialPayments($productID, $totalAmount, $installments
         ],
     ]);
 
-    $this->createPartialPayments($trip->stripe_product_id, $totalAmount, $installments, $dueDates, $this->payment_option);
+    // $this->createPartialPayments($trip->stripe_product_id, $totalAmount, $installments, $dueDates, $this->payment_option);
     
     
 

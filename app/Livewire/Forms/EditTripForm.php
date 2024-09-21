@@ -31,6 +31,7 @@ class EditTripForm extends Component
     public bool $active = false;
     public string $slug = '';
     public $tripCosts = [];
+    public ?array $existingImageURLs = [];
 
     public string $status = ''; // Trip Creation Flash Message
     public string $success = '';
@@ -62,6 +63,7 @@ class EditTripForm extends Component
         } else {
             $this->loadFromDatabase();
         }
+        $this->existingImageURLs = json_decode($this->trip->tripPhotos, true) ?? [];
     }
     
     private function loadFromCache(array $cachedTrip): void
@@ -309,7 +311,10 @@ class EditTripForm extends Component
                     'tripPhotos'=>$tripPhotos 
                 ]);
 
-                $this->success = 'Image removed successfully!';
+                $this->imageReplaceSuccess = 'Image removed successfully!';
+            }
+            else{
+                $this->imageReplaceError = 'Unable to remove image';
             }
         }
 
@@ -318,11 +323,6 @@ class EditTripForm extends Component
     
 
 
-    
-  
-
- 
-
     public function editTrip(): void
     {
         \Log::info('Editing trip with costs: ' . json_encode($this->tripCosts));
@@ -330,8 +330,8 @@ class EditTripForm extends Component
         $rules = [
             'tripLocation' => 'required|string|max:255',
             // 'tripPhotos.*'=>'sometimes|array|max:3',
-            'tripPhotos' => 'nullable|array|max:3', // Ensure tripPhotos is an array with a max of 3 items
-            'tripPhotos.*' => 'image|mimes:jpg,jpeg,png|max:5120', // Validate image types and max size (2MB
+            // 'tripPhotos' => 'nullable|array|max:3', // Ensure tripPhotos is an array with a max of 3 items
+            // 'tripPhotos.*' => 'image|mimes:jpg,jpeg,png|max:5120', // Validate image types and max size (2MB
             'tripLandscape' => 'required|array',
             'tripAvailability' => 'required|string',
             'tripDescription' => 'required|string',
@@ -362,34 +362,37 @@ class EditTripForm extends Component
 
                 \Log::info('Current Image URLs array: '.json_encode($newImageURLs));
 
-                \Log::info('Checking if user selected pictures');
-                if(isset($this->tripPhotos)){
-                    
-                    \Log::info('User selected pictures for upload. Iterating over pictures..');
-                    foreach ($this->tripPhotos as $photo) {
-                        $image = $photo->getRealPath();
-                        $fileName = $photo->hashName(). '.'.$photo->extension();
-                        $filePath = 'booking_photos/' . $fileName;
-                        $fullPath = storage_path('app/public/' . $filePath);
-                    
-                        \Log::info('Resizing Image..');
-                        $this->resizeImage($image, $fullPath, 525, 351);
-                    
-                        // Save the image to the file system
-                        $photo->storeAs('public/booking_photos', $fileName); // Save the original image
-                    
-                        $newImageURLs[] = asset(Storage::url($filePath)); // Add URL to array
-                        \Log::info('Current image URLs array: ' . json_encode($newImageURLs));
-                    }
-                    
+                \Log::info('');
+                if (!empty($this->tripPhotos) && is_array($this->tripPhotos)) {
+                        \Log::info('User selected new pictures for upload. Iterating over new pictures..');
+                        
+                        $newImageURLs = []; // Store new image URLs
+                        foreach ($this->tripPhotos as $photo) {
+                            \Log::info('Checking if user selected pictures');
 
-                        // else{
-                        //     \Log::error('File is not a valid instance of Livewire TemporaryUploadedFile');
-                        //     $this->error = 'Cannot upload files. Something went wrong';
-                        //     return;
-                        // }
+                            if ($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) { 
+                                $image = $photo->getRealPath();
+                                $fileName = $photo->hashName() . '.' . $photo->extension();
+                                $filePath = 'booking_photos/' . $fileName;
+                                $fullPath = storage_path('app/public/' . $filePath);
+                    
+                                \Log::info('Resizing Image...');
+                                $this->resizeImage($image, $fullPath, 525, 351);
+                    
+                                // Save the image to the file system
+                                $photo->storeAs('public/booking_photos', $fileName);
+                          
+                                $newImageURLs[] = asset(Storage::url($filePath)); 
+                                \Log::info('Current image URLs array: ' . json_encode($newImageURLs));
+                            }
+                        }
+                        
+                        // Merge existing image URLs with new ones, if necessary
+                        $this->tripPhotosURLs = array_merge($this->existingImageURLs, $newImageURLs);
+                        
+                        \Log::info('All images after upload: ' . json_encode($this->tripPhotosURLs));
                     }
-                   
+                    
             
                 
                 \Log::info('Current newImageURLs array: '.json_encode($newImageURLs));

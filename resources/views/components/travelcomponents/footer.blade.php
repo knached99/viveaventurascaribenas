@@ -107,8 +107,6 @@
 <script src="{{ asset('assets/js/jquery.animateNumber.min.js') }}"></script>
 <script src="{{ asset('assets/js/bootstrap-datepicker.js') }}"></script>
 <script src="{{ asset('assets/js/scrollax.min.js') }}"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
-<script src="{{ asset('assets/js/google-map.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>
 <script src="{{ asset('assets/js/carousel.js') }}"></script>
 
@@ -159,26 +157,26 @@
         updateSlide();
     });
 </script>
+@if (\Route::currentRouteName() === '/' || \Route::currentRouteName() === 'landing.destination')
+    <!-- Slider on booking images -->
+    <script>
+        var swiper = new Swiper('.swiper-container', {
+            loop: true,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            slidesPerView: 1,
+            spaceBetween: 10,
+        });
+    </script>
+@endif
 
-<!-- Slider on booking images -->
-<script>
-    var swiper = new Swiper('.swiper-container', {
-        loop: true,
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        slidesPerView: 1,
-        spaceBetween: 10,
-    });
-</script>
-
-
-@if (\Route::currentRouteName() === 'landing.destination')
+@if (\Route::currentRouteName() === '/' || \Route::currentRouteName() === 'landing.destination')
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const carouselElement = document.querySelector("#testimonialsCarousel");
@@ -202,8 +200,8 @@
     </script>
 
 
-    <!-- Color Extraction Algorithm using ColorTheif --> 
-{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+    <!-- Color Extraction Algorithm using ColorTheif -->
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const colorThief = new ColorThief();
@@ -244,7 +242,6 @@
         carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
     });
 </script> --}}
-
 @endif
 
 @livewireScripts

@@ -115,14 +115,14 @@
 }
 
 .booking-cta h1 {
-    font-size: 3.5rem;
+    font-size: 30px;
     text-transform: uppercase;
     color: #fff;
-    font-weight: 700;
+    font-weight: 900;
 }
 
 .booking-cta p {
-    font-size: 16px;
+    font-size: 25px;
     color: rgba(255, 255, 255, 0.8);
 }
 

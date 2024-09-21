@@ -24,7 +24,7 @@
 
 
                 <form wire:submit.prevent="editTrip" class="p-4" enctype="multipart/form-data">
-
+                    {{-- 
                     @if ($errors->any())
                         <div class="alert alert-danger">
                             <ul>
@@ -33,7 +33,7 @@
                                 @endforeach
                             </ul>
                         </div>
-                    @endif
+                    @endif --}}
                     <!-- Editable Images -->
                     <div class="text-center mb-4">
                         <label for="tripPhotos" class="form-label fw-semibold d-block mb-2">Trip Photos</label>
@@ -81,6 +81,18 @@
                                 wire:click="replaceImage({{ $replaceIndex }})" class="btn btn-primary">
                                 Replace Image
                             </button>
+
+                            @if ($imageReplaceSuccess)
+                                <div class="alert alert-success">
+                                    {{ $imageReplaceSuccess }}
+                                </div>
+                            @endif
+
+                            @if ($imageReplaceError)
+                                <div class="alert alert-danger">
+                                    {{ $imageReplaceError }}
+                                </div>
+                            @endif
                         @else
                             <div class="mb-3">
                                 <input type="file" wire:model="tripPhotos"
@@ -91,17 +103,6 @@
                             </div>
                         @endif
 
-                        @if ($imageReplaceSuccess)
-                            <div class="alert alert-success">
-                                {{ $imageReplaceSuccess }}
-                            </div>
-                        @endif
-
-                        @if ($imageReplaceError)
-                            <div class="alert alert-danger">
-                                {{ $imageReplaceError }}
-                            </div>
-                        @endif
                     </div>
 
                     <!-- Form Fields -->
