@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Home;
 use App\Http\Controllers\Analytics;
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\PhotoGalleryController;
 use Livewire\Volt\Volt;
 use App\Http\Livewire\TripInfoForm;
 
@@ -59,9 +60,14 @@ Route::group(['middleware' => 'auth', 'verified'], function () {
     Route::put('/admin/testimonial/declineTestimonial/{testimonialID}', [Admin::class, 'declineTestimonial'])->name('admin.testimonial.declineTestimonial');
     Route::delete('/admin/testimonial/delete/{testimonialID}', [Admin::class, 'deleteTestimonial'])->name('admin.testimonial.delete');
     Volt::route('/admin/createTrip', 'pages.create-trip')->name('admin.create-trip');
+    Volt::route('/admin/uploadPhoto', 'pages.photo-gallery-upload')->name('admin.photo-gallery-upload');
     Route::get('/admin/trip/{tripID}', [Admin::class, 'getTripDetails'])->name('admin.trip');
     Route::delete('/admin/trip/delete/{tripID}', [Admin::class, 'deleteTrip'])->name('admin.trip.delete');
     Route::get('/admin/reservations/{reservationID}', [Admin::class, 'getReservationDetails'])->name('admin.reservations');
+    
+    // Photo Gallery 
+
+    Route::get('/admin/photo-gallery', [PhotoGalleryController::class, 'retrivePhotoGallery'])->name('admin.photo-gallery');
 });
 // Route::view('admin/dashboard', 'admin/dashboard')
 //     ->middleware(['auth', 'verified'])

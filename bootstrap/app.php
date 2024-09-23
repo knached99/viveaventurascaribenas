@@ -12,6 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+
+    ->withCommands([
+        __DIR__.'/../app/Domain/Orders/Commands',
+    ]
+        
+    )
     ->withMiddleware(function (Middleware $middleware) {
         // Add your VisitorMiddleware here
         $middleware->append(TrackVisitors::class);

@@ -79,6 +79,15 @@
                     </a>
                 </li>
 
+                <li class="menu-item {{request()->routeIs('admin.photo-gallery') ? 'active' : '' }}">
+                <a href="{{ route('admin.photo-gallery') }}" class="menu-link text-decoration-none">
+                <div class="text-truncate" data-i18n="Photo Gallery"><i class='menu-icon tf-icons bx bx-images'></i>
+                Photo Gallery
+                </div>
+                </a>
+
+                </li>
+
             </ul>
         </li>
 

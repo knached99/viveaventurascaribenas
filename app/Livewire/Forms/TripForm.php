@@ -208,7 +208,7 @@ class TripForm extends Form {
 
     public function render()
     {
-        return view('livewire.forms.create-trip');
+        return view('livewire.pages.create-trip');
     }
 
     private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight) {
@@ -262,6 +262,7 @@ class TripForm extends Form {
         imagedestroy($image);
         imagedestroy($resizedImage);
     }
+    
 
     
 }
