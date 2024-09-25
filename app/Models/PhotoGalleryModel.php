@@ -20,7 +20,7 @@ class PhotoGalleryModel extends Model
         'tripID',
         'photoLabel',
         'photoDescription',
-        'tripPhotos',
+        'photos',
     ];
 
     protected $casts = [

@@ -16,7 +16,7 @@ return new class extends Migration
         $table->uuid('photoID')->primary();
         $table->string('photoLabel')->nullable();
         $table->text('photoDescription')->nullable();
-        $table->json('tripPhotos');
+        $table->json('photos');
         $table->uuid('tripID');
 
         $table->foreign('tripID')
@@ -34,6 +34,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Discard tablespace before dropping the table, if it exists
+        DB::statement('ALTER TABLE photo_gallery DISCARD TABLESPACE');
+        
         Schema::dropIfExists('photo_gallery');
     }
+
 };
