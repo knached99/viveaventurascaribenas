@@ -66,6 +66,106 @@
                 /* Ensure carousel height remains fixed */
             }
         </style>
+
+        <!--- Photo Gallery -->
+
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600;700&display=swap');
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Ubuntu', sans-serif;
+                margin: 0;
+                height: 100vh;
+                background-color: #4158D0;
+                color: #00000090;
+                background-color: #fff;
+                //  background-image: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+            }
+
+            .header {
+                text-align: center;
+                padding: 32px;
+            }
+
+            .row {
+                display: flex;
+                flex-wrap: wrap;
+                padding: 0 4px;
+            }
+
+            .column {
+                flex: 25%;
+                max-width: 25%;
+                padding: 0 4px;
+            }
+
+            .column img {
+                margin-top: 8px;
+                vertical-align: middle;
+            }
+
+            @media (max-width: 800px) {
+                .column {
+                    flex: 50%;
+                    max-width: 50%;
+                }
+            }
+
+            @media (max-width: 600px) {
+                .column {
+                    flex: 100%;
+                    max-width: 100%;
+                }
+            }
+
+            .column {
+                position: relative;
+                /* Establishes a positioning context for the overlay */
+            }
+
+            .overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.6);
+                /* Semi-transparent background */
+                color: white;
+                /* Text color */
+                display: flex;
+                /* Use flexbox for centering */
+                flex-direction: column;
+                /* Stack label and description vertically */
+                justify-content: center;
+                /* Center content vertically */
+                align-items: center;
+                /* Center content horizontally */
+                opacity: 0;
+                /* Start hidden */
+                transition: opacity 0.3s ease;
+                /* Smooth transition for hover */
+            }
+
+            .column:hover .overlay {
+                opacity: 1;
+                /* Show overlay on hover */
+            }
+
+            .overlay h4,
+            .overlay p {
+                margin: 0;
+                /* Remove default margins */
+                padding: 10px;
+                /* Add some padding */
+                text-align: center;
+                /* Center text */
+            }
+        </style>
     @endif
 
     <style>

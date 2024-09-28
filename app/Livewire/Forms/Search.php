@@ -5,6 +5,7 @@ namespace App\Livewire\Forms;
 use App\Models\Testimonials;
 use App\Models\TripsModel;
 use App\Models\BookingModel;
+use App\Models\PhotoGalleryModel;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
 use Exception;
@@ -53,9 +54,8 @@ class Search extends Component
         ->get()
         ->toArray();
 
+
             $this->searchResults = array_merge($tripsResults, $testimonialsResults, $bookingResults);
-
-
 
         } catch (Exception $e) {
             $this->searchError = 'Unable to perform search';

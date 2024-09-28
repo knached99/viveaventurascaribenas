@@ -55,8 +55,8 @@
                             </div>
                             <div class="text p-4 card-body">
                                 <span class="price">${{ number_format($trip->tripPrice, 2) }}/person</span>
-                                <span
-                                    class="days">{{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}
+                                <span class="days">Duration:
+                                    {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}
                                     Days</span>
                                 <h3><a
                                         href="{{ route('landing.destination', ['slug' => $trip->slug]) }}">{{ $trip->tripLocation }}</a>

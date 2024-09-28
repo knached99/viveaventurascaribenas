@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TripsModel;
 use App\Models\Testimonials;
+use App\Models\PhotoGalleryModel;
 use Stripe\Stripe;
 use Stripe\Product;
 use Stripe\StripeClient;
@@ -36,7 +37,10 @@ class Home extends Controller
     {
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'slug', 'stripe_product_id')->where('active', true)->get();
         $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
-    
+        
+       
+
+        $photos = PhotoGalleryModel::with(['trip'])->select('photoID', 'photoLabel', 'photoDescription', 'photos', 'tripID')->get();
         
         $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
             ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
@@ -77,6 +81,7 @@ class Home extends Controller
             'testimonials' => $testimonials,
             'popularTrips' => $popularTrips,
             'mostPopularTripId' => $mostPopularTripId, // Pass the most popular trip ID
+            'photos'=>$photos
         ]);
     }
 
@@ -209,7 +214,9 @@ class Home extends Controller
     
         try {
             // Retrieve the Stripe session using the session ID
-            $session = $stripe->checkout->sessions->retrieve($sessionID);
+            $session = $stripe->checkout->sessions->retrieve($sessionID, [
+                'expand'=>['payment_intent']
+            ]);
     
             // Check if the session exists and has the correct payment status
             if ($session && $session->payment_status == 'paid') {
@@ -220,7 +227,11 @@ class Home extends Controller
                     return redirect()->route('booking.cancel', ['tripID' => $tripID])
                                      ->with('message', 'Booking already completed.');
                 }
-    
+                $paymentIntent = $session->payment_intent;
+                if(is_object($paymentIntent)){
+                $amount_charged_in_cents = $paymentIntent->amount_received;
+                $amount_charged_in_dollars = $amount_charged_in_cents / 100;
+                }
                 // Create a new booking record
                 BookingModel::create([
                     'bookingID' => $this->bookingID,
@@ -233,6 +244,7 @@ class Home extends Controller
                     'city' => $session->metadata->city ?? 'N/A',
                     'state' => $session->metadata->state ?? 'N/A',
                     'zip_code' => $session->metadata->zipcode ?? '00000',
+                    'amount_captured'=>$amount_charged_in_dollars ?? 0.00,
                     'stripe_checkout_id' => $session->id,
                     'stripe_product_id' => $session->metadata->stripe_product_id ?? null,
                 ]);
@@ -282,6 +294,8 @@ class Home extends Controller
                 // Handle the case where the payment was not successful or the session is invalid
                 return redirect()->route('booking.cancel', ['tripID' => $tripID, 'signedURL'=>$signedURLCancel]);
             }
+
+            Cache::flush();
         } catch (\Exception $e) {
             \Log::error('Uncaught database or stripe exception in class: ' . __CLASS__ . ' On line: ' . __LINE__ . ' Error Message: ' . $e->getMessage());
             abort(500, 'An error occurred while processing your booking.');
@@ -326,7 +340,11 @@ class Home extends Controller
     
 
     public function aboutPage(){
-        return view('/landing/about');
+        $totalBookings = BookingModel::count();
+        $totalTrips = TripsModel::count();
+        $customers = $this->stripe->customers->all();
+        $totalCustomers = count($customers);
+        return view('/landing/about', compact('totalBookings', 'totalTrips', 'totalCustomers'));
     }
 
     public function galleryPage(){

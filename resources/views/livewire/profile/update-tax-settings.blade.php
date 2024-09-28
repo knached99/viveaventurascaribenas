@@ -69,16 +69,9 @@
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
             @if ($error)
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">An error occurred</strong>
-                    <span class="block sm:inline">{{ $error }}</span>
-
-                </div>
+                <span class="block sm:inline text-red-500">{{ $error }}</span>
             @elseif($success)
-                <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded relative"
-                    role="alert">
-                    <span class="block sm:inline">{{ $success }}</span>
-                </div>
+                <span class="block sm:inline text-emerald-500">{{ $success }}</span>
             @endif
 
         </div>

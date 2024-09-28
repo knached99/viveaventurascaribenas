@@ -231,4 +231,9 @@
 <livewire:forms.testimonial-form />
 <!-- Testimonial Submission -->
 
+<!-- Photo Galleries Component -->
+@if (!$photos->isEmpty())
+    <x-travelcomponents.photo-gallery :photos="$photos" />
+@else
+@endif
 <x-travelcomponents.footer />

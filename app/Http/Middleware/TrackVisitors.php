@@ -40,7 +40,11 @@ class TrackVisitors
             'verification.notice',
             'verification.verify',
             'password.confirm',
+            '*.css', '*.js', '*.png', '*.jpg', '*.jpeg', '*.gif', '*.svg', '*.woff', '*.woff2', '*.ttf', '*.ico',
+            'node_modules',
+
         ];
+
         if($request->is($excludedPaths) || strpos(url()->previous(), '/admin') !== false){
             return $next($request);
         }

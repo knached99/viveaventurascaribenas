@@ -5,6 +5,9 @@ namespace App\Livewire\Forms;
 use Livewire\Component;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use Stripe\Invoice;
+use Stripe\InvoiceItem;
+use Stripe\Exception\ApiErrorException;
 use App\Models\TripsModel;
 use App\Models\Reservations; 
 use Illuminate\Support\Facades\Notification;
@@ -15,6 +18,8 @@ use Carbon\Carbon;
 
 class BookingForm extends Component
 {
+    protected $stripe;
+
     public $currentStep = 1;
     public string $name = '';
     public string $email = '';
@@ -26,9 +31,12 @@ class BookingForm extends Component
     public string $zipcode = '';
     public string $tripID;
     public string $num_trips = '';
-    // public string $payment_option = '';
+    public string $payment_option = '';
+    public string $tripAvailability = '';
     public array $states = [];
+    public $customers;
     public string $error = '';
+
 
     protected $rules = [
         'name' => 'required|string',
@@ -38,7 +46,7 @@ class BookingForm extends Component
         'city' => ['required'],
         'state' => ['required'],
         'zipcode' => ['required', 'regex:/^\d{5}(-\d{4})?$/'],
-        // 'payment_option'=>['required'],
+        'payment_option'=>['required'],
     ];
 
     protected $validationAttributes = [
@@ -50,13 +58,20 @@ class BookingForm extends Component
         'city' => 'City',
         'state' => 'State',
         'zipcode' => 'Zipcode',
-        // 'payment_option' => 'Payment Option',
+        'payment_option' => 'Payment Option',
     ];
 
     public function mount($tripID)
     {
+        
+
+        \Log::info('Initializing Stripe client...');
+        $this->stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+        \Log::info('Stripe client initialized.');
+        
         $this->tripID = $tripID;
         $trip = TripsModel::findOrFail($this->tripID);
+        $this->tripAvailability = $trip->tripAvailability;
         $this->num_trips = $trip->num_trips;
         $statesJson = file_get_contents(resource_path('js/states.json'));
         $statesArray = json_decode($statesJson, true);
@@ -106,234 +121,64 @@ class BookingForm extends Component
                 'city' => $this->rules['city'],
                 'state' => $this->rules['state'],
                 'zipcode' => $this->rules['zipcode'],
-                // 'payment_option'=>$this->rules['payment_option'],
+                'payment_option'=>$this->rules['payment_option'],
                 
             ]);
         }
     }
 
-    private function getPriceIDForProduct($productID){
-        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
 
-        $prices = $stripe->prices->all([
-            'product'=>$productID,
-        ]);
-
-        if(isset($prices->data[0])){
-            return $prices->data[0]->id;
-        }
-        else{
-            throw new \Exception('No prices found for product '.$productID);
-            \Log::error('Cannot find Stripe Product ID: '.$productID. ' in function: '.__FUNCTION__. ' in class: '.__CLASS__. ' on line: '.__LINE__);
-        }
-    }
-
-    private function createInstallmentInvoices($stripe, $customer, $priceID, $installments, $dueDates)
+private function createSplitInvoices($customerID, $amount, $tripName)
 {
-    foreach ($installments as $index => $amount) {
-        // Create an invoice item for each installment
-        $stripe->invoiceItems->create([
-            'customer' => $customer->id,
-            'price' => $priceID,
-            'quantity' => 1,
-            'description' => 'Installment ' . ($index + 1),
-        ]);
-
-        // Create an invoice with 'send_invoice' and set the due date
-        $invoice = $stripe->invoices->create([
-            'customer' => $customer->id,
-            'collection_method' => 'send_invoice', // Customer will pay manually
-            'due_date' => $dueDates[$index]->timestamp, // Set due date for installment
-            'auto_advance' => true // Automatically finalize the invoice after it's created
-        ]);
-
-        // Finalize the invoice
-        $stripe->invoices->finalizeInvoice($invoice->id);
-        
+    // Initialize the Stripe client if it's not already initialized
+    if (!$this->stripe) {
+        $this->stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
     }
-}
+    
+    $initialPayment = $amount * 0.60;
+    $finalPayment = $amount * 0.40;
 
-private function createFullPaymentInvoice($stripe, $customer, $priceID, $totalAmount)
-{
-    // Create an invoice item for the full payment
-    $stripe->invoiceItems->create([
-        'customer' => $customer->id,
-        'price' => $priceID,
-        'quantity' => 1,
-        'description' => 'Full Payment',
+    // Create initial invoice item
+    $this->stripe->invoiceItems->create([
+        'customer' => $customerID,
+        'amount' => $initialPayment,
+        'currency' => 'usd',
+        'description' => 'Initial payment for ' . $tripName,
     ]);
 
-    // Create a single invoice for full payment
-    $invoice = $stripe->invoices->create([
-        'customer' => $customer->id,
-        'collection_method' => 'send_invoice', // Customer will pay manually
-        'auto_advance' => true // Automatically finalize the invoice after it's created
+    // First Invoice
+    $firstInvoice = $this->stripe->invoices->create([
+        'customer' => $customerID,
+        'collection_method' => 'send_invoice',
+        'auto_advance' => true,
+        'days_until_due' => 0,
     ]);
 
-    // Finalize the invoice
-    $stripe->invoices->finalizeInvoice($invoice->id);
-}
+    // Finalize first invoice and send to customer
+    $this->stripe->invoices->finalizeInvoice($firstInvoice->id); // Fix the typo here
 
+    // Second Invoice (for final payment)
+    $secondInvoice = $this->stripe->invoices->create([
+        'customer' => $customerID,
+        'collection_method' => 'send_invoice',
+        'auto_advance' => true,
+        'days_until_due' => 7, // Due in 7 days
+    ]);
 
-public function createPartialPayments($productID, $totalAmount, $installments, $dueDates, $payment_option)
-{
-    \Log::info('Initializing Stripe...');
-    
-    $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
-
-    \Log::info('Retrieving Price ID...');
-    $priceID = $this->getPriceIDForProduct($productID);
-    
-    \Log::info('Price ID: '.$priceID);
-
-    // Create or retrieve customer
-    \Log::info('Creating or retrieving customer in Stripe..');
-
-    $customer = null;
-    $customers = $stripe->customers->all(['email' => $this->email]);
-
-    if (count($customers->data) > 0) {
-        $customer = $customers->data[0]; // Use the first customer found with this email
-    } else {
-        // Create new customer if none exists
-        $customer = $stripe->customers->create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone_number
-        ]);
-        \Log::info('Customer created: ' . $customer->id);
-    }
-
-    // Handle payment options
-    if ($payment_option === 'pay_in_full') {
-        \Log::info('Customer is choosing to pay in full.');
-        $this->createFullPaymentInvoice($stripe, $customer, $priceID, $totalAmount);
-    } elseif ($payment_option === 'installments') {
-        \Log::info('Customer opted to pay in installments.');
-        $this->createInstallmentInvoices($stripe, $customer, $priceID, $installments, $dueDates);
-    }
-
-    \Log::info('Invoices created successfully.');
-    return $stripe->invoices->all(['customer' => $customer->id]); // Return all invoices for the customer
+    $this->stripe->invoices->finalizeInvoice($secondInvoice->id);
 }
 
 
 
 
-
-    public function bookTrip()
+private function createStripeCheckoutSession($customerId, $trip, $tripName, $amount)
 {
-    $this->validate();
+    // Handle partial payments or full payments
+    $finalAmount = $this->payment_option === 'partial_payments'
+        ? $amount * 0.60  // 60% for partial payments
+        : $amount;         // Full amount for 'pay_in_full'
 
-    $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
-    $trip = TripsModel::findOrFail($this->tripID);
-    $reservationID = Str::uuid();
-    
-    // Ensure trip name is not empty and provide a fallback
-    $tripName = $trip->tripName ?? 'Trip Reservation'; // Default name if tripName is empty
-
-    if($trip->num_trips === 0){
-        return redirect('/');
-    }
-    // If trip is unavailable, redirect
-    if ($trip->tripAvailability === 'unavailable') {
-        return redirect('/');
-    }
-
-
-    // If the trip is coming soon, handle reservation without Stripe
-    if ($trip->tripAvailability === 'coming soon') {
-        $reservationExists = Reservations::where('email', $this->email)
-            ->orWhere('phone_number', $this->phone_number)
-            ->first();
-
-        if (!empty($reservationExists)) {
-            $this->error = 'A reservation for this trip has already been confirmed for you. Please check your email for further information and next steps';
-            return;
-        }
-
-        // Insert reservation into the Reservations model
-        Reservations::create([
-            'reservationID' => $reservationID,
-            'stripe_product_id' => $trip->stripe_product_id,
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone_number' => $this->phone_number,
-            'address_line_1' => $this->address_line_1,
-            'address_line_2' => $this->address_line_2,
-            'city' => $this->city,
-            'state' => $this->state,
-            'zip_code' => $this->zipcode,
-        ]);
-
-        if($this->num_trips !==0){
-            $this->num_trips -=1;
-            $trip->save();
-        }
-
-        // Send notifications to customer and admin
-        $data = [
-            'reservationID' => $reservationID,
-            'name' => $this->name,
-            'tripLocation' => $trip->tripLocation,
-        ];
-
-        Notification::route('mail', $this->email)->notify(new BookingReservedCustomer($data));
-        Notification::route('mail', config('mail.mailers.smtp.to_email'))->notify(new BookingReservedAdmin($data));
-
-        return redirect()->route('reservation-confirmed', ['reservationID' => $reservationID]);
-    }
-
-    // Calculate subtotal, tax, and total price
-    // $salesTaxRate = 0.07; // Example 7% sales tax
-    // $subtotal = $trip->tripPrice;
-    // $taxAmount = $subtotal * $salesTaxRate;
-    // $totalAmount = $subtotal + $taxAmount;
-
-    // Handle Stripe-related logic for available trips 
-    // $totalAmount = $trip->tripAmount * 100;
-    // $initialDownPaymentpercentage = 0.60; // 60 % initial downpayment 
-    // $finalDownpaymentPercentage = 0.40; // Remaining 40 % 
-
-    // $downPaymentAmount = round($totalAmount * $initialDownPaymentpercentage, 2);
-    // $finalDownpaymentPercentage = round($totalAmount * $finalDownpaymentPercentage, 2);
-
-    // $installments = [
-    //     $downPaymentAmount,
-    //     $finalDownpaymentPercentage
-    // ];
-    // $now = Carbon::now();
-    // $nextWeek = $now->addWeek();
-    // $dueDates = [
-    //     $now,  // Initial payment is due now 
-    //     $nextWeek // Final payment is due a week from initial payment 
-    // ];
-
-    $existingCustomer = null;
-    $customers = $stripe->customers->all(['email' => $this->email]);
-
-    if (count($customers->data) > 0) {
-        $existingCustomer = $customers->data[0]; // Use the first customer found with this email
-    } else {
-        // Create a new customer if not found
-        $existingCustomer = $stripe->customers->create([
-            'email' => $this->email,
-            'name' => $this->name,
-            'metadata' => [
-                'name' => $this->name,
-                'email' => $this->email,
-                'phone_number' => $this->phone_number,
-                'address_line_1' => $this->address_line_1,
-                'address_line_2' => $this->address_line_2,
-                'city' => $this->city,
-                'state' => $this->state,
-                'zipcode' => $this->zipcode,
-            ],
-        ]);
-    }
-
-   
-    $stripe_session = $stripe->checkout->sessions->create([
+    return $this->stripe->checkout->sessions->create([
         'payment_method_types' => ['card', 'cashapp', 'affirm'],
         'line_items' => [[
             'price_data' => [
@@ -344,7 +189,7 @@ public function createPartialPayments($productID, $totalAmount, $installments, $
                         'stripe_product_id' => $trip->stripe_product_id
                     ],
                 ],
-                'unit_amount' => $trip->tripPrice * 100,
+                'unit_amount' => $finalAmount * 100, // Stripe requires amount in cents
             ],
             'quantity' => 1,
         ]],
@@ -352,7 +197,7 @@ public function createPartialPayments($productID, $totalAmount, $installments, $
         'shipping_address_collection' => [
             'allowed_countries' => ['US'],
         ],
-        'customer' => $existingCustomer->id,
+        'customer' => $customerId,
         'customer_update' => [
             'address' => 'auto',
             'shipping' => 'auto'
@@ -363,33 +208,114 @@ public function createPartialPayments($productID, $totalAmount, $installments, $
             'tripID' => $this->tripID,
             'name' => $this->name,
             'email' => $this->email,
-            'phone_number' => $this->phone_number,
-            'address_line_1' => $this->address_line_1,
-            'address_line_2' => $this->address_line_2,
-            'city' => $this->city,
-            'state' => $this->state,
-            'zipcode' => $this->zipcode
         ]),
         'metadata' => [
             'tripID' => $this->tripID,
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone_number' => $this->phone_number,
-            'address_line_1' => $this->address_line_1,
-            'address_line_2' => $this->address_line_2,
-            'city' => $this->city,
-            'state' => $this->state,
-            'zipcode' => $this->zipcode,
             'stripe_product_id' => $trip->stripe_product_id
         ],
     ]);
-
-    // $this->createPartialPayments($trip->stripe_product_id, $totalAmount, $installments, $dueDates, $this->payment_option);
-    
-    
-
-    return redirect()->away($stripe_session->url);
 }
+
+
+private function getOrCreateStripeCustomer(string $email, string $name){
+    $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+
+    // Retrieve customers with the given email
+    $customers = $stripe->customers->all(['email'=>$email]);
+
+    // If a customer exists, return the first one
+    if(count($customers->data) > 0){
+        return $customers->data[0];
+    }
+
+    // If no customer exists, create a new one
+    return $stripe->customers->create([
+        'email' => $email,
+        'name' => $name,
+        'metadata' => [
+            'name' => $name,
+            'email' => $email,
+        ],
+    ]);
+}
+
+
+    private function handleComingSoonReservation($trip, $reservationID){
+        $reservationExists = Reservations::where('email', $this->email)->orWhere('
+        phone_number', $this->phone_number)->first();
+
+        if(!empty($reservationExists)){
+            $this->error = 'A reservation for this trip has already been confirmed for you. Please check your email for further information and next steps.';
+            return;
+        }
+
+        Reservations::create([
+            'reservationID'=>$reservationID,
+            'stripe_product_id'=>$trip->stripe_product_id,
+            'name'=>$this->name,
+            'email'=>$this->email,
+            'phone_number'=>$this->phone_number,
+            'address_line_1'=>$this->address_line_1,
+            'address_line_2'=>$this->address_line_2,
+            'city'=>$this->city,
+            'state'=>$this->state,
+            'zip_code'=>$this->zipCode,
+        ]);
+
+        if($trip->num_trips !== 0){
+            $trip->num_trips -= 1;
+            $trip->save();
+        }
+
+        $data = [
+            'reservationID'=>$reservationID,
+            'name'=>$this->name,
+            'tripLocation'=>$trip->tripLocation
+        ];
+
+        Notification::route('mail',  $this->email)->notify(new BookingReservedCustomer($data));
+        Notification::route('mail', config('mail.mailers.smtp.to_email'))->notify(new BookingReservedAdmin($data));
+
+        return redirect()->route('reservation-confirmed', ['reservationID'=>$reservationID]);
+    }
+
+    public function bookTrip()
+    {
+        $this->validate();
+    
+        $trip = TripsModel::findOrFail($this->tripID);
+        $reservationID = Str::uuid();
+    
+        $tripName = $this->tripName ?? 'Trip Reservation';
+    
+        if ($trip->num_trips === 0 || $this->tripAvailability === 'unavailable') {
+            return redirect()->route('landing.destination', ['tripID' => $this->tripID]);
+        }
+    
+        if ($this->tripAvailability === 'coming soon') {
+            return $this->handleComingSoonReservation($trip, $reservationID);
+        }
+    
+        $existingCustomer = $this->getOrCreateStripeCustomer($this->email, $this->name);
+    
+        // Correct amount calculation (in dollars)
+        $tripPrice = $trip->tripPrice; // This should be the price in dollars, not cents.
+    
+        // Now calculate the correct amount in dollars and later convert to cents where needed
+        $amount = $tripPrice; // Amount is still in dollars here, do not multiply by 100 yet
+    
+        if ($this->payment_option === 'partial_payments') {
+            // Pass amount in dollars to the method, it will handle the split invoices
+            $this->createSplitInvoices($existingCustomer->id, $amount, $tripName);
+        }
+    
+        // Create Stripe checkout session (amount will be multiplied by 100 in this method)
+        $stripe_session = $this->createStripeCheckoutSession($existingCustomer->id, $trip, $tripName, $amount);
+    
+        return redirect()->away($stripe_session->url);
+    }  
+
+
 
 
     public function render()

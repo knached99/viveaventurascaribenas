@@ -37,7 +37,7 @@ class Admin extends Controller
         $cacheKeyCharges = 'stripe_charges';
         $popularTrips = [];
         $stripeProducts = Cache::remember($cacheKeyProducts, 3600, function () {
-            return $this->stripe->products->all(['limit' => 100]); // Adjust the limit as needed
+            return $this->stripe->products->all(['limit' => 100]); 
         });
     
         $charges = Cache::remember($cacheKeyCharges, 3600, function () {
@@ -265,92 +265,96 @@ class Admin extends Controller
         return redirect()->route('admin.testimonials')->With('testimonial_delete_error', 'Unable to delete testimony. Something went wrong and if this error persists, please contact the developer');
        }
     }
+  
+    // Optimized Algorithm
+
     public function getTripDetails($tripID)
-    {
-        // Define the cache key based on the trip ID
-        $cacheKey = "trip_details_{$tripID}";
-    
-        // Attempt to get the cached data
-        $cachedData = Cache::get($cacheKey);
-    
-        if ($cachedData) {
-            // Return the cached data if available
-            return view('admin.trip', $cachedData);
-        }
-    
-        try {
-            // Retrieve trip details
-            $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
-    
-            // Parse the tripCosts JSON and calculate the total net cost
-            $tripCosts = json_decode($trip->tripCosts, true) ?: [];
-            $totalNetCost = array_reduce($tripCosts, function ($carry, $cost) {
-                return $carry + (float) $cost['amount'];
-            }, 0);
-    
-            $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-            $stripeProductID = $trip->stripe_product_id;  // Product ID for the specific trip
-    
-            // Use Stripe's search API to retrieve charges with succeeded status
-            $charges = $stripe->charges->search([
-                'query' => "status:'succeeded'",
-                'limit' => 100, // Adjust the limit if needed
-            ]);
-    
-            $filteredCharges = [];
-    
-            // Loop through each charge and filter based on the product ID
-            foreach ($charges->data as $charge) {
-                // Make sure the charge is succeeded and not refunded
-                if ($charge->amount_refunded == 0 && $charge->amount_captured > 0) {
-                    // Check if the charge has an associated invoice
-                    if ($charge->invoice) {
-                        // Retrieve the invoice and expand the line items to check for product ID
-                        $invoice = $stripe->invoices->retrieve($charge->invoice, ['expand' => ['lines']]);
-    
-                        foreach ($invoice->lines->data as $lineItem) {
-                            // Check if the product ID matches
-                            if ($lineItem->price->product === $stripeProductID) {
-                                $filteredCharges[] = $charge;  // Add this charge to the filtered array
-                                break;  // No need to check further line items once we have a match
-                            }
-                        }
-                    }
-                }
-            }
-    
-            // Calculate gross profit based on the captured amount
-            $grossProfit = array_reduce($filteredCharges, function ($carry, $charge) {
-                return $carry + (float) $charge->amount_captured / 100; // Convert from cents to dollars
-            }, 0);
-    
-            // Calculate net profit
-            $netProfit = $grossProfit - $totalNetCost;
-    
-            // Prepare data for caching
-            $dataToCache = [
-                'tripId' => $tripID,
-                'trip' => $trip,
-                'totalNetCost' => $totalNetCost,
-                'grossProfit' => $grossProfit,
-                'netProfit' => $netProfit
-            ];
-    
-            // Caching data for 1 minute for testing purposes 
-            Cache::put($cacheKey, $dataToCache, 60);
-    
-            // Pass these values to the view
-            return view('admin.trip', $dataToCache);
-    
-        } catch (ModelNotFoundException $e) {
-            \Log::error('Unable to get trip details: ' . $e->getMessage());
-            abort(404);
-        } catch (Exception $e) {
-            \Log::error('Error retrieving Stripe charges: ' . $e->getMessage());
-            abort(500);
-        }
+{
+    $cacheKey = "trip_details_{$tripID}";
+    $cachedData = Cache::get($cacheKey);
+
+
+    if ($cachedData) {
+        return view('admin.trip', $cachedData);
     }
-    
+
+    try {
+        $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
+
+      
+
+        $tripCosts = json_decode($trip->tripCosts, true) ?: [];
+       
+        $totalNetCost = array_reduce($tripCosts, fn($carry, $cost) => $carry + (float) $cost['amount'], 0);
+        // $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        // $stripeProductID = $trip->stripe_product_id;
+
+        $grossProfit = BookingModel::where('tripID', $tripID)->sum('amount_captured');
+        $netProfit = $grossProfit - $totalNetCost;
+      
+
+
+        // Query payment intents for successful payments
+        // $paymentIntents = $stripe->paymentIntents->search([
+        //     'query' => 'status:"succeeded" AND metadata["product_id"]:"'.$stripeProductID.'"', // Filter by product ID in metadata
+        //     'limit' => 100,
+        // ]);
+
+
+        // \Log::info(json_encode($paymentIntents));
+
+        // $filteredCharges = [];
+
+
+        // foreach ($paymentIntents->data as $intent) {
+        //     $charges = $stripe->charges->all([
+        //         'payment_intent' => $intent->id,
+        //         'limit' => 100,
+        //     ]);
+
+
+        //     foreach ($charges->data as $charge) {
+        //         if ($charge->amount_refunded == 0 && $charge->amount_captured > 0) {
+        //             if ($charge->invoice) {
+        //                 \Log::info('Charge Invoice: '.json_encode($charge->invoice));
+        //                 $invoice = $stripe->invoices->retrieve($charge->invoice, ['expand' => ['lines']]);
+        //                 foreach ($invoice->lines->data as $lineItem) {
+        //                     if ($lineItem->price->product === $stripeProductID) {
+        //                         $filteredCharges[] = $charge;
+        //                         break;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+
+        // Calculate gross profit based on the captured amount
+        // $grossProfit = array_reduce($filteredCharges, fn($carry, $charge) => $carry + (float) $charge->amount_captured / 100, 0);
+
+
+        $dataToCache = [
+            'tripId' => $tripID,
+            'trip' => $trip,
+            'totalNetCost' => $totalNetCost,
+            'grossProfit' => $grossProfit,
+            'netProfit' => $netProfit
+        ];
+
+        Cache::put($cacheKey, $dataToCache, 60);
+        return view('admin.trip', $dataToCache);
+
+    } catch (ModelNotFoundException $e) {
+        \Log::error('Unable to get trip details: ' . $e->getMessage());
+        abort(404);
+    } catch (Exception $e) {
+        \Log::error('Error retrieving Stripe charges: ' . $e->getMessage());
+        $error = 'Something went wrong fetching trip details';
+        return view('admin.trip', $error);
+    }
+}
+
     
     
     

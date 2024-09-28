@@ -12,7 +12,7 @@
                     aria-label="Search..." />
 
                 <div class="spinner-border" wire:loading role="status">
-                <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">Loading...</span>
                 </div>
 
                 <!-- Autocomplete Results Container -->
@@ -28,10 +28,11 @@
                                         <li
                                             class="list-group-item p-2 border-bottom hover:bg-light cursor-pointer d-flex align-items-center">
                                             <div class="me-2">
-                                                <h5 class="mb-1">{{ $result['tripLocation'] ?? 'No Location' }} - Trip</h5>
-                                              
+                                                <h5 class="mb-1">{{ $result['tripLocation'] ?? 'No Location' }} - Trip
+                                                </h5>
+
                                             </div>
-                                         
+
                                         </li>
                                     </a>
                                 @elseif(isset($result['bookingID']))

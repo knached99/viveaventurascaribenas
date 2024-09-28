@@ -26,7 +26,8 @@ class BookingModel extends Model
         'address_line_2',
         'city',
         'state',
-        'zip_code'
+        'zip_code',
+        'amount_captured'
     ];
 
     protected $casts = [

@@ -363,10 +363,14 @@ class EditTripForm extends Component
                 \Log::info('Current Image URLs array: '.json_encode($newImageURLs));
 
                 \Log::info('');
+
+            
+                $newImageURLs = []; 
+
+            
                 if (!empty($this->tripPhotos) && is_array($this->tripPhotos)) {
                         \Log::info('User selected new pictures for upload. Iterating over new pictures..');
                         
-                        $newImageURLs = []; // Store new image URLs
                         foreach ($this->tripPhotos as $photo) {
                             \Log::info('Checking if user selected pictures');
 
@@ -388,9 +392,9 @@ class EditTripForm extends Component
                         }
                         
                         // Merge existing image URLs with new ones, if necessary
-                        $this->tripPhotosURLs = array_merge($this->existingImageURLs, $newImageURLs);
+                    //    $this->tripPhotosURLs = array_merge($this->existingImageURLs, $newImageURLs);
                         
-                        \Log::info('All images after upload: ' . json_encode($this->tripPhotosURLs));
+                      //  \Log::info('All images after upload: ' . json_encode($this->tripPhotosURLs));
                     }
                     
             
@@ -400,7 +404,7 @@ class EditTripForm extends Component
         
         
                 $tripModel->tripLocation = $this->tripLocation;
-                $tripModel->tripPhoto = json_encode($newImageURLs);
+                $tripModel->tripPhoto = !empty($newImageURLs) ? json_encode($newImageURLs) : json_encode($this->tripPhotos);
                 $tripModel->tripLandscape = json_encode($this->tripLandscape);
                 $tripModel->tripAvailability = $this->tripAvailability;
                 $tripModel->tripDescription = $this->tripDescription;

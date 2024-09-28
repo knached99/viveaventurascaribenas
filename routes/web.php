@@ -68,6 +68,7 @@ Route::group(['middleware' => 'auth', 'verified'], function () {
     // Photo Gallery 
 
     Route::get('/admin/photo-gallery', [PhotoGalleryController::class, 'retrivePhotoGallery'])->name('admin.photo-gallery');
+    Route::delete('/admin/deletePhotosFromGallery/{photoID}', [PhotoGalleryController::class, 'deletePhotosFromGallery'])->name('admin.deletePhotosFromGallery');
 });
 // Route::view('admin/dashboard', 'admin/dashboard')
 //     ->middleware(['auth', 'verified'])

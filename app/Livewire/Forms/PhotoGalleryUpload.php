@@ -25,7 +25,7 @@ class PhotoGalleryUpload extends Form{
     public string $photoDescription = '';
     public array $trips = [];
     
-    #[Validate('required|array|max:3')]
+    #[Validate('required|array|max:5')]
     public ?array $photos = [];
 
     public string $success = '';
@@ -43,10 +43,10 @@ class PhotoGalleryUpload extends Form{
     }
 
 
-    public function mount(){
-        $this->trips = TripsModel::select('tripID', 'tripLocation')->get();
-        \Log::info('Trips: '. json_encode($this->trips));
-    }
+    // public function mount(){
+    //     $this->trips = TripsModel::select('tripID', 'tripLocation')->get();
+    //      \Log::info('Trips: '. json_encode($this->trips));
+    // }
     
     public function uploadPhotosToGallery(){
         $this->validate();
@@ -64,13 +64,13 @@ class PhotoGalleryUpload extends Form{
             foreach ($this->photos as $photo) {
                 // Resize and store the uploaded file
                 $image = $photo->getRealPath();
-                $filePath = 'photo_gallery/' . time() . '-' . $photo->hashName() . '.'.$photo->extension();
+                $filePath = 'photo_gallery/'. $photo->hashName() . '.'.$photo->extension();
                 $fullPath = storage_path('app/public/' . $filePath);
 
                 // Use GD to resize the image
                 $this->resizeImage($photo->getRealPath(), $fullPath,  525, 351);
 
-                $imageURLs[] = asset(Storage::url($filePath));
+                $photosArray[] = asset(Storage::url($filePath));
             }
             $data = [
                 'photoID'=>Str::uuid(),
@@ -102,7 +102,6 @@ class PhotoGalleryUpload extends Form{
         
         public function render(){
             return view('livewire.pages.photo-gallery-upload', [
-                'trips'=>$this->trips 
             ]);
         }
 
