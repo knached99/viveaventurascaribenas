@@ -35,17 +35,27 @@ class EditTripForm extends Component
     public $tripCosts = [];
     public ?array $existingImageURLs = [];
 
-    public string $status = ''; // Trip Creation Flash Message
+    public string $status = '';
     public string $success = '';
+    public string $error = '';
+
+    public string $discountCreateSuccess = '';
+    public string $discountCreateError = '';
+
     public string $imageReplaceSuccess = '';
     public string $imageReplaceError = '';
-    public string $error = '';
     public ?int $replaceIndex = null;
     public string $totalNetCost = '';
     public string $grossProfit = '';
     public string $netProfit = '';
     private string $stripe_product_id = '';
     private string $cacheKey = '';
+
+    public $discountType = 'percentage';
+
+    public $discountValue = '';
+
+    public string $promotionCode = '';
 
     public function mount($trip)
     {
@@ -509,44 +519,102 @@ class EditTripForm extends Component
 
 
     // Create a coupon to apply discounts to a destination pacakge 
+  
+    public function createDiscount()
+    {
+        try {
+            $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
     
-    private function createCoupon($percentageOff){
-        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-
-        try{
-            $coupon = Coupon::create([
-                'percentage_off'=> $percentageOff, 
-                'duration'=>'once'
-            ]);
-
-            return $coupon->id;
-        }
-        catch(\Exception $e){
-            return redirect()->back()->with(['error'=>'An unknown error has occurred. If this persists, please contact the developer asap!']);
-            \Log::critical('A critical Stripe exception has been encountered: '.$e->getMessage());
-        }
-    }
-
-    private function createPromoCode($couponID, $productID){
-        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-
-        try{
-            $promoCode = PromotionCode::create([
-                'coupon'=>$couponID,
-                'restrictions'=> [
-                    'products'=>[$productID],
+            // Validate discountValue for percentage type
+            if ($this->discountType === 'percentage' && ($this->discountValue < 0 || $this->discountValue > 100)) {
+                $this->discountCreateError = 'Percentage discounted must be between 0% and 100%';
+                return;
+            }
+    
+            // Validate discountValue for amount type
+            elseif ($this->discountType === 'amount' && $this->discountValue <= 0) {
+                $this->discountCreateError = 'Amount discounted must be greater than 0';
+                return;
+            }
+    
+            $couponData = [];
+    
+            // Handle percentage-based discount
+            if ($this->discountType === 'percentage') {
+                $couponData = [
+                    'percent_off' => round($this->discountValue, 2), // Ensure it’s rounded to two decimal places
+                    'duration' => 'once',
+                ];
+            }
+    
+            // Handle amount-based discount
+            elseif ($this->discountType === 'amount') {
+                $couponData = [
+                    'amount_off' => intval($this->discountValue * 100), // Ensure it’s an integer
+                    'currency' => 'usd',
+                    'duration' => 'once',
+                ];
+            }
+    
+            // Create the coupon
+            $coupon = $stripe->coupons->create($couponData);
+            \Log::info('Coupon created in Stripe with ID: ' . $coupon->id);
+    
+            // Create the promotion code
+            $promotionCode = $stripe->promotionCodes->create([
+                'coupon' => $coupon->id,
+                'restrictions' => [
+                    'products' => [$this->Stripe_product_id],
                 ],
-                'expires_at'=>now()->addWeek()->timestamp,
+                'code' => $this->promotionCode ? $this->promotionCode : strtoupper(Str::random(8)),
             ]);
-
-            return $promoCode->id;
-
-        }
-        catch(\Exception $e){
-            return redirect()->back()->with(['error'=>'An unknown error has occurred. If this persists, please contact the developer asap!']);
-            \Log::critical('A critical Stripe exception has been encountered: '.$e->getMessage());
+    
+            \Log::info('Promotion code created successfully: ' . $promotionCode->id);
+            $this->discountCreateSuccesss = 'Discount and promotion codes created successfully';
+    
+        } catch (Exception $e) {
+            \Log::error('Error creating discount: ' . $e->getMessage());
+            $this->discountCreateError = 'Failed to create discount. Something went wrong.';
         }
     }
+    
+    // private function createCoupon($percentageOff){
+    //     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+    //     try{
+    //         $coupon = Coupon::create([
+    //             'percentage_off'=> $percentageOff, 
+    //             'duration'=>'once'
+    //         ]);
+
+    //         return $coupon->id;
+    //     }
+    //     catch(\Exception $e){
+    //         return redirect()->back()->with(['error'=>'An unknown error has occurred. If this persists, please contact the developer asap!']);
+    //         \Log::critical('A critical Stripe exception has been encountered: '.$e->getMessage());
+    //     }
+    // }
+
+    // private function createPromoCode($couponID, $productID){
+    //     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+    //     try{
+    //         $promoCode = PromotionCode::create([
+    //             'coupon'=>$couponID,
+    //             'restrictions'=> [
+    //                 'products'=>[$productID],
+    //             ],
+    //             'expires_at'=>now()->addWeek()->timestamp,
+    //         ]);
+
+    //         return $promoCode->id;
+
+    //     }
+    //     catch(\Exception $e){
+    //         return redirect()->back()->with(['error'=>'An unknown error has occurred. If this persists, please contact the developer asap!']);
+    //         \Log::critical('A critical Stripe exception has been encountered: '.$e->getMessage());
+    //     }
+    // }
     
     
     

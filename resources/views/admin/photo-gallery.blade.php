@@ -5,7 +5,7 @@
                 <div class="m-3">
                     <a href="{{ route('admin.photo-gallery-upload') }}"
                         class="bg-indigo-500 p-2 rounded text-white no-underline hover:bg-indigo-600">
-                        Upload Photo
+                        Upload
                     </a>
                     {{-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                         Upload Photo

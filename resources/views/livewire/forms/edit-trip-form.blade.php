@@ -9,6 +9,45 @@
 
 <div class="container mt-5">
     <div class="row justify-content-center">
+
+    <!-- Discount -->
+    <div class="col">
+    <div class="card shadow-sm border-0 rounded-lg">
+    <h3 class="mb-0">Discount this Trip</h3>
+    <form wire:submit.prevent="createDiscount" >
+    <div class="form-group">
+    <label class="form-label">Discount Type</label>
+    <select class="form-control" id="discountType" wire:model="discountType">
+    <option value="percentage">percentage</option>
+    <option value="amount">amount</option>
+    </select>
+    </div>
+    
+    <div class="form-group">
+    <label class="form-label">Discount Value</label>
+    <input type="number" wire:model="discountValue" id="discountValue" class="form-control"/>
+    </div>
+
+    <div class="form-group">
+    <label class="form-label">Promo Code (optional)</label>
+    <input type="text" wire:model="promotionCode" id="promotionCode" class="form-control"/>
+    </div>
+
+    <button wire:click="createDiscount" class="btn btn-primary">Create Discount</button>
+    @if($discountCreateSuccess)
+    <div class="bg-emerald-500 text-white p-2 m-2">
+    {{ $discountCreateSuccess}}
+    </div>
+
+    @elseif($discountCreateError)
+    <div class="bg-red-500 text-white p-2 m-2">
+    {{$discountCreateError}}
+    </div>
+    @endif 
+    </form>
+    </div>
+    </div>
+    <!-- / Discount -->
         <div class="col-12 col-md-10 col-lg-8">
             <div class="card shadow-sm border-0 rounded-lg">
                 <!-- Card Header -->
