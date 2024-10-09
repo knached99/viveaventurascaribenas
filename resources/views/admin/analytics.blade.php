@@ -17,6 +17,7 @@
                                 <th>Device</th>
                                 <th>Browser</th>
                                 <th>Country</th>
+                                <th>Date Visited</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -34,6 +35,7 @@
                                     <td>{{ $url->operating_system ?? 'N/A' }}</td>
                                     <td>{{ $url->browser ?? 'N/A' }}</td>
                                     <td>{{ $url->country ?? 'N/A' }}</td>
+                                    <td>{{ date('F jS, Y, \a\t g:i A', strtotime($url->created_at)) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

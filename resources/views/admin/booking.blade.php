@@ -4,7 +4,8 @@
     $product = $stripe->products->retrieve($booking->stripe_product_id);
     $location = $product->name;
 
-    $photos = json_decode($booking->trip->tripPhotos, true);
+    $photos = json_decode($booking->trip->tripPhoto, true);
+
     $firstPhoto = !empty($photos) ? asset($photos[0]) : asset('assets/images/booking_page_bg.webp');
 
     if (!empty($stripeCheckoutID)) {
@@ -18,7 +19,7 @@
                 $charge = $charges->data[0];
                 $paymentMethod = $charge->payment_method_details->type;
 
-                // Initialize variables to avoid undefined errors
+                // Initializing variables to avoid undefined errors
                 $cardExpirationMonth = 'N/A';
                 $cardExpirationYear = 'N/A';
                 $cardFunding = 'N/A';

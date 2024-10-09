@@ -4,8 +4,7 @@
             <span class="app-brand-logo demo">
                 <img src="{{ asset('assets/images/faviconIcon.png') }}" />
             </span>
-            <span class="ms-2">{{ config('app.name') }}</span>
-            {{-- <span class="app-brand-text demo menu-text fw-bold ms-2">My Dashboard</span> --}}
+            <span class="app-brand-text demo menu-text fw-bold ms-2">Admin</span>
         </a>
 
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -79,12 +78,13 @@
                     </a>
                 </li>
 
-                <li class="menu-item {{request()->routeIs('admin.photo-gallery') ? 'active' : '' }}">
-                <a href="{{ route('admin.photo-gallery') }}" class="menu-link text-decoration-none">
-                <div class="text-truncate" data-i18n="Photo Gallery"><i class='menu-icon tf-icons bx bx-images'></i>
-                Photo Gallery
-                </div>
-                </a>
+                <li class="menu-item {{ request()->routeIs('admin.photo-gallery') ? 'active' : '' }}">
+                    <a href="{{ route('admin.photo-gallery') }}" class="menu-link text-decoration-none">
+                        <div class="text-truncate" data-i18n="Photo Gallery"><i
+                                class='menu-icon tf-icons bx bx-images'></i>
+                            Photo Gallery
+                        </div>
+                    </a>
 
                 </li>
 

@@ -29,31 +29,49 @@ class TestimonialForm extends Component
         $this->testimonialID = (string) Str::uuid(); // Generate UUID for the testimonialID
     }
 
-    #[Validate('required|string')]
     public string $name = '';
 
-    #[Validate('required|string|email')]
     public string $email = '';
 
-    #[Validate('required|uuid')]
-    public string $tripID = ''; // Update to tripID
+    public string $tripID = ''; 
 
    
-    #[Validate('required|string')]
     public string $trip_date = '';
 
-
-    #[Validate('required|integer')]
     public string $trip_rating = '';
 
-    #[Validate('required|string|max:1000')]
     public string $testimonial = '';
 
-    #[Validate('required|accepted')]
     public bool $consent = false;
 
     public string $status = '';
     public string $error = '';
+
+
+
+    protected $rules = [
+        'name' => 'required|string',
+        'email'=>'required|string|email|unique:testimonials',
+        'tripID'=>'required|uuid',
+        'trip_date'=>'required|string',
+        'trip_rating'=>'required|integer',
+        'testimonial'=>'required|string|max:1000',
+        'consent'=>'required|accepted',
+    ];
+
+    protected $messages = [
+        'name.required'=>'Your first name is required',
+        'email.required'=>'Your email is required',
+        'email.email'=>'You\'ve entered an invalid email',
+        'email.unique'=>'You\'ve already submitted a testimonial with us before',
+        'tripID.required'=>'You must select the trip you went on',
+        'trip_date.required'=>'You must provide the month you went on this trip',
+        'trip_rating.required'=>'You need to provide a rating for this trip',
+        'testimonial.required'=>'Your testimonial is required',
+        'testimonial.max'=>'Your testimonial is too long!',
+        'consent.required'=>'You must consent to submitting your testimonial',
+        'consent.accepted'=>'You must consent to submitting your testimonial'
+    ];
 
     public HoneypotData $extraFields;
     

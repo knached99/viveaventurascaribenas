@@ -67,8 +67,8 @@ class Analytics extends Controller
 
         // URLs and referrers data
            // URLs and referrers data
-        $urlData = VisitorModel::selectRaw('visited_url, visitor_ip_address, visitor_user_agent, COUNT(*) as visit_count, visitor_referrer')
-        ->groupBy('visited_url', 'visitor_ip_address', 'visitor_user_agent', 'visitor_referrer')
+        $urlData = VisitorModel::selectRaw('visited_url, visitor_ip_address, visitor_user_agent, created_at, COUNT(*) as visit_count, visitor_referrer')
+        ->groupBy('visited_url', 'visitor_ip_address', 'visitor_user_agent', 'visitor_referrer', 'created_at')
         ->orderBy('visit_count', 'DESC')
         ->get()
         ->map(function ($url) {

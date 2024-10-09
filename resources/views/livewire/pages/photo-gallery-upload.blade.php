@@ -67,7 +67,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             @else
                                 <label for="tripID" class="form-label">Associate photos with a trip</label>
 
-                                <select class="form-control p-3 {{ $errors->has('form.tripID') ? 'is-invalid' : '' }}"
+                                <select class="form-control p-2 {{ $errors->has('form.tripID') ? 'is-invalid' : '' }}"
                                     name="tripID" wire:model="form.tripID">
                                     <option value="" disabled selected>Select a Trip</option>
                                     @foreach ($trips as $trip)

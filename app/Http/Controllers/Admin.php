@@ -46,18 +46,20 @@ class Admin extends Controller
             ]);
         });
     
-        // Filter non-refunded transactions
+        // We need to get all transactions that weren't refunded
         $transactions = array_filter($charges->data, function ($charge) {
             return !$charge->refunded && isset($charge->amount_captured) && $charge->amount_captured > 0;
         });
     
-        // Group transactions by day
         $transactionsPerDay = [];
         foreach ($transactions as $charge) {
             $date = Carbon::parse($charge->created)->format('Y-m-d');
             $transactionsPerDay[$date] = ($transactionsPerDay[$date] ?? 0) + (float) $charge->amount_captured / 100;
         }
-    
+        
+        // Sort transactions by date in ascending order using built in ksort() method to sort the returned array by key 
+        ksort($transactionsPerDay);
+        
         // Format transaction data for the current year
         $transactionData = array_map(function ($date, $amount) {
             return [
@@ -65,13 +67,13 @@ class Admin extends Controller
                 'amount' => $amount
             ];
         }, array_keys($transactionsPerDay), $transactionsPerDay);
-    
+        
         // Calculate gross profit
         $grossProfit = array_reduce($transactions, function ($carry, $charge) {
             return $carry + (float) $charge->amount_captured / 100; // Convert from cents to dollars
         }, 0);
     
-        // Calculate total net costs
+     
         $totalNetCosts = TripsModel::select('tripCosts')->where('active', true)->get()
             ->flatMap(function ($trip) {
                 return json_decode($trip->tripCosts, true) ?? [];
@@ -89,7 +91,7 @@ class Admin extends Controller
     
         $reservations = Reservations::select('reservationID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();
     
-        // Optimize Stripe API calls
+        // Optimizing Stripe API calls here
         $allProductIds = $bookings->pluck('stripe_product_id')
             ->merge($reservations->pluck('stripe_product_id'))
             ->unique()
@@ -101,7 +103,7 @@ class Admin extends Controller
                 return [$product->id => $product->name];
             });
     
-        // Fetch the most popular booking
+        // This query retrieves the most popular booking
         $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
             ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
             ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
@@ -127,7 +129,6 @@ class Admin extends Controller
             }
         }
     
-        // Return the view with the necessary data
         return view('admin.dashboard', compact(
             'transactionData',
             'bookings',
@@ -152,8 +153,7 @@ class Admin extends Controller
     public function bookingInfo($bookingID)
     {
         try {
-            $booking = BookingModel::with('trip')->findOrFail($bookingID);
-    
+            $booking = BookingModel::with('trip')->where('bookingID', $bookingID)->firstOrFail();
             return view('admin.booking', [
                 'bookingID' => $bookingID,
                 'booking' => $booking

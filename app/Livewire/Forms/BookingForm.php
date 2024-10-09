@@ -5,6 +5,7 @@ namespace App\Livewire\Forms;
 use Livewire\Component;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use Stripe\StripeClient;
 use Stripe\Invoice;
 use Stripe\InvoiceItem;
 use Stripe\Exception\ApiErrorException;
@@ -43,10 +44,25 @@ class BookingForm extends Component
         'email' => 'required|string|email',
         'phone_number' => ['required', 'regex:/^\d{3}-\d{3}-\d{4}$/'],
         'address_line_1' => ['required', 'regex:/^\d+\s[A-z]+\s[A-z]+/'],
+        'address_line_1'=> ['sometimes', 'regex:/^[\w\s,.-]*$/'],
         'city' => ['required'],
         'state' => ['required'],
         'zipcode' => ['required', 'regex:/^\d{5}(-\d{4})?$/'],
         'payment_option'=>['required'],
+    ];
+
+    protected $messages = [
+        'name.required'=>'Please provide your first and last name',
+        'email.required'=>'Please provide your email',
+        'email.email'=>'You\'ve entered an invalid email',
+        'phone_number.required'=>'Please provide your phone number',
+        'phone_number.regex'=>'Your number must be a valid US phone number',
+        'address_line_1.required'=>'Your street address is required',
+        'address_line_1.regex'=>'You must provide a valid street address',
+        'address_line_2.regex'=>'You must provide a valid PO box or suite number',
+        'city.required'=>'Your city is required',
+        'state.required'=>'Your state is required',
+        'payment_option'=>'Please choose if you\'d like to pay in full or make partial payments',
     ];
 
     protected $validationAttributes = [
@@ -66,7 +82,6 @@ class BookingForm extends Component
         
 
         \Log::info('Initializing Stripe client...');
-        $this->stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
         \Log::info('Stripe client initialized.');
         
         $this->tripID = $tripID;
@@ -130,16 +145,14 @@ class BookingForm extends Component
 
 private function createSplitInvoices($customerID, $amount, $tripName)
 {
-    // Initialize the Stripe client if it's not already initialized
-    if (!$this->stripe) {
-        $this->stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
-    }
+    $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+
     
     $initialPayment = $amount * 0.60;
     $finalPayment = $amount * 0.40;
 
     // Create initial invoice item
-    $this->stripe->invoiceItems->create([
+    $stripe->invoiceItems->create([
         'customer' => $customerID,
         'amount' => $initialPayment,
         'currency' => 'usd',
@@ -147,7 +160,7 @@ private function createSplitInvoices($customerID, $amount, $tripName)
     ]);
 
     // First Invoice
-    $firstInvoice = $this->stripe->invoices->create([
+    $firstInvoice = $stripe->invoices->create([
         'customer' => $customerID,
         'collection_method' => 'send_invoice',
         'auto_advance' => true,
@@ -155,17 +168,17 @@ private function createSplitInvoices($customerID, $amount, $tripName)
     ]);
 
     // Finalize first invoice and send to customer
-    $this->stripe->invoices->finalizeInvoice($firstInvoice->id); // Fix the typo here
+    $stripe->invoices->finalizeInvoice($firstInvoice->id); // Fix the typo here
 
     // Second Invoice (for final payment)
-    $secondInvoice = $this->stripe->invoices->create([
+    $secondInvoice = $stripe->invoices->create([
         'customer' => $customerID,
         'collection_method' => 'send_invoice',
         'auto_advance' => true,
         'days_until_due' => 7, // Due in 7 days
     ]);
 
-    $this->stripe->invoices->finalizeInvoice($secondInvoice->id);
+    $stripe->invoices->finalizeInvoice($secondInvoice->id);
 }
 
 
@@ -173,12 +186,13 @@ private function createSplitInvoices($customerID, $amount, $tripName)
 
 private function createStripeCheckoutSession($customerId, $trip, $tripName, $amount)
 {
+    $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
     // Handle partial payments or full payments
     $finalAmount = $this->payment_option === 'partial_payments'
         ? $amount * 0.60  // 60% for partial payments
         : $amount;         // Full amount for 'pay_in_full'
 
-    return $this->stripe->checkout->sessions->create([
+    return $stripe->checkout->sessions->create([
         'payment_method_types' => ['card', 'cashapp', 'affirm'],
         'line_items' => [[
             'price_data' => [
@@ -211,14 +225,24 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
         ]),
         'metadata' => [
             'tripID' => $this->tripID,
-            'stripe_product_id' => $trip->stripe_product_id
+            'stripe_product_id' => $trip->stripe_product_id,
+            'name'=>$this->name,
+            'email'=>$this->email,
+            'phone_number'=>$this->phone_number,
+            'address_line_1'=>$this->address_line_1,
+            'address_line_2'=>$this->address_line_2,
+            'city'=>$this->city,
+            'state'=>$this->state,
+            'zipcode'=>$this->zipcode,
+            
         ],
     ]);
 }
 
 
 private function getOrCreateStripeCustomer(string $email, string $name){
-    $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+
+    $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
     // Retrieve customers with the given email
     $customers = $stripe->customers->all(['email'=>$email]);

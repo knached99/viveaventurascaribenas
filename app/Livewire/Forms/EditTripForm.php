@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Stripe\StripeClient;
+use Stripe\Coupon;
+use Stripe\PromotionCode;
 use Exception;
 use Carbon\Carbon;
 
@@ -503,6 +505,47 @@ class EditTripForm extends Component
         // Free up memory
         imagedestroy($image);
         imagedestroy($resizedImage);
+    }
+
+
+    // Create a coupon to apply discounts to a destination pacakge 
+    
+    private function createCoupon($percentageOff){
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+        try{
+            $coupon = Coupon::create([
+                'percentage_off'=> $percentageOff, 
+                'duration'=>'once'
+            ]);
+
+            return $coupon->id;
+        }
+        catch(\Exception $e){
+            return redirect()->back()->with(['error'=>'An unknown error has occurred. If this persists, please contact the developer asap!']);
+            \Log::critical('A critical Stripe exception has been encountered: '.$e->getMessage());
+        }
+    }
+
+    private function createPromoCode($couponID, $productID){
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+        try{
+            $promoCode = PromotionCode::create([
+                'coupon'=>$couponID,
+                'restrictions'=> [
+                    'products'=>[$productID],
+                ],
+                'expires_at'=>now()->addWeek()->timestamp,
+            ]);
+
+            return $promoCode->id;
+
+        }
+        catch(\Exception $e){
+            return redirect()->back()->with(['error'=>'An unknown error has occurred. If this persists, please contact the developer asap!']);
+            \Log::critical('A critical Stripe exception has been encountered: '.$e->getMessage());
+        }
     }
     
     

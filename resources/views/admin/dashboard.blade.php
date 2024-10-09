@@ -189,9 +189,9 @@
             </div>
         </div>
         <!-- Total Revenue Chart -->
-        @if(!empty($transactionData))
-        <x-admincomponents.total-revenue-chart :transactionData="$transactionData" />
-        @else 
+        @if (!empty($transactionData))
+            <x-admincomponents.total-revenue-chart :transactionData="$transactionData" />
+        @else
         @endif
         <!-- / Total Revenue Chart -->
 
@@ -202,7 +202,7 @@
                 @if (!empty($popularTrips))
                     @foreach ($popularTrips as $trip)
                         <div class="col-12 mb-6">
-                            <div class="card">
+                            <div class="card hover:shadow-lg ease-in-out duration-300">
                                 <div class="card-body">
                                     <div
                                         class="d-flex justify-content-between align-items-center flex-sm-row flex-column gap-10">
