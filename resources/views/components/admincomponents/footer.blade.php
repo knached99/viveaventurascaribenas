@@ -74,45 +74,6 @@
      });
  </script>
 
- {{-- @if (\Route::currentRouteName() === 'admin.create-trip' || \Route::currentRouteName() === 'admin.trip')
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initialize CKEditor for all elements with the class "ckeditor"
-        document.querySelectorAll('.ckeditor').forEach(element => {
-            ClassicEditor
-                .create(element)
-                .then(editor => {
-                    console.log('Editor was initialized', editor);
-
-                    // Set initial data if needed (this assumes you have Livewire data or other source)
-                    const initialData = element.getAttribute('data-initial-content');
-                    if (initialData) {
-                        editor.setData(initialData);
-                    }
-
-                    // Sync the CKEditor content with Livewire or other backend models
-                    editor.model.document.on('change:data', () => {
-                        const editorData = editor.getData();
-                        
-                        // Sync the CKEditor content with Livewire
-                        if (window.Livewire) {
-                            const livewireElement = element.closest('[wire\\:id]');
-                            if (livewireElement) {
-                                const componentId = livewireElement.getAttribute('wire:id');
-                                window.Livewire.find(componentId).set(element.getAttribute('name'), editorData);
-                            }
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error during initialization of the editor', error);
-                });
-        });
-    });
-</script>
-
-@endif --}}
 
  @if (\Route::currentRouteName() === 'admin.create-trip')
      <script>
@@ -216,31 +177,6 @@
 
 
  <!-- endbuild -->
-
- <!-- Vendors JS -->
-
-
- {{-- <script src="{{ asset('assets/theme_assets/assets/vendor/libs/apex-charts/apexcharts.js') }}"></script> --}}
-
- <!-- ALPINE EDITOR -->
- {{-- <script src="https://cdn.jsdelivr.net/gh/maxeckel/alpine-editor@0.3.1/dist/alpine-editor.min.js"></script> --}}
-
-
- {{-- <script src="https://cdn.ckeditor.com/ckeditor5/41.3.1/classic/ckeditor.js"></script>
-
-       <!-- CKEDTITOR 5 -->
-      <x-admincomponents.ckeditor-script/> --}}
-
- <!-- Initialize Quill editor -->
- {{-- <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
-  <!-- Initialize Quill editor -->
-  <script>
-      const quill = new Quill('#editor', {
-          theme: 'snow'
-      });
-  </script> --}}
-
 
 
 

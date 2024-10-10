@@ -95,9 +95,15 @@ class EditTripForm extends Component
         $this->num_trips = $cachedTrip['num_trips'];
         $this->active = $cachedTrip['active'];
         $this->slug = $cachedTrip['slug'] ?? '';
+        $this->stripe_coupon_id = $cachedTrip['stripe_coupon_id'];
+        $this->stripe_promo_id = $cachedTrip['stripe_promo_id'];
     
-        $this->calculateFinancials();
-        $this->getDiscountFromStripe($this->stripe_promo_id);
+        // $this->calculateFinancials();
+        
+        // if($this->stripe_promo_id){
+        
+        //     $this->getDiscountFromStripe($this->stripe_promo_id);
+        // }
     }
     
     private function loadFromDatabase(): void
@@ -123,6 +129,8 @@ class EditTripForm extends Component
         $this->num_trips = $trip->num_trips;
         $this->active = (bool) $trip->active;
         $this->slug = $trip->slug;
+        $this->stripe_promo_id = $trip->stripe_promo_id;
+        $this->stripe_coupon_id = $trip->stripe_coupon_id;
     
         // Cache trip data excluding TemporaryUploadedFile objects
         Cache::put($this->cacheKey, [
@@ -141,61 +149,68 @@ class EditTripForm extends Component
             'tripCosts' => $this->tripCosts,
             'num_trips' => $this->num_trips,
             'active' => $this->active,
-        ], 600); // Cache for 10 minutes
+            'stripe_coupon_id' => $this->stripe_coupon_id,
+            'stripe_promo_id' => $this->stripe_promo_id,    
+            
+        ], 600); // Cached for 10 minutes
     
-        $this->calculateFinancials();
-        $this->getDiscountFromStripe($this->stripe_promo_id);
+        // $this->calculateFinancials();
+
+        // if($this->stripe_promo_id){
+        //     $this->getDiscountFromStripe($this->stripe_promo_id);
+        // }
+        
     }
 
-    private function getDiscountFromStripe($stripe_promo_id){
+    // private function getDiscountFromStripe($stripe_promo_id){
 
-        try{
-        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-        $discount = $stripe->promotionCodes->retrieve($stripe_promo_id, []);
-        \Log::info(json_encode($discount));
+    //     try{
+    //     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+    //     $discount = $stripe->promotionCodes->retrieve($stripe_promo_id, []);
+    //     \Log::info($discount);
 
-        }
-        catch(Stripe\Exception\ApiErrorException $e){
-            $this->discountCreateError = 'Something went wrong!';
-            \Log::error($e->getMessage());
-            return;
-        }
+    //     }
+    //     catch(Stripe\Exception\ApiErrorException $e){
+    //         $this->discountCreateError = 'Something went wrong!';
+    //         \Log::error($e->getMessage());
+    //         return;
+    //     }
 
-        return $discount;
-    }
+    //     return $discount;
+    // }
     
-    private function calculateFinancials(): void
-    {
-        $totalNetCost = array_reduce($this->tripCosts, function($carry, $cost) {
-            return $carry + (float) $cost['amount'];
-        });
+    // private function calculateFinancials(): void
+    // {
+    //     $totalNetCost = array_reduce($this->tripCosts, function($carry, $cost) {
+    //         return $carry + (float) $cost['amount'];
+    //     });
 
-        try {
-            $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-            $charges = Cache::remember('charges_' . $this->stripe_product_id, 600, function() use ($stripe) {
-                return $stripe->charges->search([
-                    'query' => "status:'succeeded'",
-                    'limit' => 100,
-                ]);
-            });
+    //     try {
+    //         $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+    //         $charges = Cache::remember('charges_' . $this->stripe_product_id, 600, function() use ($stripe) {
+    //             return $stripe->charges->search([
+    //                 'query' => "status:'succeeded'",
+    //                 'limit' => 100,
+    //             ]);
+    //         });
 
-            $filteredCharges = array_filter($charges->data, function ($charge) {
-                return $charge->amount_refunded == 0 && isset($charge->amount_captured) && $charge->amount_captured > 0;
-            });
+    //         $filteredCharges = array_filter($charges->data, function ($charge) {
+    //             return $charge->amount_refunded == 0 && isset($charge->amount_captured) && $charge->amount_captured > 0;
+    //         });
 
-            $grossProfit = array_reduce($filteredCharges, function ($carry, $charge) {
-                return $carry + (float) $charge->amount_captured / 100;
-            }, 0);
+    //         $grossProfit = array_reduce($filteredCharges, function ($carry, $charge) {
+    //             return $carry + (float) $charge->amount_captured / 100;
+    //         }, 0);
 
-            $netProfit = $grossProfit - $totalNetCost;
+    //         $netProfit = $grossProfit - $totalNetCost;
 
-            $this->grossProfit = $grossProfit;
-            $this->netProfit = $netProfit;
+    //         $this->grossProfit = $grossProfit;
+    //         $this->netProfit = $netProfit;
 
-        } catch (Exception $e) {
-            \Log::error('Error encountered: '.$e->getMessage());
-        }
-    }
+    //     } catch (Exception $e) {
+    //         \Log::error('Error encountered: '.$e->getMessage());
+    //     }
+    // }
 
     public function addCost()
     {
@@ -403,7 +418,6 @@ class EditTripForm extends Component
 
                 \Log::info('Current Image URLs array: '.json_encode($newImageURLs));
 
-                \Log::info('');
 
             
                 $newImageURLs = []; 
@@ -432,10 +446,7 @@ class EditTripForm extends Component
                             }
                         }
                         
-                        // Merge existing image URLs with new ones, if necessary
-                    //    $this->tripPhotosURLs = array_merge($this->existingImageURLs, $newImageURLs);
-                        
-                      //  \Log::info('All images after upload: ' . json_encode($this->tripPhotosURLs));
+            
                     }
                     
             

@@ -270,6 +270,7 @@ class Admin extends Controller
 
     public function getTripDetails($tripID)
 {
+
     $cacheKey = "trip_details_{$tripID}";
     $cachedData = Cache::get($cacheKey);
 
@@ -281,7 +282,7 @@ class Admin extends Controller
     try {
         $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
 
-        $discount = $trip->discount; 
+    
 
         $tripCosts = json_decode($trip->tripCosts, true) ?: [];
        
@@ -294,54 +295,14 @@ class Admin extends Controller
       
 
 
-        // Query payment intents for successful payments
-        // $paymentIntents = $stripe->paymentIntents->search([
-        //     'query' => 'status:"succeeded" AND metadata["product_id"]:"'.$stripeProductID.'"', // Filter by product ID in metadata
-        //     'limit' => 100,
-        // ]);
-
-
-        // \Log::info(json_encode($paymentIntents));
-
-        // $filteredCharges = [];
-
-
-        // foreach ($paymentIntents->data as $intent) {
-        //     $charges = $stripe->charges->all([
-        //         'payment_intent' => $intent->id,
-        //         'limit' => 100,
-        //     ]);
-
-
-        //     foreach ($charges->data as $charge) {
-        //         if ($charge->amount_refunded == 0 && $charge->amount_captured > 0) {
-        //             if ($charge->invoice) {
-        //                 \Log::info('Charge Invoice: '.json_encode($charge->invoice));
-        //                 $invoice = $stripe->invoices->retrieve($charge->invoice, ['expand' => ['lines']]);
-        //                 foreach ($invoice->lines->data as $lineItem) {
-        //                     if ($lineItem->price->product === $stripeProductID) {
-        //                         $filteredCharges[] = $charge;
-        //                         break;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
-
-        // Calculate gross profit based on the captured amount
-        // $grossProfit = array_reduce($filteredCharges, fn($carry, $charge) => $carry + (float) $charge->amount_captured / 100, 0);
-
-
         $dataToCache = [
             'tripId' => $tripID,
             'trip' => $trip,
             'totalNetCost' => $totalNetCost,
             'grossProfit' => $grossProfit,
             'netProfit' => $netProfit,
-            'discount'=>$discount, 
         ];
+
 
         Cache::put($cacheKey, $dataToCache, 60);
         return view('admin.trip', $dataToCache);
@@ -351,8 +312,9 @@ class Admin extends Controller
         abort(404);
     } catch (Exception $e) {
         \Log::error('Error retrieving Stripe charges: ' . $e->getMessage());
-        $error = 'Something went wrong fetching trip details';
-        return view('admin.trip', $error);
+        // $error = 'Something went wrong fetching trip details';
+        // return view('admin.trip', $error);
+        abort(500);
     }
 }
 
@@ -479,6 +441,8 @@ class Admin extends Controller
                 (is_object(json_decode($data)) ||
                 is_array(json_decode($data))))) ? true : false;
     }
+
+
     
 
 

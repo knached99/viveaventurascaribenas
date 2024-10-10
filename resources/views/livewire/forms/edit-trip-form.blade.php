@@ -6,7 +6,7 @@
     $tripPhotos = json_decode($trip->tripPhoto, true);
     $acive = $trip->active;
 
-@endphp
+@endphp 
 
 <div class="container mt-5">
     <div class="row justify-content-center">
@@ -280,7 +280,7 @@
             </div>
         </div>
 
-        @if (!empty($stripe_coupon_id) || !empty($stripe_promo_id))
+        @if (empty($promoID) || empty($couponID))
             <!-- Discount -->
             <div class="col">
                 <div class="card shadow-sm border-0 rounded-lg m-3 p-3">
@@ -335,7 +335,6 @@
             <div class="col">
                 <div class="card shadow-sm border-0 rounded-lg m-3 p-3">
                     <h5>Discount applied to this trip</h5>
-                    <p>Discount Percentage {{ $discount }}</p>
                 </div>
             </div>
 
