@@ -250,8 +250,6 @@
  <!-- Page JS -->
  {{-- <script src="{{asset('assets/theme_assets/assets/js/dashboards-analytics.js')}}"></script> --}}
 
- {{-- <script src="../../../../../node_modules/preline/dist/preline.js"></script> --}}
- <script src="{{ asset('node_modules/preline/dist/preline.js') }}"></script>
 
  <!-- Place this tag before closing body tag for github widget button. -->
  <script async defer src="https://buttons.github.io/buttons.js"></script>

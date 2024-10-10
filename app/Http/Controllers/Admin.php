@@ -281,7 +281,7 @@ class Admin extends Controller
     try {
         $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
 
-      
+        $discount = $trip->discount; 
 
         $tripCosts = json_decode($trip->tripCosts, true) ?: [];
        
@@ -339,7 +339,8 @@ class Admin extends Controller
             'trip' => $trip,
             'totalNetCost' => $totalNetCost,
             'grossProfit' => $grossProfit,
-            'netProfit' => $netProfit
+            'netProfit' => $netProfit,
+            'discount'=>$discount, 
         ];
 
         Cache::put($cacheKey, $dataToCache, 60);

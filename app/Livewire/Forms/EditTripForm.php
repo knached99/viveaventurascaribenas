@@ -13,6 +13,7 @@ use Stripe\StripeClient;
 use Stripe\Coupon;
 use Stripe\PromotionCode;
 use Exception;
+use Stripe\Exception\ApiErrorException;
 use Carbon\Carbon;
 
 class EditTripForm extends Component
@@ -65,13 +66,10 @@ class EditTripForm extends Component
         // Load trip data from cache or database
         $cachedTrip = Cache::get($this->cacheKey);
         
-        \Log::info('Is this data cached?');
         if ($cachedTrip) {
-            \Log::info('Yes, loading data from cache...');
-            $this->loadFromCache($cachedTrip);
-            \Log::info('Data loaded!');
 
-            \Log::info(json_encode($cachedTrip));
+            $this->loadFromCache($cachedTrip);
+
         } else {
             $this->loadFromDatabase();
         }
@@ -91,12 +89,15 @@ class EditTripForm extends Component
         $this->tripEndDate = $cachedTrip['tripEndDate'];
         $this->tripPrice = $cachedTrip['tripPrice'];
         $this->stripe_product_id = $cachedTrip['stripe_product_id'];
+        $this->stripe_coupon_id = $cachedTrip['stripe_coupon_id'];
+        $this->stripe_promo_id = $cachedTrip['stripe_promo_id'];
         $this->tripCosts = $cachedTrip['tripCosts'];
         $this->num_trips = $cachedTrip['num_trips'];
         $this->active = $cachedTrip['active'];
         $this->slug = $cachedTrip['slug'] ?? '';
     
         $this->calculateFinancials();
+        $this->getDiscountFromStripe($this->stripe_promo_id);
     }
     
     private function loadFromDatabase(): void
@@ -116,6 +117,8 @@ class EditTripForm extends Component
         $this->tripEndDate = Carbon::parse($trip->tripEndDate)->format('Y-m-d');
         $this->tripPrice = $trip->tripPrice;
         $this->stripe_product_id = $trip->stripe_product_id;
+        $this->stripe_coupon_id = $trip->stripe_coupon_id;
+        $this->stripe_promo_id = $trip->stripe_promo_id;
         $this->tripCosts = json_decode($trip->tripCosts, true);
         $this->num_trips = $trip->num_trips;
         $this->active = (bool) $trip->active;
@@ -133,12 +136,32 @@ class EditTripForm extends Component
             'tripEndDate' => $this->tripEndDate,
             'tripPrice' => $this->tripPrice,
             'stripe_product_id' => $this->stripe_product_id,
+            'stripe_coupon_id'=> $this->stripe_coupon_id ?? '',
+            'stripe_promo_id' => $this->stripe_promo_id ?? '',
             'tripCosts' => $this->tripCosts,
             'num_trips' => $this->num_trips,
             'active' => $this->active,
         ], 600); // Cache for 10 minutes
     
         $this->calculateFinancials();
+        $this->getDiscountFromStripe($this->stripe_promo_id);
+    }
+
+    private function getDiscountFromStripe($stripe_promo_id){
+
+        try{
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        $discount = $stripe->promotionCodes->retrieve($stripe_promo_id, []);
+        \Log::info(json_encode($discount));
+
+        }
+        catch(Stripe\Exception\ApiErrorException $e){
+            $this->discountCreateError = 'Something went wrong!';
+            \Log::error($e->getMessage());
+            return;
+        }
+
+        return $discount;
     }
     
     private function calculateFinancials(): void
@@ -180,26 +203,32 @@ class EditTripForm extends Component
         $this->tripCosts[] = ['name' => '', 'amount' => 0];
     }
 
-    public function removeCost($index)
-    {
-        \Log::info('Attempting to remove cost at index: ' . $index);
+    // Optimized to achieve O(1) time complexity 
+    // was previously O(n) due to re-indexing
 
-        if (isset($this->tripCosts[$index])) {
+    public function removeCost($index){
+
+        if(isset($this->tripCosts[$index])){
             unset($this->tripCosts[$index]);
-            $this->tripCosts = array_values($this->tripCosts);
+        
 
-            try {
-                $tripModel = TripsModel::findOrFail($this->trip->tripID);
-                $tripModel->tripCosts = $this->tripCosts;
-                $tripModel->save();
-                $this->invalidateCache((string) $this->trip->tripID);
-            } catch (\Exception $e) {
-                \Log::error('Error updating trip costs in the database: ' . $e->getMessage());
-            }
-        } else {
-            \Log::error('Invalid index for removal: ' . $index);
+        try{
+            $tripModel = TripsModel::findOrFail($tripID);
+            $tripModel->tripCosts = $this->tripCosts;
+            $tripModel->save();
+
+            $this->invalidateCache((string) $this->tripID);
+        }
+
+        catch(\Exception $e){
+            \Log::error('An error occurred while removing a trip cost: '.$e->getMessage().' This error occurred in class: '.__CLASS__. ' in method: '.__FUNCTION__. ' on line: '.__LINE__);
         }
     }
+
+    else{
+        \Log::error('Index: '.$index. ' is not valid for removal');
+    }
+}
 
     public function replaceImage($index)
     {
@@ -518,103 +547,86 @@ class EditTripForm extends Component
     }
 
 
-    // Create a coupon to apply discounts to a destination pacakge 
+    // Create a coupon to apply discounts to a specific destination pacakge 
   
-    public function createDiscount()
-    {
-        try {
+
+    public function createDiscount(){
+        
+        try{
+
             $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+            $trip = TripsModel::findOrFail($this->trip->tripID);
+
+            $rules = [
+                'discountType' => 'required|in:percentage,amount',
+                'discountValue' => 'required|numeric',
+                'promotionCode' => 'nullable|string'
+            ];
     
-            // Validate discountValue for percentage type
-            if ($this->discountType === 'percentage' && ($this->discountValue < 0 || $this->discountValue > 100)) {
-                $this->discountCreateError = 'Percentage discounted must be between 0% and 100%';
+            $validationMessages = [
+                'discountType.required' => 'You must choose the discount type',
+                'discountType.in' => 'The discount type must be either percentage or amount',
+                'discountValue.required' => 'You must enter the discount amount',
+                'discountValue.numeric' => 'Discount value must be numeric',
+            ];
+
+            $this->validate($rules, $validationMessages);
+
+            if($this->discountType === 'percentage' && ($this->discountValue < 1 || $this->discountValue > 100)){
+                $this->discountCreateError = 'Discount percentage must be between 1% and 100%';
                 return;
             }
-    
-            // Validate discountValue for amount type
-            elseif ($this->discountType === 'amount' && $this->discountValue <= 0) {
-                $this->discountCreateError = 'Amount discounted must be greater than 0';
+
+            elseif($this->discountType === 'amount' && $this->discountValue <=0){
+                $this->discountCreateError = 'Amount discounted must be greater than $0';
                 return;
             }
-    
+
             $couponData = [];
-    
-            // Handle percentage-based discount
-            if ($this->discountType === 'percentage') {
+
+            if($this->discountType === 'percentage'){
+
                 $couponData = [
-                    'percent_off' => round($this->discountValue, 2), // Ensure it’s rounded to two decimal places
-                    'duration' => 'once',
+                    'percent_off'=>round($this->discountValue, 2),
+                    'duration'=>'once',
+                ];
+                
+            }
+
+            elseif($this->discountType === 'amount'){
+
+                $couponData = [
+                    'amount_off'=>intval($this->discountValue * 100),
+                    'currency'=>'usd',
+                    'duration'=>'once',
                 ];
             }
-    
-            // Handle amount-based discount
-            elseif ($this->discountType === 'amount') {
-                $couponData = [
-                    'amount_off' => intval($this->discountValue * 100), // Ensure it’s an integer
-                    'currency' => 'usd',
-                    'duration' => 'once',
-                ];
-            }
-    
-            // Create the coupon
+
             $coupon = $stripe->coupons->create($couponData);
             \Log::info('Coupon created in Stripe with ID: ' . $coupon->id);
-    
-            // Create the promotion code
-            $promotionCode = $stripe->promotionCodes->create([
-                'coupon' => $coupon->id,
-                'restrictions' => [
-                    'products' => [$this->Stripe_product_id],
-                ],
-                'code' => $this->promotionCode ? $this->promotionCode : strtoupper(Str::random(8)),
+
+            $promoCode = $stripe->promotionCodes->create([
+                'coupon'=>$coupon->id,
+                'code'=>$this->promotionCode ? $this->promotionCode : strtoupper(Str::random(8)),
             ]);
-    
-            \Log::info('Promotion code created successfully: ' . $promotionCode->id);
-            $this->discountCreateSuccesss = 'Discount and promotion codes created successfully';
-    
-        } catch (Exception $e) {
-            \Log::error('Error creating discount: ' . $e->getMessage());
-            $this->discountCreateError = 'Failed to create discount. Something went wrong.';
+
+            \Log::info('Promotion code created successfully: ' . $promoCode->id);
+
+            $trip->stripe_coupon_id = $coupon->id;
+            $trip->stripe_promo_id = $promoCode->id;
+            $trip->save();
+
+            $this->discountCreateSuccess = 'Discount created successfully!';
+
         }
+
+        catch(Stripe\Exception\ApiErrorException $e){
+
+            \Log::error('Error creating discount on line '.__LINE__. ' in class: '.__CLASS__. ' in method: '.__FUNCTION__. ' Error: ' . $e->getMessage());
+            $this->discountCreateError = 'Failed to create discount. Something went wrong';
+        } 
     }
-    
-    // private function createCoupon($percentageOff){
-    //     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-
-    //     try{
-    //         $coupon = Coupon::create([
-    //             'percentage_off'=> $percentageOff, 
-    //             'duration'=>'once'
-    //         ]);
-
-    //         return $coupon->id;
-    //     }
-    //     catch(\Exception $e){
-    //         return redirect()->back()->with(['error'=>'An unknown error has occurred. If this persists, please contact the developer asap!']);
-    //         \Log::critical('A critical Stripe exception has been encountered: '.$e->getMessage());
-    //     }
-    // }
-
-    // private function createPromoCode($couponID, $productID){
-    //     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-
-    //     try{
-    //         $promoCode = PromotionCode::create([
-    //             'coupon'=>$couponID,
-    //             'restrictions'=> [
-    //                 'products'=>[$productID],
-    //             ],
-    //             'expires_at'=>now()->addWeek()->timestamp,
-    //         ]);
-
-    //         return $promoCode->id;
-
-    //     }
-    //     catch(\Exception $e){
-    //         return redirect()->back()->with(['error'=>'An unknown error has occurred. If this persists, please contact the developer asap!']);
-    //         \Log::critical('A critical Stripe exception has been encountered: '.$e->getMessage());
-    //     }
-    // }
     
     
     

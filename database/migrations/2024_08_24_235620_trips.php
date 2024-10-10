@@ -11,6 +11,8 @@ return new class extends Migration
         Schema::create('trips', function (Blueprint $table) {
             $table->uuid('tripID')->primary();
             $table->string('stripe_product_id')->unique();
+            $table->string('stripe_coupon_id')->nullable();
+            $table->string('stripe_promo_id')->nullable();
             $table->string('tripLocation');
             $table->json('tripPhoto');
             $table->text('tripDescription');

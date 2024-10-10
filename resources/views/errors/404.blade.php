@@ -1,3 +1,14 @@
+@php
+    $isAuthenticated = \Auth::check();
+    $redirectRoute = '';
+    if ($isAuthenticated) {
+        $redirectRoute = 'admin.dashboard';
+    } else {
+        $redirectRoute = '/';
+    }
+
+@endphp
+
 <head>
     <link rel="stylesheet" href="{{ asset('assets/css/404.css') }}" />
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/images/faviconIcon.png') }}">
@@ -19,7 +30,7 @@
             </p>
 
             <p>But Don’t Worry – Your Adventure Doesn’t Have to End Here!
-                <a href="{{ route('/') }}">return to safety</a>
+                <a href="{{ route($redirectRoute) }}">return to safety</a>
             </p>
         </div>
         <div class="col-R">

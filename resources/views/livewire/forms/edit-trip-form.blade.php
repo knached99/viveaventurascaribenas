@@ -5,49 +5,13 @@
     $endDate = Carbon::parse($trip->tripEndDate)->format('Y-m-d');
     $tripPhotos = json_decode($trip->tripPhoto, true);
     $acive = $trip->active;
+
 @endphp
 
 <div class="container mt-5">
     <div class="row justify-content-center">
 
-    <!-- Discount -->
-    <div class="col">
-    <div class="card shadow-sm border-0 rounded-lg">
-    <h3 class="mb-0">Discount this Trip</h3>
-    <form wire:submit.prevent="createDiscount" >
-    <div class="form-group">
-    <label class="form-label">Discount Type</label>
-    <select class="form-control" id="discountType" wire:model="discountType">
-    <option value="percentage">percentage</option>
-    <option value="amount">amount</option>
-    </select>
-    </div>
-    
-    <div class="form-group">
-    <label class="form-label">Discount Value</label>
-    <input type="number" wire:model="discountValue" id="discountValue" class="form-control"/>
-    </div>
 
-    <div class="form-group">
-    <label class="form-label">Promo Code (optional)</label>
-    <input type="text" wire:model="promotionCode" id="promotionCode" class="form-control"/>
-    </div>
-
-    <button wire:click="createDiscount" class="btn btn-primary">Create Discount</button>
-    @if($discountCreateSuccess)
-    <div class="bg-emerald-500 text-white p-2 m-2">
-    {{ $discountCreateSuccess}}
-    </div>
-
-    @elseif($discountCreateError)
-    <div class="bg-red-500 text-white p-2 m-2">
-    {{$discountCreateError}}
-    </div>
-    @endif 
-    </form>
-    </div>
-    </div>
-    <!-- / Discount -->
         <div class="col-12 col-md-10 col-lg-8">
             <div class="card shadow-sm border-0 rounded-lg">
                 <!-- Card Header -->
@@ -315,5 +279,90 @@
                 </form>
             </div>
         </div>
+
+        @if (!empty($stripe_coupon_id) || !empty($stripe_promo_id))
+            <!-- Discount -->
+            <div class="col">
+                <div class="card shadow-sm border-0 rounded-lg m-3 p-3">
+                    <h3 class="mb-0">Discount this Trip</h3>
+                    <p class="text-slate-700 mt-3">If you notice sales aren't going well for this trip, you may opt to
+                        provide
+                        a discount to attract customers</p>
+                    <form wire:submit.prevent="createDiscount">
+                        <div class="form-group">
+                            <label class="form-label">Select Discount Type</label>
+                            <select class="form-control {{ $errors->has('discountType') ? 'is-invalid' : '' }}"
+                                id="discountType" wire:model="discountType">
+                                <option value="percentage">percentage</option>
+                                <option value="amount">amount</option>
+                            </select>
+                            <x-input-error :messages="$errors->get('discountType')" class="invalid-feedback" />
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="form-label">Discount Value</label>
+                            <input type="number" wire:model="discountValue" id="discountValue"
+                                class="form-control {{ $errors->has('discountValue') ? 'is-invalid' : '' }}" />
+                            <x-input-error :messages="$errors->get('discountValue')" class="invalid-feedback" />
+                        </div>
+
+                        <div class="form-group">
+                            <input type="hidden" wire:model="promoCode" id="promoCode" />
+                            <!-- Placeholder for promo code display -->
+                            <span id="promoCodeDisplay" class="inline-block m-2 text-black font-bold"></span>
+                            <!-- Button for generating the promo code -->
+                            <button type="button" onclick="generatePromoCode()" class="block mt-3 btn btn-secondary"
+                                id="promoCodeGenButton">
+                                Generate Promo Code (optional)
+                            </button>
+
+
+
+
+
+                            <button wire:click="createDiscount" class="btn btn-primary mt-3">Create Discount</button>
+                            @if ($discountCreateSuccess)
+                                <span class="text-emerald-500">{{ $discountCreateSuccess }}</span>
+                            @elseif($discountCreateError)
+                                <span class="text-red-500">{{ $discountCreateError }}</span>
+                            @endif
+                    </form>
+                </div>
+            </div>
+            <!-- / Discount -->
+        @else
+            <div class="col">
+                <div class="card shadow-sm border-0 rounded-lg m-3 p-3">
+                    <h5>Discount applied to this trip</h5>
+                    <p>Discount Percentage {{ $discount }}</p>
+                </div>
+            </div>
+
+        @endif
     </div>
 </div>
+
+<script>
+    function generatePromoCode() {
+        let actionButton = document.getElementById('promoCodeGenButton');
+        let promoHiddenInput = document.getElementById("promoCode");
+        let promoCodeDisplay = document.getElementById('promoCodeDisplay');
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charLength = characters.length;
+        const length = 8; // Fixed length of the promo code is 8 characters
+        let counter = 0;
+
+        while (counter < length) {
+            result += characters.charAt(Math.floor(Math.random() * charLength));
+            counter += 1;
+        }
+
+        promoHiddenInput.value = result;
+
+        actionButton.style.visibility = "hidden";
+
+        promoCodeDisplay.textContent = 'Promo Code: ' + result;
+    }
+</script>
