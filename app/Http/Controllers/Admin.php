@@ -57,7 +57,7 @@ class Admin extends Controller
             $transactionsPerDay[$date] = ($transactionsPerDay[$date] ?? 0) + (float) $charge->amount_captured / 100;
         }
         
-        // Sort transactions by date in ascending order using built in ksort() method to sort the returned array by key 
+        // Sort transactions array by date in ascending order using built in ksort() method to sort the returned array by key 
         ksort($transactionsPerDay);
         
         // Format transaction data for the current year

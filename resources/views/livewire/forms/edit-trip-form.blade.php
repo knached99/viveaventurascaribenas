@@ -1,11 +1,42 @@
 @php
     use Carbon\Carbon;
+    use Stripe\StripeClient;
 
     $startDate = Carbon::parse($trip->tripStartDate)->format('Y-m-d');
     $endDate = Carbon::parse($trip->tripEndDate)->format('Y-m-d');
     $tripPhotos = json_decode($trip->tripPhoto, true);
     $acive = $trip->active;
+    $couponID = $trip->stripe_coupon_id;
 
+    $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+
+
+    $tripPrice = $trip->tripPrice;
+    $newPrice = 0;
+
+    if(!empty($trip->stripe_coupon_id)){
+        try{
+        $coupon = $stripe->coupons->retrieve($couponID);
+        if(isset($coupon) && $coupon->percent_off){
+                $discount = ($coupon->percent_off / 100) * $tripPrice;
+                $newPrice = $tripPrice - $discount; 
+            }
+
+            if(isset($coupon) && $coupon->amount_off){
+
+                $newPrice = $tripPrice - $coupon->amount_off;
+            }
+        }
+
+        catch(\Exception $e){
+            \Log::error('Unable to retrieve coupon: '.$e->getMessage());
+        }
+    }
+
+    else{
+        \Log::warning('No coupon ID found for trip: '.$trip->tripID);
+    }
+    
 @endphp 
 
 <div class="container mt-5">
@@ -280,7 +311,7 @@
             </div>
         </div>
 
-        @if (empty($promoID) || empty($couponID))
+        @if (empty($couponID))
             <!-- Discount -->
             <div class="col">
                 <div class="card shadow-sm border-0 rounded-lg m-3 p-3">
@@ -312,7 +343,7 @@
                             <!-- Placeholder for promo code display -->
                             <span id="promoCodeDisplay" class="inline-block m-2 text-black font-bold"></span>
                             <!-- Button for generating the promo code -->
-                            <button type="button" onclick="generatePromoCode()" class="block mt-3 btn btn-secondary"
+                            <button type="button" onclick="generatePromoCode()" class="block m-2 btn btn-secondary"
                                 id="promoCodeGenButton">
                                 Generate Promo Code (optional)
                             </button>
@@ -321,7 +352,7 @@
 
 
 
-                            <button wire:click="createDiscount" class="btn btn-primary mt-3">Create Discount</button>
+                            <button wire:click="createDiscount" class="btn btn-primary ml-4 mt-2">Create Discount</button>
                             @if ($discountCreateSuccess)
                                 <span class="text-emerald-500">{{ $discountCreateSuccess }}</span>
                             @elseif($discountCreateError)
@@ -335,6 +366,18 @@
             <div class="col">
                 <div class="card shadow-sm border-0 rounded-lg m-3 p-3">
                     <h5>Discount applied to this trip</h5>
+                    <ul class="list-group">
+                    <li class="list-group-item">
+                    <i class='bx bx-purchase-tag'></i>
+                    {{ $coupon->percent_off ? 'Percentage Off' : ($coupon->amount_off ? 'Amount Off' : '') }}
+                    <span class="block text-emerald-500 font-semibold">
+                    {{ $coupon->percent_off ? $coupon->percent_off . '%' : ($coupon->amount_off ? '$' . $coupon->amount_off : '') }}
+                    </span>
+                    </li>
+                    <li class="list-group-item"><i class='bx bx-dollar-circle' ></i> Price after discount: ${{number_format($newPrice, 2)}}</li>
+                    <li class="list-group-item"><i class='bx bx-calendar' ></i> Redeem By: {{$coupon->redeem_by ?? 'N/A'}}</li>
+                    <li class="list-group-item"><i class='bx bx-calendar' ></i> Duration In Months: {{$coupon->duration_in_months}}</li>
+                    </ul
                 </div>
             </div>
 

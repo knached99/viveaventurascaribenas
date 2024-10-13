@@ -505,70 +505,87 @@ class EditTripForm extends Component
         Cache::forget('trip_' . $tripId);
     }
 
-    private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight) {
+    private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight){
+
         $imageType = exif_imagetype($sourcePath);
     
-        switch ($imageType) {
-            case IMAGETYPE_JPEG: 
+        switch($imageType){
+    
+            case IMAGETYPE_JPEG:
+    
                 $image = imagecreatefromjpeg($sourcePath);
                 break;
+    
             case IMAGETYPE_PNG:
                 $image = imagecreatefrompng($sourcePath);
                 break;
+    
             default:
-                throw new Exception('The image you selected is not supported. Please select a JPEG or PNG image');
+    
+            throw new Exception('The image you selected is not supported. Please select a JPEG or PNG image');
+    
+       }
+    
+       $originalWidth = imagesx($image);
+       $originalHeight = imagesy($image);
+    
+       $aspectRatio = $originalWidth / $originalHeight;
+    
+        if($newWidth / $newHeight > $aspectRatio){
+            $newWidth = $newHeight * $aspectRatio;
         }
     
-        $originalWidth = imagesx($image);
-        $originalHeight = imagesy($image);
-    
-        $aspectRatio = $originalWidth / $originalHeight;
-    
-        if ($newWidth / $newHeight > $aspectRatio) {
-            $newWidth = $newHeight * $aspectRatio;
-        } else {
-            $newHeight = $newWidth / $aspectRatio;
+        else{
+            $newHeight / $newWidth / $aspectRatio;
         }
     
         $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
     
-        if ($imageType == IMAGETYPE_PNG) {
+        if($imageType == IMAGETYPE_PNG){
+            
+            // We need to preserve transparency for PNG images 
+    
             imagealphablending($resizedImage, false);
             imagesavealpha($resizedImage, true);
-            $transparent = imagecolorallocatealpha($resizedImage, 255, 255, 255, 127);
+            $transparent = imagecolorallocatealpha($resizedImage, 255, 255 ,255 ,127);
             imagefill($resizedImage, 0, 0, $transparent);
         }
     
         imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
     
-        switch ($imageType) {
+        switch($imageType){
+    
             case IMAGETYPE_JPEG:
-                $quality = 90; 
+                $quality = 100; // max quality for JPEG images 
                 imagejpeg($resizedImage, $destinationPath, $quality);
                 break;
+    
             case IMAGETYPE_PNG:
-                $compression = 1; // Lowest compression setting
+    
+                $compression = 0; // PNG does not support compression 
                 imagepng($resizedImage, $destinationPath, $compression);
                 break;
         }
     
-        // Free up memory
+        // Freeing up memory 
+    
         imagedestroy($image);
         imagedestroy($resizedImage);
     }
+    
 
 
     // Create a coupon to apply discounts to a specific destination pacakge 
   
 
-    public function createDiscount(){
-        
-        try{
-
+    public function createDiscount()
+    {
+        try {
             $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-
+    
             $trip = TripsModel::findOrFail($this->trip->tripID);
-
+    
+            // Validation rules
             $rules = [
                 'discountType' => 'required|in:percentage,amount',
                 'discountValue' => 'required|numeric',
@@ -581,62 +598,87 @@ class EditTripForm extends Component
                 'discountValue.required' => 'You must enter the discount amount',
                 'discountValue.numeric' => 'Discount value must be numeric',
             ];
-
+    
             $this->validate($rules, $validationMessages);
-
-            if($this->discountType === 'percentage' && ($this->discountValue < 1 || $this->discountValue > 100)){
+    
+            if ($this->discountType === 'percentage' && ($this->discountValue < 1 || $this->discountValue > 100)) {
                 $this->discountCreateError = 'Discount percentage must be between 1% and 100%';
                 return;
-            }
-
-            elseif($this->discountType === 'amount' && $this->discountValue <=0){
+            } elseif ($this->discountType === 'amount' && $this->discountValue <= 0) {
                 $this->discountCreateError = 'Amount discounted must be greater than $0';
                 return;
             }
-
+    
+            // Prepare coupon data based on discount type
             $couponData = [];
-
-            if($this->discountType === 'percentage'){
-
+            if ($this->discountType === 'percentage') {
                 $couponData = [
-                    'percent_off'=>round($this->discountValue, 2),
-                    'duration'=>'once',
+                    'percent_off' => round($this->discountValue, 2),
+                    'duration' => 'repeating',
+                    'duration_in_months' => 1,
                 ];
-                
-            }
-
-            elseif($this->discountType === 'amount'){
-
+            } elseif ($this->discountType === 'amount') {
                 $couponData = [
-                    'amount_off'=>intval($this->discountValue * 100),
-                    'currency'=>'usd',
-                    'duration'=>'once',
+                    'amount_off' => intval($this->discountValue * 100),
+                    'currency' => 'usd',
+                    'duration' => 'repeating',
+                    'duration_in_months' => 1,
                 ];
             }
-
-            $coupon = $stripe->coupons->create($couponData);
-            \Log::info('Coupon created in Stripe with ID: ' . $coupon->id);
-
-            $promoCode = $stripe->promotionCodes->create([
-                'coupon'=>$coupon->id,
-                'code'=>$this->promotionCode ? $this->promotionCode : strtoupper(Str::random(8)),
-            ]);
-
-            \Log::info('Promotion code created successfully: ' . $promoCode->id);
-
+    
+            // Get all coupons and find the one that matches the product and discount type
+            $existingCoupons = $stripe->coupons->all(['limit' => 100]); // Fetch all coupons
+            $coupon = null;
+    
+            foreach ($existingCoupons->data as $existingCoupon) {
+                // Check if coupon matches the discount type and value (you may need to adjust this logic)
+                if (($this->discountType === 'percentage' && isset($existingCoupon->percent_off) && $existingCoupon->percent_off == $couponData['percent_off']) ||
+                    ($this->discountType === 'amount' && isset($existingCoupon->amount_off) && $existingCoupon->amount_off == $couponData['amount_off'])) {
+                    $coupon = $existingCoupon;
+                    break;
+                }
+            }
+    
+            if (!$coupon) {
+                // Create a new coupon if none exists
+                $coupon = $stripe->coupons->create($couponData);
+                \Log::info('Coupon created in Stripe with ID: ' . $coupon->id);
+            } else {
+                \Log::info('Using existing coupon: ' . $coupon->id);
+            }
+    
+            // Get all promotion codes and check if one exists for the coupon
+            $existingPromoCodes = $stripe->promotionCodes->all(['limit' => 100]); // Fetch all promo codes
+            $promoCode = null;
+    
+            foreach ($existingPromoCodes->data as $existingPromoCode) {
+                if ($existingPromoCode->coupon === $coupon->id) {
+                    $promoCode = $existingPromoCode;
+                    break;
+                }
+            }
+    
+            if (!$promoCode) {
+                // Create a new promotion code if none exists
+                $promoCode = $stripe->promotionCodes->create([
+                    'coupon' => $coupon->id,
+                    'code' => $this->promotionCode ? $this->promotionCode : strtoupper(Str::random(8)),
+                ]);
+                \Log::info('Promotion code created successfully: ' . $promoCode->id);
+            } else {
+                \Log::info('Using existing promotion code: ' . $promoCode->id);
+            }
+    
+            // Update trip with Stripe coupon and promo code IDs
             $trip->stripe_coupon_id = $coupon->id;
             $trip->stripe_promo_id = $promoCode->id;
             $trip->save();
-
+    
             $this->discountCreateSuccess = 'Discount created successfully!';
-
-        }
-
-        catch(Stripe\Exception\ApiErrorException $e){
-
-            \Log::error('Error creating discount on line '.__LINE__. ' in class: '.__CLASS__. ' in method: '.__FUNCTION__. ' Error: ' . $e->getMessage());
+        } catch (Stripe\Exception\ApiErrorException $e) {
+            \Log::error('Error creating discount on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' in method: ' . __FUNCTION__ . ' Error: ' . $e->getMessage());
             $this->discountCreateError = 'Failed to create discount. Something went wrong';
-        } 
+        }
     }
     
     

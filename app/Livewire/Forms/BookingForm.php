@@ -207,16 +207,23 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
             ],
             'quantity' => 1,
         ]],
+
         'automatic_tax' => ['enabled' => true],
         'shipping_address_collection' => [
             'allowed_countries' => ['US'],
         ],
+
         'customer' => $customerId,
         'customer_update' => [
             'address' => 'auto',
             'shipping' => 'auto'
         ],
+
         'mode' => 'payment',
+        'discounts'=> [[
+            'coupon'=>$trip->stripe_coupon_id,
+        ]],
+
         'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID,
         'cancel_url' => route('booking.cancel', [
             'tripID' => $this->tripID,
@@ -234,7 +241,6 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
             'city'=>$this->city,
             'state'=>$this->state,
             'zipcode'=>$this->zipcode,
-            
         ],
     ]);
 }

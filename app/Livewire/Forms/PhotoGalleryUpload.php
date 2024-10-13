@@ -15,7 +15,7 @@ use Exception;
 
 
 
-class PhotoGalleryUpload extends Form{
+class PhotoGalleryUpload extends Form {
 
     use WithFileUploads;
 
@@ -31,22 +31,21 @@ class PhotoGalleryUpload extends Form{
     public string $success = '';
     public string $error = '';
 
+    protected $rules = [
+        'photos.*'=>'image|mimes:jpeg,png,jpg',
+        'photoLabel'=>'required|string',
+        'photoDescription'=>'required|max:255',
+        'tripID'=>'required',
+    ];
 
-    public function rules(){
-        return [
-            'photos.*'=>'image|mimes:jpeg,png,jpg',
-            'photoLabel'=>'required|string',
-            'photoDescription'=>'required|max:255',
-            'tripID'=>'required',
-        ];
+    protected $messages = [
+        'photos.*.image'=>'The file selected is not a valid image',
+        'photos.*.mimes'=>'The file selected must be a valid JPEG, JPG, or PNG image',
+        'photoLabel.required'=>'You must provide a photo label',
+        'photoDescription.required'=>'You must provide a photo description',
+        'tripID.required'=>'You must select the trip to associate the photo(s) to',
+    ];
 
-    }
-
-
-    // public function mount(){
-    //     $this->trips = TripsModel::select('tripID', 'tripLocation')->get();
-    //      \Log::info('Trips: '. json_encode($this->trips));
-    // }
     
     public function uploadPhotosToGallery(){
         $this->validate();

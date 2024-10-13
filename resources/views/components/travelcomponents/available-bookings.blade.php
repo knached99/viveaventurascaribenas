@@ -1,4 +1,10 @@
 @props(['trips', 'mostPopularTripId'])
+@php 
+
+use Stripe\StripeClient; 
+$stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+@endphp 
+
 <section class="ftco-section ftco-no-pt">
     <div class="container">
         <div class="row justify-content-center pb-4">
@@ -53,8 +59,55 @@
                                     </div>
                                 @endif
                             </div>
-                            <div class="text p-4 card-body">
-                                <span class="price">${{ number_format($trip->tripPrice, 2) }}/person</span>
+                       <div class="text p-4 card-body">
+    <span class="price">
+     @php 
+    $tripPrice = $trip->tripPrice; // Start with the original price
+    $newPrice = $tripPrice; // Default to original price
+
+    // Check if the coupon ID is valid
+    if(!empty($trip->stripe_coupon_id)) {
+        try {
+            $coupon = $stripe->coupons->retrieve($trip->stripe_coupon_id);
+            
+            // Calculate new price based on the coupon
+            if(isset($coupon)) {
+                if(isset($coupon->percent_off)) {
+                    $discount = ($coupon->percent_off / 100) * $tripPrice;
+                    $newPrice = $tripPrice - $discount;
+                }
+
+                if(isset($coupon->amount_off)) {
+                    $newPrice = $tripPrice - $coupon->amount_off; 
+                }
+            }
+        } catch (\Exception $e) {
+            // Log the error message or handle it as needed
+            \Log::error('Error retrieving coupon: ' . $e->getMessage());
+            // Optionally set $newPrice to tripPrice if coupon retrieval fails
+        }
+    } else {
+        // Handle case where coupon ID is not set
+        \Log::warning('No coupon ID provided for trip: ' . $trip->id);
+    }
+@endphp
+
+        @if(isset($newPrice) && $newPrice < $tripPrice)
+            <span class="text-decoration-line-through text-danger">
+                ${{ number_format($tripPrice, 2) }}
+            </span>
+            <span class="fw-bold">
+                ${{ number_format($newPrice, 2) }}
+            </span>
+        @else
+            <span class="fw-bold">
+                ${{ number_format($tripPrice, 2) }}
+            </span>
+        @endif
+    </span>
+
+
+                              
                                 <span class="days">Duration:
                                     {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}
                                     Days</span>

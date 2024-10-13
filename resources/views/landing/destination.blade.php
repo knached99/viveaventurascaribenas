@@ -1,12 +1,42 @@
 @php
     use Carbon\Carbon;
-
+    use Stripe\StripeClient; 
     $today = Carbon::today();
 
     $startDate = Carbon::parse($trip->tripStartDate);
     $endDate = Carbon::parse($trip->tripEndDate);
     $tripPhotos = json_decode($trip->tripPhoto, true);
     $landscapes = isset($trip->tripLandscape) ? json_decode($trip->tripLandscape, true) : [];
+
+    $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+   $tripPrice = $trip->tripPrice; // Initial trip price 
+
+    $newPrice = 0; // Initializing to $0 
+    // Calculate and apply any available discounts for this trip
+    if(!empty($trip->stripe_coupon_id)){
+    try{
+    $coupon = $stripe->coupons->retrieve($trip->stripe_coupon_id);
+ 
+
+    if(isset($coupon) && $coupon->percent_off){
+        $discount = ($coupon->percent_off / 100) * $tripPrice; 
+        $newPrice = $tripPrice - $discount;  
+    }
+
+    if(isset($coupon) && $coupon->amount_off){
+        $newPrice = $tripPrice - $coupon->amount_off; 
+    }
+    }
+
+    catch(\Exception $e){
+        \Log::error('Unable to retrieve coupon: '.$e->getMessage());
+    }
+    }
+
+    else{
+        \Log::warning('No Coupon ID provided for trip: '.$tripID);
+    }
+
 @endphp
 
 <x-travelcomponents.header />
@@ -116,7 +146,21 @@
 
 
 
-                    <span class="trip-price text-dark">${{ number_format($trip->tripPrice, 2) }} /person</span>
+                 <span class="trip-price text-dark">
+                    @if(isset($coupon) && isset($newPrice) && $newPrice < $tripPrice)
+                        <span class="text-decoration-line-through text-danger">
+                            ${{ number_format($tripPrice, 2) }}
+                        </span>
+                        <span class="fw-bold text-success">
+                            ${{ number_format($newPrice, 2) }}
+                        </span>
+                    @elseif(!isset($coupon)) 
+                        <span class="fw-bold">
+                            ${{ number_format($tripPrice, 2) }}
+                        </span>
+                    @endif 
+                </span>
+
                     <p class="trip-duration text-dark">
                         <!-- End Average Star Rating -->
 
@@ -146,16 +190,20 @@
                             @break
                         @endswitch
                     </p>
-                    <p class="trip-description" style="color: #000;"> {!! $trip->tripDescription !!}.</p>
+                    <p class="trip-description" style="color: #000;"> {!! $trip->tripDescription !!}</p>
+
+                    <h5 class="block mb-3 mt-5 fw-bold">Trip Dates</h5>
                     <ul class="trip-info">
                         <li style="color: #000; font-weight: bold;"><img
-                                src="{{ asset('assets/images/calendar.png') }}" class="icon" />
+                                src="{{ asset('assets/images/calendar.png') }}" class="icon" style="width: 60px; height: 60px;"/>
                             {{ date('F jS, Y', strtotime($trip->tripStartDate)) }} -
                             {{ date('F jS, Y', strtotime($trip->tripEndDate)) }}
                         </li>
 
 
                         @if (is_array($landscapes))
+                           <h5 class="block mb-3 mt-5 fw-bold">Landscapes</h5>
+
                             <div class="d-flex align-items-center">
                                 @foreach ($landscapes as $landscape)
                                     @switch($landscape)
@@ -163,7 +211,7 @@
                                             <div style="text-align: center; margin: 5px;">
                                                 <img src="{{ asset('assets/images/beach.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
-                                                    style="height: 40px; width: 40px; margin: 5px;" />
+                                                    style="height: 50px; width: 50px; margin: 5px;" />
                                                 <span style="display: block;">Beach</span>
                                             </div>
                                         @break
@@ -172,7 +220,7 @@
                                             <div style="text-align: center; margin: 5px;">
                                                 <img src="{{ asset('assets/images/buildings.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
-                                                    style="height: 40px; width: 40px; margin: 5px;" />
+                                                    style="height: 50px; width: 50px; margin: 5px;" />
                                                 <span style="display: block;">City</span>
                                             </div>
                                         @break
@@ -181,7 +229,7 @@
                                             <div style="text-align: center; margin: 5px;">
                                                 <img src="{{ asset('assets/images/farm.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
-                                                    style="height: 40px; width: 40px; margin: 5px;" />
+                                                    style="height: 50px; width: 50px; margin: 5px;" />
                                                 <span style="display: block;">Country Side</span>
                                             </div>
                                         @break
@@ -190,7 +238,7 @@
                                             <div style="text-align: center; margin: 5px;">
                                                 <img src="{{ asset('assets/images/mountain.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
-                                                    style="height: 40px; width: 40px; margin: 5px;" />
+                                                    style="height: 50px; width: 50px; margin: 5px;" />
                                                 <span style="display: block;">Mountainous</span>
                                             </div>
                                         @break
@@ -199,7 +247,7 @@
                                             <div style="text-align: center; margin: 5px;">
                                                 <img src="{{ asset('assets/images/forest.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
-                                                    style="height: 40px; width: 40px; margin: 5px;" />
+                                                    style="height: 50px; width: 50px; margin: 5px;" />
                                                 <span style="display: block;">Forested</span>
                                             </div>
                                         @break

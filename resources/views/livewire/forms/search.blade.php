@@ -10,10 +10,11 @@
                 <input id="searchQuery" name="searchQuery" wire:model="searchQuery" type="text" wire:loading.remove
                     class="form-control border-0 shadow-none ps-1 ps-sm-2" placeholder="Search..."
                     aria-label="Search..." />
-
-                <div class="spinner-border" wire:loading role="status">
+                
+                <span class="text-muted" wire:loading>loading search results...</span>
+                {{-- <div class="spinner-border" wire:loading role="status">
                     <span class="visually-hidden">Loading...</span>
-                </div>
+                </div> --}}
 
                 <!-- Autocomplete Results Container -->
                 <div class="autocomplete-results position-absolute top-100 start-0 w-100 bg-white rounded shadow-lg mt-1 max-height-200 overflow-auto"

@@ -35,7 +35,7 @@ class Home extends Controller
     // Optimized for performance 
     public function homePage()
     {
-        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'slug', 'stripe_product_id')->where('active', true)->get();
+        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'slug', 'stripe_product_id', 'stripe_coupon_id')->where('active', true)->get();
         $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
         
        
@@ -66,6 +66,7 @@ class Home extends Controller
                     'name' => $product->name,
                     'count' => $booking->booking_count,
                     'image' => $trip->tripPhoto,
+                    'coupon'=>$trip->stripe_coupon_id,
                     
                 ];
     
@@ -133,7 +134,7 @@ class Home extends Controller
 
     public function destinationsPage(){
        // Fetch all trips
-       $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'slug', 'stripe_product_id')->where('active', true)->get();
+       $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'slug', 'stripe_product_id', 'stripe_coupon_id')->where('active', true)->get();
         
        // Fetch approved testimonials
        $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
@@ -171,6 +172,8 @@ class Home extends Controller
                'name' => $product->name,
                'count' => $booking->booking_count,
                'image' => $trip->tripPhoto,
+               'coupon'=>$trip->stripe_coupon_id,
+
            ];
 
            if ($booking->booking_count > $highestBookingCount) {

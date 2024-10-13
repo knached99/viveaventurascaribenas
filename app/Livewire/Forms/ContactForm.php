@@ -19,20 +19,28 @@ class ContactForm extends Component
 
     use UsesSpamProtection;
 
-    #[Validate('required|string')]
     public string $name = '';
-
-    #[Validate('required|string|email')]
     public string $email = '';
-
-    #[Validate('required|string')]
     public string $subject = '';
-
-    #[Validate('required|string')]
     public string $message = '';
-
     public string $status = '';
     public string $error = '';
+
+
+    protected $rules = [
+        'name'=>'required|string',
+        'email'=>'required|string|email',
+        'subject'=>'required',
+        'message'=>"required|max:500",
+    ];
+
+    protected $messages = [
+        'name.required'=>'Your name is required',
+        'email.required'=>'Your email is required',
+        'email.email'=>'You\'ve entered an invalid email',
+        'message.required'=>'Please provide a reason for why you\'re reaching out to us',
+        'message.max'=>'Your message is too long',
+    ];
 
     public HoneypotData $extraFields;
 
