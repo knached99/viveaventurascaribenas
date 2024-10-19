@@ -343,7 +343,7 @@ private function getOrCreateStripeCustomer(string $email, string $name){
         $stripe_session = $this->createStripeCheckoutSession($existingCustomer->id, $trip, $tripName, $amount);
     
         return redirect()->away($stripe_session->url);
-    }  
+    }
 
 
 

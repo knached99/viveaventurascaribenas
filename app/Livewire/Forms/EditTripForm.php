@@ -16,6 +16,11 @@ use Exception;
 use Stripe\Exception\ApiErrorException;
 use Carbon\Carbon;
 
+// Dispatch events and notifications to users for trip availability status updates
+use App\Events\TripAvailabilityUpdated;
+use App\Listeners\SendNotificationOfTripAvailability;
+use App\Notifications\TripAvailabilityNotification;
+
 class EditTripForm extends Component
 {
     use WithFileUploads;
@@ -417,7 +422,6 @@ class EditTripForm extends Component
                 $newImageURLs = [];
 
                 \Log::info('Current Image URLs array: '.json_encode($newImageURLs));
-
 
             
                 $newImageURLs = []; 
