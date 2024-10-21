@@ -1,12 +1,17 @@
 @php
+    use Carbon\Carbon;
     $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
     $stripeCheckoutID = $booking->stripe_checkout_id;
     $product = $stripe->products->retrieve($booking->stripe_product_id);
     $location = $product->name;
 
+    $fullPrice = $booking->trip->tripPrice;
+
     $photos = json_decode($booking->trip->tripPhoto, true);
 
     $firstPhoto = !empty($photos) ? asset($photos[0]) : asset('assets/images/booking_page_bg.webp');
+
+    $isPartialPayment = false;
 
     if (!empty($stripeCheckoutID)) {
         $stripeCheckoutSession = $stripe->checkout->sessions->retrieve($stripeCheckoutID);
@@ -17,7 +22,13 @@
 
             if (count($charges->data) > 0) {
                 $charge = $charges->data[0];
+
+                dd($charge);
                 $paymentMethod = $charge->payment_method_details->type;
+
+                if ($charge->amount < $fullPrice) {
+                    $isPartialPayment = true;
+                }
 
                 // Initializing variables to avoid undefined errors
                 $cardExpirationMonth = 'N/A';
@@ -92,13 +103,15 @@
                 </p>
             </div>
 
-            <!-- Payment Status -->
-            <div class="mb-6">
-                <h6 class="text-lg font-medium text-blue-gray-800">
-                    <i class='bx bxs-check-shield'></i> Payment Status
-                </h6>
-                <span
-                    class="inline-block px-3 py-1 mt-2 text-xs font-semibold rounded-full
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- Payment Status -->
+                    <div class="mb-6">
+                        <h6 class="text-lg font-medium text-blue-gray-800">
+                            <i class='bx bxs-check-shield'></i> Payment Status
+                        </h6>
+                        <span
+                            class="inline-block px-3 py-1 mt-2 text-xs font-semibold rounded-full
                     @switch($paymentStatus)
                         @case('succeeded') bg-emerald-500 @break
                         @case('incomplete') bg-indigo-500 @break
@@ -107,10 +120,61 @@
                         @case('canceled') bg-orange-500 @break
                     @endswitch
                     text-white">
-                    {{ $paymentStatus }}
-                </span>
-            </div>
+                            {{ $paymentStatus }}
+                        </span>
+                    </div>
+                </div> <!-- End Col -->
 
+                <!-- If Payment was partial or full -->
+                <div class="col-md-6">
+                    <div class="mb-6">
+                        <h6 class="text-lg font-medium text-blue-gray-800">
+                            @switch('isPartialPayment')
+                                @case(true)
+                                    <i class='bx bx-time-five'></i>
+                                    Partial Payment Recieved
+                                @break
+
+                                @case(false)
+                                    <i class='bx bx-check-circle'></i>
+                                    Full Payment Recieved
+                                @break
+                            @endswitch
+                        </h6>
+                        <span
+                            class="inline-block px-3 py-1 mt-2 text-xs font-semibold rounded-full text-white
+               @switch('isPartialPayment')
+               @case(true)
+               bg-amber-500 
+               @break
+               @case(false)
+               bg-green-500
+               @endswitch 
+               ">
+                            @switch('isPartialPayment')
+                                @case(true)
+                                    Partial Payment
+                                @break
+
+                                @case(false)
+                                    Full Payment Recieved
+                                @break
+                            @endswitch
+                        </span>
+                        @php
+                            if ($isPartialPayment = true) {
+                                $bookedAt = Carbon::parse($booking->created_at);
+                                $now = Carbon::now();
+                                $daysRemainingForPayment = $bookedAt->diffInDays($now);
+                            }
+                        @endphp
+                        <p>Full amount due in {{ $daysRemainingForPayment ?? '' }} days</p>
+
+                    </div>
+                </div>
+                <!-- End Col -->
+            </div>
+            <!-- End Row -->
             <!-- Payment Details -->
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <!-- Payment Method -->

@@ -78,19 +78,29 @@
                 <div class="form-group mb-3">
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="payment_option" wire:model="payment_option"
-                            id="payment_option" value="pay_in_full">
-                        <label class="form-check-label" for="payment_option">
+                            wire:change="display_partial_amount" id="payment_option_full" value="pay_in_full">
+                        <label class="form-check-label" for="payment_option_full">
                             Full Payment
                         </label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="payment_option"
-                            wire:model="payment_option" id="payment_option" value="partial_payments">
-                        <label class="form-check-label" for="flexRadioDefault2">
+                            wire:model="payment_option" wire:change="display_partial_amount"
+                            id="payment_option_partial" value="partial_payments">
+                        <label class="form-check-label" for="payment_option_partial">
                             Partial Payments
                         </label>
                     </div>
                 </div>
+
+                <!-- Display the partial payment amount -->
+                <div>
+                    @if ($payment_option == 'partial_payments')
+                        <span>Initial Payment Due Today: ${{ number_format($initialPayment, 2) }}</span><br>
+                    @endif
+                </div>
+
+
 
 
 

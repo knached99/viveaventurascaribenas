@@ -38,6 +38,14 @@ class BookingForm extends Component
     public $customers;
     public string $error = '';
 
+    public $initialPayment = 0;
+    public $finalPayment = 0;
+
+    protected $listeners = ['payment_option_selected' => 'displayPartialAmount'];
+    
+    public $partialAmount = 0;
+
+   
 
     protected $rules = [
         'name' => 'required|string',
@@ -97,6 +105,35 @@ class BookingForm extends Component
        
     }
 
+
+  
+public function display_partial_amount()
+{
+    if ($this->payment_option == 'partial_payments') {
+       
+        $paymentData = $this->calculatePartialPayment();
+
+        $this->initialPayment = $paymentData['initialPayment'];
+    }
+     else {
+        // Reset the values when "Full Payment" is selected
+        $this->initialPayment = 0;
+    }
+}
+
+
+private function calculatePartialPayment()
+{
+    $trip = TripsModel::findOrFail($this->tripID);
+    
+    $initialPayment = $trip->tripPrice * 0.60;
+
+    return [
+        'initialPayment' => $initialPayment,
+    ];
+}
+    
+
     public function updatedPhoneNumber($value)
     {
         $numbersOnly = preg_replace('/\D/', '', $value);
@@ -143,106 +180,140 @@ class BookingForm extends Component
     }
 
 
-private function createSplitInvoices($customerID, $amount, $tripName)
-{
-    $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
-
+    private function createSplitInvoices($customerID, $amount, $tripName)
+    {
+        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
     
-    $initialPayment = $amount * 0.60;
-    $finalPayment = $amount * 0.40;
-
-    // Create initial invoice item
-    $stripe->invoiceItems->create([
-        'customer' => $customerID,
-        'amount' => $initialPayment,
-        'currency' => 'usd',
-        'description' => 'Initial payment for ' . $tripName,
-    ]);
-
-    // First Invoice
-    $firstInvoice = $stripe->invoices->create([
-        'customer' => $customerID,
-        'collection_method' => 'send_invoice',
-        'auto_advance' => true,
-        'days_until_due' => 0,
-    ]);
-
-    // Finalize first invoice and send to customer
-    $stripe->invoices->finalizeInvoice($firstInvoice->id); // Fix the typo here
-
-    // Second Invoice (for final payment)
-    $secondInvoice = $stripe->invoices->create([
-        'customer' => $customerID,
-        'collection_method' => 'send_invoice',
-        'auto_advance' => true,
-        'days_until_due' => 7, // Due in 7 days
-    ]);
-
-    $stripe->invoices->finalizeInvoice($secondInvoice->id);
-}
+        $initialPayment = $amount * 0.60;
+        $finalPayment = $amount * 0.40;
+    
+        // Create invoice item for the initial payment
+        $stripe->invoiceItems->create([
+            'customer' => $customerID,
+            'amount' => $initialPayment * 100, // Convert to cents for Stripe
+            'currency' => 'usd',
+            'description' => 'Initial payment for ' . $tripName,
+        ]);
+    
+        // Create and finalize the first invoice for the initial payment
+        $firstInvoice = $stripe->invoices->create([
+            'customer' => $customerID,
+            'collection_method' => 'charge_automatically', // Automatically charge the customer
+            'auto_advance' => true, // Automatically finalize and attempt collection
+        ]);
+    
+        $stripe->invoices->finalizeInvoice($firstInvoice->id); // Finalize and attempt to charge
+    
+        // Optional: You can retrieve the charge that was created for the first invoice
+        $firstCharge = $stripe->charges->all([
+            'invoice' => $firstInvoice->id,
+        ])->data[0]; // Retrieve the first charge associated with this invoice
+        
+        \Log::info('First charge ID: ' . $firstCharge->id);
+    
+        // Now create invoice item for the final payment
+        $stripe->invoiceItems->create([
+            'customer' => $customerID,
+            'amount' => $finalPayment * 100, // Convert to cents for Stripe
+            'currency' => 'usd',
+            'description' => 'Final payment for ' . $tripName,
+        ]);
+    
+        // Create and finalize the second invoice for the final payment
+        $secondInvoice = $stripe->invoices->create([
+            'customer' => $customerID,
+            'collection_method' => 'charge_automatically', // Automatically charge the customer
+            'auto_advance' => true, // Automatically finalize and attempt collection
+            'due_date' => strtotime('+7 days'), // Set due date 7 days in the future
+        ]);
+    
+        $stripe->invoices->finalizeInvoice($secondInvoice->id); // Finalize and attempt to charge
+    
+        // Optional: Retrieve the charge for the second invoice
+        $secondCharge = $stripe->charges->all([
+            'invoice' => $secondInvoice->id,
+        ])->data[0]; // Retrieve the first charge associated with this invoice
+        
+        \Log::info('Second charge ID: ' . $secondCharge->id);
+    }
+    
 
 
 
 
 private function createStripeCheckoutSession($customerId, $trip, $tripName, $amount)
 {
+    
     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-    // Handle partial payments or full payments
+
     $finalAmount = $this->payment_option === 'partial_payments'
         ? $amount * 0.60  // 60% for partial payments
-        : $amount;         // Full amount for 'pay_in_full'
+        : $amount;
+        
+    
+    try {
 
-    return $stripe->checkout->sessions->create([
-        'payment_method_types' => ['card', 'cashapp', 'affirm'],
-        'line_items' => [[
-            'price_data' => [
-                'currency' => 'usd',
-                'product_data' => [
-                    'name' => $tripName,
-                    'metadata' => [
-                        'stripe_product_id' => $trip->stripe_product_id
+        $discounts = !empty($trip->stripe_coupon_id) ? [['coupon'=>$trip->stripe_coupon_id]] 
+        : null;
+
+        $sessionData = [
+            'payment_method_types' => ['card', 'cashapp', 'affirm'],
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'usd',
+                    'product_data' => [
+                        'name' => $tripName,
+                        'metadata' => [
+                            'stripe_product_id' => $trip->stripe_product_id,
+                        ],
                     ],
+                    'unit_amount' => $finalAmount * 100, // Stripe requires amount in cents
                 ],
-                'unit_amount' => $finalAmount * 100, // Stripe requires amount in cents
+                'quantity' => 1,
+            ]],
+            'automatic_tax' => ['enabled' => true],
+            'shipping_address_collection' => [
+                'allowed_countries' => ['US'],
             ],
-            'quantity' => 1,
-        ]],
+            'customer' => $customerId,
+            'customer_update' => [
+                'address' => 'auto',
+                'shipping' => 'auto',
+            ],
+            'mode' => 'payment',
+            'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID,
+            'cancel_url' => route('booking.cancel', [
+                'tripID' => $this->tripID,
+                'name' => $this->name,
+                'email' => $this->email,
+            ]),
+            'metadata' => [
+                'tripID' => $this->tripID,
+                'stripe_product_id' => $trip->stripe_product_id,
+                'name' => $this->name,
+                'email' => $this->email,
+                'phone_number' => $this->phone_number,
+                'address_line_1' => $this->address_line_1,
+                'address_line_2' => $this->address_line_2,
+                'city' => $this->city,
+                'state' => $this->state,
+                'zipcode' => $this->zipcode,
+            ],
+        ];
 
-        'automatic_tax' => ['enabled' => true],
-        'shipping_address_collection' => [
-            'allowed_countries' => ['US'],
-        ],
+        if($discounts){
+            $sessionData['discounts'] = $discounts;
+        }
 
-        'customer' => $customerId,
-        'customer_update' => [
-            'address' => 'auto',
-            'shipping' => 'auto'
-        ],
+        return $stripe->checkout->sessions->create($sessionData);
 
-        'mode' => 'payment',
-        'discounts'=> [[
-            'coupon'=>$trip->stripe_coupon_id,
-        ]],
+}
 
-        'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID,
-        'cancel_url' => route('booking.cancel', [
-            'tripID' => $this->tripID,
-            'name' => $this->name,
-            'email' => $this->email,
-        ]),
-        'metadata' => [
-            'tripID' => $this->tripID,
-            'stripe_product_id' => $trip->stripe_product_id,
-            'name'=>$this->name,
-            'email'=>$this->email,
-            'phone_number'=>$this->phone_number,
-            'address_line_1'=>$this->address_line_1,
-            'address_line_2'=>$this->address_line_2,
-            'city'=>$this->city,
-            'state'=>$this->state,
-            'zipcode'=>$this->zipcode,
-        ],
-    ]);
+catch(\Stripe\Exception\InvalidRequestException $e){
+
+    \Log::critical('Error: '.$e->getMessage(). 'Encountered in method: '.__FUNCTION__. ' in class: '.__CLASS__. ' on line: '.__LINE__);
+}
+
 }
 
 
@@ -342,7 +413,7 @@ private function getOrCreateStripeCustomer(string $email, string $name){
         // Create Stripe checkout session (amount will be multiplied by 100 in this method)
         $stripe_session = $this->createStripeCheckoutSession($existingCustomer->id, $trip, $tripName, $amount);
     
-        return redirect()->away($stripe_session->url);
+    return redirect()->away($stripe_session->url);
     }
 
 

@@ -290,10 +290,12 @@ class Admin extends Controller
         // $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
         // $stripeProductID = $trip->stripe_product_id;
 
-        $grossProfit = BookingModel::where('tripID', $tripID)->sum('amount_captured');
-        $netProfit = $grossProfit - $totalNetCost;
-      
 
+
+
+        $grossProfit = BookingModel::where('tripID', $tripID)->sum('amount_captured');
+        $netProfit = isset($grossProfit) && isset($totalNetCost) ? $grossProfit - $totalNetCost : 0;
+        
 
         $dataToCache = [
             'tripId' => $tripID,
