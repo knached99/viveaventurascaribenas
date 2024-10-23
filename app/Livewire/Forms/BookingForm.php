@@ -179,37 +179,19 @@ private function calculatePartialPayment()
         }
     }
 
+   
 
+    // This method is called when the user selects "partial payments" 
     private function createSplitInvoices($customerID, $amount, $tripName)
     {
         $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
     
-        $initialPayment = $amount * 0.60;
         $finalPayment = $amount * 0.40;
     
-        // Create invoice item for the initial payment
-        $stripe->invoiceItems->create([
-            'customer' => $customerID,
-            'amount' => $initialPayment * 100, // Convert to cents for Stripe
-            'currency' => 'usd',
-            'description' => 'Initial payment for ' . $tripName,
-        ]);
-    
-        // Create and finalize the first invoice for the initial payment
-        $firstInvoice = $stripe->invoices->create([
-            'customer' => $customerID,
-            'collection_method' => 'charge_automatically', // Automatically charge the customer
-            'auto_advance' => true, // Automatically finalize and attempt collection
-        ]);
-    
-        $stripe->invoices->finalizeInvoice($firstInvoice->id); // Finalize and attempt to charge
-    
-        // Optional: You can retrieve the charge that was created for the first invoice
-        $firstCharge = $stripe->charges->all([
-            'invoice' => $firstInvoice->id,
-        ])->data[0]; // Retrieve the first charge associated with this invoice
-        
-        \Log::info('First charge ID: ' . $firstCharge->id);
+        /*
+        TO
+        find a way to pay the final payment invoice and check to see if there's a charge object associated with it
+        */
     
         // Now create invoice item for the final payment
         $stripe->invoiceItems->create([
@@ -222,20 +204,19 @@ private function calculatePartialPayment()
         // Create and finalize the second invoice for the final payment
         $secondInvoice = $stripe->invoices->create([
             'customer' => $customerID,
-            'collection_method' => 'charge_automatically', // Automatically charge the customer
+            'collection_method' => 'send_invoice', // Automatically charge the customer
             'auto_advance' => true, // Automatically finalize and attempt collection
-            'due_date' => strtotime('+7 days'), // Set due date 7 days in the future
+            'days_until_due'=>7,
+            
         ]);
     
         $stripe->invoices->finalizeInvoice($secondInvoice->id); // Finalize and attempt to charge
     
-        // Optional: Retrieve the charge for the second invoice
-        $secondCharge = $stripe->charges->all([
-            'invoice' => $secondInvoice->id,
-        ])->data[0]; // Retrieve the first charge associated with this invoice
-        
-        \Log::info('Second charge ID: ' . $secondCharge->id);
+    
     }
+    
+
+
     
 
 
@@ -253,7 +234,7 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
     
     try {
 
-        $discounts = !empty($trip->stripe_coupon_id) ? [['coupon'=>$trip->stripe_coupon_id]] 
+        $discounts = !empty($trip->stripe_coupon_id) ? [['coupon'=>$trip->stripe_coupon_id]]
         : null;
 
         $sessionData = [
@@ -400,10 +381,9 @@ private function getOrCreateStripeCustomer(string $email, string $name){
         $existingCustomer = $this->getOrCreateStripeCustomer($this->email, $this->name);
     
         // Correct amount calculation (in dollars)
-        $tripPrice = $trip->tripPrice; // This should be the price in dollars, not cents.
     
         // Now calculate the correct amount in dollars and later convert to cents where needed
-        $amount = $tripPrice; // Amount is still in dollars here, do not multiply by 100 yet
+        $amount = $trip->tripPrice; // Amount is still in dollars here, do not multiply by 100 yet
     
         if ($this->payment_option === 'partial_payments') {
             // Pass amount in dollars to the method, it will handle the split invoices

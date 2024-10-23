@@ -45,6 +45,7 @@ class Admin extends Controller
                 'query' => "status:'succeeded'",
             ]);
         });
+
     
         // We need to get all transactions that weren't refunded
         $transactions = array_filter($charges->data, function ($charge) {
@@ -154,10 +155,14 @@ class Admin extends Controller
     {
         try {
             $booking = BookingModel::with('trip')->where('bookingID', $bookingID)->firstOrFail();
+           
+            dd($booking);
             return view('admin.booking', [
                 'bookingID' => $bookingID,
                 'booking' => $booking
             ]);
+
+           
     
         } catch (ModelNotFoundException $e) {
             \Log::error('ModelNotFoundException encountered on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' Error Message: ' . $e->getMessage());
@@ -287,10 +292,6 @@ class Admin extends Controller
         $tripCosts = json_decode($trip->tripCosts, true) ?: [];
        
         $totalNetCost = array_reduce($tripCosts, fn($carry, $cost) => $carry + (float) $cost['amount'], 0);
-        // $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-        // $stripeProductID = $trip->stripe_product_id;
-
-
 
 
         $grossProfit = BookingModel::where('tripID', $tripID)->sum('amount_captured');
@@ -436,16 +437,6 @@ class Admin extends Controller
             'freeSpace' => $freeSpace
         ];
     }
-    
-    
-    private function isJson($data) {
-        return ((is_string($data) &&
-                (is_object(json_decode($data)) ||
-                is_array(json_decode($data))))) ? true : false;
-    }
-
-
-    
 
 
 

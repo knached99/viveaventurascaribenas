@@ -23,7 +23,6 @@
             if (count($charges->data) > 0) {
                 $charge = $charges->data[0];
 
-                dd($charge);
                 $paymentMethod = $charge->payment_method_details->type;
 
                 if ($charge->amount < $fullPrice) {
