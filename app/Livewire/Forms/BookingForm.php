@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Forms;
 
+namespace App\Livewire\Forms;
+
 use Livewire\Component;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
@@ -17,10 +19,11 @@ use App\Notifications\BookingReservedAdmin;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
+
 class BookingForm extends Component
 {
     protected $stripe;
-
+    
     public $currentStep = 1;
     public string $name = '';
     public string $email = '';
@@ -34,6 +37,9 @@ class BookingForm extends Component
     public string $num_trips = '';
     public string $payment_option = '';
     public string $tripAvailability = '';
+    public string $preferred_start_date = '';
+    public string $preferred_end_date = '';
+
     public array $states = [];
     public $customers;
     public string $error = '';
@@ -45,19 +51,46 @@ class BookingForm extends Component
     
     public $partialAmount = 0;
 
-   
+    public function mount($tripID)
+    {
+        \Log::info('Initializing Stripe client...');
+        $this->tripID = $tripID;
+        $trip = TripsModel::findOrFail($this->tripID);
+        $this->tripAvailability = $trip->tripAvailability;
+        $this->num_trips = $trip->num_trips;
+        $statesJson = file_get_contents(resource_path('js/states.json'));
+        $statesArray = json_decode($statesJson, true);
+    
+        $this->states = array_map(function($name, $code) {
+            return ['code' => $code, 'name' => $name];
+        }, $statesArray, array_keys($statesArray));
+    }
+    
+    public function rules()
+    {
+        // Define the minimum start date
+        $minStartDate = Carbon::now()->addWeek()->format('Y-m-d');
 
-    protected $rules = [
-        'name' => 'required|string',
-        'email' => 'required|string|email',
-        'phone_number' => ['required', 'regex:/^\d{3}-\d{3}-\d{4}$/'],
-        'address_line_1' => ['required', 'regex:/^\d+\s[A-z]+\s[A-z]+/'],
-        'address_line_1'=> ['sometimes', 'regex:/^[\w\s,.-]*$/'],
-        'city' => ['required'],
-        'state' => ['required'],
-        'zipcode' => ['required', 'regex:/^\d{5}(-\d{4})?$/'],
-        'payment_option'=>['required'],
-    ];
+        $rules = [
+            'name' => 'required|string',
+            'email' => 'required|string|email',
+            'phone_number' => ['required', 'regex:/^\d{3}-\d{3}-\d{4}$/'],
+            'address_line_1' => ['required', 'regex:/^\d+\s[A-z]+\s[A-z]+/'],
+            'address_line_2'=> ['sometimes', 'regex:/^[\w\s,.-]*$/'],
+            'city' => ['required'],
+            'state' => ['required'],
+            'zipcode' => ['required', 'regex:/^\d{5}(-\d{4})?$/'],
+            'payment_option'=> ['sometimes'],
+        ];
+
+        // Add preferred dates rules if tripAvailability is 'coming soon'
+        if ($this->tripAvailability === 'coming soon') {
+            $rules['preferred_start_date'] = 'required|date|after_or_equal:' . $minStartDate;
+            $rules['preferred_end_date'] = 'required|date|after:preferred_start_date';
+        }
+
+        return $rules;
+    }
 
     protected $messages = [
         'name.required'=>'Please provide your first and last name',
@@ -70,7 +103,13 @@ class BookingForm extends Component
         'address_line_2.regex'=>'You must provide a valid PO box or suite number',
         'city.required'=>'Your city is required',
         'state.required'=>'Your state is required',
-        'payment_option'=>'Please choose if you\'d like to pay in full or make partial payments',
+        'payment_option.required'=>'Please choose if you\'d like to pay in full or make partial payments',
+        'preferred_start_date.required'=>'Please select a start date',
+        'preferred_start_date.date'=>'You must select a valid start date',
+        'preferred_start_date.after'=>'Start date must be at least 1 week from today',
+        'preferred_end_date.required'=>'Please select a valid end date',
+        'preferred_end_date.date'=>'You must select a valid end date',
+        'preferred_end_date.after'=>'End date must not be equal to or before the start date',
     ];
 
     protected $validationAttributes = [
@@ -83,27 +122,9 @@ class BookingForm extends Component
         'state' => 'State',
         'zipcode' => 'Zipcode',
         'payment_option' => 'Payment Option',
+        'preferred_start_date'=>'Start Date',
+        'preferred_end_date'=>'End Date',
     ];
-
-    public function mount($tripID)
-    {
-        
-
-        \Log::info('Initializing Stripe client...');
-        \Log::info('Stripe client initialized.');
-        
-        $this->tripID = $tripID;
-        $trip = TripsModel::findOrFail($this->tripID);
-        $this->tripAvailability = $trip->tripAvailability;
-        $this->num_trips = $trip->num_trips;
-        $statesJson = file_get_contents(resource_path('js/states.json'));
-        $statesArray = json_decode($statesJson, true);
-
-        $this->states = array_map(function($name, $code) {
-            return ['code' => $code, 'name' => $name];
-        }, $statesArray, array_keys($statesArray));
-       
-    }
 
 
   
@@ -163,22 +184,28 @@ private function calculatePartialPayment()
     {
         if ($this->currentStep === 1) {
             $this->validate([
-                'name' => $this->rules['name'],
-                'email' => $this->rules['email'],
-                'phone_number' => $this->rules['phone_number'],
+                'name' => $this->rules()['name'],
+                'email' => $this->rules()['email'],
+                'phone_number' => $this->rules()['phone_number'],
             ]);
         } elseif ($this->currentStep === 2) {
             $this->validate([
-                'address_line_1' => $this->rules['address_line_1'],
-                'city' => $this->rules['city'],
-                'state' => $this->rules['state'],
-                'zipcode' => $this->rules['zipcode'],
-                'payment_option'=>$this->rules['payment_option'],
-                
+                'address_line_1' => $this->rules()['address_line_1'],
+                'city' => $this->rules()['city'],
+                'state' => $this->rules()['state'],
+                'zipcode' => $this->rules()['zipcode'],
+                'payment_option' => $this->rules()['payment_option'],
+            ]);
+        }
+
+        elseif($this->currentStep === 3){
+            $this->validate([
+                'preferred_start_date'=>$this->rules()['preferred_start_date'],
+                'preferred_end_date'=>$this->rules()['preferred_end_date'],
             ]);
         }
     }
-
+    
    
 
     // This method is called when the user selects "partial payments" 
@@ -323,17 +350,19 @@ private function getOrCreateStripeCustomer(string $email, string $name){
 
 
     private function handleComingSoonReservation($trip, $reservationID){
-        $reservationExists = Reservations::where('email', $this->email)->orWhere('
-        phone_number', $this->phone_number)->first();
+
+
+        $reservationExists = Reservations::where('email', $this->email)->orWhere('phone_number', $this->phone_number)->first();
 
         if(!empty($reservationExists)){
-            $this->error = 'A reservation for this trip has already been confirmed for you. Please check your email for further information and next steps.';
+            $this->error = 'A reservation for this trip has already been confirmed for you. Please check your email '.$this->email. ' for further information and next steps.';
             return;
         }
 
         Reservations::create([
             'reservationID'=>$reservationID,
             'stripe_product_id'=>$trip->stripe_product_id,
+            'tripID'=>$trip->tripID,
             'name'=>$this->name,
             'email'=>$this->email,
             'phone_number'=>$this->phone_number,
@@ -341,7 +370,9 @@ private function getOrCreateStripeCustomer(string $email, string $name){
             'address_line_2'=>$this->address_line_2,
             'city'=>$this->city,
             'state'=>$this->state,
-            'zip_code'=>$this->zipCode,
+            'zip_code'=>$this->zipcode,
+            'preferred_start_date'=>$this->preferred_start_date,
+            'preferred_end_date'=>$this->preferred_end_date,
         ]);
 
         if($trip->num_trips !== 0){
@@ -402,7 +433,8 @@ private function getOrCreateStripeCustomer(string $email, string $name){
     public function render()
     {
         return view('livewire.forms.booking-form', [
-            'states' => $this->states
+            'states' => $this->states,
+            'tripAvailability' => $this->tripAvailability
         ]);
     }
 }

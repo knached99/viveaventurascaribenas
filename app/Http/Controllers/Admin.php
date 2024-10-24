@@ -90,8 +90,7 @@ class Admin extends Controller
             ->select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id', 'tripID', 'created_at')
             ->get();
     
-        $reservations = Reservations::select('reservationID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();
-    
+        $reservations = Reservations::with(['trip'])->select('reservationID', 'tripID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();
         // Optimizing Stripe API calls here
         $allProductIds = $bookings->pluck('stripe_product_id')
             ->merge($reservations->pluck('stripe_product_id'))
@@ -156,7 +155,7 @@ class Admin extends Controller
         try {
             $booking = BookingModel::with('trip')->where('bookingID', $bookingID)->firstOrFail();
            
-            dd($booking);
+        
             return view('admin.booking', [
                 'bookingID' => $bookingID,
                 'booking' => $booking
@@ -173,12 +172,13 @@ class Admin extends Controller
         }
     }
 
+
     public function getReservationDetails($reservationID){
         try{
             
-            $reservation = Reservations::findOrFail($reservationID);
+            $reservation = Reservations::with(['trip'])->findOrFail($reservationID);
 
-            return view('admin/reservations/', ['reservationID' => $reservationID, 'reservation'=>$reservation]);
+            return view('admin.reservation', ['reservationID' => $reservationID, 'reservation'=>$reservation]);
         
     }
     catch(ModelNotFoundException $e){

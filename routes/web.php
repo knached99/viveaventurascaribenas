@@ -63,7 +63,7 @@ Route::group(['middleware' => 'auth', 'verified'], function () {
     Volt::route('/admin/uploadPhoto', 'pages.photo-gallery-upload')->name('admin.photo-gallery-upload');
     Route::get('/admin/trip/{tripID}', [Admin::class, 'getTripDetails'])->name('admin.trip');
     Route::delete('/admin/trip/delete/{tripID}', [Admin::class, 'deleteTrip'])->name('admin.trip.delete');
-    Route::get('/admin/reservations/{reservationID}', [Admin::class, 'getReservationDetails'])->name('admin.reservations');
+    Route::get('/admin/reservation/{reservationID}', [Admin::class, 'getReservationDetails'])->name('admin.reservation');
     
     // Photo Gallery 
 

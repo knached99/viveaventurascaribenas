@@ -5,7 +5,8 @@
         <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="card-title m-0 me-2">Reservations</h5>
             <div class="dropdown">
-                <button class="btn text-muted p-0" type="button" id="transactionID" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button class="btn text-muted p-0" type="button" id="transactionID" data-bs-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
                     <i class="bx bx-dots-vertical-rounded bx-lg"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">
@@ -33,9 +34,6 @@
                 </thead>
                 <tbody>
                     @foreach ($reservations as $reservation)
-                        @php
-                            $location = $productMap[$reservation->stripe_product_id] ?? 'Unknown';
-                        @endphp
                         <tr>
                             <td>{{ $reservation->name }}</td>
                             <td>{{ $reservation->email }}</td>
@@ -45,8 +43,11 @@
                             <td>{{ $reservation->city }}</td>
                             <td>{{ $reservation->state }}</td>
                             <td>{{ $reservation->zip_code }}</td>
-                            <td>{{ $location }}</td>
-                            <td><a href="#">View</a></td>
+                            <td>{{ $reservation->trip->tripLocation }}</td>
+                            <td><a
+                                    href="{{ route('admin.reservation', ['reservationID' => $reservation->reservationID]) }}">View</a>
+                            </td>]
+
                         </tr>
                     @endforeach
                 </tbody>

@@ -17,7 +17,7 @@ use Stripe\Exception\ApiErrorException;
 use Carbon\Carbon;
 
 // Dispatch events and notifications to users for trip availability status updates
-use App\Events\TripAvailabilityUpdated;
+use App\Events\TripBecameAvailable;
 use App\Listeners\SendNotificationOfTripAvailability;
 use App\Notifications\TripAvailabilityNotification;
 
@@ -103,12 +103,7 @@ class EditTripForm extends Component
         $this->stripe_coupon_id = $cachedTrip['stripe_coupon_id'];
         $this->stripe_promo_id = $cachedTrip['stripe_promo_id'];
     
-        // $this->calculateFinancials();
-        
-        // if($this->stripe_promo_id){
-        
-        //     $this->getDiscountFromStripe($this->stripe_promo_id);
-        // }
+
     }
     
     private function loadFromDatabase(): void
@@ -118,8 +113,6 @@ class EditTripForm extends Component
         $this->tripLocation = $trip->tripLocation;
         $this->tripPhotos = json_decode($trip->tripPhoto, true); // true converts JSON to array
 
-        // $this->tripPhotos = isset($trip->tripPhoto) ? json_decode($trip->tripPhoto, true) : [];
-       // $this->tripPhotos = $trip->tripPhoto ? json_decode($trip->tripPhoto, true) : []; // This should be an array of URLs or paths
         $this->tripLandscape = $trip->tripLandscape ? json_decode($trip->tripLandscape, true) : [];
         $this->tripAvailability = $trip->tripAvailability;
         $this->tripDescription = $trip->tripDescription;
@@ -159,64 +152,10 @@ class EditTripForm extends Component
             
         ], 600); // Cached for 10 minutes
     
-        // $this->calculateFinancials();
-
-        // if($this->stripe_promo_id){
-        //     $this->getDiscountFromStripe($this->stripe_promo_id);
-        // }
-        
+    
     }
 
-    // private function getDiscountFromStripe($stripe_promo_id){
-
-    //     try{
-    //     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-    //     $discount = $stripe->promotionCodes->retrieve($stripe_promo_id, []);
-    //     \Log::info($discount);
-
-    //     }
-    //     catch(Stripe\Exception\ApiErrorException $e){
-    //         $this->discountCreateError = 'Something went wrong!';
-    //         \Log::error($e->getMessage());
-    //         return;
-    //     }
-
-    //     return $discount;
-    // }
-    
-    // private function calculateFinancials(): void
-    // {
-    //     $totalNetCost = array_reduce($this->tripCosts, function($carry, $cost) {
-    //         return $carry + (float) $cost['amount'];
-    //     });
-
-    //     try {
-    //         $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-    //         $charges = Cache::remember('charges_' . $this->stripe_product_id, 600, function() use ($stripe) {
-    //             return $stripe->charges->search([
-    //                 'query' => "status:'succeeded'",
-    //                 'limit' => 100,
-    //             ]);
-    //         });
-
-    //         $filteredCharges = array_filter($charges->data, function ($charge) {
-    //             return $charge->amount_refunded == 0 && isset($charge->amount_captured) && $charge->amount_captured > 0;
-    //         });
-
-    //         $grossProfit = array_reduce($filteredCharges, function ($carry, $charge) {
-    //             return $carry + (float) $charge->amount_captured / 100;
-    //         }, 0);
-
-    //         $netProfit = $grossProfit - $totalNetCost;
-
-    //         $this->grossProfit = $grossProfit;
-    //         $this->netProfit = $netProfit;
-
-    //     } catch (Exception $e) {
-    //         \Log::error('Error encountered: '.$e->getMessage());
-    //     }
-    // }
-
+  
     public function addCost()
     {
         \Log::info('Adding Trip Cost');
@@ -390,9 +329,6 @@ class EditTripForm extends Component
         
         $rules = [
             'tripLocation' => 'required|string|max:255',
-            // 'tripPhotos.*'=>'sometimes|array|max:3',
-            // 'tripPhotos' => 'nullable|array|max:3', // Ensure tripPhotos is an array with a max of 3 items
-            // 'tripPhotos.*' => 'image|mimes:jpg,jpeg,png|max:5120', // Validate image types and max size (2MB
             'tripLandscape' => 'required|array',
             'tripAvailability' => 'required|string',
             'tripDescription' => 'required|string',
@@ -424,7 +360,7 @@ class EditTripForm extends Component
                 \Log::info('Current Image URLs array: '.json_encode($newImageURLs));
 
             
-                $newImageURLs = []; 
+                $newImageURLs = [];
 
             
                 if (!empty($this->tripPhotos) && is_array($this->tripPhotos)) {
@@ -457,7 +393,16 @@ class EditTripForm extends Component
                 
                 \Log::info('Current newImageURLs array: '.json_encode($newImageURLs));
                
-        
+                \Log::info('Current trip availability in DB: ' . $tripModel->tripAvailability);
+                \Log::info('Current trip availability in Livewire: ' . $this->tripAvailability);
+                if ($tripModel->tripAvailability !== $this->tripAvailability) {
+                    \Log::info('Trip availability has changed.');
+                    if (strtolower($this->tripAvailability) === 'available') {
+                        \Log::info('Dispatching TripBecameAvailable event for trip ID: ' . $tripModel->tripID);
+                        event(new TripBecameAvailable($tripModel));
+                    }
+                    
+                }
         
                 $tripModel->tripLocation = $this->tripLocation;
                 $tripModel->tripPhoto = !empty($newImageURLs) ? json_encode($newImageURLs) : json_encode($this->tripPhotos);
@@ -474,6 +419,11 @@ class EditTripForm extends Component
                 $tripModel->tripCosts = json_encode($this->tripCosts);
         
                 $tripModel->save();
+
+               
+
+                
+                
         
                 Cache::put($this->cacheKey, [
                     'tripLocation' => $this->tripLocation,

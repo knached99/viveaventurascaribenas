@@ -161,13 +161,20 @@
                             @endswitch
                         </span>
                         @php
-                            if ($isPartialPayment = true) {
+                            if ($isPartialPayment === true) {
                                 $bookedAt = Carbon::parse($booking->created_at);
                                 $now = Carbon::now();
-                                $daysRemainingForPayment = $bookedAt->diffInDays($now);
+                                // Calculate the remaining days for the full payment (7 days from booking date)
+                                $daysRemainingForPayment = 7 - $bookedAt->diffInDays($now);
+
+                                // Ensure days remaining does not go negative
+                                if ($daysRemainingForPayment < 0) {
+                                    $daysRemainingForPayment = 0;
+                                }
                             }
+
                         @endphp
-                        <p>Full amount due in {{ $daysRemainingForPayment ?? '' }} days</p>
+                        <p>Full amount due in {{ $daysRemainingForPayment ?? 0 }} days</p>
 
                     </div>
                 </div>

@@ -1,3 +1,12 @@
+@php
+    // Calculate the minimum start date (1 week from today)
+    $minStartDate = \Carbon\Carbon::now()->addWeek()->format('Y-m-d');
+    $minEndDate = !empty($preferred_start_date)
+        ? \Carbon\Carbon::parse($preferred_start_date)->addDay()->format('Y-m-d')
+        : '';
+
+@endphp
+
 <div class="booking-form">
     <form wire:submit.prevent="bookTrip" class="p-4 rounded bg-white">
         <!-- Step 1 -->
@@ -75,32 +84,37 @@
                     <x-input-error :messages="$errors->get('zipcode')" class="mt-2 text-danger" style="list-style: none; " />
                 </div>
 
-                <div class="form-group mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_option" wire:model="payment_option"
-                            wire:change="display_partial_amount" id="payment_option_full" value="pay_in_full">
-                        <label class="form-check-label" for="payment_option_full">
-                            Full Payment
-                        </label>
+
+
+
+                @if (!$tripAvailability == 'coming soon')
+                    <div class="form-group mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_option"
+                                wire:model="payment_option" wire:change="display_partial_amount"
+                                id="payment_option_full" value="pay_in_full">
+                            <label class="form-check-label" for="payment_option_full">
+                                Full Payment
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_option"
+                                wire:model="payment_option" wire:change="display_partial_amount"
+                                id="payment_option_partial" value="partial_payments">
+                            <label class="form-check-label" for="payment_option_partial">
+                                Partial Payments
+                            </label>
+                        </div>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="payment_option"
-                            wire:model="payment_option" wire:change="display_partial_amount"
-                            id="payment_option_partial" value="partial_payments">
-                        <label class="form-check-label" for="payment_option_partial">
-                            Partial Payments
-                        </label>
+
+                    <!-- Display the partial payment amount -->
+                    <div>
+                        @if ($payment_option == 'partial_payments')
+                            <span>Initial Payment Due Today: ${{ number_format($initialPayment, 2) }}</span><br>
+                        @endif
                     </div>
-                </div>
 
-                <!-- Display the partial payment amount -->
-                <div>
-                    @if ($payment_option == 'partial_payments')
-                        <span>Initial Payment Due Today: ${{ number_format($initialPayment, 2) }}</span><br>
-                    @endif
-                </div>
-
-
+                @endif
 
 
 
@@ -118,6 +132,33 @@
                     {{ $error }}
                 </div>
             @endif
+
+            @if ($tripAvailability == 'coming soon')
+                <!-- Preferred Start Date -->
+                <div class="form-group mb-3">
+                    <label class="form-label text-dark float-start">Preferred Start Date</label>
+                    <input type="date" id="preferred_start_date" name="preferred_start_date"
+                        wire:model="preferred_start_date" class="form-control"
+                        style="{{ $errors->has('preferred_start_date') ? 'border:1px solid #dc2626' : '' }}"
+                        min="{{ $minStartDate }}" />
+
+                    <x-input-error :messages="$errors->get('preferred_start_date')" class="mt-2 text-danger" style="list-style: none;" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="form-label text-dark float-start">Preferred End Date</label>
+
+                    <input type="date" id="preferred_end_date" name="preferred_end_date"
+                        wire:model="preferred_end_date" class="form-control"
+                        style="{{ $errors->has('preferred_end_date') ? 'border:1px solid #dc2626' : '' }}"
+                        min="{{ $minEndDate }}" />
+
+                    <x-input-error :messages="$errors->get('preferred_end_date')" class="mt-2 text-danger" style="list-style: none;" />
+                </div>
+
+                <!-- Preferred End Date -->
+            @endif
+
             <div class="step text-center">
                 <div class="form-btn">
                     <button type="button" class="previous-btn" wire:click="previousStep">Previous</button>

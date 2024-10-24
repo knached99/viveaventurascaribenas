@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table){
             $table->uuid('reservationID')->primary();
             $table->string('stripe_product_id');
+            $table->uuid('tripID');
             $table->string('name');
             $table->string('email');
             $table->string('phone_number');
@@ -21,9 +22,15 @@ return new class extends Migration
             $table->string('address_line_2')->nullable();
             $table->string('city');
             $table->string('state');
-            $table->string('preferred_date_range');
+            $table->string('preferred_start_date');
+            $table->string('preferred_end_date');
             $table->string('zip_code');
             $table->timestamps();
+
+            $table->foreign('tripID')
+            ->references('tripID')
+            ->on('trips')
+            ->onDelete('cascade');
         });
     }
 
