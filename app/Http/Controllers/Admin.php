@@ -90,7 +90,7 @@ class Admin extends Controller
             ->select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id', 'tripID', 'created_at')
             ->get();
     
-        $reservations = Reservations::with(['trip'])->select('reservationID', 'tripID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();
+        $reservations = Reservations::with(['trip'])->select('reservationID', 'stripe_product_id', 'tripID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();
         // Optimizing Stripe API calls here
         $allProductIds = $bookings->pluck('stripe_product_id')
             ->merge($reservations->pluck('stripe_product_id'))
@@ -110,8 +110,23 @@ class Admin extends Controller
             ->having('booking_count', '>', 2)
             ->orderByDesc('booking_count')
             ->first();
+
+        
+            // Retrieve the most popular reserved trip containing a count of 2 or more reservations 
+        $mostPopularReservations = Reservations::select('reservations.stripe_product_id', DB::raw('COUNT(*) as reservation_count'))
+        ->join('trips', 'reservations.stripe_product_id', '=', 'trips.stripe_product_id')
+        ->groupBy('reservations.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
+        ->having('reservation_count', '>', 2)
+        ->orderByDesc('reservation_count')
+        ->first();
+        
+        
+        $mostPopularReservedTripName = '';
+
+        
     
         $mostPopularTripName = $mostPopularTripPhoto = null;
+
         if ($mostPopularBookings) {
             $product = $this->stripe->products->retrieve($mostPopularBookings->stripe_product_id);
             $trip = TripsModel::where('stripe_product_id', $mostPopularBookings->stripe_product_id)->first();
@@ -124,24 +139,89 @@ class Admin extends Controller
                     'id' => $trip->tripID,
                     'name' => $mostPopularTripName,
                     'count' => $mostPopularBookings->booking_count,
-                    'image' => $mostPopularTripPhoto
+                    'image' => $mostPopularTripPhoto,
                 ];
             }
         }
+
+        
+        // Calculate data for most reseserved trip 
+
+        if ($mostPopularReservations) {
+            $reservedTrip = Tripsmodel::where('stripe_product_id', $mostPopularReservations->stripe_product_id)->first();
+        
+            if ($reservedTrip) {
+                // Extract the trip photo
+                $tripPhotos = json_decode($reservedTrip->tripPhoto, true);
+                $mostPopularReservedTripName = $reservedTrip->tripLocation;
+                $mostPopularReservedTripPhoto = $tripPhotos[0] ?? null;  // Get the first photo or null if none exists
+        
+                // Extracting all reservations for this trip
+                $reservations = Reservations::where('tripID', $reservedTrip->tripID)->get();
+        
+                // Initialize variables to store total start and end dates
+                $totalStartDates = 0;
+                $totalEndDates = 0;
+                $totalDays = 0;
+                $reservationCount = $reservations->count();
+        
+                foreach ($reservations as $reservation) {
+                    $startDate = Carbon::parse($reservation->preferred_start_date);
+                    $endDate = Carbon::parse($reservation->preferred_end_date);
+                    $dateRange = abs($endDate->diffInDays($startDate));  
+        
+                    // Summing up the timestamp values of start and end dates for calculating the average
+                    $totalStartDates += $startDate->timestamp;
+                    $totalEndDates += $endDate->timestamp;
+        
+                    // Adding to the total days for calculating the average duration
+                    $totalDays += $dateRange;
+                }
+        
+                if ($reservationCount > 0) {
+                    // Calculating the average start and end dates
+                    $averageStartDate = Carbon::createFromTimestamp($totalStartDates / $reservationCount);
+                    $averageEndDate = Carbon::createFromTimestamp($totalEndDates / $reservationCount);
+        
+                    // Calculating the average number of days between the start and end dates
+                    $averageDateRange = round($totalDays / $reservationCount);
+                } else {
+                    $averageStartDate = null;
+                    $averageEndDate = null;
+                    $averageDateRange = 0;
+                }
+        
+                // Build the most reserved trips array
+                $mostReservedTrips[] = [
+                    'tripID' => $reservedTrip->tripID,
+                    'location' => $reservedTrip->tripLocation,
+                    'count' => $mostPopularReservations->reservation_count,
+                    'image' => $mostPopularReservedTripPhoto,
+                    'averageStartDate' => $averageStartDate ? $averageStartDate->format('m/d/Y') : null,
+                    'averageEndDate' => $averageEndDate ? $averageEndDate->format('m/d/Y') : null,
+                    'averageDateRange' => round($averageDateRange, 2),
+                ];
+            }
+        }
+        
     
         return view('admin.dashboard', compact(
             'transactionData',
             'bookings',
             'reservations',
             'mostPopularTripName',
+            'mostPopularReservedTripName',
             'mostPopularTripPhoto',
             'productMap',
             'grossProfit',
             'totalNetCosts',
             'netProfit',
-            'popularTrips'
+            'popularTrips',
+            'mostReservedTrips'
         ));
     }
+
+    
     
     
 

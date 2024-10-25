@@ -16,8 +16,11 @@
                                 <th>IP Address</th>
                                 <th>Device</th>
                                 <th>Browser</th>
+                                <th>Region/State</th>
+                                <th>City</th>
                                 <th>Country</th>
                                 <th>Date Visited</th>
+                                <th>Map Location</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -31,11 +34,19 @@
                                             target="_blank">{{ $url->visitor_referrer }}</a>
                                     </td>
                                     {{-- <td>{{ <a href="{{$url->visitor_referrer ? $url->visitor_referrer : '#'}}"> $url->visitor_referrer ?? 'N/A' }}</td> --}}
-                                    <td>{{ \Crypt::decryptString($url->visitor_ip_address) ?? 'N/A' }}</td>
+                                    <td>{{ Crypt::decryptString($url->visitor_ip_address) ?? 'N/A' }}</td>
                                     <td>{{ $url->operating_system ?? 'N/A' }}</td>
                                     <td>{{ $url->browser ?? 'N/A' }}</td>
+                                    <td>{{ $url->state ?? 'N/A' }}</td>
+                                    <td>{{ $url->city ?? 'N/A' }}</td>
                                     <td>{{ $url->country ?? 'N/A' }}</td>
                                     <td>{{ date('F jS, Y, \a\t g:i A', strtotime($url->created_at)) }}</td>
+                                    <td><a href="https://www.openstreetmap.org/?mlat={{ $url->latitude }}&mlon={{ $url->longitude }}#map=17/"
+                                            target="_blank" rel="noreferrer noopener">View Location</a></td>
+
+
+
+
                                 </tr>
                             @endforeach
                         </tbody>

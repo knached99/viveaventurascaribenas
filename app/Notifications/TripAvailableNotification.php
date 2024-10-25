@@ -17,7 +17,6 @@ class TripAvailableNotification extends Notification
     public function __construct($trip)
     {
         $this->trip = $trip;
-        \Log::info(json_encode($trip));
     }
 
     /**

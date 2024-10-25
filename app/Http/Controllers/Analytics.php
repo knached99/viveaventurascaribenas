@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\GeoJSService;
 use App\Models\VisitorModel;
+use Illuminate\Support\Facades\Crypt;
+
 
 class Analytics extends Controller
 {
@@ -75,7 +77,11 @@ class Analytics extends Controller
             $parsedAgent = $this->parseUserAgent($url->visitor_user_agent);
             $url->browser = $parsedAgent['browser'];
             $url->operating_system = $parsedAgent['os'];
-            $url->country = $this->geoJSService->getLocation(\Crypt::decryptString($url->visitor_ip_address))['country'] ?? null;
+            $url->state = $this->geoJSService->getlocation(Crypt::decryptString($url->visitor_ip_address))['region'] ?? null;
+            $url->city = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['city'] ?? null;
+            $url->country = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['country'] ?? null;
+            $url->latitude = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['latitude'] ?? null;
+            $url->longitude = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['longitude'] ?? null;
             return $url;
         });
 

@@ -15,5 +15,6 @@ class TripBecameAvailable
     public function __construct(TripsModel $trip)
     {
         $this->trip = $trip;
+  
     }
 }

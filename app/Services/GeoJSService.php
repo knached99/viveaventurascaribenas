@@ -48,7 +48,9 @@ class GeoJSService
         return [
             'city' => $location['city'] ?? null,
             'region' => $location['region'] ?? null,
-            'country' => $location['country'] ?? null
+            'country' => $location['country'] ?? null,
+            'latitude' => $location['latitude'] ?? null,
+            'longitude' => $location['longitude'] ?? null,
         ];
     }
 }

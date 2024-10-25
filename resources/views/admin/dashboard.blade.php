@@ -230,6 +230,56 @@
                 <!-- / Most Popular Booking -->
             </div>
         </div>
+        <!-- / Most Popular Booking -->
+
+        <!-- Most Popular Reserved Trip -->
+
+        <div class="col-12 col-md-8 col-lg-12 col-xxl-4 order-3 order-md-2">
+            <div class="row">
+
+                @if (!empty($mostPopularReservedTripName))
+                    @foreach ($mostReservedTrips as $trip)
+                        <div class="col-12 mb-6">
+                            <div class="card hover:shadow-lg ease-in-out duration-300">
+                                <div class="card-body">
+                                    <div
+                                        class="d-flex justify-content-between align-items-center flex-sm-row flex-column gap-10">
+                                        <div
+                                            class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
+                                            <a href={{ route('admin.trip', ['tripID' => $trip['tripID']]) }}>
+                                                <div class="card-title mb-6">
+                                                    <h5 class="text-nowrap mb-1">Most Reserved Trip</h5>
+                                                    <h4 style="font-size: 18px; display: inline-block">
+                                                        {{ $trip['location'] }}</h4>
+                                                    <img src="{{ $trip['image'] }}" />
+                                                </div>
+                                            </a>
+                                            <div class="mt-sm-auto">
+                                                <h5 class="mb-0">Reserved {{ $trip['count'] }} times</h5>
+                                            </div>
+
+                                            <div class="mt-sm-auto">
+                                                <p class="font-semibold"> Most Preferred Dates: <span
+                                                        class="text-indigo-500">{{ $trip['averageStartDate'] }} -
+                                                        {{ $trip['averageEndDate'] }}</span></p>
+
+                                                <p class="font-semibold">Average Number of Days:
+                                                    <span class="text-indigo-500">{{ $trip['averageDateRange'] }}
+                                                        days</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+
+            </div>
+        </div>
+
+        <!-- / Most Popular Reserved Trip -->
     </div>
     <div class="row">
         <!-- Order Statistics -->
