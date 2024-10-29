@@ -122,7 +122,7 @@ class Admin extends Controller
         
         
         $mostPopularReservedTripName = '';
-
+        $mostReservedTrips = [];
         
     
         $mostPopularTripName = $mostPopularTripPhoto = null;

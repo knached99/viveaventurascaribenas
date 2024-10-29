@@ -145,7 +145,7 @@
                     </div>
 
 
-
+                @if($trip->tripAvailability == 'available')
                  <span class="trip-price text-dark">
                     @if(isset($coupon) && isset($newPrice) && $newPrice < $tripPrice)
                         <span class="text-decoration-line-through text-danger">
@@ -159,15 +159,18 @@
                             ${{ number_format($tripPrice, 2) }}
                         </span>
                     @endif 
+                @else 
+                Trip Price Unavailable 
+                @endif 
                 </span>
 
+                    @if(!in_array($trip->tripAvailability, ['coming soon', 'unavailable']))
                     <p class="trip-duration text-dark">
                         <!-- End Average Star Rating -->
-
-
                         <span>Duration:</span>
                         {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }} Days
                     </p>
+                    @endif 
                     <p class="trip-availability text-dark">
                         @switch($trip->tripAvailability)
                             @case('available')
@@ -194,11 +197,15 @@
 
                     <h5 class="block mb-3 mt-5 fw-bold">Trip Dates</h5>
                     <ul class="trip-info">
-                        <li style="color: #000; font-weight: bold;"><img
-                                src="{{ asset('assets/images/calendar.png') }}" class="icon" style="width: 60px; height: 60px;"/>
+                    <img src="{{ asset('assets/images/calendar.png') }}" class="icon" style="width: 60px; height: 60px;"/>
+                    @if(!in_array($trip->tripAvailability, ['coming soon', 'unavailable']))
+                        <li style="color: #000; font-weight: bold;">
                             {{ date('F jS, Y', strtotime($trip->tripStartDate)) }} -
                             {{ date('F jS, Y', strtotime($trip->tripEndDate)) }}
                         </li>
+                    @else 
+                    <li class="text-dark">trip dates coming soon</li>
+                    @endif 
 
 
                         @if (is_array($landscapes))

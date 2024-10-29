@@ -5,6 +5,7 @@
         ? \Carbon\Carbon::parse($preferred_start_date)->addDay()->format('Y-m-d')
         : '';
 
+    $buttonText = $tripAvailability == 'coming soon' ? 'Reserve' : 'Book';
 @endphp
 
 <div class="booking-form">
@@ -162,7 +163,7 @@
             <div class="step text-center">
                 <div class="form-btn">
                     <button type="button" class="previous-btn" wire:click="previousStep">Previous</button>
-                    <button class="submit-btn" wire:loading.remove type="submit">Book</button>
+                    <button class="submit-btn" wire:loading.remove type="submit">{{$buttonText}}</button>
                 </div>
 
                 <div class="spinner-border text-primary mt-3" role="status" wire:loading></div>

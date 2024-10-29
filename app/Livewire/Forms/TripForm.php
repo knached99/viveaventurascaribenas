@@ -13,7 +13,7 @@ use Stripe\Product;
 use Stripe\StripeClient;
 use Illuminate\Support\Facades\Storage;
 use Stripe\Exception\InvalidRequestException;
-
+use Carbon\Carbon;
 use Exception;
 
 class TripForm extends Form {
@@ -33,7 +33,7 @@ class TripForm extends Form {
     public string $tripActivities = '';
     public string $tripStartDate = '';
     public string $tripEndDate = '';
-    public string $tripPrice = '';
+    public int $tripPrice = 0;
     public array $tripCosts = [];
     public string $num_trips = '';
     public bool $active = false;
@@ -47,21 +47,51 @@ class TripForm extends Form {
 
     public function rules()
     {
-        return [
+
+        $rules = [
             'tripPhoto.*' => 'image|mimes:jpeg,png,jpg', // Validation for each file
             'tripLocation' => 'required|string',
             'tripLandscape' => 'required|array',
             'tripAvailability' => 'required|string',
             'tripDescription' => 'required|string',
             'tripActivities' => 'required|string',
-            'tripStartDate' => 'sometimes|date|before_or_equal:tripEndDate',
-            'tripEndDate' => 'sometimes|date|after_or_equal:tripStartDate',
-            'tripPrice' => 'required|numeric|min:1',
             'tripCosts.*.name' => 'sometimes|string',
             'tripCosts.*.amount'=>'sometimes|numeric|min:1',
-            'num_trips'=>'required|min:1',
+            'num_trips'=>'required|min:1', 
         ];
+
+        if(!in_array($this->tripAvailability, ['coming soon', 'unavailable'])){
+            $rules['tripPrice'] ='required|numeric|min:1';
+            $rules['tripStartDate'] = 'required|date|before_or_equal:tripEndDate';
+            $rules['tripEndDate'] = 'required|date|after_or_equal:tripStartDate';
+        }
+
+        return $rules;
     }
+
+
+    protected $messages =[
+        'tripPhoto.image'=>'The image you selected is not valid',
+        'tripPhoto.mimes'=>'The image you selected must be a valid jpg, jpeg, or png file',
+        'tripLocation.required'=>'Provide the location of this trip',
+        'tripLandscape.required'=>'Select the landscapes available in this trip',
+        'tripAvailability.required'=>'Select the availability of this trip',
+        'tripDescription.required'=>'Provide a description of this trip',
+        'tripActivities.required'=>'Provide a list of activities for this trip',
+        'tripPrice.required'=>'You must provide a price for this trip',
+        'num_trips.required'=>'Please enter a number for the number of slots you want to make available for this trip',
+    ];
+
+    protected $validattionAttributes = [
+        'tripPhoto'=>'Photos',
+        'tripLocation'=> 'Location',
+        'tripLandscape'=>'Landscape',
+        'tripAvailability'=>'Availability',
+        'tripDescription'=>'Description',
+        'tripActivities'=>'Activities',
+        'tripPrice'=>'Price',
+        'num_trips'=>'Available Slots'
+    ];
 
     public function addCost(){
         $this->tripCosts[] = ['name'=>'', 'amount'=>''];
@@ -100,6 +130,10 @@ class TripForm extends Form {
         }
 
         $this->active = (bool) $this->active ?? false;
+
+        // Initializing to today's date 
+        $this->tripStartDate = Carbon::now()->format('Y-m-d'); 
+        $this->tripEndDate = Carbon::now()->format('Y-m-d');    
     }
 
     public function submitTripForm()
@@ -149,7 +183,7 @@ class TripForm extends Form {
 
                 if ($price) {
                     // Reset the temporary file from Livewire
-                    $this->tripID = Str::uuid();
+                    $this->tripID = Str::uuid(5);
 
                     $data = [
                         'tripID' => $this->tripID,
@@ -160,13 +194,15 @@ class TripForm extends Form {
                         'tripLandscape' => $tripLandscapeJson,
                         'tripAvailability' => $this->tripAvailability,
                         'tripPhoto' => json_encode($imageURLs), // Store image URLs as a JSON array
-                        'tripStartDate' => $this->tripStartDate,
-                        'tripEndDate' => $this->tripEndDate,
+                        'tripStartDate' => !empty($this->tripStartDate) ? $this->tripStartDate : Carbon::now()->format('Y-m-d'),
+                        'tripEndDate' => !empty($this->tripEndDate) ? $this->tripEndDate : Carbon::now()->format('Y-m-d'),
                         'tripPrice' => $this->tripPrice,
                         'tripCosts' => $tripCostsJson,
-                        'num_trips' => intval($this->num_trips),
+                        'num_trips' => intval($this->num_trips) ?? 0,
                         'active' => $this->active ? true : false,
-                        'slug'=>Str::slug($this->tripLocation)
+                        'slug'=>Str::slug($this->tripLocation),
+                        'created_at'=>Carbon::now(),
+                        'updated_at'=>Carbon::now(),
                     ];
 
                     // Save trip data
@@ -197,7 +233,7 @@ class TripForm extends Form {
         $this->tripPhoto = []; // Reset file array
         $this->tripStartDate = '';
         $this->tripEndDate = '';
-        $this->tripPrice = '';
+        $this->tripPrice = 0;
         $this->tripCosts = [];
         $this->num_trips = '';
         $this->active = false;

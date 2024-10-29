@@ -60,7 +60,7 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                 @endif
                             </div>
                        <div class="text p-4 card-body">
-    <span class="price">
+    
      @php 
     $tripPrice = $trip->tripPrice; // Start with the original price
     $newPrice = $tripPrice; // Default to original price
@@ -91,7 +91,8 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
         \Log::warning('No coupon ID provided for trip: ' . $trip->id);
     }
 @endphp
-
+        @if($trip->tripAvailability == 'available')
+        <span class="price">
         @if(isset($newPrice) && $newPrice < $tripPrice)
             <span class="text-decoration-line-through text-danger">
                 ${{ number_format($tripPrice, 2) }}
@@ -105,12 +106,16 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
             </span>
         @endif
     </span>
+     @else 
+       <span class="text-secondary fw-bold">  Trip Price Unavailable </span>
+        @endif 
 
 
-                              
+                               @if(!in_array($trip->tripAvailability, ['coming soon', 'unavailable']))
                                 <span class="days">Duration:
                                     {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}
                                     Days</span>
+                                    @endif
                                 <h3><a
                                         href="{{ route('landing.destination', ['slug' => $trip->slug]) }}">{{ $trip->tripLocation }}</a>
                                 </h3>
@@ -128,12 +133,18 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                     @break
                                 @endswitch
                                 <ul>
-                                    <li>
-                                        <img src="{{ asset('assets/images/calendar.png') }}"
-                                            style="width: 20px; height: 20px; margin: 5px;" />
+                                  <li>
+                                 <img src="{{ asset('assets/images/calendar.png') }}"
+                                     style="width: 20px; height: 20px; margin: 5px;" />
+                                  
+                                   @if(!in_array($trip->tripAvailability, ['coming soon', 'unavailable']))
                                         {{ date('F jS, Y', strtotime($trip->tripStartDate)) }} -
                                         {{ date('F jS, Y', strtotime($trip->tripEndDate)) }}
-                                    </li>
+                                        
+                                    @else 
+                                     trip dates coming soon
+                                    @endif 
+                                       </li>
                                     {{-- @switch($trip->tripLandscape)
                                     @case('Beach')
                                         <li><img src="{{ asset('assets/images/beach.png') }}"
@@ -175,6 +186,7 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
+                                                            <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('City')
@@ -182,6 +194,7 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
+                                                            <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('Country Side')
@@ -189,6 +202,7 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
+                                                            <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('Mountainous')
@@ -196,6 +210,7 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
+                                                            <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('Forested')
@@ -203,6 +218,7 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="width: 40px; height: 40px; margin: 5px;" />
+                                                            <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
                                                 @endswitch
                                             @endforeach

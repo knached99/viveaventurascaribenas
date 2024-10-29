@@ -117,42 +117,54 @@ class Analytics extends Controller
      * @param string $userAgent
      * @return array
      */
+
+     // Refactored code for readibility. Also time complexity is O(1) because we're using a hashmap 
     protected function parseUserAgent($userAgent)
     {
         $browser = 'Unknown';
         $os = 'Unknown';
-
-        if (strpos($userAgent, 'MSIE') !== false || strpos($userAgent, 'Trident') !== false) {
-            $browser = 'Internet Explorer';
-        } elseif (strpos($userAgent, 'Firefox') !== false) {
-            $browser = 'Firefox';
-        } elseif (strpos($userAgent, 'Chrome') !== false) {
-            $browser = 'Chrome';
-        } elseif (strpos($userAgent, 'Safari') !== false) {
-            $browser = 'Safari';
-        } elseif (strpos($userAgent, 'Opera') !== false || strpos($userAgent, 'OPR') !== false) {
-            $browser = 'Opera';
+    
+        // Browser detection using a hash map (associative array)
+        $browserMap = [
+            'MSIE' => 'Internet Explorer',
+            'Trident' => 'Internet Explorer',
+            'Firefox' => 'Firefox',
+            'Chrome' => 'Chrome',
+            'Safari' => 'Safari',
+            'Opera' => 'Opera',
+            'OPR' => 'Opera'
+        ];
+    
+        foreach ($browserMap as $key => $name) {
+            if (strpos($userAgent, $key) !== false) {
+                $browser = $name;
+                break;
+            }
         }
-
-        if (strpos($userAgent, 'Windows NT 10.0') !== false) {
-            $os = 'Windows 10';
-        } elseif (strpos($userAgent, 'Windows NT 6.3') !== false) {
-            $os = 'Windows 8.1';
-        } elseif (strpos($userAgent, 'Windows NT 6.2') !== false) {
-            $os = 'Windows 8';
-        } elseif (strpos($userAgent, 'Windows NT 6.1') !== false) {
-            $os = 'Windows 7';
-        } elseif (strpos($userAgent, 'Mac OS X') !== false) {
-            $os = 'Mac OS X';
-        } elseif (strpos($userAgent, 'Android') !== false) {
-            $os = 'Android';
-        } elseif (strpos($userAgent, 'iPhone') !== false) {
-            $os = 'iOS';
+    
+        // OS detection using a hash map
+        $osMap = [
+            'Windows NT 11.0' => 'Windows 11',
+            'Windows NT 10.0' => 'Windows 10',
+            'Windows NT 6.3' => 'Windows 8.1',
+            'Windows NT 6.2' => 'Windows 8',
+            'Windows NT 6.1' => 'Windows 7',
+            'Mac OS X' => 'Mac OS X',
+            'Android' => 'Android',
+            'iPhone' => 'iOS'
+        ];
+    
+        foreach ($osMap as $key => $name) {
+            if (strpos($userAgent, $key) !== false) {
+                $os = $name;
+                break;
+            }
         }
-
+    
         return [
             'browser' => $browser,
             'os' => $os
         ];
     }
+    
 }

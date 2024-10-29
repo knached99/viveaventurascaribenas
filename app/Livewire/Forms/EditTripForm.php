@@ -176,7 +176,7 @@ class EditTripForm extends Component
             $tripModel->tripCosts = $this->tripCosts;
             $tripModel->save();
 
-            $this->invalidateCache((string) $this->tripID);
+            $this->purgeCache((string) $this->tripID);
         }
 
         catch(\Exception $e){
@@ -216,7 +216,7 @@ class EditTripForm extends Component
             'tripPhotos.' . $index => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
-        $this->invalidateCache((string) $this->trip->tripID);
+        $this->purgeCache((string) $this->trip->tripID);
 
     
         \Log::info('File validated successfully!');
@@ -297,7 +297,7 @@ class EditTripForm extends Component
     
                 \Log::info('Invalidating cache..');
 
-                $this->invalidateCache((string) $this->trip->tripID);
+                $this->purgeCache((string) $this->trip->tripID);
                 \Log::info('Cache invalidated!');
 
                 // Update trip photos and save
@@ -333,19 +333,22 @@ class EditTripForm extends Component
             'tripAvailability' => 'required|string',
             'tripDescription' => 'required|string',
             'tripActivities' => 'required|string',
-            'tripStartDate' => 'required|date|before_or_equal:tripEndDate',
-            'tripEndDate' => 'required|date|after_or_equal:tripStartDate',
-            'tripPrice' => 'required|numeric|min:1',
             'tripCosts' => 'nullable|array',
             'tripCosts.*.name' => 'required|string|max:255',
             'tripCosts.*.amount' => 'required|numeric|min:0',
             'num_trips' => 'required|min:1',
         ];
+
+        if(!in_array($this->tripAvailability, ['coming soon', 'unavailable'])){
+            $rules['tripPrice'] = 'required|numeric|min:1';
+            $rules['tripStartDate'] = 'required|date|before_or_equal:tripEndDate';
+            $rules['tripEndDate'] = 'required|date|after_or_equal:tripStartDate';
+        }
         
         $this->validate($rules);
         
         try {
-            $this->invalidateCache((string) $this->trip->tripID);
+            $this->purgeCache((string) $this->trip->tripID);
             
             $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
             $product = $stripe->products->retrieve($this->trip->stripe_product_id);
@@ -389,7 +392,6 @@ class EditTripForm extends Component
             
                     }
                     
-            
                 
                 \Log::info('Current newImageURLs array: '.json_encode($newImageURLs));
                
@@ -412,7 +414,7 @@ class EditTripForm extends Component
                 $tripModel->tripActivities = $this->tripActivities;
                 $tripModel->tripStartDate = Carbon::parse($this->tripStartDate)->format('Y-m-d');
                 $tripModel->tripEndDate = Carbon::parse($this->tripEndDate)->format('Y-m-d');
-                $tripModel->tripPrice = $this->tripPrice;
+                $tripModel->tripPrice = $this->tripPrice ?? 0;
                 $tripModel->num_trips = $this->num_trips;
                 $tripModel->active = $this->active;
                 $tripModel->slug = Str::slug($this->tripLocation);
@@ -453,7 +455,7 @@ class EditTripForm extends Component
     }
     
 
-    private function invalidateCache(string $tripId): void
+    private function purgeCache(string $tripId): void
     {
         \Log::info('Invalidating cache for trip ID: ' . $tripId);
         Cache::forget('trip_' . $tripId);

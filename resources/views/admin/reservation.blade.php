@@ -78,6 +78,15 @@
                         {{ $reservation->city }}, {{ $reservation->state }} {{ $reservation->zip_code }}
                     </p>
                 </div>
+
+                <div class="p-4 bg-gray-50 rounded-lg shadow-sm col-span-2">
+                <h6 class="text-lg font-medium text-blue-gray-800">
+                <i class='bx bx-calendar-heart'></i> Preferred Travel Dates 
+                </h6>
+                <p class="text-base font-light leading-relaxed mt-2">
+                {{date('F jS, Y', strtotime($reservation->preferred_start_date))}} - {{date('F jS, Y', strtotime($reservation->preferred_end_date))}}
+                </p>
+                </div>
             </div>
         </div>
 
