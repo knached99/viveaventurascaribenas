@@ -12,6 +12,8 @@ use App\Http\Livewire\TripInfoForm;
 
 Route::get('/', [Home::class, 'homePage'])->name('/');
 
+Route::get('/terms_and_conditions', [Home::class, 'termsAndConditions'])->name('terms_and_conditions');
+Route::get('/privacy', [Home::class, 'userPrivacy'])->name('privacy');
 Route::get('/landing/destination/{slug}', [Home::class, 'getDestinationDetails'])->name('landing.destination');
 Route::get('/about', [Home::class, 'aboutPage'])->name('about');
 

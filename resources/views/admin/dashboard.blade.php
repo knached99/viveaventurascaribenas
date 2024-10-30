@@ -36,53 +36,52 @@
                   </div>
                 </div> --}}
 
-      <div class="col-xxl-8 mb-6 order-0">
-    <div class="card shadow-sm border-0 h-100">
-        <div class="d-flex align-items-start row g-0">
-            <!-- Left Section: Text Content -->
-            <div class="col-sm-7">
-                <div class="card-body">
-                    <!-- Title with Icon -->
-                    <h5 class="card-title text-primary mb-4">
-                        <i class="bx bx-bar-chart-alt-2 me-2"></i> Website Visitor Analytics
-                    </h5>
+        <div class="col-xxl-8 mb-6 order-0">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="d-flex align-items-start row g-0">
+                    <!-- Left Section: Text Content -->
+                    <div class="col-sm-7">
+                        <div class="card-body">
+                            <!-- Title with Icon -->
+                            <h5 class="card-title text-primary mb-4">
+                                <i class="bx bx-bar-chart-alt-2 me-2"></i> Website Visitor Analytics
+                            </h5>
 
-                    <!-- Overview Text -->
-                    <p class="text-muted mb-5">
-                        Get a quick overview of your website's visitor statistics.
-                    </p>
+                            <!-- Overview Text -->
+                            <p class="text-muted mb-5">
+                                Get a quick overview of your website's visitor statistics.
+                            </p>
 
-                    <!-- Visitor Count -->
-                    <h6 class="mb-4 text-dark">
-                        <i class="bx bx-user me-2"></i> Total Visitors: 
-                        <span class="fw-bold">{{$visitors['total_visitors_count']}}</span>
-                    </h6>
+                            <!-- Visitor Count -->
+                            <h6 class="mb-4 text-dark">
+                                <i class="bx bx-user me-2"></i> Total Visitors:
+                                <span class="fw-bold">{{ $visitors['total_visitors_count'] }}</span>
+                            </h6>
 
-                    <!-- Most Visited Page -->
-                    <h6 class="text-dark">
-                        <i class="bx bx-world me-2"></i> Most Visited Page: 
-                        <span class="fw-bold">
-                        <a href="{{route($visitors['most_visited_url'])}}" target="_blank" rel="noopener noreferrer">{{$visitors['most_visited_url']}}</a>
-                        </span>
-                    </h6>
+                            <!-- Most Visited Page -->
+                            <h6 class="text-dark">
+                                <i class="bx bx-world me-2"></i> Most Visited Page:
+                                <span class="fw-bold">
+                                    <a href="{{ $visitors['most_visited_url'] }}" target="_blank"
+                                        rel="noopener noreferrer">{{ $visitors['most_visited_url'] }}</a>
+                                </span>
+                            </h6>
 
-                    <span>View detailed analytics <a href="{{route('admin.analytics')}}">here</a></span>
-                </div>
+                            <span>View detailed analytics <a href="{{ route('admin.analytics') }}">here</a></span>
+                        </div>
 
-            </div>
+                    </div>
 
-            <!-- Right Section: Image -->
-            <div class="col-sm-5 text-center text-sm-left d-flex align-items-center justify-content-center">
-                <div class="card-body pb-0 px-0 px-md-6">
-                    <img src="{{ asset('assets/theme_assets/assets/img/illustrations/cloud-storage.webp') }}" 
-                         height="175" 
-                         class="scaleX-n1-rtl img-fluid" 
-                         alt="Storage Usage Illustration" />
+                    <!-- Right Section: Image -->
+                    <div class="col-sm-5 text-center text-sm-left d-flex align-items-center justify-content-center">
+                        <div class="card-body pb-0 px-0 px-md-6">
+                            <img src="{{ asset('assets/theme_assets/assets/img/illustrations/cloud-storage.webp') }}"
+                                height="175" class="scaleX-n1-rtl img-fluid" alt="Storage Usage Illustration" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
 
 
@@ -281,7 +280,7 @@
                                                         class="text-indigo-500">{{ $trip['averageStartDate'] }} -
                                                         {{ $trip['averageEndDate'] }}</span></p>
 
-                                                <p class="font-semibold">Average Number of Days:
+                                                <p class="font-semibold">Most Preferred Number of Days:
                                                     <span class="text-indigo-500">{{ $trip['averageDateRange'] }}
                                                         days</span>
                                                 </p>

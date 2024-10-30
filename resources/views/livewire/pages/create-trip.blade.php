@@ -47,9 +47,6 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
 
 
-
-
-
     <div class="row">
         <div class="col-12 col-xl-8 mb-4">
             <div class="card shadow-sm border-0">

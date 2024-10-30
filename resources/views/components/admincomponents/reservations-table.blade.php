@@ -46,7 +46,7 @@
                             <td>{{ $reservation->trip->tripLocation }}</td>
                             <td><a
                                     href="{{ route('admin.reservation', ['reservationID' => $reservation->reservationID]) }}">View</a>
-                            </td>]
+                            </td>
 
                         </tr>
                     @endforeach

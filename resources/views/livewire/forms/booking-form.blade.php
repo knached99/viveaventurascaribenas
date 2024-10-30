@@ -88,7 +88,7 @@
 
 
 
-                @if (!$tripAvailability == 'coming soon')
+                @if ($tripAvailability != 'coming soon')
                     <div class="form-group mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="payment_option"
@@ -163,7 +163,7 @@
             <div class="step text-center">
                 <div class="form-btn">
                     <button type="button" class="previous-btn" wire:click="previousStep">Previous</button>
-                    <button class="submit-btn" wire:loading.remove type="submit">{{$buttonText}}</button>
+                    <button class="submit-btn" wire:loading.remove type="submit">{{ $buttonText }}</button>
                 </div>
 
                 <div class="spinner-border text-primary mt-3" role="status" wire:loading></div>

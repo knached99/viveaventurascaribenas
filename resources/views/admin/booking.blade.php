@@ -8,10 +8,9 @@
     $fullPrice = $booking->trip->tripPrice;
 
     $photos = json_decode($booking->trip->tripPhoto, true);
-
     $firstPhoto = !empty($photos) ? asset($photos[0]) : asset('assets/images/booking_page_bg.webp');
 
-    $isPartialPayment = false;
+    $isPartialPayment = false; // Default to false
 
     if (!empty($stripeCheckoutID)) {
         $stripeCheckoutSession = $stripe->checkout->sessions->retrieve($stripeCheckoutID);
@@ -22,14 +21,18 @@
 
             if (count($charges->data) > 0) {
                 $charge = $charges->data[0];
-
                 $paymentMethod = $charge->payment_method_details->type;
 
-                if ($charge->amount < $fullPrice) {
+                $chargedAmount = $charge->amount / 100;
+
+                // Checks if the charged amount is less than the full price for partial payment
+                if ($chargedAmount < intval($fullPrice)) {
                     $isPartialPayment = true;
+                } else {
+                    $isPartialPayment = false; // Full payment
                 }
 
-                // Initializing variables to avoid undefined errors
+                // Initialize variables to avoid undefined errors
                 $cardExpirationMonth = 'N/A';
                 $cardExpirationYear = 'N/A';
                 $cardFunding = 'N/A';
@@ -38,6 +41,7 @@
                 $paymentMethodCashapp = 'N/A';
                 $paymentMethodAffirm = 'N/A';
 
+                // Process payment method details based on the payment method used
                 switch ($paymentMethod) {
                     case 'card':
                         $cardExpirationMonth = $charge->payment_method_details->card->exp_month;
@@ -60,7 +64,7 @@
                         break;
                 }
 
-                $paymentAmount = '$' . number_format($charge->amount / 100, 2);
+                $paymentAmount = '$' . number_format($chargedAmount, 2);
                 $paymentStatus = $charge->status;
                 $receiptLink = $charge->receipt_url;
             } else {
@@ -72,6 +76,7 @@
         }
     }
 @endphp
+
 <x-authenticated-theme-layout>
     <div class="relative w-full mt-6 text-gray-700 bg-white shadow-sm rounded-lg">
         <div class="p-6">
@@ -128,7 +133,7 @@
                 <div class="col-md-6">
                     <div class="mb-6">
                         <h6 class="text-lg font-medium text-blue-gray-800">
-                            @switch('isPartialPayment')
+                            @switch($isPartialPayment)
                                 @case(true)
                                     <i class='bx bx-time-five'></i>
                                     Partial Payment Recieved
@@ -142,7 +147,7 @@
                         </h6>
                         <span
                             class="inline-block px-3 py-1 mt-2 text-xs font-semibold rounded-full text-white
-               @switch('isPartialPayment')
+               @switch($isPartialPayment)
                @case(true)
                bg-amber-500 
                @break
@@ -150,7 +155,7 @@
                bg-green-500
                @endswitch 
                ">
-                            @switch('isPartialPayment')
+                            @switch($isPartialPayment)
                                 @case(true)
                                     Partial Payment
                                 @break
@@ -171,10 +176,10 @@
                                 if ($daysRemainingForPayment < 0) {
                                     $daysRemainingForPayment = 0;
                                 }
+                                echo 'Full amount due in ' . ($daysRemainingForPayment ?? 0) . ' days';
                             }
 
                         @endphp
-                        <p>Full amount due in {{ $daysRemainingForPayment ?? 0 }} days</p>
 
                     </div>
                 </div>

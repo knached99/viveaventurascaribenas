@@ -26,7 +26,8 @@ class GeoJSService
 
         if (!$location) {
             try {
-                $decryptedIP = Crypt::decryptString($ip);
+              $decryptedIP = Crypt::decryptString($ip);
+
                 $response = $this->client->request('GET', "https://get.geojs.io/v1/ip/geo/{$decryptedIP}.json");
                 $responseBody = $response->getBody()->getContents(); // Get response body as string
                 $location = json_decode($responseBody, true);

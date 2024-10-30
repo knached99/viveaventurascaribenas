@@ -99,7 +99,7 @@ class TripForm extends Form {
 
     public function removeCost($index){
         unset($this->tripCosts[$index]);
-        // Reindexes array 
+        // Reindexes array
         $this->tripCosts = array_values($this->tripCosts); 
     }
 
@@ -131,17 +131,18 @@ class TripForm extends Form {
 
         $this->active = (bool) $this->active ?? false;
 
-        // Initializing to today's date 
-        $this->tripStartDate = Carbon::now()->format('Y-m-d'); 
-        $this->tripEndDate = Carbon::now()->format('Y-m-d');    
+        // Initializing to today's date
+        $this->tripStartDate = Carbon::now()->format('Y-m-d');
+        $this->tripEndDate = Carbon::now()->format('Y-m-d');
     }
 
     public function submitTripForm()
     {
+
         $this->validate();
 
         $tripCostsJson = json_encode($this->tripCosts);
-        $tripLandscapeJson = json_encode($this->tripLandscape); 
+        $tripLandscapeJson = json_encode($this->tripLandscape);
 
         if(!$this->stripe){
             $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
@@ -214,8 +215,8 @@ class TripForm extends Form {
                     $this->resetForm();
 
                     // Set success message
-                    $this->status = 'Trip Successfully Created!';
-                   // return redirect('/admin/trip/'.$this->tripID)->with('status', $this->status);
+                   // $this->status = 'Trip Successfully Created!';
+                   return redirect('/admin/trip/'.$this->tripID)->with('status', $this->status);
                 }
             }
         } catch (Exception $e) {

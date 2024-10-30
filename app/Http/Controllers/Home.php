@@ -32,6 +32,14 @@ class Home extends Controller
     }
     
    
+    public function termsAndConditions(){
+        return view('terms_and_conditions');
+    }
+
+    public function userPrivacy(){
+        return view('privacy');
+    }
+
     // Optimized for performance 
     public function homePage()
     {
