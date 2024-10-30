@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\GeoJSService;
 use App\Models\VisitorModel;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 
 
 class Analytics extends Controller
@@ -16,6 +17,36 @@ class Analytics extends Controller
     {
         $this->geoJSService = $geoJSService;
     }
+
+
+   public static function quickAnalytics(){
+    // Static method call in the Admin dashboard page, retrieves 
+    // most visited urls and total number of visits 
+
+    $visitors = VisitorModel::select('visited_url', 'visitor_user_agent', 'visited_at')->get()->toArray();
+    // Return the values from a single column in the mostVisitedURLs array
+    $mostVisitedURLs = array_column($visitors, 'visited_url');
+    
+    
+    // Counts all the values of an array
+
+    $urlCounts = array_count_values($mostVisitedURLs);
+
+    // Sort an array in reverse order and maintain index association
+
+    arsort($urlCounts);
+    //Gets the first key of an array
+    // Gets the most visited URL (first element in the sorted array)
+    $mostVisitedURL = array_key_first($urlCounts);
+
+    $totalVisitors = count($visitors);
+
+    return [
+        'most_visited_url' => $mostVisitedURL,
+        'total_visitors_count' => $totalVisitors
+    ];
+
+   }
 
     public function showAnalytics()
     {

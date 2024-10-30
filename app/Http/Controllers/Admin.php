@@ -19,6 +19,7 @@ use Stripe\StripeClient;
 use Carbon\Carbon;
 use App\Jobs\ProcessStripeCharges;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Controllers\Analytics; 
 
 class Admin extends Controller
 {
@@ -31,7 +32,9 @@ class Admin extends Controller
     }
     
     public function dashboardPage()
-    {
+    {   
+        $visitors = Analytics::quickAnalytics();
+
         // Cache Stripe products and charges
         $cacheKeyProducts = 'stripe_products';
         $cacheKeyCharges = 'stripe_charges';
@@ -200,6 +203,7 @@ class Admin extends Controller
                     'averageStartDate' => $averageStartDate ? $averageStartDate->format('m/d/Y') : null,
                     'averageEndDate' => $averageEndDate ? $averageEndDate->format('m/d/Y') : null,
                     'averageDateRange' => round($averageDateRange, 2),
+                  
                 ];
             }
         }
@@ -217,7 +221,8 @@ class Admin extends Controller
             'totalNetCosts',
             'netProfit',
             'popularTrips',
-            'mostReservedTrips'
+            'mostReservedTrips',
+            'visitors',
         ));
     }
 

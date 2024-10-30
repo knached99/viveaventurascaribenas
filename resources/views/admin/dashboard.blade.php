@@ -36,36 +36,54 @@
                   </div>
                 </div> --}}
 
-        <div class="col-xxl-8 mb-6 order-0">
-            <div class="card">
-                <div class="d-flex align-items-start row">
-                    <div class="col-sm-7">
-                        <div class="card-body">
-                            <h5 class="card-title text-primary mb-3">Storage Usage</h5>
-                            <p class="mb-6">
-                                You have used <strong>100 GB</strong> of your
-                                <strong>100 GB</strong> storage capacity.
-                            </p>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100"
-                                    aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mb-6">
-                                You have <strong>0 GB</strong> of storage remaining.
-                            </p>
+      <div class="col-xxl-8 mb-6 order-0">
+    <div class="card shadow-sm border-0 h-100">
+        <div class="d-flex align-items-start row g-0">
+            <!-- Left Section: Text Content -->
+            <div class="col-sm-7">
+                <div class="card-body">
+                    <!-- Title with Icon -->
+                    <h5 class="card-title text-primary mb-4">
+                        <i class="bx bx-bar-chart-alt-2 me-2"></i> Website Visitor Analytics
+                    </h5>
 
-                            <a href="javascript:;" class="btn btn-sm btn-outline-primary">Manage Storage</a>
-                        </div>
-                    </div>
-                    <div class="col-sm-5 text-center text-sm-left">
-                        <div class="card-body pb-0 px-0 px-md-6">
-                            <img src="{{ asset('assets/theme_assets/assets/img/illustrations/cloud-storage.webp') }}"
-                                height="175" class="scaleX-n1-rtl" alt="Storage Usage" />
-                        </div>
-                    </div>
+                    <!-- Overview Text -->
+                    <p class="text-muted mb-5">
+                        Get a quick overview of your website's visitor statistics.
+                    </p>
+
+                    <!-- Visitor Count -->
+                    <h6 class="mb-4 text-dark">
+                        <i class="bx bx-user me-2"></i> Total Visitors: 
+                        <span class="fw-bold">{{$visitors['total_visitors_count']}}</span>
+                    </h6>
+
+                    <!-- Most Visited Page -->
+                    <h6 class="text-dark">
+                        <i class="bx bx-world me-2"></i> Most Visited Page: 
+                        <span class="fw-bold">
+                        <a href="{{route($visitors['most_visited_url'])}}" target="_blank" rel="noopener noreferrer">{{$visitors['most_visited_url']}}</a>
+                        </span>
+                    </h6>
+
+                    <span>View detailed analytics <a href="{{route('admin.analytics')}}">here</a></span>
+                </div>
+
+            </div>
+
+            <!-- Right Section: Image -->
+            <div class="col-sm-5 text-center text-sm-left d-flex align-items-center justify-content-center">
+                <div class="card-body pb-0 px-0 px-md-6">
+                    <img src="{{ asset('assets/theme_assets/assets/img/illustrations/cloud-storage.webp') }}" 
+                         height="175" 
+                         class="scaleX-n1-rtl img-fluid" 
+                         alt="Storage Usage Illustration" />
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
 
 
 
