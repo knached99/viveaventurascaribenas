@@ -1,5 +1,5 @@
 @php
-    $totalTransactions = count($transactionData);
+    $totalTransactions = count($bookings);
     // $totalAmount = 0;
 
     // foreach ($transactions as $transaction) {
@@ -112,7 +112,6 @@
                             </div>
                             <p class="mb-1">Gross Profit</p>
                             <h4 class="card-title mb-3">${{ $grossProfit }}</h4>
-                            <small class="text-success fw-medium"><i class="bx bx-up-arrow-alt"></i> +72.80%</small>
                         </div>
                     </div>
                 </div>
@@ -140,7 +139,6 @@
                             </div>
                             <p class="mb-1">Total Net Costs</p>
                             <h4 class="card-title mb-3">${{ $totalNetCosts }}</h4>
-                            <small class="text-success fw-medium"><i class="bx bx-up-arrow-alt"></i> +72.80%</small>
                         </div>
                     </div>
                 </div>
@@ -169,7 +167,6 @@
                             </div>
                             <p class="mb-1">Net Profit</p>
                             <h4 class="card-title mb-3">${{ $netProfit }}</h4>
-                            <small class="text-success fw-medium"><i class="bx bx-up-arrow-alt"></i> +72.80%</small>
                         </div>
                     </div>
                 </div>

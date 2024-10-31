@@ -244,7 +244,9 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label font-bold">Number of available slots</label>
+                        <label class="form-label font-bold">Number of available slots <span
+                                class="text-indigo-500">(this number will go down as
+                                bookings/reservations are made)</span></label>
                         <input type="text" placeholder="Enter number of available slots" wire:model="num_trips"
                             name="num_trips"
                             class="form-control {{ $errors->has('num_trips') ? 'is-invalid' : '' }}" />
@@ -361,6 +363,8 @@
             <div class="col">
                 <div class="card shadow-sm border-0 rounded-lg m-3 p-3">
                     <h5>Discount applied to this trip</h5>
+                    <button type="submit" class="m-3" wire:click="removeDiscount({{ $couponID }})">Remove
+                        Discount</button>
                     <ul class="list-group">
                         <li class="list-group-item">
                             <i class='bx bx-purchase-tag'></i>

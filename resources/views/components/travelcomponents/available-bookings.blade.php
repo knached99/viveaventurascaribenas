@@ -1,9 +1,9 @@
 @props(['trips', 'mostPopularTripId'])
-@php 
+@php
 
-use Stripe\StripeClient; 
-$stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-@endphp 
+    use Stripe\StripeClient;
+    $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+@endphp
 
 <section class="ftco-section ftco-no-pt">
     <div class="container">
@@ -59,63 +59,63 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                     </div>
                                 @endif
                             </div>
-                       <div class="text p-4 card-body">
-    
-     @php 
-    $tripPrice = $trip->tripPrice; // Start with the original price
-    $newPrice = $tripPrice; // Default to original price
+                            <div class="text p-4 card-body">
 
-    // Check if the coupon ID is valid
-    if(!empty($trip->stripe_coupon_id)) {
-        try {
-            $coupon = $stripe->coupons->retrieve($trip->stripe_coupon_id);
-            
-            // Calculate new price based on the coupon
-            if(isset($coupon)) {
-                if(isset($coupon->percent_off)) {
-                    $discount = ($coupon->percent_off / 100) * $tripPrice;
-                    $newPrice = $tripPrice - $discount;
-                }
+                                @php
+                                    $tripPrice = $trip->tripPrice; // Start with the original price
+                                    $newPrice = $tripPrice; // Default to original price
 
-                if(isset($coupon->amount_off)) {
-                    $newPrice = $tripPrice - $coupon->amount_off; 
-                }
-            }
-        } catch (\Exception $e) {
-            // Log the error message or handle it as needed
-            \Log::error('Error retrieving coupon: ' . $e->getMessage());
-            // Optionally set $newPrice to tripPrice if coupon retrieval fails
-        }
-    } else {
-        // Handle case where coupon ID is not set
-        \Log::warning('No coupon ID provided for trip: ' . $trip->id);
-    }
-@endphp
-        @if($trip->tripAvailability == 'available')
-        <span class="price">
-        @if(isset($newPrice) && $newPrice < $tripPrice)
-            <span class="text-decoration-line-through text-danger">
-                ${{ number_format($tripPrice, 2) }}
-            </span>
-            <span class="fw-bold">
-                ${{ number_format($newPrice, 2) }}
-            </span>
-        @else
-            <span class="fw-bold">
-                ${{ number_format($tripPrice, 2) }}
-            </span>
-        @endif
-    </span>
-     @else 
-       <span class="text-secondary fw-bold">  Trip Price Unavailable </span>
-        @endif 
+                                    // Check if the coupon ID is valid
+                                    if (!empty($trip->stripe_coupon_id)) {
+                                        try {
+                                            $coupon = $stripe->coupons->retrieve($trip->stripe_coupon_id);
+
+                                            // Calculate new price based on the coupon
+                                            if (isset($coupon)) {
+                                                if (isset($coupon->percent_off)) {
+                                                    $discount = ($coupon->percent_off / 100) * $tripPrice;
+                                                    $newPrice = $tripPrice - $discount;
+                                                }
+
+                                                if (isset($coupon->amount_off)) {
+                                                    $newPrice = $tripPrice - $coupon->amount_off;
+                                                }
+                                            }
+                                        } catch (\Exception $e) {
+                                            // Log the error message or handle it as needed
+                                            \Log::error('Error retrieving coupon: ' . $e->getMessage());
+                                            // Optionally set $newPrice to tripPrice if coupon retrieval fails
+                                        }
+                                    } else {
+                                        // Handle case where coupon ID is not set
+                                        \Log::warning('No coupon ID provided for trip: ' . $trip->id);
+                                    }
+                                @endphp
+                                @if ($trip->tripAvailability == 'available')
+                                    <span class="price">
+                                        @if (isset($newPrice) && $newPrice < $tripPrice)
+                                            <span class="text-decoration-line-through text-danger">
+                                                ${{ number_format($tripPrice, 2) }}
+                                            </span>
+                                            <span class="fw-bold">
+                                                ${{ number_format($newPrice, 2) }}
+                                            </span>
+                                        @else
+                                            <span class="fw-bold">
+                                                ${{ number_format($tripPrice, 2) }}
+                                            </span>
+                                        @endif
+                                    </span>
+                                @else
+                                    <span class="text-secondary fw-bold"> Trip Price Unavailable </span>
+                                @endif
 
 
-                               @if(!in_array($trip->tripAvailability, ['coming soon', 'unavailable']))
-                                <span class="days">Duration:
-                                    {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}
-                                    Days</span>
-                                    @endif
+                                @if (!in_array($trip->tripAvailability, ['coming soon']))
+                                    <span class="days">Duration:
+                                        {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}
+                                        Days</span>
+                                @endif
                                 <h3><a
                                         href="{{ route('landing.destination', ['slug' => $trip->slug]) }}">{{ $trip->tripLocation }}</a>
                                 </h3>
@@ -133,18 +133,17 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                     @break
                                 @endswitch
                                 <ul>
-                                  <li>
-                                 <img src="{{ asset('assets/images/calendar.png') }}"
-                                     style="width: 20px; height: 20px; margin: 5px;" />
-                                  
-                                   @if(!in_array($trip->tripAvailability, ['coming soon', 'unavailable']))
-                                        {{ date('F jS, Y', strtotime($trip->tripStartDate)) }} -
-                                        {{ date('F jS, Y', strtotime($trip->tripEndDate)) }}
-                                        
-                                    @else 
-                                     trip dates coming soon
-                                    @endif 
-                                       </li>
+                                    <li>
+                                        <img src="{{ asset('assets/images/calendar.png') }}"
+                                            style="width: 20px; height: 20px; margin: 5px;" />
+
+                                        @if (!in_array($trip->tripAvailability, ['coming soon']))
+                                            {{ date('F jS, Y', strtotime($trip->tripStartDate)) }} -
+                                            {{ date('F jS, Y', strtotime($trip->tripEndDate)) }}
+                                        @else
+                                            trip dates coming soon
+                                        @endif
+                                    </li>
                                     {{-- @switch($trip->tripLandscape)
                                     @case('Beach')
                                         <li><img src="{{ asset('assets/images/beach.png') }}"
@@ -186,7 +185,7 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
-                                                            <span style="font-size: 18px;">{{ $landscape }}</span>
+                                                        <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('City')
@@ -194,7 +193,7 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
-                                                            <span style="font-size: 18px;">{{ $landscape }}</span>
+                                                        <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('Country Side')
@@ -202,7 +201,7 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
-                                                            <span style="font-size: 18px;">{{ $landscape }}</span>
+                                                        <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('Mountainous')
@@ -210,7 +209,7 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
-                                                            <span style="font-size: 18px;">{{ $landscape }}</span>
+                                                        <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('Forested')
@@ -218,7 +217,7 @@ $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="width: 40px; height: 40px; margin: 5px;" />
-                                                            <span style="font-size: 18px;">{{ $landscape }}</span>
+                                                        <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
                                                 @endswitch
                                             @endforeach

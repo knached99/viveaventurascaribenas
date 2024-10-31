@@ -1,6 +1,6 @@
 @php
     use Carbon\Carbon;
-    use Stripe\StripeClient; 
+    use Stripe\StripeClient;
     $today = Carbon::today();
 
     $startDate = Carbon::parse($trip->tripStartDate);
@@ -9,32 +9,27 @@
     $landscapes = isset($trip->tripLandscape) ? json_decode($trip->tripLandscape, true) : [];
 
     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-   $tripPrice = $trip->tripPrice; // Initial trip price 
+    $tripPrice = $trip->tripPrice; // Initial trip price
 
-    $newPrice = 0; // Initializing to $0 
+    $newPrice = 0; // Initializing to $0
     // Calculate and apply any available discounts for this trip
-    if(!empty($trip->stripe_coupon_id)){
-    try{
-    $coupon = $stripe->coupons->retrieve($trip->stripe_coupon_id);
- 
+    if (!empty($trip->stripe_coupon_id)) {
+        try {
+            $coupon = $stripe->coupons->retrieve($trip->stripe_coupon_id);
 
-    if(isset($coupon) && $coupon->percent_off){
-        $discount = ($coupon->percent_off / 100) * $tripPrice; 
-        $newPrice = $tripPrice - $discount;  
-    }
+            if (isset($coupon) && $coupon->percent_off) {
+                $discount = ($coupon->percent_off / 100) * $tripPrice;
+                $newPrice = $tripPrice - $discount;
+            }
 
-    if(isset($coupon) && $coupon->amount_off){
-        $newPrice = $tripPrice - $coupon->amount_off; 
-    }
-    }
-
-    catch(\Exception $e){
-        \Log::error('Unable to retrieve coupon: '.$e->getMessage());
-    }
-    }
-
-    else{
-        \Log::warning('No Coupon ID provided for trip: '.$tripID);
+            if (isset($coupon) && $coupon->amount_off) {
+                $newPrice = $tripPrice - $coupon->amount_off;
+            }
+        } catch (\Exception $e) {
+            \Log::error('Unable to retrieve coupon: ' . $e->getMessage());
+        }
+    } else {
+        \Log::warning('No Coupon ID provided for trip: ' . $tripID);
     }
 
 @endphp
@@ -145,32 +140,32 @@
                     </div>
 
 
-                @if($trip->tripAvailability == 'available')
-                 <span class="trip-price text-dark">
-                    @if(isset($coupon) && isset($newPrice) && $newPrice < $tripPrice)
-                        <span class="text-decoration-line-through text-danger">
-                            ${{ number_format($tripPrice, 2) }}
-                        </span>
-                        <span class="fw-bold text-success">
-                            ${{ number_format($newPrice, 2) }}
-                        </span>
-                    @elseif(!isset($coupon)) 
-                        <span class="fw-bold">
-                            ${{ number_format($tripPrice, 2) }}
-                        </span>
-                    @endif 
-                @else 
-                Trip Price Unavailable 
-                @endif 
-                </span>
+                    @if ($trip->tripAvailability == 'available')
+                        <span class="trip-price text-dark">
+                            @if (isset($coupon) && isset($newPrice) && $newPrice < $tripPrice)
+                                <span class="text-decoration-line-through text-danger">
+                                    ${{ number_format($tripPrice, 2) }}
+                                </span>
+                                <span class="fw-bold text-success">
+                                    ${{ number_format($newPrice, 2) }}
+                                </span>
+                            @elseif(!isset($coupon))
+                                <span class="fw-bold">
+                                    ${{ number_format($tripPrice, 2) }}
+                                </span>
+                            @endif
+                        @else
+                            Trip Price Unavailable
+                    @endif
+                    </span>
 
-                    @if(!in_array($trip->tripAvailability, ['coming soon', 'unavailable']))
-                    <p class="trip-duration text-dark">
-                        <!-- End Average Star Rating -->
-                        <span>Duration:</span>
-                        {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }} Days
-                    </p>
-                    @endif 
+                    @if (!in_array($trip->tripAvailability, ['coming soon']))
+                        <p class="trip-duration text-dark">
+                            <!-- End Average Star Rating -->
+                            <span>Duration:</span>
+                            {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }} Days
+                        </p>
+                    @endif
                     <p class="trip-availability text-dark">
                         @switch($trip->tripAvailability)
                             @case('available')
@@ -197,19 +192,20 @@
 
                     <h5 class="block mb-3 mt-5 fw-bold">Trip Dates</h5>
                     <ul class="trip-info">
-                    <img src="{{ asset('assets/images/calendar.png') }}" class="icon" style="width: 60px; height: 60px;"/>
-                    @if(!in_array($trip->tripAvailability, ['coming soon', 'unavailable']))
-                        <li style="color: #000; font-weight: bold;">
-                            {{ date('F jS, Y', strtotime($trip->tripStartDate)) }} -
-                            {{ date('F jS, Y', strtotime($trip->tripEndDate)) }}
-                        </li>
-                    @else 
-                    <li class="text-dark">trip dates coming soon</li>
-                    @endif 
+                        <img src="{{ asset('assets/images/calendar.png') }}" class="icon"
+                            style="width: 60px; height: 60px;" />
+                        @if (!in_array($trip->tripAvailability, ['coming soon']))
+                            <li style="color: #000; font-weight: bold;">
+                                {{ date('F jS, Y', strtotime($trip->tripStartDate)) }} -
+                                {{ date('F jS, Y', strtotime($trip->tripEndDate)) }}
+                            </li>
+                        @else
+                            <li class="text-dark">trip dates coming soon</li>
+                        @endif
 
 
                         @if (is_array($landscapes))
-                           <h5 class="block mb-3 mt-5 fw-bold">Landscapes</h5>
+                            <h5 class="block mb-3 mt-5 fw-bold">Landscapes</h5>
 
                             <div class="d-flex align-items-center">
                                 @foreach ($landscapes as $landscape)
@@ -355,7 +351,7 @@
                             class="btn">{{ $trip->tripAvailability === 'coming soon'
                                 ? 'Reserve Now'
                                 : 'Book
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Now' }}</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    Now' }}</a>
 
                     </div>
                 </div>
