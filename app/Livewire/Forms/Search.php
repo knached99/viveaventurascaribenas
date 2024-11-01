@@ -46,7 +46,7 @@ class Search extends Component
                 ->orWhere('email', 'LIKE', "%{$this->searchQuery}%")
                 ->orWhere('testimonial', 'LIKE', "%{$this->searchQuery}%")
                 ->orWhere('testimonial_approval_status', 'LIKE', "%{$this->searchQuery}%")
-                ->select('testimonialID', 'tripID', 'name', 'testimonial')
+                ->select('testimonialID', 'tripID', 'name', 'email', 'testimonial')
                 ->get()
                 ->map(function ($testimonial) {
                     $testimonial['type'] = 'testimonial';

@@ -58,7 +58,14 @@
                 </div>
                 <div class="flex items-center">
                     <i class='bx bx-calendar text-lg'></i>
+                    <span class="ml-2 font-bold">Trip Date:</span>
                     <span class="ml-2">{{ date('F, Y', strtotime($testimonial->trip_date)) }}</span>
+                </div>
+
+                <div class="flex items-center">
+                    <i class='bx bx-calendar text-lg'></i>
+                    <span class="ml-2 font-bold">Submitted At:</span>
+                    <span class="ml-2">{{ date('F jS, Y \a\t g:i A', strtotime($testimonial->created_at)) }}</span>
                 </div>
 
                 <div class="flex items-center space-x-1">
