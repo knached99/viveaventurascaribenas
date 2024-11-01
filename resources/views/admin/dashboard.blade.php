@@ -1,40 +1,31 @@
 @php
     $totalTransactions = count($bookings);
-    // $totalAmount = 0;
-
-    // foreach ($transactions as $transaction) {
-    //     $totalAmount += $transaction->amount / 100; // Stripe amounts are in cents
-    // }
-
-    // $formattedTotalAmount = number_format($totalAmount, 2);
 @endphp
+
 <x-authenticated-theme-layout>
     <div class="row">
-        {{-- <div class="col-xxl-8 mb-6 order-0">
-                  <div class="card">
-                    <div class="d-flex align-items-start row">
-                      <div class="col-sm-7">
+        <div class="col-xxl-8 mb-6 order-0">
+            <div class="card">
+                <div class="d-flex align-items-start row">
+                    <div class="col-sm-7">
                         <div class="card-body">
-                          <h5 class="card-title text-primary mb-3">Welcome back, {{auth()->user()->name}} !</h5>
-                          <p class="mb-6">
-                            Manage all administrative activities from this dashboard.
-                          </p>
+                            <h5 class="card-title text-primary mb-3">Welcome back, {{ auth()->user()->name }} !</h5>
+                            <p class="mb-6">
+                                Manage all administrative activities from this dashboard.
+                            </p>
 
-                          <a href="javascript:;" class="btn btn-sm btn-outline-primary">View Badges</a>
+                            <a href="javascript:;" class="btn btn-sm btn-outline-primary">View Badges</a>
                         </div>
-                      </div>
-                      <div class="col-sm-5 text-center text-sm-left">
-                        <div class="card-body pb-0 px-0 px-md-6">
-                          <img
-                            src="{{asset('assets/theme_assets/assets/img/illustrations/man-with-laptop.png')}}"
-                            height="175"
-                            class="scaleX-n1-rtl"
-                            alt="View Badge User" />
-                        </div>
-                      </div>
                     </div>
-                  </div>
-                </div> --}}
+                    <div class="col-sm-5 text-center text-sm-left">
+                        <div class="card-body pb-0 px-0 px-md-6">
+                            <img src="{{ asset('assets/theme_assets/assets/img/illustrations/man-with-laptop.png') }}"
+                                height="175" class="scaleX-n1-rtl" alt="View Badge User" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="col-xxl-8 mb-6 order-0">
             <div class="card shadow-sm border-0 h-100">
