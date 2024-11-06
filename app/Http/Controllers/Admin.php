@@ -372,7 +372,90 @@ class Admin extends Controller
     try {
         $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
 
+                   // Retrieve the most popular reserved trip containing a count of 2 or more reservations 
+        $mostPopularReservations = Reservations::select('reservations.stripe_product_id', DB::raw('COUNT(*) as reservation_count'))
+        ->join('trips', 'reservations.stripe_product_id', '=', 'trips.stripe_product_id')
+        ->groupBy('reservations.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
+        ->having('reservation_count', '>', 2)
+        ->orderByDesc('reservation_count')
+        ->first();
+        
+        
+        $mostPopularReservedTripName = '';
+        $mostReservedTrips = [];
+        
     
+        $mostPopularTripName = $mostPopularTripPhoto = null;
+
+        // if ($mostPopularBookings) {
+        //     $product = $this->stripe->products->retrieve($mostPopularBookings->stripe_product_id);
+        //     $trip = TripsModel::where('stripe_product_id', $mostPopularBookings->stripe_product_id)->first();
+    
+        //     if ($trip) {
+        //         $mostPopularTripName = $product->name;
+        //         $mostPopularTripPhoto = json_decode($trip->tripPhoto, true)[0] ?? null;
+    
+        //         $popularTrips[] = [
+        //             'id' => $trip->tripID,
+        //             'name' => $mostPopularTripName,
+        //             'count' => $mostPopularBookings->booking_count,
+        //             'image' => $mostPopularTripPhoto,
+        //         ];
+        //     }
+        // }
+
+        
+        // Calculate data for most reseserved trip 
+
+        if ($mostPopularReservations) {
+            $reservedTrip = Tripsmodel::where('stripe_product_id', $mostPopularReservations->stripe_product_id)->first();
+          
+            if ($reservedTrip && $reservedTrip->tripID == $tripID) {
+                // Extract the trip photo
+                $tripPhotos = json_decode($reservedTrip->tripPhoto, true);
+                $mostPopularReservedTripName = $reservedTrip->tripLocation;
+                $mostPopularReservedTripPhoto = $tripPhotos[0] ?? null;  // Get the first photo or null if none exists
+        
+                // Extracting all reservations for this trip
+                $reservations = Reservations::where('tripID', $reservedTrip->tripID)->get();
+        
+                // Initialize variables to store total start and end dates
+                $totalStartDates = 0;
+                $totalEndDates = 0;
+                $totalDays = 0;
+                $reservationCount = $reservations->count();
+               
+                if($reservationCount > 0){
+                    foreach($reservations as $reservation){
+                        $startDate = Carbon::parse($reservation->preferred_start_date);
+                        $endDate = Carbon::parse($reservation->preferred_end_date);
+                        $dateRange = abs($endDate->diffInDays($startDate));
+                        
+                        // Sum and calculate the date range average 
+
+                        $totalStartDates += $startDate->timestamp;
+                        $totalEndDates += $endDate->timestamp;
+
+                        $totalDays += $dateRange; 
+                    }
+
+                    $averageStartDate = Carbon::createFromTimestamp($totalStartDates / $reservationCount);
+                    $averageEndDate = Carbon::createFromTimestamp($totalEndDates / $reservationCount);
+
+                    $averageDateRange = round($totalDays / $reservationCount);
+                }
+
+                else{
+                    $averageStartDate = null;
+                    $averageEndDate = null;
+                    $averageDateRange = 0;
+                }
+
+             
+            }
+        }
+        
+                 
 
         $tripCosts = json_decode($trip->tripCosts, true) ?: [];
        
@@ -389,13 +472,16 @@ class Admin extends Controller
             'totalNetCost' => $totalNetCost,
             'grossProfit' => $grossProfit,
             'netProfit' => $netProfit,
+            'averageStartDate' => isset($averageStartDate) ? $averageStartDate->format('m/d/Y') : null,
+            'averageEndDate' => isset($averageEndDate) ? $averageEndDate->format('m/d/Y') : null,
+            'averageDateRange' => isset($averageDateRange) ? round($averageDateRange, 2) : null,
         ];
-
 
         Cache::put($cacheKey, $dataToCache, 60);
         return view('admin.trip', $dataToCache);
-
-    } catch (ModelNotFoundException $e) {
+    
+    }
+     catch (ModelNotFoundException $e) {
         \Log::error('Unable to get trip details: ' . $e->getMessage());
         abort(404);
     } catch (Exception $e) {
@@ -405,6 +491,7 @@ class Admin extends Controller
         abort(500);
     }
 }
+
 
     
     

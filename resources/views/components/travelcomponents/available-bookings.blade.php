@@ -24,6 +24,7 @@
                         $landscapes = isset($trip->tripLandscape) ? json_decode($trip->tripLandscape) : [];
                     @endphp
                     <div class="col-md-4 col-sm-6 ftco-animate">
+                        <a href="{{route('landing.destination', ['slug'=>$trip->slug])}}">
                         <div class="project-wrap card">
                             <div id="carouselExampleControls{{ $loop->index }}" class="carousel slide"
                                 data-bs-interval="false">
@@ -116,9 +117,9 @@
                                         {{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}
                                         Days</span>
                                 @endif
-                                <h3><a
-                                        href="{{ route('landing.destination', ['slug' => $trip->slug]) }}">{{ $trip->tripLocation }}</a>
-                                </h3>
+                                {{-- <h3><a style="text-decoration:underline; text-decoration-color: #3b82f6;" href="{{ route('landing.destination', ['slug' => $trip->slug]) }}">{{ $trip->tripLocation }}</a> --}}
+                                {{-- </h3> --}}
+                                <h3 class="fw-bold">{{$trip->tripLocation}}</h3>
                                 @switch($trip->tripAvailability)
                                     @case('available')
                                         <span class="success-badge">{{ $trip->tripAvailability }}</span>
@@ -177,7 +178,7 @@
                                 @endswitch --}}
 
                                     @if (is_array($landscapes))
-                                        <div class="d-flex align-items-center">
+                                        <div class="d-flex align-items-center overflow-x-auto">
                                             @foreach ($landscapes as $landscape)
                                                 @switch($landscape)
                                                     @case('Beach')
@@ -185,7 +186,6 @@
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
-                                                        <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('City')
@@ -193,7 +193,6 @@
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
-                                                        <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('Country Side')
@@ -201,7 +200,6 @@
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
-                                                        <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('Mountainous')
@@ -209,7 +207,6 @@
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="height: 40px; width: 40px; margin: 5px;" />
-                                                        <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
 
                                                     @case('Forested')
@@ -217,7 +214,6 @@
                                                             data-bs-toggle="tooltip" data-bs-placement="bottom"
                                                             data-bs-title="{{ $landscape }}"
                                                             style="width: 40px; height: 40px; margin: 5px;" />
-                                                        <span style="font-size: 18px;">{{ $landscape }}</span>
                                                     @break
                                                 @endswitch
                                             @endforeach
@@ -228,6 +224,7 @@
                                 </ul>
                             </div>
                         </div>
+                        </a>
                     </div>
                 @endforeach
             @endif

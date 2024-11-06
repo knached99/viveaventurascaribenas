@@ -48,9 +48,9 @@ class PhotoGalleryUpload extends Form {
 
     
     public function uploadPhotosToGallery(){
+        
         $this->validate();
 
-  
             $photosArray = [];
             
             $dirPath = storage_path('app/public/photo_gallery');

@@ -26,6 +26,10 @@ class EditTripForm extends Component
     use WithFileUploads;
 
     public $trip;
+
+    public ?string $couponID = '';
+    public ?string $promoID = '';
+
     public string $tripLocation = '';
     public array $tripLandscape = []; 
     public array $tripPhotos = [];
@@ -48,12 +52,18 @@ class EditTripForm extends Component
     public string $discountCreateSuccess = '';
     public string $discountCreateError = '';
 
+    public string $couponDeleteSuccess = '';
+    public string $couponDeleteError = '';
+
     public string $imageReplaceSuccess = '';
     public string $imageReplaceError = '';
     public ?int $replaceIndex = null;
     public string $totalNetCost = '';
     public string $grossProfit = '';
     public string $netProfit = '';
+    public ?string $averageStartDate = null;
+    public ?string $averageEndDate = null; 
+    public ?string $averageDateRange = null;
     private string $stripe_product_id = '';
     private string $cacheKey = '';
 
@@ -587,7 +597,7 @@ class EditTripForm extends Component
             $coupon = null;
     
             foreach ($existingCoupons->data as $existingCoupon) {
-                // Check if coupon matches the discount type and value (you may need to adjust this logic)
+                // Check if coupon matches the discount type and value 
                 if (($this->discountType === 'percentage' && isset($existingCoupon->percent_off) && $existingCoupon->percent_off == $couponData['percent_off']) ||
                     ($this->discountType === 'amount' && isset($existingCoupon->amount_off) && $existingCoupon->amount_off == $couponData['amount_off'])) {
                     $coupon = $existingCoupon;
@@ -634,6 +644,39 @@ class EditTripForm extends Component
         } catch (Stripe\Exception\ApiErrorException $e) {
             \Log::error('Error creating discount on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' in method: ' . __FUNCTION__ . ' Error: ' . $e->getMessage());
             $this->discountCreateError = 'Failed to create discount. Something went wrong';
+        }
+    }
+    
+
+    public function deleteCoupon()
+    {
+        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        $trip = TripsModel::findOrFail($this->trip->tripID);
+    
+        $couponID = $trip->stripe_coupon_id;
+        
+        try {
+            if (!empty($couponID)) {  // Ensure couponID is not null or empty
+                $deleteCouponStripe = $stripe->coupons->delete($couponID, []);
+                
+                if ($deleteCouponStripe) {
+                    $trip->stripe_coupon_id = '';
+    
+                    $deleteCouponDB = $trip->save();
+    
+                    $this->couponDeleteSuccess = $deleteCouponDB
+                        ? 'The coupon has been deleted and is no longer available'
+                        : 'Unable to delete the coupon. Something went wrong in the database.';
+                } else {
+                    $this->couponDeleteError = 'Unable to delete the coupon from Stripe.';
+                }
+            } else {
+                $this->couponDeleteError = 'Coupon ID is missing.';
+                \Log::error('Unable to delete coupon because couponID is missing.');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Unable to delete coupon. This error occurred: '.$e->getMessage());
+            $this->couponDeleteError = 'Unable to delete the coupon, something went wrong!';
         }
     }
     

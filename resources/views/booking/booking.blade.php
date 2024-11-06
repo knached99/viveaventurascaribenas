@@ -8,12 +8,16 @@
                     ? 'Fill out the form to reserve your trip to ' . $trip->tripLocation
                     : 'Finish booking your trip to ' . $trip->tripLocation));
 
-    $message =
-        $trip->num_trips === 0
-            ? 'Unfortunately, this trip is fully booked at the moment.'
-            : ($trip->tripAvailability === 'unavailable'
-                ? 'You cannot book this trip as it is currently unavailable.'
-                : 'Once this trip becomes available, you will be notified to complete the booking');
+$message = 
+    $trip->num_trips === 0
+        ? 'Unfortunately, this trip is fully booked at the moment.'
+        : ($trip->tripAvailability === 'unavailable'
+            ? 'You cannot book this trip as it is currently unavailable.'
+            : ($trip->tripAvailability === 'coming soon'
+                ? 'Once this trip becomes available, you will be notified to complete the booking.'
+                : 'This trip is available for booking.'));
+
+
 
     $tripPhotos = json_decode($trip->tripPhoto, true);
     $firstPhotoURL = !empty($tripPhotos) ? asset($tripPhotos[0]) : asset('assets/images/booking_page_bg.webp');

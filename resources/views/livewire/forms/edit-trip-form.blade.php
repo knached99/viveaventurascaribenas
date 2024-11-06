@@ -12,7 +12,8 @@
 
     $tripPrice = $trip->tripPrice;
     $newPrice = 0;
-
+    $coupon = null; 
+    
     if (!empty($trip->stripe_coupon_id)) {
         try {
             $coupon = $stripe->coupons->retrieve($couponID);
@@ -30,6 +31,17 @@
     } else {
         \Log::warning('No coupon ID found for trip: ' . $trip->tripID);
     }
+
+
+$redeemByDate = '';
+
+if(isset($coupon) && isset($coupon->duration_in_months)){
+                        $redeemByDate = Carbon::now()->addMonths($coupon->duration_in_months);
+}
+else{
+ $redeemByDate = '';
+ }
+
 
 @endphp
 
@@ -158,6 +170,12 @@
                         <x-input-error :messages="$errors->get('tripActivities')" class="invalid-feedback" />
                     </div>
 
+                    @if(isset($averageStartDate, $averageEndDate, $averageDateRange))
+                    <span class="text-wrap block fw-bold m-3" style="color: #6366f1;">Users prefer the following dates:
+                    <span class="block text-dark">Start Date: {{$averageStartDate}}</span>
+                    <span class="block text-dark">End Date: {{$averageEndDate}}</span>
+                    </span>
+                    @endif 
                     <!-- Dates -->
                     <div class="mb-3">
                         <label for="tripStartDate" class="form-label">Trip Start Date</label>
@@ -307,6 +325,29 @@
             </div>
         </div>
 
+        <!-- Preferred Dates -->
+        @if(isset($averageStartDate, $averageEndDate, $averageDateRange))
+            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                <div class="card shadow-sm border-0 rounded-lg mb-3">
+                    <div class="card-body p-3">
+                        <h3 class="mb-0 fw-bold">Preferred Dates</h3>
+                        <i class='bx bx-calendar-alt' style="color: #6366f1;"></i>
+                        <span class="text-xl mt-3" style="color: #6366f1;">{{$averageStartDate}} - {{$averageEndDate}}</span>
+
+                        <span class="block mt-3 font-bold text-wrap">Average Preferred Duration: {{$averageDateRange}} days</span>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+             <!-- / Preferred Dates -->
+        @if($couponDeleteSuccess)
+            <span class="text-emerald-500">{{ $couponDeleteSuccess }}</span>
+        
+        @elseif($couponDeleteError)
+            <span class="text-red-500">{{$couponDeleteError}}</span>
+        @endif 
+
         @if (empty($couponID))
             <!-- Discount -->
             <div class="col">
@@ -335,20 +376,20 @@
                         </div>
 
                         <div class="form-group">
-                            <input type="hidden" wire:model="promoCode" id="promoCode" />
+                            {{-- <input type="hidden" wire:model="promoCode" id="promoCode" />
                             <!-- Placeholder for promo code display -->
                             <span id="promoCodeDisplay" class="inline-block m-2 text-black font-bold"></span>
                             <!-- Button for generating the promo code -->
                             <button type="button" onclick="generatePromoCode()" class="block m-2 btn btn-secondary"
                                 id="promoCodeGenButton">
                                 Generate Promo Code (optional)
-                            </button>
+                            </button> --}}
 
 
 
 
 
-                            <button wire:click="createDiscount" class="btn btn-primary ml-4 mt-2">Create
+                            <button wire:click="createDiscount" class="btn btn-primary ml-4 mt-2 float-start">Create
                                 Discount</button>
                             @if ($discountCreateSuccess)
                                 <span class="text-emerald-500">{{ $discountCreateSuccess }}</span>
@@ -363,23 +404,28 @@
             <div class="col">
                 <div class="card shadow-sm border-0 rounded-lg m-3 p-3">
                     <h5>Discount applied to this trip</h5>
-                    <button type="submit" class="m-3" wire:click="removeDiscount({{ $couponID }})">Remove
-                        Discount</button>
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <i class='bx bx-purchase-tag'></i>
-                            {{ $coupon->percent_off ? 'Percentage Off' : ($coupon->amount_off ? 'Amount Off' : '') }}
-                            <span class="block text-emerald-500 font-semibold">
-                                {{ $coupon->percent_off ? $coupon->percent_off . '%' : ($coupon->amount_off ? '$' . $coupon->amount_off : '') }}
-                            </span>
-                        </li>
-                        <li class="list-group-item"><i class='bx bx-dollar-circle'></i> Price after discount:
-                            ${{ number_format($newPrice, 2) }}</li>
-                        <li class="list-group-item"><i class='bx bx-calendar'></i> Redeem By:
-                            {{ $coupon->redeem_by ?? 'N/A' }}</li>
-                        <li class="list-group-item"><i class='bx bx-calendar'></i> Duration In Months:
-                            {{ $coupon->duration_in_months }}</li>
-                    </ul </div>
+          
+                <button type="button" class="m-3 btn btn-outline-danger" wire:click="deleteCoupon">Remove Discount</button>
+
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <i class='bx bx-purchase-tag'></i>
+                        {{ $coupon && $coupon->percent_off ? 'Percentage Off' : ($coupon && $coupon->amount_off ? 'Amount Off' : '') }}
+                        <span class="block text-emerald-500 font-semibold">
+                            {{ $coupon && $coupon->percent_off ? $coupon->percent_off . '%' : ($coupon && $coupon->amount_off ? '$' . $coupon && $coupon->amount_off : '') }}
+                        </span>
+                    </li>
+                    <li class="list-group-item"><i class='bx bx-dollar-circle'></i> Price after discount:
+                        ${{ number_format($newPrice, 2) }}
+                    </li>
+                    <li class="list-group-item"><i class='bx bx-calendar'></i> Redeem By:
+                   
+                    {{date('F jS, Y, \a\t g:i A', strtotime($redeemByDate))}}        
+                    </li>
+                    <li class="list-group-item"><i class='bx bx-calendar'></i> Duration In Months:
+                        {{ $coupon && $coupon->duration_in_months }}
+                    </li>
+                </ul>
                 </div>
 
         @endif

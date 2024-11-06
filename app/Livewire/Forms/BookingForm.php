@@ -103,6 +103,8 @@ class BookingForm extends Component
         'address_line_2.regex'=>'You must provide a valid PO box or suite number',
         'city.required'=>'Your city is required',
         'state.required'=>'Your state is required',
+        'zipcode.required'=>'Your zip code is required',
+        'zipcode.regex'=>'You must enter a valid US zipcode',
         'payment_option.required'=>'Please choose if you\'d like to pay in full or make partial payments',
         'preferred_start_date.required'=>'Please select a start date',
         'preferred_start_date.date'=>'You must select a valid start date',
@@ -242,12 +244,6 @@ private function calculatePartialPayment()
     
     }
     
-
-
-    
-
-
-
 
 private function createStripeCheckoutSession($customerId, $trip, $tripName, $amount)
 {
