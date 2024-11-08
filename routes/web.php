@@ -14,7 +14,7 @@ Route::get('/', [Home::class, 'homePage'])->name('/');
 
 Route::get('/terms_and_conditions', [Home::class, 'termsAndConditions'])->name('terms_and_conditions');
 Route::get('/privacy', [Home::class, 'userPrivacy'])->name('privacy');
-Route::get('/landing/destination/{slug}', [Home::class, 'getDestinationDetails'])->name('landing.destination');
+Route::get('/destination/{slug}', [Home::class, 'getDestinationDetails'])->name('destination');
 Route::get('/about', [Home::class, 'aboutPage'])->name('about');
 
 Route::get('/destinations', [Home::class, 'destinationsPage'])->name('destinations');

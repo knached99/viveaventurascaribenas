@@ -9,6 +9,7 @@
                 <p>Your payment was successful. We've sent the confirmation details to
                     {{ $customerEmail ?? 'your email' }} <br>
                 </p>
+                <a href="/" class="text-indigo-500 font-bold block">Go Home</a>
             </div>
         </div>
     </div>

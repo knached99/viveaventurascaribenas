@@ -23,7 +23,7 @@
 
                             <span class="m-3 text-secondary"><i class='bx bx-map' style="font-size: 30px;"></i>
                                 <a style="border-bottom: 1px solid blue;"
-                                    href="{{ route('landing.destination', ['slug' => $testimony->trip->slug]) }}">
+                                    href="{{ route('destination', ['slug' => $testimony->trip->slug]) }}">
                                     {{ $testimony->trip->tripLocation }}</span>
                             </a>
                             <span class="m-3 text-secondary"><i class='bx bx-calendar'

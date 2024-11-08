@@ -1,7 +1,7 @@
 @php
 
     $isLandingDestination =
-        \Route::currentRouteName() === 'landing.destination' ||
+        \Route::currentRouteName() === 'destination' ||
         \Route::currentRouteName() === 'booking.success' ||
         \Route::currentRouteName() === 'booking.cancel';
 

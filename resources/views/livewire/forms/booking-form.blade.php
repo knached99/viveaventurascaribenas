@@ -88,7 +88,7 @@
 
 
 
-                @if ($tripAvailability != 'coming soon')
+                {{-- @if ($tripAvailability != 'coming soon')
                     <div class="form-group mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="payment_option"
@@ -115,7 +115,7 @@
                         @endif
                     </div>
 
-                @endif
+                @endif --}}
 
 
 

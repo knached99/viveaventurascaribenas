@@ -89,7 +89,9 @@
                 <h6 class="text-lg font-medium text-blue-gray-800">
                     <i class='bx bxs-map'></i> Booked Location
                 </h6>
-                <p class="text-base font-light leading-relaxed mb-3">{{ $location }}</p>
+                <a class="btn btn-primary mb-5" href="{{ route('admin.trip', ['tripID' => $booking->trip->tripID]) }}">
+                    {{ $location }}
+                </a>
 
                 <div class="block">
                     <img src="{{ $firstPhoto }}" alt="Location Image"

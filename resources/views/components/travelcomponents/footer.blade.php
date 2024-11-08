@@ -158,7 +158,7 @@
         updateSlide();
     });
 </script>
-@if (\Route::currentRouteName() === '/' || \Route::currentRouteName() === 'landing.destination')
+@if (\Route::currentRouteName() === '/' || \Route::currentRouteName() === 'destination')
     <!-- Slider on booking images -->
     <script>
         var swiper = new Swiper('.swiper-container', {
@@ -177,7 +177,7 @@
     </script>
 @endif
 
-@if (\Route::currentRouteName() === '/' || \Route::currentRouteName() === 'landing.destination')
+@if (\Route::currentRouteName() === '/' || \Route::currentRouteName() === 'destination')
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const carouselElement = document.querySelector("#testimonialsCarousel");

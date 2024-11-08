@@ -26,13 +26,6 @@ return new class extends Migration
             $table->boolean('active')->default(false);
             $table->json('tripCosts')->nullable();
             $table->string('slug')->unique()->nullable(); // URL slug replacing uuid for SEO
-           // $table->uuid('testimonial_id')->nullable();
-
-            // $table->foreign('testimonial_id')
-            //       ->references('testimonialID')
-            //       ->on('testimonials')
-            //       ->onDelete('cascade');
-
             $table->timestamps();
         });
     }

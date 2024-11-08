@@ -35,7 +35,7 @@
                         <div class="card-body">
                             <!-- Title with Icon -->
                             <h5 class="card-title text-primary mb-4">
-                                <i class="bx bx-bar-chart-alt-2 me-2"></i> Website Visitor Analytics
+                                <i class="fa-solid fa-chart-simple"></i> Website Visitor Analytics
                             </h5>
 
                             <!-- Overview Text -->

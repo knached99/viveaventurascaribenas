@@ -41,7 +41,9 @@
         rel="stylesheet" />
 
     <link rel="stylesheet" href="{{ asset('assets/theme_assets/assets/vendor/fonts/boxicons.css') }}" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Core CSS -->
     <link rel="stylesheet" href="{{ asset('assets/theme_assets/assets/vendor/css/core.css') }}"
         class="template-customizer-core-css" />
@@ -71,9 +73,10 @@
 
     <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
 
-    <!-- Loading Apex Chart Library -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
+    <!-- Loading ChartJS Open Source Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
+        integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     @livewireStyles
 </head>
 

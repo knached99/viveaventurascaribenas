@@ -128,15 +128,16 @@
                         <td class="m-3 text-white badge rounded-pill bg-secondary">Inactive</td>
                     @endswitch
                     <td>
-                        <a href="{{ route('admin.trip', ['tripID' => $trip->tripID]) }}" class="text-decoration-underline">
-                            View
+                        <a href="{{ route('admin.trip', ['tripID' => $trip->tripID]) }}" class="btn btn-primary">
+                            <i class="fa-solid fa-eye mr-2"></i> View
                         </a>
                     </td>
                     <td>
                         <form method="post" action="{{ route('admin.trip.delete', ['tripID' => $trip->tripID]) }}">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger text-white">Delete</button>
+                            <button type="submit" class="btn btn-danger text-white"><i class="fa-solid fa-trash mr-2"></i>
+                                Delete</button>
                         </form>
                     </td>
                 </tr>

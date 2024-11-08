@@ -276,7 +276,7 @@ class Admin extends Controller
 
 
     public function allTripsPage(){
-        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'active', 'tripPrice')->get();
+        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'active', 'tripPrice', 'created_at', 'updated_at')->get();
         return view('admin/all-trips', compact('trips'));
     }
 

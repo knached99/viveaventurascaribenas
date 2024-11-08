@@ -48,7 +48,7 @@
                 <li class="menu-item {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
                     <a href="{{ route('admin.analytics') }}" class="menu-link text-decoration-none">
                         <div class="text-truncate" data-i18n="analytics"><i
-                                class='menu-icon tf-icons bx bx-bar-chart-alt-2'></i> Analytics</div>
+                                class="menu-icon tf-icons fa-solid fa-chart-line"></i> Analytics</div>
                     </a>
                 </li>
 

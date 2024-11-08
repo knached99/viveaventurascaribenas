@@ -9,6 +9,8 @@
                 <p>Your reservation is confirmed. We've sent the reservation details to
                     {{ $customerEmail ?? 'your email' }} <br>
                 </p>
+                <a href="/" style="color: #0ea5e9; text-decoration: underline;">Go Home</a>
+
             </div>
         </div>
     </div>

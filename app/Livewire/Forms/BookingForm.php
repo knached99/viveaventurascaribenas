@@ -398,7 +398,7 @@ private function getOrCreateStripeCustomer(string $email, string $name){
         $tripName = $this->tripName ?? 'Trip Reservation';
     
         if ($trip->num_trips === 0 || $this->tripAvailability === 'unavailable') {
-            return redirect()->route('landing.destination', ['tripID' => $this->tripID]);
+            return redirect()->route('destination', ['tripID' => $this->tripID]);
         }
     
         if ($this->tripAvailability === 'coming soon') {

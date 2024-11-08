@@ -33,7 +33,8 @@
                             <div class="carousel-inner">
                                 @foreach ($photosArray as $index => $photoArray)
                                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                        <img src="{{ $photoArray }}" class="d-block w-100" alt="Photo">
+                                        <img src="{{ $photoArray }}" class="d-block"
+                                            style="width: auto; height: 200px;" alt="Photo">
                                     </div>
                                 @endforeach
                             </div>

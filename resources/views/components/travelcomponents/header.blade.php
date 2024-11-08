@@ -679,7 +679,7 @@
         }
     </style>
 
-    @if (\Route::currentRouteName() === 'landing.destination')
+    @if (\Route::currentRouteName() === 'destination')
         <style>
             .testimonials-slider .card {
                 border: none;
