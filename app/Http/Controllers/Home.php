@@ -212,38 +212,35 @@ class Home extends Controller
     public function bookingSuccess(Request $request)
     {
         $tripID = $request->query('tripID');
-        $trip = TripsModel::findOrFail($tripID);
+        $email = base64_decode($request->query('email'));
         $sessionID = $request->query('session_id');
     
-        // Validate tripID and sessionID
         if (empty($tripID) || empty($sessionID)) {
             abort(404, 'Trip ID or Session ID is missing.');
         }
+    
+        $trip = TripsModel::findOrFail($tripID);
+        $reservation = Reservations::where('tripID', $tripID)->where('email', $email)->firstOrFail();
     
         // Initialize Stripe client
         $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
     
         try {
-            // Retrieve the Stripe session using the session ID
-            $session = $stripe->checkout->sessions->retrieve($sessionID, [
-                'expand'=>['payment_intent']
-            ]);
+            // Retrieve the Stripe session and payment intent
+            $session = $stripe->checkout->sessions->retrieve($sessionID, ['expand' => ['payment_intent']]);
     
-            // Check if the session exists and has the correct payment status
-            if ($session && $session->payment_status == 'paid') {
-                // Check if a booking already exists with the same stripe_checkout_id
-                $existingBooking = BookingModel::where('stripe_checkout_id', $session->id)->first();
-    
-                if ($existingBooking) {
+            if ($session && $session->payment_status === 'paid') {
+                // Prevent duplicate bookings
+                if (BookingModel::where('stripe_checkout_id', $session->id)->exists()) {
                     return redirect()->route('booking.cancel', ['tripID' => $tripID])
-                                     ->with('message', 'Booking already completed.');
+                        ->with('message', 'Booking already completed.');
                 }
+    
+                // Capture payment details
                 $paymentIntent = $session->payment_intent;
-                if(is_object($paymentIntent)){
-                $amount_charged_in_cents = $paymentIntent->amount_received;
-                $amount_charged_in_dollars = $amount_charged_in_cents / 100;
-                }
-                // Create a new booking record
+                $amountCharged = isset($paymentIntent->amount_received) ? $paymentIntent->amount_received / 100 : 0.00;
+    
+                // Create booking record
                 BookingModel::create([
                     'bookingID' => $this->bookingID,
                     'tripID' => $session->metadata->tripID ?? null,
@@ -255,63 +252,48 @@ class Home extends Controller
                     'city' => $session->metadata->city ?? 'N/A',
                     'state' => $session->metadata->state ?? 'N/A',
                     'zip_code' => $session->metadata->zipcode ?? '00000',
-                    'amount_captured'=>$amount_charged_in_dollars ?? 0.00,
+                    'amount_captured' => $amountCharged,
                     'stripe_checkout_id' => $session->id,
                     'stripe_product_id' => $session->metadata->stripe_product_id ?? null,
                 ]);
-                $trip->num_trips -=1;
-                $trip->save();
     
-                // Retrieve charges and receipt link
-                $receiptLink = null;
-                if (!empty($session->payment_intent)) {
-                    $charges = $stripe->charges->all(['payment_intent' => $session->payment_intent]);
+                // Update trip availability and delete reservation
+                $trip->decrement('num_trips');
+                $reservation->delete();
     
-                    if (!empty($charges->data) && count($charges->data) > 0) {
-                        $receiptLink = $charges->data[0]->receipt_url;
-                    }
-                }
+                // Retrieve receipt link if available
+                $receiptLink = optional($stripe->charges->all(['payment_intent' => $session->payment_intent])->data[0] ?? null)->receipt_url;
     
-                // Retrieve the Stripe product
-                if (!empty($session->metadata->stripe_product_id)) {
-                    $product = $stripe->products->retrieve($session->metadata->stripe_product_id);
-                }
-
-                // Temporary Signed URL is valid for 2 minutes 
-                $signedURLSuccess = URL::temporarySignedRoute(
-                    'booking.success', now()->addMinutes(2), ['tripID' => $tripID]
-                );
-
-                $signedURLCancel = URL::temporarySignedRoute(
-                    'booking.cancel', now()->addMinutes(2), ['tripID' => $tripID]
-                );
+                // Generate signed URLs for success and cancel routes
+                $signedURLSuccess = URL::temporarySignedRoute('booking.success', now()->addMinutes(2), ['tripID' => $tripID]);
+                $signedURLCancel = URL::temporarySignedRoute('booking.cancel', now()->addMinutes(2), ['tripID' => $tripID]);
     
-                // Send notifications
+                // Send notifications to admin and customer
                 Notification::route('mail', config('mail.mailers.smtp.to_email'))
                     ->notify(new BookingSubmittedAdmin($session->metadata->name, $this->bookingID));
-    
                 Notification::route('mail', $session->metadata->email)
                     ->notify(new BookingSubmittedCustomer($session->metadata->name, $this->bookingID, $receiptLink));
     
-                
-                // Pass the metadata to the view
+                // Render success view
                 return view('booking.success', [
                     'customerName' => $session->metadata->name,
                     'customerEmail' => $session->metadata->email,
                     'tripID' => $tripID,
-                    'signedURL'=>$signedURLSuccess
+                    'signedURL' => $signedURLSuccess
                 ]);
-            } else {
-                // Handle the case where the payment was not successful or the session is invalid
-                return redirect()->route('booking.cancel', ['tripID' => $tripID, 'signedURL'=>$signedURLCancel]);
             }
-
-            Cache::flush();
+    
+            // Redirect if payment was unsuccessful
+            return redirect()->route('booking.cancel', ['tripID' => $tripID, 'signedURL' => $signedURLCancel]);
+    
         } catch (\Exception $e) {
-            \Log::error('Uncaught database or stripe exception in class: ' . __CLASS__ . ' On line: ' . __LINE__ . ' Error Message: ' . $e->getMessage());
+            \Log::error("Error processing booking in " . __METHOD__ . ": " . $e->getMessage());
             abort(500, 'An error occurred while processing your booking.');
+        } finally {
+            Cache::flush();
         }
     }
+    
     
     
     

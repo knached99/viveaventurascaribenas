@@ -407,6 +407,7 @@ class EditTripForm extends Component
                
                 \Log::info('Current trip availability in DB: ' . $tripModel->tripAvailability);
                 \Log::info('Current trip availability in Livewire: ' . $this->tripAvailability);
+               
                 if ($tripModel->tripAvailability !== $this->tripAvailability) {
                     \Log::info('Trip availability has changed.');
                     if (strtolower($this->tripAvailability) === 'available') {
@@ -425,7 +426,10 @@ class EditTripForm extends Component
                 $tripModel->tripStartDate = Carbon::parse($this->tripStartDate)->format('Y-m-d');
                 $tripModel->tripEndDate = Carbon::parse($this->tripEndDate)->format('Y-m-d');
                 $tripModel->tripPrice = $this->tripPrice ?? 0;
-                $tripModel->num_trips = $this->num_trips;
+                $tripModel->num_trips = ($tripModel->num_trips == 0 || $tripModel->num_trips < $reservationsCount) 
+                ? max($reservationsCount, $tripModel->num_trips) 
+                : $tripModel->num_trips;
+
                 $tripModel->active = $this->active;
                 $tripModel->slug = Str::slug($this->tripLocation);
                 $tripModel->tripCosts = json_encode($this->tripCosts);

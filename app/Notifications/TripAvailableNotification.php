@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Carbon\Carbon;
 
 class TripAvailableNotification extends Notification
 {
@@ -14,9 +15,10 @@ class TripAvailableNotification extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct($trip)
+    public function __construct($trip, $reservation)
     {
         $this->trip = $trip;
+        $this->reservation = $reservation;
     }
 
     /**
@@ -32,11 +34,31 @@ class TripAvailableNotification extends Notification
     /**
      * Get the mail representation of the notification.
      */
+
+     
+
+     // Greet the user based on the time of day 
+
+     private function timeOfDayGreeting(){
+
+        $time = Carbon::now();
+           // Determine greeting based on the time of day
+           if ($time >= 5 && $time < 12) {
+
+            return 'Good morning!';
+        } elseif ($time >= 12 && $time < 18) {
+            return 'Good afternoon!';
+        } else {
+            return 'Good evening!';
+        }
+    }
+
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
+            ->greeting($this->timeOfDayGreeting(). ' '.$this->reservation->name)
             ->line('The trip you reserved is now available to book!')
-            ->action('Click here to continue booking this trip', url('/booking/' . $this->trip->slug))
+            ->action('Click here to continue booking this trip', url('/booking/' . $this->trip->slug.'/'.$this->reservation->reservationID))
             ->line('Thank you for using our application!');
     }
     
