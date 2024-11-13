@@ -1,6 +1,6 @@
 @props(['testimonials'])
 
-<table class="table">
+<table class="table dataTable">
     @if (session('testimonial_delete_success'))
         <p class="text-success m-3">{{ session('testimonial_delete_success') }}</p>
     @elseif(session('testimonial_delete_error'))

@@ -2,14 +2,10 @@
 
 namespace App\Livewire\Forms;
 
-namespace App\Livewire\Forms;
-
 use Livewire\Component;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use Stripe\StripeClient;
-use Stripe\Invoice;
-use Stripe\InvoiceItem;
 use Stripe\Exception\ApiErrorException;
 use App\Models\TripsModel;
 use App\Models\Reservations; 
@@ -24,6 +20,8 @@ class BookingForm extends Component
 {
     protected $stripe;
     
+    public $reservation;
+
     public $currentStep = 1;
     public string $name = '';
     public string $email = '';
@@ -35,7 +33,6 @@ class BookingForm extends Component
     public string $zipcode = '';
     public string $tripID;
     public string $num_trips = '';
-    public string $payment_option = '';
     public string $tripAvailability = '';
     public string $preferred_start_date = '';
     public string $preferred_end_date = '';
@@ -47,11 +44,10 @@ class BookingForm extends Component
     public $initialPayment = 0;
     public $finalPayment = 0;
 
-    protected $listeners = ['payment_option_selected' => 'displayPartialAmount'];
     
     public $partialAmount = 0;
 
-    public function mount($tripID)
+    public function mount($tripID, $reservationID)
     {
         \Log::info('Initializing Stripe client...');
         $this->tripID = $tripID;
@@ -60,10 +56,19 @@ class BookingForm extends Component
         $this->num_trips = $trip->num_trips;
         $statesJson = file_get_contents(resource_path('js/states.json'));
         $statesArray = json_decode($statesJson, true);
-    
+        $reservation = $reservationID ? Reservations::findOrFail($reservationID) : null;
         $this->states = array_map(function($name, $code) {
             return ['code' => $code, 'name' => $name];
         }, $statesArray, array_keys($statesArray));
+
+        $this->name = $reservation && $reservation->name ? $reservation->name : '';
+        $this->email = $reservation && $reservation->email ? $reservation->email : '';
+        $this->phone_number = $reservation && $reservation->phone_number ? $reservation->phone_number : '';
+        $this->address_line_1 = $reservation && $reservation->address_line_1 ? $reservation->address_line_1 : '';
+        $this->address_line_2 = $reservation && $reservation->address_line_2 ? $reservation->address_line_2 : '';
+        $this->city = $reservation && $reservation->city ? $reservation->city : '';
+        $this->state = $reservation && $reservation->state ? $reservation->state : '';
+        $this->zipcode = $reservation && $reservation->zip_code ? $reservation->zip_code : '';
     }
     
     public function rules()
@@ -80,7 +85,6 @@ class BookingForm extends Component
             'city' => ['required'],
             'state' => ['required'],
             'zipcode' => ['required', 'regex:/^\d{5}(-\d{4})?$/'],
-            'payment_option'=> ['sometimes'],
         ];
 
         // Add preferred dates rules if tripAvailability is 'coming soon'
@@ -105,7 +109,6 @@ class BookingForm extends Component
         'state.required'=>'Your state is required',
         'zipcode.required'=>'Your zip code is required',
         'zipcode.regex'=>'You must enter a valid US zipcode',
-        'payment_option.required'=>'Please choose if you\'d like to pay in full or make partial payments',
         'preferred_start_date.required'=>'Please select a start date',
         'preferred_start_date.date'=>'You must select a valid start date',
         'preferred_start_date.after'=>'Start date must be at least 1 week from today',
@@ -123,39 +126,11 @@ class BookingForm extends Component
         'city' => 'City',
         'state' => 'State',
         'zipcode' => 'Zipcode',
-        'payment_option' => 'Payment Option',
         'preferred_start_date'=>'Start Date',
         'preferred_end_date'=>'End Date',
     ];
 
 
-  
-public function display_partial_amount()
-{
-    if ($this->payment_option == 'partial_payments') {
-       
-        $paymentData = $this->calculatePartialPayment();
-
-        $this->initialPayment = $paymentData['initialPayment'];
-    }
-     else {
-        // Reset the values when "Full Payment" is selected
-        $this->initialPayment = 0;
-    }
-}
-
-
-private function calculatePartialPayment()
-{
-    $trip = TripsModel::findOrFail($this->tripID);
-    
-    $initialPayment = $trip->tripPrice * 0.60;
-
-    return [
-        'initialPayment' => $initialPayment,
-    ];
-}
-    
 
     public function updatedPhoneNumber($value)
     {
@@ -196,7 +171,6 @@ private function calculatePartialPayment()
                 'city' => $this->rules()['city'],
                 'state' => $this->rules()['state'],
                 'zipcode' => $this->rules()['zipcode'],
-                'payment_option' => $this->rules()['payment_option'],
             ]);
         }
 
@@ -210,49 +184,13 @@ private function calculatePartialPayment()
     
    
 
-    // This method is called when the user selects "partial payments" 
-    private function createSplitInvoices($customerID, $amount, $tripName)
-    {
-        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
-    
-        $finalPayment = $amount * 0.40;
-    
-        /*
-        TO
-        find a way to pay the final payment invoice and check to see if there's a charge object associated with it
-        */
-    
-        // Now create invoice item for the final payment
-        $stripe->invoiceItems->create([
-            'customer' => $customerID,
-            'amount' => $finalPayment * 100, // Convert to cents for Stripe
-            'currency' => 'usd',
-            'description' => 'Final payment for ' . $tripName,
-        ]);
-    
-        // Create and finalize the second invoice for the final payment
-        $secondInvoice = $stripe->invoices->create([
-            'customer' => $customerID,
-            'collection_method' => 'send_invoice', // Automatically charge the customer
-            'auto_advance' => true, // Automatically finalize and attempt collection
-            'days_until_due'=>7,
-            
-        ]);
-    
-        $stripe->invoices->finalizeInvoice($secondInvoice->id); // Finalize and attempt to charge
-    
-    
-    }
+
     
 
 private function createStripeCheckoutSession($customerId, $trip, $tripName, $amount)
 {
     
     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-
-    $finalAmount = $this->payment_option === 'partial_payments'
-        ? $amount * 0.60  // 60% for partial payments
-        : $amount;
         
     
     try {
@@ -271,7 +209,7 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
                             'stripe_product_id' => $trip->stripe_product_id,
                         ],
                     ],
-                    'unit_amount' => $finalAmount * 100, // Stripe requires amount in cents
+                    'unit_amount' => $amount * 100, // Stripe requires amount in cents
                 ],
                 'quantity' => 1,
             ]],
@@ -285,7 +223,7 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
                 'shipping' => 'auto',
             ],
             'mode' => 'payment',
-            'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID,
+            'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID.'&email='.base64_encode($this->email),
             'cancel_url' => route('booking.cancel', [
                 'tripID' => $this->tripID,
                 'name' => $this->name,
@@ -412,11 +350,6 @@ private function getOrCreateStripeCustomer(string $email, string $name){
         // Now calculate the correct amount in dollars and later convert to cents where needed
         $amount = $trip->tripPrice; // Amount is still in dollars here, do not multiply by 100 yet
     
-        if ($this->payment_option === 'partial_payments') {
-            // Pass amount in dollars to the method, it will handle the split invoices
-            $this->createSplitInvoices($existingCustomer->id, $amount, $tripName);
-        }
-    
         // Create Stripe checkout session (amount will be multiplied by 100 in this method)
         $stripe_session = $this->createStripeCheckoutSession($existingCustomer->id, $trip, $tripName, $amount);
     
@@ -430,7 +363,8 @@ private function getOrCreateStripeCustomer(string $email, string $name){
     {
         return view('livewire.forms.booking-form', [
             'states' => $this->states,
-            'tripAvailability' => $this->tripAvailability
+            'tripAvailability' => $this->tripAvailability,
+            'reservation'=>$this->reservation,
         ]);
     }
 }

@@ -23,7 +23,7 @@ Route::get('/gallery', [Home::class, 'galleryPage'])->name('gallery');
 
 Route::get('/contact', [Home::class, 'contactPage'])->name('contact');
 
-Route::get('/booking/{slug}', [Home::class, 'bookingPage'])->name('booking');
+Route::get('/booking/{slug}/{reservationID?}', [Home::class, 'bookingPage'])->name('booking');
 Route::get('/success', [Home::class, 'bookingSuccess'])->name('booking.success');
 Route::get('/booking/{tripID}/cancel', [Home::class, 'bookingCancel'])->name('booking.cancel');
 Route::get('/reservation-confirmed/{reservationID}', [Home::class, 'reservationConfirmed'])->name('reservation-confirmed');

@@ -43,7 +43,7 @@ $message =
                     @if ($trip->tripAvailability === 'unavailable' || $trip->num_trips === 0)
                     @else
                         <div class="booking-form-wrapper p-4 rounded">
-                            <livewire:forms.booking-form :tripID="$tripID" />
+                        <livewire:forms.booking-form :tripID="$tripID" :reservationID="$reservationID" :reservation="$reservation"/>
                         </div>
                     @endif
                     <!-- Form End -->

@@ -43,6 +43,11 @@ class Home extends Controller
     // Optimized for performance 
     public function homePage()
     {
+        $totalBookings = BookingModel::count();
+        $totalTrips = TripsModel::count();
+        $customers = $this->stripe->customers->all();
+        $totalCustomers = count($customers);
+
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'slug', 'stripe_product_id', 'stripe_coupon_id')->where('active', true)->get();
         $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
         
@@ -84,13 +89,16 @@ class Home extends Controller
                 }
             }
         }
-    
+
         return view('landing.home', [
             'trips' => $trips,
             'testimonials' => $testimonials,
             'popularTrips' => $popularTrips,
             'mostPopularTripId' => $mostPopularTripId, // Pass the most popular trip ID
-            'photos'=>$photos
+            'photos'=>$photos,
+            'totalBookings' => $totalBookings,
+            'totalTrips' => $totalTrips,
+            'totalCustomers'=>$totalCustomers, 
         ]);
     }
 
@@ -195,20 +203,26 @@ class Home extends Controller
         
     }
 
-    public function bookingPage($slug){
-        try{
-        
+    public function bookingPage($slug, $reservationID = null) {
+        try {
             $trip = TripsModel::where('slug', $slug)->firstOrFail();
             $tripID = $trip->tripID;
-           
-        return view('booking/booking', ['tripID'=>$tripID, 'trip'=>$trip]);
-        }
-        
-        catch(\ModelNotFoundException $e){
+    
+            // Check if reservationID is provided before finding the reservation
+           $reservation = $reservationID ? Reservations::findOrFail($reservationID) : null;
+    
+            return view('booking/booking', [
+                'tripID' => $tripID,
+                'trip' => $trip,
+                'reservationID' => $reservationID,
+                'reservation' => $reservation
+            ]);
+        } catch (\ModelNotFoundException $e) {
             \Log::error($e->getMessage());
-        return redirect('/');
+            return redirect('/');
         }
     }
+    
     public function bookingSuccess(Request $request)
     {
         $tripID = $request->query('tripID');

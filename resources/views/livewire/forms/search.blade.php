@@ -122,7 +122,7 @@
                                         {{ $result['email'] ?? 'No Email' }}</p>
                                     <p class="mb-0 text-gray-600">
                                         <span class="font-bold block">Testimonial</span>
-                                        <span class="text-clip">{{ $result['testimonial'] }}</span>
+                                        <span class="text-clip italic">"{{ $result['testimonial'] }}"</span>
                                     </p>
                                 </div>
                             </li>

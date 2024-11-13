@@ -16,10 +16,12 @@ class NotifyUsersTripAvailable implements ShouldQueue
         // Fetch reservations associated with this trip
         $reservations = Reservations::where('tripID', $event->trip->tripID)->get();
         
-        // Notify all users who made reservations for this trip
+       // Notify all users who made reservations for this trip
         foreach ($reservations as $reservation) {
             \Log::info('Notification being sent to: ' . $reservation->email);
-            Notification::route('mail', $reservation->email)->notify(new TripAvailableNotification($event->trip,));
+            
+            Notification::route('mail', $reservation->email)
+                ->notify(new TripAvailableNotification($event->trip, $reservation->reservationID, $reservation->customerName));
         }
     }
 }

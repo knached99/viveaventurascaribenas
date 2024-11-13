@@ -5,6 +5,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\TemporaryUploadedFile;
 use App\Models\TripsModel;
+use App\Models\Reservations;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -21,12 +22,15 @@ use App\Events\TripBecameAvailable;
 use App\Listeners\SendNotificationOfTripAvailability;
 use App\Notifications\TripAvailabilityNotification;
 
+// Import helper class to use static method calls
+
+use App\Helpers\Helper; 
+
 class EditTripForm extends Component
 {
     use WithFileUploads;
 
     public $trip;
-
     public ?string $couponID = '';
     public ?string $promoID = '';
 
@@ -39,7 +43,7 @@ class EditTripForm extends Component
     public string $tripStartDate = ''; 
     public string $tripEndDate = ''; 
     public string $tripPrice = '';
-    public string $num_trips = '';
+    public int $num_trips = 0;
     public bool $active = false;
     public string $slug = '';
     public $tripCosts = [];
@@ -58,14 +62,15 @@ class EditTripForm extends Component
     public string $imageReplaceSuccess = '';
     public string $imageReplaceError = '';
     public ?int $replaceIndex = null;
-    public string $totalNetCost = '';
-    public string $grossProfit = '';
-    public string $netProfit = '';
+    public float $totalNetCost = 0.0;
+    public float $grossProfit = 0.0;
+    public float $netProfit = 0.0;
     public ?string $averageStartDate = null;
     public ?string $averageEndDate = null; 
     public ?string $averageDateRange = null;
     private string $stripe_product_id = '';
     private string $cacheKey = '';
+    public ?int $reservationsCount = null;
 
     public $discountType = 'percentage';
 
@@ -77,7 +82,7 @@ class EditTripForm extends Component
     {
         $this->trip = $trip;
         $this->cacheKey = 'trip_' . $this->trip->tripID;
-        
+                
         // Load trip data from cache or database
         $cachedTrip = Cache::get($this->cacheKey);
         
@@ -88,6 +93,7 @@ class EditTripForm extends Component
         } else {
             $this->loadFromDatabase();
         }
+
         $this->existingImageURLs = json_decode($this->trip->tripPhotos, true) ?? [];
     }
     
@@ -107,13 +113,12 @@ class EditTripForm extends Component
         $this->stripe_coupon_id = $cachedTrip['stripe_coupon_id'];
         $this->stripe_promo_id = $cachedTrip['stripe_promo_id'];
         $this->tripCosts = $cachedTrip['tripCosts'];
-        $this->num_trips = $cachedTrip['num_trips'];
+        $this->num_trips = intval($cachedTrip['num_trips']);
         $this->active = $cachedTrip['active'];
         $this->slug = $cachedTrip['slug'] ?? '';
         $this->stripe_coupon_id = $cachedTrip['stripe_coupon_id'];
         $this->stripe_promo_id = $cachedTrip['stripe_promo_id'];
     
-
     }
     
     private function loadFromDatabase(): void
@@ -134,7 +139,9 @@ class EditTripForm extends Component
         $this->stripe_coupon_id = $trip->stripe_coupon_id;
         $this->stripe_promo_id = $trip->stripe_promo_id;
         $this->tripCosts = json_decode($trip->tripCosts, true);
-        $this->num_trips = $trip->num_trips;
+       // $this->num_trips = $trip->num_trips;
+       $this->num_trips = intval($this->num_trips);
+
         $this->active = (bool) $trip->active;
         $this->slug = $trip->slug;
         $this->stripe_promo_id = $trip->stripe_promo_id;
@@ -240,7 +247,7 @@ class EditTripForm extends Component
         \Log::info('Full Path: ' . $fullPath);
     
         // Resize the image using GD or another method
-        $this->resizeImage($file->getRealPath(), $fullPath,  525, 351);
+        Helper::resizeImage($file->getRealPath(), $fullPath,  525, 351);
     
         \Log::info('Image resized!');
     
@@ -337,6 +344,8 @@ class EditTripForm extends Component
     {
         \Log::info('Editing trip with costs: ' . json_encode($this->tripCosts));
         
+        $reservationsCount = Reservations::count(); 
+
         $rules = [
             'tripLocation' => 'required|string|max:255',
             'tripLandscape' => 'required|array',
@@ -389,7 +398,7 @@ class EditTripForm extends Component
                                 $fullPath = storage_path('app/public/' . $filePath);
                     
                                 \Log::info('Resizing Image...');
-                                $this->resizeImage($image, $fullPath, 525, 351);
+                                Helper::resizeImage($image, $fullPath, 525, 351);
                     
                                 // Save the image to the file system
                                 $photo->storeAs('public/booking_photos', $fileName);
@@ -429,6 +438,10 @@ class EditTripForm extends Component
                 $tripModel->num_trips = ($tripModel->num_trips == 0 || $tripModel->num_trips < $reservationsCount) 
                 ? max($reservationsCount, $tripModel->num_trips) 
                 : $tripModel->num_trips;
+        
+                
+            
+               
 
                 $tripModel->active = $this->active;
                 $tripModel->slug = Str::slug($this->tripLocation);
@@ -475,73 +488,7 @@ class EditTripForm extends Component
         Cache::forget('trip_' . $tripId);
     }
 
-    private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight){
-
-        $imageType = exif_imagetype($sourcePath);
     
-        switch($imageType){
-    
-            case IMAGETYPE_JPEG:
-    
-                $image = imagecreatefromjpeg($sourcePath);
-                break;
-    
-            case IMAGETYPE_PNG:
-                $image = imagecreatefrompng($sourcePath);
-                break;
-    
-            default:
-    
-            throw new Exception('The image you selected is not supported. Please select a JPEG or PNG image');
-    
-       }
-    
-       $originalWidth = imagesx($image);
-       $originalHeight = imagesy($image);
-    
-       $aspectRatio = $originalWidth / $originalHeight;
-    
-        if($newWidth / $newHeight > $aspectRatio){
-            $newWidth = $newHeight * $aspectRatio;
-        }
-    
-        else{
-            $newHeight / $newWidth / $aspectRatio;
-        }
-    
-        $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
-    
-        if($imageType == IMAGETYPE_PNG){
-            
-            // We need to preserve transparency for PNG images 
-    
-            imagealphablending($resizedImage, false);
-            imagesavealpha($resizedImage, true);
-            $transparent = imagecolorallocatealpha($resizedImage, 255, 255 ,255 ,127);
-            imagefill($resizedImage, 0, 0, $transparent);
-        }
-    
-        imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
-    
-        switch($imageType){
-    
-            case IMAGETYPE_JPEG:
-                $quality = 100; // max quality for JPEG images 
-                imagejpeg($resizedImage, $destinationPath, $quality);
-                break;
-    
-            case IMAGETYPE_PNG:
-    
-                $compression = 0; // PNG does not support compression 
-                imagepng($resizedImage, $destinationPath, $compression);
-                break;
-        }
-    
-        // Freeing up memory 
-    
-        imagedestroy($image);
-        imagedestroy($resizedImage);
-    }
     
 
 
