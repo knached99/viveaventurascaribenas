@@ -33,8 +33,8 @@
                 </div>
             @endforeach
         </div>
-        <button class="nav-btn prev-btn">Prev</button>
-        <button class="nav-btn next-btn">Next</button>
+        <button class="nav-btn prev-btn"><i class="fa-solid fa-left-long"></i></button>
+        <button class="nav-btn next-btn"><i class="fa-solid fa-right-long"></i></button>
     </div>
     <div class="indicator">
         @for ($i = 0; $i < count($testimonials); $i++)

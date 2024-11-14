@@ -310,11 +310,13 @@
                             <!-- Custom buttons -->
                             <button class="carousel-control-prev" type="button"
                                 data-bs-target="#testimonialsCarousel" data-bs-slide="prev">
-                                <span class="visually-hidden"><i class='bx bx-left-arrow-alt'></i></span>
+                                <i class="fa-solid fa-left-long"></i>
+                                <span class="visually-hidden">Previous</span>
                             </button>
                             <button class="carousel-control-next" type="button"
                                 data-bs-target="#testimonialsCarousel" data-bs-slide="next">
-                                <span class="visually-hidden"><i class='bx bx-right-arrow-alt'></i></span>
+                                <i class="fa-solid fa-right-long"></i>
+                                <span class="visually-hidden">Next</span>
                             </button>
                         </div>
                     @else

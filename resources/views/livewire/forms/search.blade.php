@@ -133,6 +133,8 @@
 
 
         </ul>
+
+    
     @elseif(isset($searchQuery) && $searchQuery !== '')
         <ul
             class="list-group m-0 p-0 bg-white shadow-lg border border-gray-200 rounded-lg mt-2 absolute w-full max-h-[400px] overflow-y-auto z-40">
@@ -141,6 +143,19 @@
             <li class="list-group-item p-4 border-b hover:bg-gray-100 cursor-pointer flex items-center">
                 No results found for "<b>{{ $searchQuery }}</b>"
             </li>
+
+            <!-- Suggestion Prompt --> 
+            @if (empty($searchResults) && $suggestion)
+                <li class="list-group-item p-4 border-b hover:bg-gray-100 cursor-pointer flex items-center">
+                    Did you mean: 
+                    
+                    <span class="text-indigo-500 font-semibold">{{ $suggestion }}</span>? 
+                    
+                    If so, try your search again with this suggestion
+                </li>
+            @endif
+            <!-- / Suggestion Prompt -->
+
             <span class="block m-3 top-0 sticky z-50 bg-white p-3 float-start">
 
                 <button type="button" wire:click="clearSearchResults"

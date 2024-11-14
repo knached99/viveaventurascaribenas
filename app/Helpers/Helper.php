@@ -4,6 +4,9 @@ namespace App\Helpers;
 
 class Helper
 {
+
+    // Resize image to reduce memory consumption but also retain aspect ratio and resolution  
+
     public static function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight)
     {
         $imageType = exif_imagetype($sourcePath);
@@ -60,4 +63,7 @@ class Helper
         imagedestroy($image);
         imagedestroy($resizedImage);
     }
+
+
+  
 }
