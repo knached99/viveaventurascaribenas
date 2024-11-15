@@ -17,7 +17,7 @@ class Search extends Component
 {
     public array $searchResults = [];
     public string $searchError = '';
-    public string $suggestion = '';  // Search suggestion 
+    public ?string $suggestion = null;  // Search suggestion 
 
     #[Validate('required|string')]
     public string $searchQuery = '';
@@ -93,24 +93,18 @@ class Search extends Component
                 })
                 ->toArray();
     
-                $this->searchResults = array_merge($tripsResults, $testimonialsResults, $bookingResults, $reservationsResults);
+            $this->searchResults = array_merge($tripsResults, $testimonialsResults, $bookingResults, $reservationsResults);
     
-            // Suggest similar term (add the missing `findSimilarTerm` call)
-                if(empty($this->searchResults)){
-                
-                 $this->suggestion = $this->findSimilarTerm($this->searchQuery);
-                
-                }       
-                
-           
+            // Suggest similar term if no results found
+            if (empty($this->searchResults)) {
+                $this->suggestion = $this->findSimilarTerm($this->searchQuery);
+            }
+    
         } catch (\Exception $e) {
-           
-        $this->searchResults = [];
-        
-        $this->searchError = 'Unable to perform search';
-        \Log::error("Search Error: {$e->getMessage()}");
-      
-    }
+            $this->searchResults = [];
+            $this->searchError = 'Unable to perform search';
+            \Log::error("Search Error: {$e->getMessage()}");
+        }
     }
     
     
@@ -121,81 +115,80 @@ class Search extends Component
 
   
     private function findSimilarTerm($query)
-{
-    // Cache the terms for 1 hour to reduce database queries
-    $terms = Cache::remember('search_terms', 60, function () {
-        $terms = [];
-
-        // Retrieve terms from `TripsModel`
-        $tripTerms = TripsModel::select('tripLocation', 'tripDescription', 'tripLandscape', 'tripAvailability')->distinct()->get();
-        foreach ($tripTerms as $trip) {
-            $terms[] = $trip->tripLocation;
-            $terms[] = $trip->tripDescription;
-            $terms[] = $trip->tripLandscape;
-            $terms[] = $trip->tripAvailability;
+    {
+        // Cache terms for 1 hour
+        $terms = Cache::remember('search_terms', 60, function () {
+            $terms = [];
+    
+            // Collect terms from different models
+            $tripTerms = TripsModel::select('tripLocation', 'tripDescription', 'tripLandscape', 'tripAvailability')->distinct()->get();
+            foreach ($tripTerms as $trip) {
+                $terms[] = $trip->tripLocation;
+                $terms[] = $trip->tripDescription;
+                $terms[] = $trip->tripLandscape;
+                $terms[] = $trip->tripAvailability;
+            }
+    
+            $testimonialTerms = Testimonials::select('name', 'email', 'testimonial')->distinct()->get();
+            foreach ($testimonialTerms as $testimonial) {
+                $terms[] = $testimonial->name;
+                $terms[] = $testimonial->email;
+                $terms[] = $testimonial->testimonial;
+            }
+    
+            $bookingTerms = BookingModel::select('name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code')->distinct()->get();
+            foreach ($bookingTerms as $booking) {
+                $terms[] = $booking->name;
+                $terms[] = $booking->email;
+                $terms[] = $booking->phone_number;
+                $terms[] = $booking->address_line_1;
+                $terms[] = $booking->address_line_2;
+                $terms[] = $booking->city;
+                $terms[] = $booking->state;
+                $terms[] = $booking->zip_code;
+            }
+    
+            $reservationTerms = Reservations::select('name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code')->distinct()->get();
+            foreach ($reservationTerms as $reservation) {
+                $terms[] = $reservation->name;
+                $terms[] = $reservation->email;
+                $terms[] = $reservation->phone_number;
+                $terms[] = $reservation->address_line_1;
+                $terms[] = $reservation->address_line_2;
+                $terms[] = $reservation->city;
+                $terms[] = $reservation->state;
+                $terms[] = $reservation->zip_code;
+            }
+    
+            // Clean up terms list by removing duplicates and empty values
+            return array_unique(array_filter($terms));
+        });
+    
+        $query = strtolower($query);
+        $querySoundex = soundex($query);
+        $closest = null;
+        $shortestDistance = -1;
+    
+        foreach ($terms as $term) {
+            $termLower = strtolower($term);
+            $termSoundex = soundex($termLower);
+    
+            if ($termSoundex === $querySoundex) {
+                $lev = levenshtein($query, $termLower);
+    
+                if ($lev == 0) {
+                    return $term;
+                }
+    
+                if ($lev < $shortestDistance || $shortestDistance < 0) {
+                    $closest = $term;
+                    $shortestDistance = $lev;
+                }
+            }
         }
-
-        // Retrieve terms from `Testimonials`
-        $testimonialTerms = Testimonials::select('name', 'email', 'testimonial')->distinct()->get();
-        foreach ($testimonialTerms as $testimonial) {
-            $terms[] = $testimonial->name;
-            $terms[] = $testimonial->email;
-            $terms[] = $testimonial->testimonial;
-        }
-
-        // Retrieve terms from `BookingModel`
-        $bookingTerms = BookingModel::select('name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code')->distinct()->get();
-        foreach ($bookingTerms as $booking) {
-            $terms[] = $booking->name;
-            $terms[] = $booking->email;
-            $terms[] = $booking->phone_number;
-            $terms[] = $booking->address_line_1;
-            $terms[] = $booking->address_line_2;
-            $terms[] = $booking->city;
-            $terms[] = $booking->state;
-            $terms[] = $booking->zip_code;
-        }
-
-        // Retrieve terms from `Reservations`
-        $reservationTerms = Reservations::select('name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code')->distinct()->get();
-        foreach ($reservationTerms as $reservation) {
-            $terms[] = $reservation->name;
-            $terms[] = $reservation->email;
-            $terms[] = $reservation->phone_number;
-            $terms[] = $reservation->address_line_1;
-            $terms[] = $reservation->address_line_2;
-            $terms[] = $reservation->city;
-            $terms[] = $reservation->state;
-            $terms[] = $reservation->zip_code;
-        }
-
-        // Clean up terms list by removing duplicates and empty values
-        return array_unique(array_filter($terms));
-    });
-
-    // Find the closest term to the user's search query
-    $closest = null;
-    $shortestPath = -1;
-
-    foreach ($terms as $term) {
-        $lev = levenshtein(strtolower($query), strtolower($term));
-
-        // If exact match is found, no need to continue
-        if ($lev == 0) {
-            $closest = $term;
-            $shortestPath = 0;
-            break;
-        }
-
-        // Track the closest term with the shortest distance so far
-        if ($lev < $shortestPath || $shortestPath < 0) {
-            $closest = $term;
-            $shortestPath = $lev;
-        }
+    
+        return $closest;
     }
-
-    return $closest;
-}
     
 
     public function clearSearchResults()

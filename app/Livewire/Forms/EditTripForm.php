@@ -22,15 +22,15 @@ use App\Events\TripBecameAvailable;
 use App\Listeners\SendNotificationOfTripAvailability;
 use App\Notifications\TripAvailabilityNotification;
 
-// Import helper class to use static method calls
-
-use App\Helpers\Helper; 
+// Helper class for image resizing 
+Use App\Helpers\Helper; 
 
 class EditTripForm extends Component
 {
     use WithFileUploads;
 
     public $trip;
+
     public ?string $couponID = '';
     public ?string $promoID = '';
 
@@ -43,7 +43,7 @@ class EditTripForm extends Component
     public string $tripStartDate = ''; 
     public string $tripEndDate = ''; 
     public string $tripPrice = '';
-    public int $num_trips = 0;
+    public string $num_trips = '';
     public bool $active = false;
     public string $slug = '';
     public $tripCosts = [];
@@ -62,9 +62,9 @@ class EditTripForm extends Component
     public string $imageReplaceSuccess = '';
     public string $imageReplaceError = '';
     public ?int $replaceIndex = null;
-    public float $totalNetCost = 0.0;
-    public float $grossProfit = 0.0;
-    public float $netProfit = 0.0;
+    public string $totalNetCost = '';
+    public string $grossProfit = '';
+    public string $netProfit = '';
     public ?string $averageStartDate = null;
     public ?string $averageEndDate = null; 
     public ?string $averageDateRange = null;
@@ -82,7 +82,7 @@ class EditTripForm extends Component
     {
         $this->trip = $trip;
         $this->cacheKey = 'trip_' . $this->trip->tripID;
-                
+        
         // Load trip data from cache or database
         $cachedTrip = Cache::get($this->cacheKey);
         
@@ -93,7 +93,6 @@ class EditTripForm extends Component
         } else {
             $this->loadFromDatabase();
         }
-
         $this->existingImageURLs = json_decode($this->trip->tripPhotos, true) ?? [];
     }
     
@@ -113,12 +112,13 @@ class EditTripForm extends Component
         $this->stripe_coupon_id = $cachedTrip['stripe_coupon_id'];
         $this->stripe_promo_id = $cachedTrip['stripe_promo_id'];
         $this->tripCosts = $cachedTrip['tripCosts'];
-        $this->num_trips = intval($cachedTrip['num_trips']);
+        $this->num_trips = $cachedTrip['num_trips'];
         $this->active = $cachedTrip['active'];
         $this->slug = $cachedTrip['slug'] ?? '';
         $this->stripe_coupon_id = $cachedTrip['stripe_coupon_id'];
         $this->stripe_promo_id = $cachedTrip['stripe_promo_id'];
     
+
     }
     
     private function loadFromDatabase(): void
@@ -139,9 +139,7 @@ class EditTripForm extends Component
         $this->stripe_coupon_id = $trip->stripe_coupon_id;
         $this->stripe_promo_id = $trip->stripe_promo_id;
         $this->tripCosts = json_decode($trip->tripCosts, true);
-       // $this->num_trips = $trip->num_trips;
-       $this->num_trips = intval($this->num_trips);
-
+        $this->num_trips = $trip->num_trips;
         $this->active = (bool) $trip->active;
         $this->slug = $trip->slug;
         $this->stripe_promo_id = $trip->stripe_promo_id;
@@ -342,10 +340,10 @@ class EditTripForm extends Component
 
     public function editTrip(): void
     {
+        $reservationsCount = Reservations::count(); 
+        
         \Log::info('Editing trip with costs: ' . json_encode($this->tripCosts));
         
-        $reservationsCount = Reservations::count(); 
-
         $rules = [
             'tripLocation' => 'required|string|max:255',
             'tripLandscape' => 'required|array',
@@ -416,7 +414,6 @@ class EditTripForm extends Component
                
                 \Log::info('Current trip availability in DB: ' . $tripModel->tripAvailability);
                 \Log::info('Current trip availability in Livewire: ' . $this->tripAvailability);
-               
                 if ($tripModel->tripAvailability !== $this->tripAvailability) {
                     \Log::info('Trip availability has changed.');
                     if (strtolower($this->tripAvailability) === 'available') {
@@ -435,13 +432,12 @@ class EditTripForm extends Component
                 $tripModel->tripStartDate = Carbon::parse($this->tripStartDate)->format('Y-m-d');
                 $tripModel->tripEndDate = Carbon::parse($this->tripEndDate)->format('Y-m-d');
                 $tripModel->tripPrice = $this->tripPrice ?? 0;
-                $tripModel->num_trips = ($tripModel->num_trips == 0 || $tripModel->num_trips < $reservationsCount) 
-                ? max($reservationsCount, $tripModel->num_trips) 
-                : $tripModel->num_trips;
-        
+                $tripModel->num_trips = $this->num_trips;
                 
-            
-               
+                
+                // $tripModel->num_trips = ($tripModel->num_trips == 0 || $tripModel->num_trips < $reservationsCount) 
+                // ? max($reservationsCount, $tripModel->num_trips) 
+                // : $tripModel->num_trips;
 
                 $tripModel->active = $this->active;
                 $tripModel->slug = Str::slug($this->tripLocation);
@@ -488,8 +484,6 @@ class EditTripForm extends Component
         Cache::forget('trip_' . $tripId);
     }
 
-    
-    
 
 
     // Create a coupon to apply discounts to a specific destination pacakge 

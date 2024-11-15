@@ -85,13 +85,15 @@ class BookingForm extends Component
             'city' => ['required'],
             'state' => ['required'],
             'zipcode' => ['required', 'regex:/^\d{5}(-\d{4})?$/'],
+            'preferred_start_date' => ['required|date}after_or_equal: '.$minStartDate],
+            'preferred_end_date' => ['required|date|after:preferred_start_date'],
         ];
 
         // Add preferred dates rules if tripAvailability is 'coming soon'
-        if ($this->tripAvailability === 'coming soon') {
-            $rules['preferred_start_date'] = 'required|date|after_or_equal:' . $minStartDate;
-            $rules['preferred_end_date'] = 'required|date|after:preferred_start_date';
-        }
+        // if ($this->tripAvailability === 'coming soon') {
+        //     $rules['preferred_start_date'] = 'required|date|after_or_equal:' . $minStartDate;
+        //     $rules['preferred_end_date'] = 'required|date|after:preferred_start_date';
+        // }
 
         return $rules;
     }

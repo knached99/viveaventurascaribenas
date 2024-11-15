@@ -118,7 +118,7 @@
                 </div>
             @endif
 
-            @if ($tripAvailability == 'coming soon')
+            {{-- @if ($tripAvailability == 'coming soon') --}}
                 <!-- Preferred Start Date -->
                 <div class="form-group mb-3">
                     <label class="form-label text-dark float-start">Preferred Start Date</label>
@@ -142,7 +142,7 @@
                 </div>
 
                 <!-- Preferred End Date -->
-            @endif
+            {{-- @endif --}}
 
             <div class="step text-center">
                 <div class="form-btn">
