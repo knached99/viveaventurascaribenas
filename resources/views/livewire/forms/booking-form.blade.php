@@ -120,11 +120,14 @@
 
             {{-- @if ($tripAvailability == 'coming soon') --}}
                 <!-- Preferred Start Date -->
+              
                 <div class="form-group mb-3">
                     <label class="form-label text-dark float-start">Preferred Start Date</label>
+                    {{$reservation && $reservation->preferred_start_date ? $reservation->preferred_start_date : ''}}
                     <input type="date" id="preferred_start_date" name="preferred_start_date"
                         wire:model="preferred_start_date" class="form-control"
-                        style="{{ $errors->has('preferred_start_date') ? 'border:1px solid #dc2626' : '' }}"
+                        style="{{ $errors->has('preferred_start_date') ? 'border:1px solid #dc2626' : '' }} {{$reservation && $reservation->preferred_start_date ? 'visibility: hidden' : ''}}"
+                        {{$reservation && $reservation->preferred_start_date ? 'readonly' : ''}}
                         min="{{ $minStartDate }}" />
 
                     <x-input-error :messages="$errors->get('preferred_start_date')" class="mt-2 text-danger" style="list-style: none;" />
@@ -132,15 +135,15 @@
 
                 <div class="form-group mb-3">
                     <label class="form-label text-dark float-start">Preferred End Date</label>
-
+                        {{$reservation && $reservation->preferred_end_date ? $reservation->preferred_end_date : ''}}
                     <input type="date" id="preferred_end_date" name="preferred_end_date"
                         wire:model="preferred_end_date" class="form-control"
-                        style="{{ $errors->has('preferred_end_date') ? 'border:1px solid #dc2626' : '' }}"
+                        style="{{ $errors->has('preferred_end_date') ? 'border:1px solid #dc2626' : '' }} {{$reservation && $reservation->preferred_end_date ? 'visibility: hidden' : ''}}"
+                        {{$reservation && $reservation->preferred_end_date ? 'readonly' : ''}}
                         min="{{ $minEndDate }}" />
 
                     <x-input-error :messages="$errors->get('preferred_end_date')" class="mt-2 text-danger" style="list-style: none;" />
                 </div>
-
                 <!-- Preferred End Date -->
             {{-- @endif --}}
 

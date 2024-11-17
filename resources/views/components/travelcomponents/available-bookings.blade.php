@@ -122,19 +122,34 @@
                                     {{-- <h3><a style="text-decoration:underline; text-decoration-color: #3b82f6;" href="{{ route('destination', ['slug' => $trip->slug]) }}">{{ $trip->tripLocation }}</a> --}}
                                     {{-- </h3> --}}
                                     <h3 class="fw-bold">{{ $trip->tripLocation }}</h3>
-                                    @switch($trip->tripAvailability)
-                                        @case('available')
-                                            <span class="success-badge">{{ $trip->tripAvailability }}</span>
-                                        @break
+                                   @php
+                                    $badgeClass = '';
+                                    $badgeText = '';
+                                    
+                                    if ($trip->num_slots == 0) {
+                                        $badgeClass = 'danger-badge';
+                                        $badgeText = 'Unavailable to book';
+                                    } else {
+                                        switch ($trip->tripAvailability) {
+                                            case 'available':
+                                                $badgeClass = 'success-badge';
+                                                $badgeText = $trip->tripAvailability;
+                                                break;
+                                            case 'coming soon':
+                                                $badgeClass = 'warning-badge';
+                                                $badgeText = $trip->tripAvailability;
+                                                break;
+                                            case 'unavailable':
+                                                $badgeClass = 'danger-badge';
+                                                $badgeText = $trip->tripAvailability;
+                                                break;
+                                        }
+                                    }
+                                @endphp
 
-                                        @case('coming soon')
-                                            <span class="warning-badge">{{ $trip->tripAvailability }}</span>
-                                        @break
+                                <span class="{{ $badgeClass }}">{{ $badgeText }}</span>
 
-                                        @case('unavailable')
-                                            <span class="danger-badge">{{ $trip->tripAvailability }}</span>
-                                        @break
-                                    @endswitch
+                                  
                                     <ul>
                                         <li>
                                             <img src="{{ asset('assets/images/calendar.png') }}"

@@ -56,6 +56,7 @@ class Home extends Controller
         $photos = PhotoGalleryModel::with(['trip'])->select('photoID', 'photoLabel', 'photoDescription', 'photos', 'tripID')->get();
         
         $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
+            ->where('trips.active', true)
             ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
             ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.slug',  'trips.tripPhoto')
             ->having('booking_count', '>', 2)
@@ -210,7 +211,7 @@ class Home extends Controller
     
             // Check if reservationID is provided before finding the reservation
            $reservation = $reservationID ? Reservations::findOrFail($reservationID) : null;
-    
+            
             return view('booking/booking', [
                 'tripID' => $tripID,
                 'trip' => $trip,
@@ -227,6 +228,7 @@ class Home extends Controller
     {
         $tripID = $request->query('tripID');
         $email = base64_decode($request->query('email'));
+        $name = base64_decode($request->query('name'));
         $sessionID = $request->query('session_id');
     
         if (empty($tripID) || empty($sessionID)) {
@@ -266,6 +268,8 @@ class Home extends Controller
                     'city' => $session->metadata->city ?? 'N/A',
                     'state' => $session->metadata->state ?? 'N/A',
                     'zip_code' => $session->metadata->zipcode ?? '00000',
+                    'preferred_start_date'=>$session->metadata->preferred_start_date,
+                    'preferred_end_date'=>$session->metadata->preferred_end_date,
                     'amount_captured' => $amountCharged,
                     'stripe_checkout_id' => $session->id,
                     'stripe_product_id' => $session->metadata->stripe_product_id ?? null,
@@ -298,7 +302,7 @@ class Home extends Controller
             }
     
             // Redirect if payment was unsuccessful
-            return redirect()->route('booking.cancel', ['tripID' => $tripID, 'signedURL' => $signedURLCancel]);
+            return redirect()->route('booking.cancel', ['tripID' => $tripID, 'name'=>$name, 'email'=>$email, 'signedURL' => $signedURLCancel]);
     
         } catch (\Exception $e) {
             \Log::error("Error processing booking in " . __METHOD__ . ": " . $e->getMessage());
@@ -314,7 +318,9 @@ class Home extends Controller
     
     public function bookingCancel(Request $request, $tripID)
     {
-        $stripeSessionId = $request->query('session_id'); // assuming you pass session_id as a query parameter
+        $stripeSessionId = $request->query('session_id'); // Assuming you pass session_id as a query parameter
+        $name = $request->query('name') ? base64_decode($request->query('name')) : null;
+        $email = $request->query('email') ? base64_decode($request->query('email')) : null;
         
         $session = null;
         if ($stripeSessionId) {
@@ -324,18 +330,22 @@ class Home extends Controller
                 $session = $stripe->checkout->sessions->retrieve($stripeSessionId);
             } catch (\Exception $e) {
                 \Log::error('Failed to retrieve Stripe session: ' . $e->getMessage());
-                // Optionally handle the error or set $session to null if an error occurs
                 $session = null;
             }
         }
-        
+    
+        // Use query parameters if provided; otherwise, fall back to session metadata
+        $finalName = $name ?? ($session && $session->metadata->name);
+        $finalEmail = $email ?? ($session && $session->customer_email);
+    
         return view('booking.cancel', [
             'tripID' => $tripID,
-            'name' => $session && $session->metadata->name,
-            'email' => $session && $session->customer_email,
-            'stripe_session_id' => $session && $session->id ,
+            'name' => $finalName,
+            'email' => $finalEmail,
+            'stripe_session_id' => $session && $session->id,
         ]);
     }
+    
 
     public function reservationConfirmed($reservationID){
         $reservation = Reservations::find($reservationID);

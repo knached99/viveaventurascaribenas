@@ -27,6 +27,8 @@ class BookingModel extends Model
         'city',
         'state',
         'zip_code',
+        'preferred_start_date',
+        'preferred_end_date',
         'amount_captured'
     ];
 

@@ -81,14 +81,18 @@ class BookingForm extends Component
             'email' => 'required|string|email',
             'phone_number' => ['required', 'regex:/^\d{3}-\d{3}-\d{4}$/'],
             'address_line_1' => ['required', 'regex:/^\d+\s[A-z]+\s[A-z]+/'],
-            'address_line_2'=> ['sometimes', 'regex:/^[\w\s,.-]*$/'],
+            'address_line_2' => ['sometimes', 'regex:/^[\w\s,.-]*$/'],
             'city' => ['required'],
             'state' => ['required'],
             'zipcode' => ['required', 'regex:/^\d{5}(-\d{4})?$/'],
-            'preferred_start_date' => ['required|date}after_or_equal: '.$minStartDate],
-            'preferred_end_date' => ['required|date|after:preferred_start_date'],
+            // 'preferred_start_date' => ['required', 'date', 'after_or_equal:' . $minStartDate],
+            // 'preferred_end_date' => ['required', 'date', 'after:preferred_start_date'],
         ];
-
+        
+        if(empty($this->reservation)){
+            $rules['preferred_start_date'] = 'required|date|after_or_equal:'.$minStartDate;
+            $rules['preferred_end_date'] = 'required|date|after:preferred_start_date';
+        }
         // Add preferred dates rules if tripAvailability is 'coming soon'
         // if ($this->tripAvailability === 'coming soon') {
         //     $rules['preferred_start_date'] = 'required|date|after_or_equal:' . $minStartDate;
@@ -228,8 +232,8 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
             'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID.'&email='.base64_encode($this->email),
             'cancel_url' => route('booking.cancel', [
                 'tripID' => $this->tripID,
-                'name' => $this->name,
-                'email' => $this->email,
+                'name' => base64_encode($this->name),
+                'email' => base64_encode($this->email),
             ]),
             'metadata' => [
                 'tripID' => $this->tripID,
@@ -242,6 +246,8 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
                 'city' => $this->city,
                 'state' => $this->state,
                 'zipcode' => $this->zipcode,
+                'preferred_start_date' => $this->preferred_start_date,
+                'preferred_end_date' => $this->preferred_end_date,
             ],
         ];
 

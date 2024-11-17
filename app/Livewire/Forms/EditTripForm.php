@@ -434,6 +434,12 @@ class EditTripForm extends Component
                 $tripModel->tripPrice = $this->tripPrice ?? 0;
                 $tripModel->num_trips = $this->num_trips;
                 
+                if($reservationsCount > 0 && $tripModel->num_trips == 0 || $tripModel->num_trips < $reservationsCount){
+                 $tripModel->num_trips = max($reservationsCount, $tripModel->num_trips);
+                }
+                else{
+                    $tripModel->num_trips = $this->num_trips;
+                }
                 
                 // $tripModel->num_trips = ($tripModel->num_trips == 0 || $tripModel->num_trips < $reservationsCount) 
                 // ? max($reservationsCount, $tripModel->num_trips) 

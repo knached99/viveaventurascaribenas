@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('city');
             $table->string('state');
             $table->string('zip_code');
+            $table->string('preferred_start_date');
+            $table->string('preferred_end_date');
             $table->float('amount_captured');
             $table->uuid('tripID');
             $table->string('stripe_product_id');
