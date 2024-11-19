@@ -37,7 +37,7 @@ class TripForm extends Form {
     public string $tripEndDate = '';
     public int $tripPrice = 0;
     public array $tripCosts = [];
-    public string $num_trips = '';
+    public ?int $num_trips = 0;
     public bool $active = false;
     
     // Validate that 'tripPhoto' is an array of images with specific rules

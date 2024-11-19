@@ -43,7 +43,7 @@ class EditTripForm extends Component
     public string $tripStartDate = ''; 
     public string $tripEndDate = ''; 
     public string $tripPrice = '';
-    public string $num_trips = '';
+    public ?int $num_trips = 0;
     public bool $active = false;
     public string $slug = '';
     public $tripCosts = [];

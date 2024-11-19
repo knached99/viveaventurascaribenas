@@ -29,6 +29,7 @@
                         <th>State</th>
                         <th>Zipcode</th>
                         <th>Location Booked</th>
+                        <th>Reservation Date</th>
                         <th>View Reservation</th>
                     </tr>
                 </thead>
@@ -44,6 +45,7 @@
                             <td>{{ $reservation->state }}</td>
                             <td>{{ $reservation->zip_code }}</td>
                             <td>{{ $reservation->trip->tripLocation }}</td>
+                            <td>{{date('F jS, Y \a\t g:i A', strtotime($reservation->created_at))}}</td>
                             <td><a
                                     href="{{ route('admin.reservation', ['reservationID' => $reservation->reservationID]) }}">View</a>
                             </td>

@@ -38,7 +38,7 @@ class BookingSubmittedAdmin extends Notification
         return (new MailMessage)
          
                     ->subject($this->name. ' Has booked a trip!')
-                    ->greeting('Hey Pablo!')
+                    ->greeting('Hey Pablo, customer '.$this->name. ' has booked a trip with you!')
                     ->line('You can view the booking details by clicking on the link below')
                     ->action('View booking', url('/admin/'.$this->bookingID.'/booking'))
                     ->line('Have a great day!');

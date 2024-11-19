@@ -14,9 +14,12 @@ class BookingSubmittedCustomer extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct(string $name, string $bookingID, string $receiptLink)
+    public function __construct(string $name, string $tripLocation, string $tripStartDate, string $tripEndDate, string $bookingID, string $receiptLink)
     {
         $this->name = $name;
+        $this->tripLocation = $tripLocation; 
+        $this->tripStartDate = $tripStartDate;
+        $this->tripEndDate = $tripEndDate;
         $this->bookingID = $bookingID;
         $this->receiptLink = $receiptLink;
     }
@@ -41,9 +44,15 @@ class BookingSubmittedCustomer extends Notification
         
         ->subject('Booking Confirmation: '.$this->bookingID)
         ->greeting('Hey '.$this->name. ' This is your booking confirmation email!')
+        ->line('Location Booked: '.$this->tripLocation)
+        ->attach($firstTripPhoto)
+        ->line('Trip Dates: ')
+        ->line(date('F jS, Y', strtotime($this->tripStartDate)). ' - '.date('F jS, Y', strtotime($this->tripEndDate)))
         ->line('Click on the link below to view your receipt')
         ->action('View Receipt', $this->receiptLink)
-        ->line('Thank you for using '.config('app.name').'!');
+        ->line('Thank you for booking your trip with us!')
+        ->salutation('Best regards,')
+        ->salutation(config('app.name'));
                   
     }
 

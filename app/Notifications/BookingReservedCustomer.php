@@ -42,13 +42,14 @@ class BookingReservedCustomer extends Notification
                     ->line('Reservation Details:')
                     ->line('Reservation ID: '.$this->data['reservationID'])
                     ->line('Trip: '.$this->data['tripLocation'])
+                    ->line('Your preferred travel dates: '.$this->data['preferredStartDate'].' -  '.$this->data['preferredEndDate'])
                     ->line('Status: Reservation Confirmed')
                     ->line('At this time, the trip is marked as "Coming Soon". Once the trip becomes available, we will notify you so you can proceed with the payment to secure and confirm your booking.')
                     ->line('Please keep an eye on your email for further updates.')
                     ->line('We look forward to helping you embark on an exciting journey to '.$this->data['tripLocation'].'!')
                     ->line('Thank you for choosing us for your travel plans.')
                     ->salutation('Best regards,')
-                    ->salutation('The Travel Team');
+                    ->salutation(config('app.name'));
     }
 
     /**

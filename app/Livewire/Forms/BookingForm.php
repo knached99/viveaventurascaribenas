@@ -69,6 +69,8 @@ class BookingForm extends Component
         $this->city = $reservation && $reservation->city ? $reservation->city : '';
         $this->state = $reservation && $reservation->state ? $reservation->state : '';
         $this->zipcode = $reservation && $reservation->zip_code ? $reservation->zip_code : '';
+        $this->preferred_start_date = $reservation && $reservation->preferred_start_date ? $reservation->preferred_start_date : '';
+        $this->preferred_end_date = $reservation && $reservation->preferred_end_date ? $reservation->preferred_end_date : '';
     }
     
     public function rules()
@@ -85,14 +87,14 @@ class BookingForm extends Component
             'city' => ['required'],
             'state' => ['required'],
             'zipcode' => ['required', 'regex:/^\d{5}(-\d{4})?$/'],
-            // 'preferred_start_date' => ['required', 'date', 'after_or_equal:' . $minStartDate],
-            // 'preferred_end_date' => ['required', 'date', 'after:preferred_start_date'],
+            'preferred_start_date' => ['required', 'date', 'after_or_equal:' . $minStartDate],
+            'preferred_end_date' => ['required', 'date', 'after:preferred_start_date'],
         ];
         
-        if(empty($this->reservation)){
-            $rules['preferred_start_date'] = 'required|date|after_or_equal:'.$minStartDate;
-            $rules['preferred_end_date'] = 'required|date|after:preferred_start_date';
-        }
+        // if(empty($this->reservation)){
+        //     $rules['preferred_start_date'] = 'required|date|after_or_equal:'.$minStartDate;
+        //     $rules['preferred_end_date'] = 'required|date|after:preferred_start_date';
+        // }
         // Add preferred dates rules if tripAvailability is 'coming soon'
         // if ($this->tripAvailability === 'coming soon') {
         //     $rules['preferred_start_date'] = 'required|date|after_or_equal:' . $minStartDate;
@@ -229,11 +231,11 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
                 'shipping' => 'auto',
             ],
             'mode' => 'payment',
-            'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID=' . $this->tripID.'&email='.base64_encode($this->email),
+            'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID='.$this->tripID.'&email='.$this->email.'&name='.$this->name,
             'cancel_url' => route('booking.cancel', [
                 'tripID' => $this->tripID,
-                'name' => base64_encode($this->name),
-                'email' => base64_encode($this->email),
+                'name' => $this->name,
+                'email' =>$this->email,
             ]),
             'metadata' => [
                 'tripID' => $this->tripID,
@@ -325,7 +327,10 @@ private function getOrCreateStripeCustomer(string $email, string $name){
         $data = [
             'reservationID'=>$reservationID,
             'name'=>$this->name,
-            'tripLocation'=>$trip->tripLocation
+            'tripLocation'=>$trip->tripLocation,
+            'tripDescription'=>$trip->tripDescription,
+            'preferredStartDate'=>$this->preferred_start_date,
+            'preferredEndDate'=>$this->preferred_end_date,
         ];
 
         Notification::route('mail',  $this->email)->notify(new BookingReservedCustomer($data));

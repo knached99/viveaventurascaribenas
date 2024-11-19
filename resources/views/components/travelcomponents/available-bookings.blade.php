@@ -18,6 +18,7 @@
                     soon for exciting upcoming adventures.</h5>
             @else
                 @foreach ($trips as $trip)
+               
                     @php
                         // Decode tripPhoto if it exists
                         $tripPhotos = isset($trip->tripPhoto) ? json_decode($trip->tripPhoto, true) : [];
@@ -126,7 +127,7 @@
                                     $badgeClass = '';
                                     $badgeText = '';
                                     
-                                    if ($trip->num_slots == 0) {
+                                    if ($trip->num_trips == 0) {
                                         $badgeClass = 'danger-badge';
                                         $badgeText = 'Unavailable to book';
                                     } else {

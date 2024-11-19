@@ -239,7 +239,7 @@ class Admin extends Controller
     {
         try {
             $booking = BookingModel::with('trip')->where('bookingID', $bookingID)->firstOrFail();
-           
+         
         
             return view('admin.booking', [
                 'bookingID' => $bookingID,

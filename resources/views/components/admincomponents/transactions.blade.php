@@ -106,7 +106,7 @@
                             </td>
                             <td><a href="{{ route('admin.booking', ['bookingID' => $booking->bookingID]) }}">View
                                     Booking</a></td>
-                            <td>{{ date('F jS, Y \a\t g:iA', strtotime($booking->created_at)) }}</td>
+                            <td>{{ date('F jS, Y \a\t g:i A', strtotime($booking->created_at)) }}</td>
                         </tr>
                     @endforeach
                 </tbody>
