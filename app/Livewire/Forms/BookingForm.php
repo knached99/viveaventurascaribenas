@@ -52,6 +52,8 @@ class BookingForm extends Component
         \Log::info('Initializing Stripe client...');
         $this->tripID = $tripID;
         $trip = TripsModel::findOrFail($this->tripID);
+        
+
         $this->tripAvailability = $trip->tripAvailability;
         $this->num_trips = $trip->num_trips;
         $statesJson = file_get_contents(resource_path('js/states.json'));
@@ -120,7 +122,7 @@ class BookingForm extends Component
         'preferred_start_date.required'=>'Please select a start date',
         'preferred_start_date.date'=>'You must select a valid start date',
         'preferred_start_date.after'=>'Start date must be at least 1 week from today',
-        'preferred_end_date.required'=>'Please select a valid end date',
+        'preferred_end_date.required'=>'Please select an end date',
         'preferred_end_date.date'=>'You must select a valid end date',
         'preferred_end_date.after'=>'End date must not be equal to or before the start date',
     ];
@@ -374,6 +376,7 @@ private function getOrCreateStripeCustomer(string $email, string $name){
 
     public function render()
     {
+
         return view('livewire.forms.booking-form', [
             'states' => $this->states,
             'tripAvailability' => $this->tripAvailability,

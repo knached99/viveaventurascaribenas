@@ -17,10 +17,12 @@ $message =
                 ? 'Once this trip becomes available, you will be notified to complete the booking.'
                 : 'This trip is available for booking.'));
 
-
-
     $tripPhotos = json_decode($trip->tripPhoto, true);
     $firstPhotoURL = !empty($tripPhotos) ? asset($tripPhotos[0]) : asset('assets/images/booking_page_bg.webp');
+
+    $tripStartDate = $trip->tripStartDate;
+    $tripEndDate = $trip->tripEndDate;
+
 @endphp
 
 <x-travelcomponents.header />
@@ -43,7 +45,8 @@ $message =
                     @if ($trip->tripAvailability === 'unavailable' || $trip->num_trips === 0)
                     @else
                         <div class="booking-form-wrapper p-4 rounded">
-                        <livewire:forms.booking-form :tripID="$tripID" :reservationID="$reservationID" :reservation="$reservation"/>
+                    
+                        <livewire:forms.booking-form :tripID="$tripID" :reservationID="$reservationID" :reservation="$reservation" :tripStartDate="$tripStartDate" :tripEndDate="$tripEndDate"/>
                         </div>
                     @endif
                     <!-- Form End -->

@@ -1,4 +1,4 @@
-@props(['reservation']) 
+@props(['reservation', 'tripStartDate', 'tripEndDate']) 
 @php
     // Calculate the minimum start date (1 week from today)
     $minStartDate = \Carbon\Carbon::now()->addWeek()->format('Y-m-d');
@@ -7,6 +7,7 @@
         : '';
 
     $buttonText = $tripAvailability == 'coming soon' ? 'Reserve' : 'Book';
+
 @endphp
 
 <div class="booking-form">
@@ -118,8 +119,9 @@
                 </div>
             @endif
 
-            {{-- @if ($tripAvailability == 'coming soon') --}}
-                <!-- Preferred Start Date -->
+          
+
+                 <!-- Preferred Start Date -->
               
                 <div class="form-group mb-3">
                     <label class="form-label text-dark float-start">Preferred Start Date</label>
@@ -145,7 +147,7 @@
                     <x-input-error :messages="$errors->get('preferred_end_date')" class="mt-2 text-danger" style="list-style: none;" />
                 </div>
                 <!-- Preferred End Date -->
-            {{-- @endif --}}
+         
 
             <div class="step text-center">
                 <div class="form-btn">

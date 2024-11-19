@@ -238,7 +238,7 @@ class TripForm extends Form {
         $this->tripEndDate = '';
         $this->tripPrice = 0;
         $this->tripCosts = [];
-        $this->num_trips = '';
+        $this->num_trips = 0;
         $this->active = false;
 
         $this->status = ''; // Reset status

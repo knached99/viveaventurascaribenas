@@ -392,14 +392,14 @@ class Home extends Controller
                 );
     
                 // Retrieve trip image
-                $tripPhotos = json_decode($trip->tripPhoto, true);
-                $firstTripPhoto = null;
+                // $tripPhotos = json_decode($trip->tripPhoto, true);
+                // $firstTripPhoto = null;
     
-                if (is_array($tripPhotos) && count($tripPhotos) > 0) {
-                    $firstTripPhoto = $tripPhotos[0];
-                } else {
-                    $firstTripPhoto = 'default-placeholder.jpg'; // Provide a default placeholder image
-                }
+                // if (is_array($tripPhotos) && count($tripPhotos) > 0) {
+                //     $firstTripPhoto = $tripPhotos[0];
+                // } else {
+                //     $firstTripPhoto = 'default-placeholder.jpg'; // Provide a default placeholder image
+                // }
     
                 // Send notifications
                 Notification::route('mail', config('mail.mailers.smtp.to_email'))
@@ -409,7 +409,7 @@ class Home extends Controller
                     ->notify(new BookingSubmittedCustomer(
                         $session->metadata->name,
                         $trip->tripLocation,
-                        $firstTripPhoto,
+                        $trip->tripPhoto,
                         $session->metadata->preferred_start_date,
                         $session->metadata->preferred_end_date,
                         $this->bookingID,
