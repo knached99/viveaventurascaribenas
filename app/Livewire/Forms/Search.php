@@ -113,7 +113,6 @@ class Search extends Component
     // dynamically retrieves the terms that closely match the user's search query
     // We also enable caching to reduce number of database queries 
 
-  
     private function findSimilarTerm($query)
     {
         // Cache terms for 1 hour
@@ -160,35 +159,44 @@ class Search extends Component
                 $terms[] = $reservation->zip_code;
             }
     
-            // Clean up terms list by removing duplicates and empty values
-            return array_unique(array_filter($terms));
+            // Clean up terms list by removing duplicates, empty values, and normalizing
+            return array_unique(array_filter(array_map('trim', $terms)));
         });
-    
-        $query = strtolower($query);
-        $querySoundex = soundex($query);
+        
+        $query = strtolower(trim($query));
         $closest = null;
-        $shortestDistance = -1;
+        $shortestDistance = PHP_INT_MAX;
     
         foreach ($terms as $term) {
-            $termLower = strtolower($term);
-            $termSoundex = soundex($termLower);
+            $term = strtolower(trim($term));
     
-            if ($termSoundex === $querySoundex) {
-                $lev = levenshtein($query, $termLower);
+            // Calculate Levenshtein distance
+            $lev = levenshtein($query, $term);
     
-                if ($lev == 0) {
-                    return $term;
-                }
+            if ($lev === 0) {
+                // Exact match found
+                return $term;
+            }
     
-                if ($lev < $shortestDistance || $shortestDistance < 0) {
-                    $closest = $term;
-                    $shortestDistance = $lev;
-                }
+            // Update closest match if distance is smaller
+            if ($lev < $shortestDistance) {
+                $closest = $term;
+                $shortestDistance = $lev;
             }
         }
     
+        // Fallback: check Soundex matches if no close Levenshtein matches found
+        $querySoundex = soundex($query);
+        foreach ($terms as $term) {
+            if (soundex($term) === $querySoundex) {
+                $closest = $term;
+                break; // Prioritize first Soundex match
+            }
+        }
+        
         return $closest;
     }
+    
     
 
     public function clearSearchResults()

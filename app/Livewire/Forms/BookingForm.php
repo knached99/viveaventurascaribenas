@@ -233,12 +233,14 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
                 'shipping' => 'auto',
             ],
             'mode' => 'payment',
-            'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID='.$this->tripID.'&email='.$this->email.'&name='.$this->name,
-            'cancel_url' => route('booking.cancel', [
-                'tripID' => $this->tripID,
-                'name' => $this->name,
-                'email' =>$this->email,
-            ]),
+            'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID='.$this->tripID.'&name='.base64_encode($this->name).'&email='.base64_encode($this->email),
+      
+    'cancel_url' => url('/booking/cancel') . '?' . http_build_query([
+        'tripID' => $this->tripID,
+        'name' => $this->name,
+        'email' => $this->email,
+    ]),
+
             'metadata' => [
                 'tripID' => $this->tripID,
                 'stripe_product_id' => $trip->stripe_product_id,

@@ -10,8 +10,6 @@
     $photos = json_decode($booking->trip->tripPhoto, true);
     $firstPhoto = !empty($photos) ? asset($photos[0]) : asset('assets/images/booking_page_bg.webp');
 
-    $isPartialPayment = false; // Default to false
-
     if (!empty($stripeCheckoutID)) {
         $stripeCheckoutSession = $stripe->checkout->sessions->retrieve($stripeCheckoutID);
 
@@ -24,13 +22,6 @@
                 $paymentMethod = $charge->payment_method_details->type;
 
                 $chargedAmount = $charge->amount / 100;
-
-                // Checks if the charged amount is less than the full price for partial payment
-                if ($chargedAmount < intval($fullPrice)) {
-                    $isPartialPayment = true;
-                } else {
-                    $isPartialPayment = false; // Full payment
-                }
 
                 // Initialize variables to avoid undefined errors
                 $cardExpirationMonth = 'N/A';
@@ -131,61 +122,6 @@
                     </div>
                 </div> <!-- End Col -->
 
-                <!-- If Payment was partial or full -->
-                <div class="col-md-6">
-                    <div class="mb-6">
-                        <h6 class="text-lg font-medium text-blue-gray-800">
-                            @switch($isPartialPayment)
-                                @case(true)
-                                    <i class='bx bx-time-five'></i>
-                                    Partial Payment Recieved
-                                @break
-
-                                @case(false)
-                                    <i class='bx bx-check-circle'></i>
-                                    Full Payment Recieved
-                                @break
-                            @endswitch
-                        </h6>
-                        <span
-                            class="inline-block px-3 py-1 mt-2 text-xs font-semibold rounded-full text-white
-               @switch($isPartialPayment)
-               @case(true)
-               bg-amber-500 
-               @break
-               @case(false)
-               bg-green-500
-               @endswitch 
-               ">
-                            @switch($isPartialPayment)
-                                @case(true)
-                                    Partial Payment
-                                @break
-
-                                @case(false)
-                                    Full Payment Recieved
-                                @break
-                            @endswitch
-                        </span>
-                        @php
-                            if ($isPartialPayment === true) {
-                                $bookedAt = Carbon::parse($booking->created_at);
-                                $now = Carbon::now();
-                                // Calculate the remaining days for the full payment (7 days from booking date)
-                                $daysRemainingForPayment = 7 - $bookedAt->diffInDays($now);
-
-                                // Ensure days remaining does not go negative
-                                if ($daysRemainingForPayment < 0) {
-                                    $daysRemainingForPayment = 0;
-                                }
-                                echo 'Full amount due in ' . ($daysRemainingForPayment ?? 0) . ' days';
-                            }
-
-                        @endphp
-
-                    </div>
-                </div>
-                <!-- End Col -->
             </div>
             <!-- End Row -->
             <!-- Payment Details -->
@@ -264,17 +200,17 @@
                     </p>
                 </div>
 
-                @if($booking->preferred_start_date && $booking->preferred_end_date)
-                <div class="p-4 bg-gray-50 rounded-lg shadow-sm col-span-2">
-                    <h6 class="text-lg font-medium text-blue-gray-800">
-                        <i class='bx bx-calendar-heart'></i> Preferred Travel Dates
-                    </h6>
-                    <p class="text-base font-light leading-relaxed mt-2">
-                        {{ date('F jS, Y', strtotime($booking->preferred_start_date)) }} -
-                        {{ date('F jS, Y', strtotime($booking->preferred_end_date)) }}
-                    </p>
-                </div>
-                @endif 
+                @if ($booking->preferred_start_date && $booking->preferred_end_date)
+                    <div class="p-4 bg-gray-50 rounded-lg shadow-sm col-span-2">
+                        <h6 class="text-lg font-medium text-blue-gray-800">
+                            <i class='bx bx-calendar-heart'></i> Preferred Travel Dates
+                        </h6>
+                        <p class="text-base font-light leading-relaxed mt-2">
+                            {{ date('F jS, Y', strtotime($booking->preferred_start_date)) }} -
+                            {{ date('F jS, Y', strtotime($booking->preferred_end_date)) }}
+                        </p>
+                    </div>
+                @endif
             </div>
         </div>
 

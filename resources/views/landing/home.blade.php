@@ -119,7 +119,10 @@
                             <div class="icon"><span class="flaticon-paragliding"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Activities</h3>
-                                <p>A small river named Duden flows by their place and supplies it with the necessary</p>
+                                <p>Immerse yourself with various activities that are available to you right from day
+                                    one! Allow yourself the opportunity to immerse yourself within a new adventure
+                                    filled with culture, excitement, & life-long remembering moments. Whether that’s
+                                    sightseeing, shopping, beach going, night life… Vive tu aventura!</p>
                             </div>
                         </div>
                     </div>
@@ -128,7 +131,10 @@
                             <div class="icon"><span class="flaticon-route"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Travel Arrangements</h3>
-                                <p>A small river named Duden flows by their place and supplies it with the necessary</p>
+                                <p>Allow yourself to feel confident that we take on all the responsibility to ensure a
+                                    positive experience! We only reserve the BEST spots in the country you choose to
+                                    experience.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -177,7 +183,7 @@
                     <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
                         <div class="block-18 text-center mb-4">
                             <div class="text">
-                                <strong class="number" data-number="{{$totalBookings}}">0</strong>
+                                <strong class="number" data-number="{{ $totalBookings }}">0</strong>
                                 <span>Successful Bookings</span>
                             </div>
                         </div>
@@ -185,7 +191,7 @@
                     <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
                         <div class="block-18 text-center mb-4">
                             <div class="text">
-                                <strong class="number" data-number="{{$totalCustomers}}">0</strong>
+                                <strong class="number" data-number="{{ $totalCustomers }}">0</strong>
                                 <span>Happy Customers</span>
                             </div>
                         </div>
@@ -193,7 +199,7 @@
                     <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
                         <div class="block-18 text-center mb-4">
                             <div class="text">
-                                <strong class="number" data-number="{{$totalTrips}}">0</strong>
+                                <strong class="number" data-number="{{ $totalTrips }}">0</strong>
                                 <span>Place Explored</span>
                             </div>
                         </div>

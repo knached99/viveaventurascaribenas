@@ -35,7 +35,10 @@
                             <div class="icon"><span class="flaticon-paragliding"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Activities</h3>
-                                <p>A small river named Duden flows by their place and supplies it with the necessary</p>
+                                <p>Immerse yourself with various activities that are available to you right from day
+                                    one! Allow yourself the opportunity to immerse yourself within a new adventure
+                                    filled with culture, excitement, & life-long remembering moments. Whether that’s
+                                    sightseeing, shopping, beach going, night life… Vive tu aventura!</p>
                             </div>
                         </div>
                     </div>
@@ -44,7 +47,10 @@
                             <div class="icon"><span class="flaticon-route"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Travel Arrangements</h3>
-                                <p>A small river named Duden flows by their place and supplies it with the necessary</p>
+                                <p>Allow yourself to feel confident that we take on all the responsibility to ensure a
+                                    positive experience! We only reserve the BEST spots in the country you choose to
+                                    experience.
+                                </p>
                             </div>
                         </div>
                     </div>
