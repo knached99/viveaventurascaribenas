@@ -28,7 +28,8 @@ class GeoJSService
             try {
               $decryptedIP = Crypt::decryptString($ip);
 
-                $response = $this->client->request('GET', "https://get.geojs.io/v1/ip/geo/{$decryptedIP}.json");
+               // $response = $this->client->request('GET', "https://get.geojs.io/v1/ip/geo/{$decryptedIP}.json");
+               $response = $this->client->request('GET', "https://freeipapi.com/api/json/{$decryptedIP}");
                 $responseBody = $response->getBody()->getContents(); // Get response body as string
                 $location = json_decode($responseBody, true);
         
@@ -47,11 +48,16 @@ class GeoJSService
         }
         
         return [
-            'city' => $location['city'] ?? null,
-            'region' => $location['region'] ?? null,
-            'country' => $location['country'] ?? null,
-            'latitude' => $location['latitude'] ?? null,
-            'longitude' => $location['longitude'] ?? null,
+            'city'=>$location['cityName'] ?? null,
+            'region'=>$location['regionName'] ?? null,
+            'country'=>$location['countryName'] ?? null,
+            'latitude'=>$location['latitude'] ?? null,
+            'longitude'=>$location['longitude'] ?? null,
+            // 'city' => $location['city'] ?? null,
+            // 'region' => $location['region'] ?? null,
+            // 'country' => $location['country'] ?? null,
+            // 'latitude' => $location['latitude'] ?? null,
+            // 'longitude' => $location['longitude'] ?? null,
         ];
     }
 }
