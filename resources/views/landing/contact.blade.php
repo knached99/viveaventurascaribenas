@@ -26,7 +26,7 @@
                         <span class="icon-map-signs"></span>
                     </div>
                     <h3 class="mb-2">Address</h3>
-                    <p>123 Fake st, West Haven, CT</p>
+                    <p>New York, USA</p>
                 </div>
             </div>
             <div class="col-md-3 d-flex">
@@ -35,7 +35,7 @@
                         <span class="icon-phone2"></span>
                     </div>
                     <h3 class="mb-2">Contact Number</h3>
-                    <p><a href="tel://1234567890">123-456-7890</a></p>
+                    <p><a href="tel://6073732208">1(607)-373-2208</a></p>
                 </div>
             </div>
             <div class="col-md-3 d-flex">
@@ -44,7 +44,7 @@
                         <span class="icon-paper-plane"></span>
                     </div>
                     <h3 class="mb-2">Email Address</h3>
-                    <p><a href="mailto:support@viveaventurascaribenas.com">support@viveaventurascaribenas.com</a></p>
+                    <p><a href="mailto:projas@viveaventurascaribenas.com">projas@viveaventurascaribenas.com</a></p>
                 </div>
             </div>
 
