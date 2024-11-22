@@ -35,7 +35,7 @@
                         <span class="icon-phone2"></span>
                     </div>
                     <h3 class="mb-2">Contact Number</h3>
-                    <p><a href="tel://6073732208">1(607)-373-2208</a></p>
+                    <p><a href="tel://6073732208">+1(607)-373-2208</a></p>
                 </div>
             </div>
             <div class="col-md-3 d-flex">
