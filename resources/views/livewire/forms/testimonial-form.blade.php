@@ -39,9 +39,14 @@
                                         class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
                                         wire:model="tripID">
                                         <option value="" disabled selected>Where did you travel with us?</option>
-                                        @foreach ($trips as $trip)
-                                            <option value="{{ $trip['tripID'] }}"> {{ $trip['tripLocation'] }}</option>
-                                        @endforeach
+                                        @if (!empty($trips))
+                                            @foreach ($trips as $trip)
+                                                <option value="{{ $trip['tripID'] }}"> {{ $trip['tripLocation'] }}
+                                                </option>
+                                            @endforeach
+                                        @else
+                                            <option value="" disabled>No trips available</option>
+                                        @endif
                                     </select>
 
                                     {{-- <input class="form-control {{$errors->has('trip_location') ? 'border border-danger' : ''}}" wire:model="trip_location" placeholder="Where did you travel with us? (Destination)"> --}}
