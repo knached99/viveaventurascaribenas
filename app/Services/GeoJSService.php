@@ -70,14 +70,14 @@ class GeoJSService
 
     if (!$location) {
         try {
-            $decryptedIP = Crypt::decryptString($ip);
+          //  $decryptedIP = Crypt::decryptString($ip);
 
-            $response = $this->client->request('GET', "https://freeipapi.com/api/json/{$decryptedIP}");
+            $response = $this->client->request('GET', "https://freeipapi.com/api/json/{$ip}");
             $responseBody = $response->getBody()->getContents(); // Get response body as string
             $location = json_decode($responseBody, true);
 
             // Log the response for debugging
-            Log::info('API Response for IP ' . $decryptedIP . ': ' . $responseBody);
+            Log::info('API Response for IP ' . $ip . ': ' . $responseBody);
 
             // Cache the result for 1 day (1440 minutes)
             Cache::put($cacheKey, $location, 1440);
