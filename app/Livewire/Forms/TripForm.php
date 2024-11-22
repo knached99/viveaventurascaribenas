@@ -35,7 +35,7 @@ class TripForm extends Form {
     public string $tripActivities = '';
     public string $tripStartDate = '';
     public string $tripEndDate = '';
-    public int $tripPrice = 0;
+    public ?int $tripPrice = 0;
     public array $tripCosts = [];
     public ?int $num_trips = 0;
     public bool $active = false;
