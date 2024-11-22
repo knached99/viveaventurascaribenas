@@ -19,7 +19,8 @@ class GeoJSService
 
     public function getLocation($ip)
 {
-    $cacheKey = "geo_location_{$ip}";
+    $cacheKey = 'geo_location_' . md5($ip);
+
 
     // Attempt to retrieve the location from cache
     $location = Cache::get($cacheKey);
