@@ -105,15 +105,31 @@ class Analytics extends Controller
         ->groupBy('visited_url', 'visitor_ip_address', 'visitor_user_agent', 'visitor_referrer', 'created_at')
         ->orderBy('visit_count', 'DESC')
         ->get()
+        // ->map(function ($url) {
+        //     $parsedAgent = $this->parseUserAgent($url->visitor_user_agent);
+        //     $url->browser = $parsedAgent['browser'];
+        //     $url->operating_system = $parsedAgent['os'];
+        //     $url->state = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['region'] ?? null;
+        //     $url->city = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['city'] ?? null;
+        //     $url->country = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['country'] ?? null;
+        //     $url->latitude = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['latitude'] ?? null;
+        //     $url->longitude = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['longitude'] ?? null;
+        //     return $url;
+        // });
+
         ->map(function ($url) {
+            $location = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address));
+            $url->geoLocation = $location;
+            $url->city = $location['city'] ?? 'Unknown City';
+            $url->state = $location['region'] ?? 'Unknown State';
+            $url->country = $location['country'] ?? 'Unknown Country';
+            $url->latitude = $location['latitude'] ?? null;
+            $url->longitude = $location['longitude'] ?? null;
+
             $parsedAgent = $this->parseUserAgent($url->visitor_user_agent);
-            $url->browser = $parsedAgent['browser'];
-            $url->operating_system = $parsedAgent['os'];
-            $url->state = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['region'] ?? null;
-            $url->city = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['city'] ?? null;
-            $url->country = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['country'] ?? null;
-            $url->latitude = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['latitude'] ?? null;
-            $url->longitude = $this->geoJSService->getLocation(Crypt::decryptString($url->visitor_ip_address))['longitude'] ?? null;
+            $url->browser = $parsedAgent['browser'] ?? 'Unknown Browser';
+            $url->operating_system = $parsedAgent['os'] ?? 'Unknown OS';
+
             return $url;
         });
 
