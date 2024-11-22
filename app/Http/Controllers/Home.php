@@ -33,11 +33,11 @@ class Home extends Controller
     
    
     public function termsAndConditions(){
-        return view('terms');
+        return view('landing.terms');
     }
 
     public function userPrivacy(){
-        return view('privacy');
+        return view('landing.privacy');
     }
 
     // Optimized for performance 
