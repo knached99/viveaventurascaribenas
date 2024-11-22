@@ -21,7 +21,7 @@
                         <li><a href="#" class="py-2 d-block">General Inquiries</a></li>
                         <li><a href="#" class="py-2 d-block">Booking Conditions</a></li>
                         <li><a href="{{ route('privacy') }}" class="py-2 d-block">Privacy Policy</a></li>
-                        <li><a href="{{ route('terms_and_conditions') }}" class="py-2 d-block">Terms and Conditions</a>
+                        <li><a href="{{ route('terms') }}" class="py-2 d-block">Terms and Conditions</a>
                         </li>
                         <li><a href="#" class="py-2 d-block">Call Us</a></li>
                     </ul>
