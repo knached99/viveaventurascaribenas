@@ -14,7 +14,7 @@ class UpdateTaxSettings extends Component
    // protected string $address = '';
     public string $city = '';
     public string $line1 = '';
-    public string $line2 = '';
+    public ?string $line2 = '';
     public string $postal_code = '';
     public string $state = '';
     public array $states = [];

@@ -117,7 +117,7 @@
                     <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
                         <div class="block-18 text-center mb-4">
                             <div class="text">
-                                <strong class="number" data-number="{{ $totalBookings }}">0</strong>
+                                <strong class="number" data-number="{{ $totalBookings && $totalBookings }}">0</strong>
                                 <span>Successful Bookings</span>
                             </div>
                         </div>
@@ -125,7 +125,7 @@
                     <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
                         <div class="block-18 text-center mb-4">
                             <div class="text">
-                                <strong class="number" data-number="{{ $totalCustomers }}">0</strong>
+                                <strong class="number" data-number="{{ $totalCustomers && $totalCustomers }}">0</strong>
                                 <span>Happy Customers</span>
                             </div>
                         </div>
@@ -133,7 +133,7 @@
                     <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
                         <div class="block-18 text-center mb-4">
                             <div class="text">
-                                <strong class="number" data-number="{{ $totalTrips }}">0</strong>
+                                <strong class="number" data-number="{{ $totalTrips && $totalCustomers }}">0</strong>
                                 <span>Places Explored</span>
                             </div>
                         </div>
