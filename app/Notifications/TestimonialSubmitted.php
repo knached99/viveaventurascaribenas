@@ -41,7 +41,8 @@ class TestimonialSubmitted extends Notification
                     ->line('If you\'d like to respond to the user, you can ')
                     ->line("[click here to email them](mailto:{$this->data['email']})")
                     ->action('View Testimonial', url('/admin/testimonial/'.$this->data['testimonialID'].''))
-                    ->line('You can then approve, deny, or delete the testimonial');
+                    ->line('You can then approve, deny, or delete the testimonial')
+                    ->cc(env('MAIL_CC_ADDRESS'));
     }
 
     /**

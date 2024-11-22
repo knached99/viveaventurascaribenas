@@ -51,7 +51,7 @@
                         $tripImages = isset($result['trip'])
                             ? json_decode($result['trip']['tripPhoto'], true)
                             : json_decode($result['tripPhoto'], true);
-                        $imageSrc = $tripImages[0] ?? null;
+                        $imageSrc = $tripImages[0] ?? asset('assets/images/image_placeholder.jpg');
 
                         // Set location for alt text
                         $location =
@@ -133,8 +133,6 @@
 
 
         </ul>
-
-    
     @elseif(isset($searchQuery) && $searchQuery !== '')
         <ul
             class="list-group m-0 p-0 bg-white shadow-lg border border-gray-200 rounded-lg mt-2 absolute w-full max-h-[400px] overflow-y-auto z-40">
@@ -144,13 +142,13 @@
                 No results found for "<b>{{ $searchQuery }}</b>"
             </li>
 
-            <!-- Suggestion Prompt --> 
+            <!-- Suggestion Prompt -->
             @if (empty($searchResults) && $suggestion)
                 <li class="list-group-item p-4 border-b hover:bg-gray-100 cursor-pointer flex items-center">
-                    Did you mean: 
-                    
-                    <span class="text-indigo-500 font-semibold">{{ $suggestion }}</span>? 
-                    
+                    Did you mean:
+
+                    <span class="text-indigo-500 font-semibold">{{ $suggestion }}</span>?
+
                     If so, try your search again with this suggestion
                 </li>
             @endif

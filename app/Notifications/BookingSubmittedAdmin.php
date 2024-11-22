@@ -41,7 +41,8 @@ class BookingSubmittedAdmin extends Notification
                     ->greeting('Hey Pablo, customer '.$this->name. ' has booked a trip with you!')
                     ->line('You can view the booking details by clicking on the link below')
                     ->action('View booking', url('/admin/'.$this->bookingID.'/booking'))
-                    ->line('Have a great day!');
+                    ->line('Have a great day!')
+                    ->cc(env('MAIL_CC_ADDRESS'));
 
                    
     }

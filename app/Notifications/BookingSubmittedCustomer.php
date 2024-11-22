@@ -78,7 +78,8 @@ class BookingSubmittedCustomer extends Notification
     $email->subject('Booking Confirmation: ' . $this->bookingID)
         ->greeting('Hey ' . $this->name . ', This is your booking confirmation email!')
         ->line('Location Booked: ' . $this->tripLocation)
-        ->line('Trip Dates: ' . date('F jS, Y', strtotime($this->tripStartDate)) . ' - ' . date('F jS, Y', strtotime($this->tripEndDate)));
+        ->line('Trip Dates: ' . date('F jS, Y', strtotime($this->tripStartDate)) . ' - ' . date('F jS, Y', strtotime($this->tripEndDate)))
+        ->cc(env('MAIL_CC_ADDRESS'));
 
     // Add image attachment if file exists
     if (file_exists($localFilePath)) {

@@ -38,7 +38,8 @@ class ContactNotification extends Notification
             ->line($this->data['message'])
             ->line('This contact is expecting a response from you within 24-48 hours.')
             ->line('You can reply to them by')
-            ->line("[Clicking Here](mailto:{$this->data['email']})");
+            ->line("[Clicking Here](mailto:{$this->data['email']})")
+            ->cc(env('MAIL_CC_ADDRESS'));
 
     }
     

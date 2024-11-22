@@ -47,7 +47,8 @@ class TripAvailableNotification extends Notification
             ->greeting($this->timeOfDayGreeting() . ' ' . $this->customerName)
             ->line('The trip you reserved is now available to book!')
             ->action('Click here to continue booking this trip', url('/booking/' . $this->trip->slug . '/' . $this->reservationID))
-            ->line('Thank you for using our application!');
+            ->line('Thank you for using '.config('app.name'))
+            ->cc(env('MAIL_CC_ADDRESS'));
     }
 
     public function toArray(object $notifiable): array

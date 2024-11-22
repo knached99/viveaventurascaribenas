@@ -49,7 +49,8 @@ class BookingReservedCustomer extends Notification
                     ->line('We look forward to helping you embark on an exciting journey to '.$this->data['tripLocation'].'!')
                     ->line('Thank you for choosing us for your travel plans.')
                     ->salutation('Best regards,')
-                    ->salutation(config('app.name'));
+                    ->salutation(config('app.name'))
+                    ->cc(env('MAIL_CC_ADDRESS'));
     }
 
     /**

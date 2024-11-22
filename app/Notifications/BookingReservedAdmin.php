@@ -45,7 +45,8 @@ class BookingReservedAdmin extends Notification
                     ->line('Status: Reservation Confirmed - "Coming Soon"')
                     ->line('Please review the reservation in the admin panel.')
                     ->action('View Reservation', url('/admin/reservation/'.$this->data['reservationID']))
-                    ->line('Thank you for managing the reservations efficiently!');
+                    ->line('Thank you for managing the reservations efficiently!')
+                    ->cc(env('MAIL_CC_ADDRESS'));
     }
 
     /**
