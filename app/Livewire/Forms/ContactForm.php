@@ -67,7 +67,7 @@ class ContactForm extends Component
 
 
 
-            $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com';
+            $recipientEmail = env('MAIL_FROM_ADDRESS');
 
             $notificationClass = ContactNotification::class;
 
