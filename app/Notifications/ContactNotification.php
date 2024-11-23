@@ -34,7 +34,7 @@ class ContactNotification extends Notification
         return (new MailMessage)
             ->subject($this->data['subject'])
             ->greeting('Hey Pablo, '.$this->data['name']. ' has contacted you')
-            ->from($this->data['email'], $this->data['name'])
+            ->from(env('MAIL_FROM_ADDRESS'), $this->data['name'])
             ->line($this->data['message'])
             ->line('This contact is expecting a response from you within 24-48 hours.')
             ->line('You can reply to them by')
