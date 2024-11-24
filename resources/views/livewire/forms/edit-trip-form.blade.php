@@ -375,6 +375,12 @@
                         </div>
 
                         <div class="form-group">
+                        <label class="form-label">Enter duration in months</label>
+                        <input type="number" wire:model="discountDuration" id="discountDuration" class="form-control {{$errors->has('discountDuration') ? 'is-invalid' : ''}}" />
+                        <x-input-error :messages="$errors->get('discountDuration')" class="invalid-feedback"/>
+                        </div>
+
+                        <div class="form-group">
                             {{-- <input type="hidden" wire:model="promoCode" id="promoCode" />
                             <!-- Placeholder for promo code display -->
                             <span id="promoCodeDisplay" class="inline-block m-2 text-black font-bold"></span>

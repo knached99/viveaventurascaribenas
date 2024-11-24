@@ -13,10 +13,9 @@
                     class="icon-video popup-vimeo d-flex align-items-center justify-content-center mb-4">
                     <span class="ion-ios-play"></span>
                 </a> --}}
-                <p class="caps" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Travel to the any
-                    corner of the world, without going around in circles</p>
+                <p class="caps" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Beyond the Ordinary. Into the Extraordinary.</p>
                 <h1 style="font-weight: 900;" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Make Your
-                    Tour
+                    Adventure
                     Amazing With Us</h1>
             </div>
         </div>
@@ -105,11 +104,11 @@
         <div class="row d-flex">
             <div class="col-md-6 order-md-last heading-section pl-md-5 ftco-animate">
                 <h2 class="mb-4">It's time to start your adventure</h2>
-                <p>Welcome to Vive Aventuras Caribeñas, your go-to travel agency for exciting
-                    and affordable pre-packaged trips to
-                    beautiful destinations in the Caribbean and beyond.
-                    Our mission is to provide you with unforgettable travel experiences at prices that won’t break the
-                    bank.</p>
+                <p>Welcome to Vive Aventuras Caribeñas, your gateway to unforgettable travel experiences in the Caribbean and beyond.
+                 We specialize in creating immersive, curated journeys that take you to stunning destinations,
+                  where every moment is filled with adventure, culture, and natural beauty. 
+                  Our mission is to offer you experiences that leave a lasting impression,
+                 making each trip a memory you’ll cherish forever.</p>
                 <p><a href="{{ route('destinations') }}" class="btn btn-primary py-3 px-4">Book a Travel</a></p>
             </div>
             <div class="col-md-6">
@@ -119,10 +118,9 @@
                             <div class="icon"><span class="flaticon-paragliding"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Activities</h3>
-                                <p>Immerse yourself with various activities that are available to you right from day
-                                    one! Allow yourself the opportunity to immerse yourself within a new adventure
-                                    filled with culture, excitement, & life-long remembering moments. Whether that’s
-                                    sightseeing, shopping, beach going, night life… Vive tu aventura!</p>
+                                <p>We provide you with a diverse array of activities, perfect for every type of traveler. 
+                                Whether you're seeking adventure, relaxation, or cultural exploration, 
+                                you'll find something to suit your interests at any of our destinations</p>
                             </div>
                         </div>
                     </div>
@@ -131,9 +129,14 @@
                             <div class="icon"><span class="flaticon-route"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Travel Arrangements</h3>
-                                <p>Allow yourself to feel confident that we take on all the responsibility to ensure a
-                                    positive experience! We only reserve the BEST spots in the country you choose to
-                                    experience.
+                                <p>At Vive Aventuras Caribeñas, we pride ourselves on offering safe and convenient travel arrangements designed to 
+                                provide our travelers with unparalleled comfort and unforgettable experiences. 
+                                From personalized itineraries to exclusive accommodations and private transportation, 
+                                every detail is meticulously crafted to ensure a stress-free, indulgent journey.
+                                 Whether you're seeking adventure, relaxation, or cultural immersion, 
+                                 our expert team ensures that each trip is tailored to your unique preferences, 
+                                 allowing you to focus on creating memories that will last a lifetime. 
+                                 With us, you're not just traveling—you're embarking on an extraordinary adventure.
                                 </p>
                             </div>
                         </div>
@@ -172,11 +175,12 @@
             <div class="col-md-6 pl-md-5 py-5">
                 <div class="row justify-content-start pb-3">
                     <div class="col-md-12 heading-section ftco-animate">
-                        <h2 class="mb-4">Make Your Tour Memorable and Safe With Us</h2>
-                        <p>At Vive Aventuras Caribeñas, we prioritize your safety and enjoyment above all else. Our
-                            experienced guides and carefully curated itineraries ensure that every moment of your tour
-                            is not only memorable but also safe, allowing you to fully immerse yourself in the adventure
-                            without any worries.</p>
+                        <h2 class="mb-4">Make Your Experience Memorable and Safe With Us</h2>
+                        <p>At Vive Aventuras Caribeñas, we’re dedicated to helping you embrace new adventures with excitement and ease. 
+                        Our experts will thoughtfully craft itineraries designed to offer you a journey filled with discovery, fun, and unique experiences.
+                         Every moment is an opportunity to explore something new, immerse yourself in vibrant cultures, 
+                         and create lasting memories—all while enjoying the thrill of the unknown without a care in the world. 
+                         Let us handle the details, so you can focus on the adventure ahead!</p>
                     </div>
                 </div>
                 <div class="row">

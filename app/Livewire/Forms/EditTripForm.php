@@ -49,6 +49,7 @@ class EditTripForm extends Component
     public $tripCosts = [];
     public ?array $existingImageURLs = [];
 
+    public ?int $discountDuration = null; // Stripe needs this value to be an integer representing the number of months 
     public string $status = '';
     public string $success = '';
     public string $error = '';
@@ -511,6 +512,7 @@ class EditTripForm extends Component
             // Validation rules
             $rules = [
                 'discountType' => 'required|in:percentage,amount',
+                'discountDuration'=>'required|integer|min:1|max:12',
                 'discountValue' => 'required|numeric',
                 'promotionCode' => 'nullable|string'
             ];
@@ -518,6 +520,9 @@ class EditTripForm extends Component
             $validationMessages = [
                 'discountType.required' => 'You must choose the discount type',
                 'discountType.in' => 'The discount type must be either percentage or amount',
+                'discountDuration.required'=>'Please provide the duration of this discount in months. (Example 1 = 1 month)',
+                'discountDuration.min'=>'Duration must be at least 1 month',
+                'discountDuration.max'=>'Duration must be a max of 12 months',
                 'discountValue.required' => 'You must enter the discount amount',
                 'discountValue.numeric' => 'Discount value must be numeric',
             ];
@@ -538,14 +543,14 @@ class EditTripForm extends Component
                 $couponData = [
                     'percent_off' => round($this->discountValue, 2),
                     'duration' => 'repeating',
-                    'duration_in_months' => 1,
+                    'duration_in_months' => $this->discountDuration,
                 ];
             } elseif ($this->discountType === 'amount') {
                 $couponData = [
                     'amount_off' => intval($this->discountValue * 100),
                     'currency' => 'usd',
                     'duration' => 'repeating',
-                    'duration_in_months' => 1,
+                    'duration_in_months' => $this->discountDuration,
                 ];
             }
     

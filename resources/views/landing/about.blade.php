@@ -19,11 +19,11 @@
         <div class="row d-flex">
             <div class="col-md-6 order-md-last heading-section pl-md-5 ftco-animate">
                 <h2 class="mb-4">Start your adventure with us!</h2>
-                <p>Vive Aventuras Caribeñas was founded with the vision of making travel accessible to everyone. </p>
-                <p> We specialize in curating pre-packaged travel bundles that offer the best value for your money.
-                    Whether you're looking for a relaxing beach getaway, a cultural exploration, or an adventure-packed
-                    holiday,
-                    we have something for every type of traveler.
+                <p>
+                Welcome to Vive Aventuras Caribeñas, your gateway to unforgettable travel experiences in the Caribbean and beyond. 
+                We specialize in creating immersive, curated journeys that take you to stunning destinations, 
+                where every moment is filled with adventure, culture, and natural beauty. 
+                Our mission is to offer you experiences that leave a lasting impression, making each trip a memory you’ll cherish forever.
                 </p>
 
                 {{-- <p><a href="#" class="btn btn-primary py-3 px-4">Search Destination</a></p> --}}
@@ -35,10 +35,9 @@
                             <div class="icon"><span class="flaticon-paragliding"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Activities</h3>
-                                <p>Immerse yourself with various activities that are available to you right from day
-                                    one! Allow yourself the opportunity to immerse yourself within a new adventure
-                                    filled with culture, excitement, & life-long remembering moments. Whether that’s
-                                    sightseeing, shopping, beach going, night life… Vive tu aventura!</p>
+                                <p>Immerse yourself with various activities that are available to you right from day one!
+                                 Allow yourself the opportunity to immerse yourself within a new adventure filled with culture, excitement, & life-long remembering moments. 
+                                 Whether that’s sightseeing, shopping, beach going, night life… Vive tu aventura!</p>
                             </div>
                         </div>
                     </div>
@@ -47,9 +46,12 @@
                             <div class="icon"><span class="flaticon-route"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Travel Arrangements</h3>
-                                <p>Allow yourself to feel confident that we take on all the responsibility to ensure a
-                                    positive experience! We only reserve the BEST spots in the country you choose to
-                                    experience.
+                                <p>At Vive Aventuras Caribeñas, we pride ourselves on offering safe and convenient travel arrangements designed to provide our travelers with unparalleled comfort and unforgettable experiences. 
+                                From personalized itineraries to exclusive accommodations and private transportation, every detail is meticulously crafted to ensure a stress-free,
+                                 indulgent journey. Whether you're seeking adventure, relaxation, or cultural immersion,
+                                  our expert team ensures that each trip is tailored to your unique preferences, 
+                                  allowing you to focus on creating memories that will last a lifetime. 
+                                  With us, you're not just traveling—you're embarking on an extraordinary adventure.
                                 </p>
                             </div>
                         </div>
@@ -58,20 +60,13 @@
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-tour-guide"></span></div>
                             <div class="media-body">
-                                <h3 class="heading mb-3">Private chauffeur</h3>
-                                <p>A small river named Duden flows by their place and supplies it with the necessary</p>
+                                <h3 class="heading mb-3">Transportation Services</h3>
+                                <p>Feel confident in the measures we take to provide you with safety and convenience when it comes to exploring your chosen destination! 
+                                With a simple request, enjoy access to beautiful beaches, restaurants, and much more</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 d-flex align-self-stretch ftco-animate">
-                        <div class="media block-6 services d-block">
-                            <div class="icon"><span class="flaticon-map"></span></div>
-                            <div class="media-body">
-                                <h3 class="heading mb-3">Location Manager</h3>
-                                <p>A small river named Duden flows by their place and supplies it with the necessary</p>
-                            </div>
-                        </div>
-                    </div>
+                
                 </div>
             </div>
         </div>
@@ -91,23 +86,24 @@
                         <h2 class="mb-4">Why Choose Us?</h2>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item">
-                                <b>Pre-Packaged Trips:</b> We offer a wide range of pre-packaged travel bundles that
-                                include flights, accommodations, and guided tours.
+                                <b>Curated Travel Experiences</b> We offer a fully custom trip that focuses on exclusive lodging accommodations 
+                                & private transportation
+                                 in the destination you choose to explore! 
+                                We ensure a seamless and memorable experience for your adventure packed destination.
                             </li>
 
 
 
                             <li class="list-group-item">
-                                <b>Affordable Pricing:</b>
-                                Our bundles are competitively priced, ensuring you get the best deal for your dream
-                                vacation.
+                                <b>Exceptional value</b>
+                                Our trips offer exceptional value, providing you with the best possible experience at your dream destination, 
+                                without compromising on quality
                             </li>
 
                             <li class="list-group-item">
                                 <b>Destination Expertise: </b>
-                                With our deep knowledge of the Caribbean and other popular destinations, we provide
-                                expert
-                                guidance and recommendations.
+                                We bring firsthand experience and deep knowledge to curate trips that are authentic, 
+                                well-planned, and tailored to your adventure.
                             </li>
 
                         </ul>

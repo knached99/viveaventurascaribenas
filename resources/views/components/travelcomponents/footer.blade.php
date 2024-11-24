@@ -1,25 +1,24 @@
 <footer class="ftco-footer bg-bottom" style="background-image: url({{ asset('assets/images/footer-bg.jpg') }});">
     <div class="container">
         <div class="row mb-5">
-            <div class="col-md">
+            {{-- <div class="col-md">
                 <div class="ftco-footer-widget mb-4">
                     <h2 class="ftco-heading-2">Vacation</h2>
-                    <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there
-                        live the blind texts.</p>
+                    <p>Beyond the Ordinary. Into the Extraordinary.</p>
                     <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
                         <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
                         <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
                         <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
                     </ul>
                 </div>
-            </div>
+            </div> --}}
             <div class="col-md">
                 <div class="ftco-footer-widget mb-4 ml-md-5">
                     <h2 class="ftco-heading-2">Information</h2>
                     <ul class="list-unstyled">
                         <li><a href="#" class="py-2 d-block">Online Inquiry</a></li>
                         <li><a href="#" class="py-2 d-block">General Inquiries</a></li>
-                        <li><a href="#" class="py-2 d-block">Booking Conditions</a></li>
+                        <li><a href="#" class="py-2 d-block">Booking Agreement</a></li>
                         <li><a href="{{ route('privacy') }}" class="py-2 d-block">Privacy Policy</a></li>
                         <li><a href="{{ route('terms') }}" class="py-2 d-block">Terms and Conditions</a>
                         </li>
@@ -27,7 +26,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-md">
+            {{-- <div class="col-md">
                 <div class="ftco-footer-widget mb-4">
                     <h2 class="ftco-heading-2">Experience</h2>
                     <ul class="list-unstyled">
@@ -39,17 +38,15 @@
                         <li><a href="#" class="py-2 d-block">Party</a></li>
                     </ul>
                 </div>
-            </div>
+            </div> --}}
             <div class="col-md">
                 <div class="ftco-footer-widget mb-4">
                     <h2 class="ftco-heading-2">Have Any Questions?</h2>
                     <div class="block-23 mb-3">
                         <ul>
-                            <li><span class="icon icon-map-marker"></span><span class="text">Connecticut, USA</span>
+                            <li><span class="icon icon-map-marker"></span><span class="text">New York, USA</span>
                             </li>
-                            <li><a href="#"><span class="icon icon-phone"></span><span class="text">
-                                        123-456-7890
-                                    </span></a></li>
+                          
                             <li><a href="{{ route('contact') }}"><span class="icon icon-envelope"></span><span
                                         class="text">Contact Us</span></a></li>
                         </ul>
