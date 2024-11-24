@@ -64,7 +64,8 @@ class Analytics extends Controller
        // Get location data based on IPs with caching
        foreach ($ips as $ip) {
            // Check cache first before making API call
-           $locations[$ip] = Cache::remember("geo_location_{$ip}", 1440, function() use ($ip) {
+           $locations[$ip] = Cache::remember("geo_" . md5($ip), 1440, function() use ($ip) {
+
                return $this->geoJSService->getLocation($ip);
            });
        }
