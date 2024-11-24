@@ -7,6 +7,7 @@ use App\Services\GeoJSService;
 use App\Models\VisitorModel;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 
 class Analytics extends Controller
