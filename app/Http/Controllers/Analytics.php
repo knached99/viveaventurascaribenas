@@ -143,7 +143,7 @@ class Analytics extends Controller
        $topOperatingSystems = collect($operatingSystems)->sortDesc();
    
        // Prepare heatmap data
-    $heatmapData = $visitors->filter(function ($visitor) {
+       $heatmapData = $visitors->filter(function ($visitor) {
         return !empty($visitor->country); // Ensure we're only counting visitors with a valid country
     })->groupBy('country')->map(function ($group) {
         return [
@@ -164,6 +164,14 @@ class Analytics extends Controller
     //     ['country' => 'Japan', 'count' => 15],
     //     ['country' => 'Mexico', 'count' => 10]
     // ];
+
+
+    // Debug: Log heatmap data
+    \Log::debug('Heatmap Data: ', $heatmapData);
+
+    if (empty($heatmapData)) {
+        \Log::debug('No valid heatmap data found.');
+    }
    
        return view('admin.analytics', compact(
            'visitorData',
