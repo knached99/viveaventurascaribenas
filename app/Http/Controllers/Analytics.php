@@ -146,6 +146,19 @@ class Analytics extends Controller
        $heatmapData = $visitors->groupBy('country')->map(function ($group) {
            return ['country' => $group->first()->country, 'count' => $group->count()];
        })->values()->toArray();
+
+    // $heatmapData = [
+    //     ['country' => 'United States', 'count' => 120],
+    //     ['country' => 'Canada', 'count' => 80],
+    //     ['country' => 'Brazil', 'count' => 50],
+    //     ['country' => 'Germany', 'count' => 40],
+    //     ['country' => 'India', 'count' => 35],
+    //     ['country' => 'United Kingdom', 'count' => 30],
+    //     ['country' => 'France', 'count' => 25],
+    //     ['country' => 'Australia', 'count' => 20],
+    //     ['country' => 'Japan', 'count' => 15],
+    //     ['country' => 'Mexico', 'count' => 10]
+    // ];
    
        return view('admin.analytics', compact(
            'visitorData',

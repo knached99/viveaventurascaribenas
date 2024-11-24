@@ -1,5 +1,9 @@
 @props(['heatmapData'])
 
+@php 
+$geojsonPath = asset('assets/js/countries.geojson');
+@endphp
+
 <div id="heatmap" style="height: 500px; width: 100%;"></div>
 
 <script>
@@ -24,7 +28,7 @@
             });
 
             // Load country polygons (GeoJSON from the 'public/assets/js' folder)
-            fetch("{{ asset('assets/js/countries.geojson') }}")  // Use Laravel's asset() function
+             fetch("{{ $geojsonPath }}")  // Use Laravel's asset() function
                 .then(response => response.json())
                 .then(function (geojsonData) {
                     // Add GeoJSON layer
