@@ -46,7 +46,7 @@ class GeoJSService
     
                 // Perform API request 
                 $apiKey = env('IPGEOLOCATION_API_KEY');
-                $response = $this->client->request('GET', 'http://ip-api.com/json/{$decryptedip}');
+                $response = $this->client->request('GET', 'http://ip-api.com/json/{$decryptedIP}');
               //  $response = $this->client->request('GET', "https://api.ipgeolocation.io/ipgeo?apiKey={$apiKey}&ip={$decryptedIP}");
                 $responseBody = $response->getBody()->getContents(); // Get response body as string
                 $location = json_decode($responseBody, true);
