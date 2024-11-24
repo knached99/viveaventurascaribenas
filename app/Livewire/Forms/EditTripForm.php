@@ -245,7 +245,13 @@ class EditTripForm extends Component
         \Log::info('Full Path: ' . $fullPath);
     
         // Resize the image using GD or another method
-        Helper::resizeImage($file->getRealPath(), $fullPath,  525, 351);
+       // Helper::resizeImage($file->getRealPath(), $fullPath,  525, 351);
+       Helper::resizeImage(
+        $photo->getRealPath(),
+        Storage::disk('public')->path($filePath), // specifying public disk driver for Hostinger 
+        525,
+        351
+    );
     
         \Log::info('Image resized!');
     

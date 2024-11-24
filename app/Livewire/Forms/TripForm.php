@@ -166,7 +166,13 @@ class TripForm extends Form {
                 $fullPath = storage_path('app/public/' . $filePath);
 
                 // Use GD to resize the image
-                Helper::resizeImage($photo->getRealPath(), $fullPath,  525, 351);
+                //Helper::resizeImage($photo->getRealPath(), $fullPath,  525, 351);
+                Helper::resizeImage(
+                    $photo->getRealPath(),
+                    Storage::disk('public')->path($filePath), // specifying public disk driver for Hostinger 
+                    525,
+                    351
+                );
 
                 $imageURLs[] = asset(Storage::url($filePath));
             }
