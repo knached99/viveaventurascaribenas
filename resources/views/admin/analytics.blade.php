@@ -71,6 +71,21 @@
             </div>
         </div>
 
+        <!-- Visitor World Heatmap Chart --> 
+
+        <div class="col-lg-12 mb-6">
+        <div class="card">
+        <div class="card-body">
+        <h5 class="card-title">World Heatmap</h5>
+        <p class="card-subtitle mb-4">
+        This map shows where your visitors come from, with brighter areas showing a higher distribution of visitors.</p>
+        </p>
+        <x-admincomponents.heatmap-chart :heatmapData="$heatmapData" /> 
+        </div>
+        </div>
+        </div>
+        <!-- / Visitor World Heatmap Chart -->
+
 
 
         <!-- Visitor Heatmap Table -->

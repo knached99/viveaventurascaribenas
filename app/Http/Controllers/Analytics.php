@@ -157,14 +157,25 @@ class Analytics extends Controller
     $heatmapData = [];
 
     foreach ($visitors as $visitor) {
-        if ($visitor->latitude && $visitor->longitude) {
-            $heatmapData[] = [
-                'lat' => $visitor->latitude,
-                'lng' => $visitor->longitude,
-                'count' => 1 // Adjust count or intensity if necessary
-            ];
+        if (!empty($visitor->country)) {
+            
+            $country = $visitor->country;
+
+            if(isset($heatmapData[$country])){
+                $heatmapData[$country] +=1;
+            }
+
+            else{
+                $heatmapData[$country] = [
+                    'country' =>$country, 
+                    'count'=>1,
+                ];
+            }
         }
     }
+
+    // converting array to JSON encoding 
+    $heatmapData = array_values($heatmapData);
 
     return view('admin.analytics', compact(
         'visitorData',

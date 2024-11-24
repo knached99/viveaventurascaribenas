@@ -63,6 +63,14 @@
     <!-- Page -->
     <link rel="stylesheet" href="{{ asset('assets/theme_assets/assets/vendor/css/pages/page-auth.css') }}" />
 
+    <!-- Leaflet Plugins for World heatmap chart -->
+    <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <!-- Leaflet JS -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <!-- Leaflet Heat Plugin -->
+        <script src="https://unpkg.com/leaflet.heat"></script>
+
 
     <!-- Helpers -->
     <script src="{{ asset('assets/theme_assets/assets/vendor/js/helpers.js') }}"></script>
