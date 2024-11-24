@@ -143,14 +143,17 @@ class Analytics extends Controller
        $topOperatingSystems = collect($operatingSystems)->sortDesc();
    
        // Prepare heatmap data
-       $heatmapData = $visitors->filter(function ($visitor) {
-        return !empty($visitor->country); // Ensure we're only counting visitors with a valid country
-    })->groupBy('country')->map(function ($group) {
-        return [
-            'country' => $group->first()->country, // Ensure we're using the country name correctly
-            'count' => $group->count() // Count the number of visitors per country
-        ];
-    })->values()->toArray();
+        $heatmapData = $visitors->filter(function ($visitor) {
+            return !empty($visitor->country);
+        })->groupBy(function ($visitor) {
+            return ucfirst(strtolower(trim($visitor->country))); // Normalize country name
+        })->map(function ($group) {
+            return [
+                'country' => $group->first()->country, 
+                'count' => $group->count()
+            ];
+        })->values()->toArray();
+    
 
     // $heatmapData = [
     //     ['country' => 'United States', 'count' => 120],
