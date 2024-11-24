@@ -24,7 +24,7 @@
             });
 
             // Load country polygons (GeoJSON from the 'public/assets/js' folder)
-            fetch('../../../../public/assets/js/countries.geojson')  // Correct path to your GeoJSON file
+            fetch("{{ asset('assets/js/countries.geojson') }}")  // Use Laravel's asset() function
                 .then(response => response.json())
                 .then(function (geojsonData) {
                     // Add GeoJSON layer
@@ -65,4 +65,3 @@
         }
     });
 </script>
-
