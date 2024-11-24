@@ -24,7 +24,7 @@
             });
 
             // Load country polygons (GeoJSON from the 'public/assets/js' folder)
-            fetch('/assets/js/countries.geojson')  // Correct path to your GeoJSON file
+            fetch('../../../../public/assets/js/countries.geojson')  // Correct path to your GeoJSON file
                 .then(response => response.json())
                 .then(function (geojsonData) {
                     // Add GeoJSON layer
