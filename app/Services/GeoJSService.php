@@ -20,49 +20,54 @@ class GeoJSService
     public function getLocation($ip)
     {
         $cacheKey = 'geo_location_' . md5($ip);
-        $rateLimitKey = 'geo_location_rate_' . md5($ip); // Rate limit cache key
-        $rateLimitWindow = 60; // In seconds, you can adjust this as needed
-        $rateLimitMaxRequests = 5; // Max API calls per window
+        $rateLimitKey = 'geo_location_rate_' . md5($ip);
+        $rateLimitWindow = 60; // In seconds
+        $rateLimitMaxRequests = 5;
     
-        // Attempt to retrieve the location from cache
         $location = Cache::get($cacheKey);
     
-        // If location is not cached
         if (!$location) {
-            // Check if the IP has exceeded the rate limit
             $requestCount = Cache::get($rateLimitKey, 0);
     
             if ($requestCount >= $rateLimitMaxRequests) {
                 Log::warning("Rate limit exceeded for IP: {$ip}");
-                return null; // You can also return a fallback location here
+                return null;
             }
     
             try {
-                // Increment the request count and set the expiry to rateLimitWindow seconds
                 Cache::put($rateLimitKey, $requestCount + 1, $rateLimitWindow);
     
-                // Attempt to decrypt the IP, or use as-is if not encrypted
+                // Decrypt IP or use as-is
                 $decryptedIP = $this->tryDecrypt($ip);
     
-                // Perform API request 
-                $apiKey = env('IPGEOLOCATION_API_KEY');
-                $response = $this->client->request('GET', 'http://ip-api.com/json/{$decryptedIP}');
-              //  $response = $this->client->request('GET', "https://api.ipgeolocation.io/ipgeo?apiKey={$apiKey}&ip={$decryptedIP}");
-                $responseBody = $response->getBody()->getContents(); // Get response body as string
+                // Validate the IP format
+                if (!filter_var($decryptedIP, FILTER_VALIDATE_IP)) {
+                    Log::warning("Invalid IP format: {$decryptedIP}");
+                    return null;
+                }
+    
+                // Log the IP being sent to the API
+                Log::info("Requesting geo-location for IP: {$decryptedIP}");
+    
+                // API request
+                $response = $this->client->request('GET', "http://ip-api.com/json/{$decryptedIP}");
+                $responseBody = $response->getBody()->getContents();
                 $location = json_decode($responseBody, true);
     
-                // Log the response for debugging
-                Log::info('API Response for IP ' . $decryptedIP . ': ' . $responseBody);
+                // Check if the API response is valid
+                if ($location['status'] == 'fail') {
+                    Log::error("Geo-location lookup failed for IP {$decryptedIP}: {$location['message']}");
+                    return null;
+                }
     
-                // Cache the result for 1 day (1440 minutes)
-                Cache::put($cacheKey, $location, 1440); // Cache for 1 day
+                // Cache the location for 1 day
+                Cache::put($cacheKey, $location, 1440);
             } catch (\Exception $e) {
                 Log::error('GeoJS lookup failed for IP ' . $ip . ': ' . $e->getMessage());
                 $location = null;
             }
         }
     
-        // Return location data (city, region, country)
         return [
             'city' => $location['city'] ?? null,
             'region' => $location['regionName'] ?? null,
@@ -70,91 +75,6 @@ class GeoJSService
         ];
     }
     
-
-    // public function getLocation($ip)
-    // {
-    //     $cacheKey = "geo_location_{$ip}";
-
-    //     // Attempt to retrieve the location from cache
-    //     $location = Cache::get($cacheKey);
-
-    //     if (!$location) {
-    //         try {
-    //           $decryptedIP = Crypt::decryptString($ip);
-
-    //            // $response = $this->client->request('GET', "https://get.geojs.io/v1/ip/geo/{$decryptedIP}.json");
-    //            $response = $this->client->request('GET', "https://freeipapi.com/api/json/{$decryptedIP}");
-    //             $responseBody = $response->getBody()->getContents(); // Get response body as string
-    //             $location = json_decode($responseBody, true);
-        
-    //             // Log the raw response body
-    //             Log::info('Response: ' . $responseBody);
-        
-    //             // Log the decoded location array
-    //             Log::info('Location: ' . print_r($location, true));
-        
-    //             // Cache the result for 1 day
-    //             Cache::put($cacheKey, $location, 1440);
-    //         } catch (\Exception $e) {
-    //             Log::error('GeoJS lookup failed: ' . $e->getMessage());
-    //             $location = null;
-    //         }
-    //     }
-        
-    //     return [
-    //         'city'=>$location['cityName'] ?? null,
-    //         'region'=>$location['regionName'] ?? null,
-    //         'country'=>$location['countryName'] ?? null,
-    //         'latitude'=>$location['latitude'] ?? null,
-    //         'longitude'=>$location['longitude'] ?? null,
-    //         // 'city' => $location['city'] ?? null,
-    //         // 'region' => $location['region'] ?? null,
-    //         // 'country' => $location['country'] ?? null,
-    //         // 'latitude' => $location['latitude'] ?? null,
-    //         // 'longitude' => $location['longitude'] ?? null,
-    //     ];
-    // }
-
-//     public function getLocation($ip)
-// {
-//     $cacheKey = "geo_location_{$ip}";
-
-//     // Attempt to retrieve the location from cache
-//     $location = Cache::get($cacheKey);
-
-//     if (!$location) {
-//         try {
-//           //  $decryptedIP = Crypt::decryptString($ip);
-
-//             // $response = $this->client->request('GET', "https://freeipapi.com/api/json/{$ip}");
-//             $response = $this->client->request('GET', "https://api.ipgeolocation.io/ipgeo?apiKey=b42ca3aa642e43c49a7f7a1ee3d4ca3f&ip={$ip}");
-//             $responseBody = $response->getBody()->getContents(); // Get response body as string
-//             $location = json_decode($responseBody, true);
-
-//             // Log the response for debugging
-//             Log::info('API Response for IP ' . $ip . ': ' . $responseBody);
-
-//             // Cache the result for 1 day (1440 minutes)
-//             Cache::put($cacheKey, $location, 1440);
-//         } catch (\Exception $e) {
-//             Log::error('GeoJS lookup failed for IP ' . $ip . ': ' . $e->getMessage());
-//             $location = null;
-//         }
-//     }
-
-//     // Map the API response to the required fields
-//     return [
-//         'city' => $location['city'] ?? null,
-//         'region' => $location['state_prov'] ?? null,
-//         'country' => $location['country_name'] ?? null,
-//         'latitude' => $location['latitude'] ?? null,
-//         'longitude' => $location['longitude'] ?? null,
-//     ];
-// }
-
-/**
- * Attempt to decrypt the IP address, or return it as is if not encrypted.
- */
 private function tryDecrypt($ip)
 {
     try {
