@@ -60,24 +60,49 @@ class PhotoGalleryUpload extends Form {
                 
             }
 
+            // foreach ($this->photos as $photo) {
+            //     // Resize and store the uploaded file
+            //     $image = $photo->getRealPath();
+            //     $filePath = 'photo_gallery/'. $photo->hashName() . '.'.$photo->extension();
+            //     $fullPath = storage_path('app/public/' . $filePath);
+
+            //     // Use GD to resize the image
+            //     $this->resizeImage($photo->getRealPath(), $fullPath,  525, 351);
+
+            //     $photosArray[] = asset(Storage::url($filePath));
+            // }
+            // $data = [
+            //     'photoID'=>Str::uuid(),
+            //     'tripID'=> $this->tripID,
+            //     'photos'=>json_encode($photosArray),
+            //     'photoLabel'=>$this->photoLabel,
+            //     'photoDescription'=>$this->photoDescription
+            // ];
+
             foreach ($this->photos as $photo) {
                 // Resize and store the uploaded file
-                $image = $photo->getRealPath();
-                $filePath = 'photo_gallery/'. $photo->hashName() . '.'.$photo->extension();
-                $fullPath = storage_path('app/public/' . $filePath);
-
-                // Use GD to resize the image
-                $this->resizeImage($photo->getRealPath(), $fullPath,  525, 351);
-
-                $photosArray[] = asset(Storage::url($filePath));
+                $fileName = $photo->hashName() . '.' . $photo->extension();
+                $filePath = 'photo_gallery/' . $fileName;
+            
+                // Use GD to resize the image (resize using the public disk path)
+                $resizedImagePath = Storage::disk('public')->path($filePath);
+                $this->resizeImage($photo->getRealPath(), $resizedImagePath, 525, 351);
+            
+                // Store the resized image on the public disk
+                $photo->storeAs('photo_gallery', $fileName, 'public');
+            
+                // Generate the URL to the file using the public disk
+                $photosArray[] = asset(Storage::disk('public')->url($filePath));
             }
+            
             $data = [
-                'photoID'=>Str::uuid(),
-                'tripID'=> $this->tripID,
-                'photos'=>json_encode($photosArray),
-                'photoLabel'=>$this->photoLabel,
-                'photoDescription'=>$this->photoDescription
+                'photoID' => Str::uuid(),
+                'tripID' => $this->tripID,
+                'photos' => json_encode($photosArray),
+                'photoLabel' => $this->photoLabel,
+                'photoDescription' => $this->photoDescription
             ];
+            
 
             
             $upload = PhotoGalleryModel::create($data);
