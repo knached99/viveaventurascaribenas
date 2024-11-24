@@ -78,7 +78,7 @@
         <div class="card-body">
         <h5 class="card-title">World Heatmap</h5>
         <p class="card-subtitle mb-4">
-        This map shows where your visitors come from, with brighter areas showing a higher distribution of visitors.</p>
+        This map shows where your visitors come from, with darker areas showing a higher distribution of visitors.</p>
         </p>
         <x-admincomponents.heatmap-chart :heatmapData="$heatmapData" /> 
         </div>
