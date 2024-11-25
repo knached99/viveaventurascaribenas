@@ -85,14 +85,15 @@ class PhotoGalleryUpload extends Form {
                 $filePath = 'photo_gallery/' . $fileName;
             
                 // Use GD to resize the image (resize using the public disk path)
-                $resizedImagePath = Storage::disk('public')->path($filePath);
-                $this->resizeImage($photo->getRealPath(), $resizedImagePath, 525, 351);
+                // $resizedImagePath = Storage::disk('public')->path($filePath);
+                // $this->resizeImage($photo->getRealPath(), $resizedImagePath, 525, 351);
             
                 // Store the resized image on the public disk
                 $photo->storeAs('photo_gallery', $fileName, 'public');
             
                 // Generate the URL to the file using the public disk
-                $photosArray[] = asset(Storage::disk('public')->url($filePath));
+               // $photosArray[] = asset(Storage::disk('public')->url($filePath));
+               $photosArray[] = $fileName; 
             }
             
             $data = [
