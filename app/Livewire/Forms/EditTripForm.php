@@ -245,14 +245,15 @@ class EditTripForm extends Component
         \Log::info('File Path: ' . $filePath);
         \Log::info('Stored file path: ' . Storage::disk('public')->path($filePath));
 
-    
-      // Resize the image and save it using the public disk
-        Helper::resizeImage(
-            $file->getRealPath(),
-            $storagePath, // Use the public disk path for Hostinger
-            525,
-            351
-        );
+        $photo->storeAs('booking_photos', $fileName, 'public');
+
+    //   // Resize the image and save it using the public disk
+    //     Helper::resizeImage(
+    //         $file->getRealPath(),
+    //         $storagePath, // Use the public disk path for Hostinger
+    //         525,
+    //         351
+    //     );
     
         \Log::info('Image resized!');
     
