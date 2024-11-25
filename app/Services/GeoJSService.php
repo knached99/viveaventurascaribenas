@@ -39,6 +39,7 @@ class GeoJSService
     
                 // Decrypt IP or use as-is
                 $decryptedIP = $this->tryDecrypt($ip);
+                $geoLocationAPIKey = env('IPGEOLOCATION_API_KEY');
     
                 // Validate the IP format
                 if (!filter_var($decryptedIP, FILTER_VALIDATE_IP)) {
@@ -50,7 +51,8 @@ class GeoJSService
                 Log::info("Requesting geo-location for IP: {$decryptedIP}");
     
                 // API request
-                $response = $this->client->request('GET', "http://ip-api.com/json/{$decryptedIP}");
+                $request = $this->client->request('GET', "https://api.ipgeolocation.io/ipgeo?apiKey={$IPGEOLOCATION_API_KEY}&ip={$decryptedIP}");
+              //  $response = $this->client->request('GET', "http://ip-api.com/json/{$decryptedIP}");
                 $responseBody = $response->getBody()->getContents();
                 $location = json_decode($responseBody, true);
     
@@ -70,8 +72,8 @@ class GeoJSService
     
         return [
             'city' => $location['city'] ?? null,
-            'region' => $location['regionName'] ?? null,
-            'country' => $location['country'] ?? null,
+            'region' => $location['state_prov'] ?? null,
+            'country' => $location['country_name'] ?? null,
         ];
     }
     
