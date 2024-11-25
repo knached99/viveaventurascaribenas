@@ -168,7 +168,7 @@ class TripForm extends Form {
                 $storagePath = Storage::disk('public')->path($filePath);
             
                 \Log::info('File Path: ' . $filePath);
-                \Log::info('Full Path: ' . $fullPath);
+                \Log::info('Stored file path: ' . Storage::disk('public')->path($filePath));
             
             // Resize the image and save it using the public disk
                 Helper::resizeImage(
