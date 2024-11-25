@@ -73,8 +73,8 @@
                         <div class="photo-item">
                             <img src="{{ asset('assets/images/image_placeholder.jpg') }}" class="d-block w-100"
                                 style="height: 300px;" />
-                        </div> --}}
-                    @endif
+                        </div>
+                    @endif --}}
                 </div>
 
                 <!-- End Photo Grid Section -->
