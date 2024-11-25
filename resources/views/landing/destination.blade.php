@@ -44,7 +44,7 @@
             <div class="col-md-8">
                 <!-- Photo Grid Section -->
                 <div class="photo-grid">
-                    {{-- @if (!empty($tripPhotos)) --}}
+                    @if (!empty($tripPhotos))
                         <div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false"
                             style="border-radius: 8px;">
                             <div class="carousel-inner">
@@ -69,12 +69,12 @@
                                 <span class="visually-hidden">Next</span>
                             </button>
                         </div>
-                    {{-- @else
+                    @else
                         <div class="photo-item">
                             <img src="{{ asset('assets/images/image_placeholder.jpg') }}" class="d-block w-100"
                                 style="height: 300px;" />
                         </div>
-                    @endif --}}
+                    @endif
                 </div>
 
                 <!-- End Photo Grid Section -->
