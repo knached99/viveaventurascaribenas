@@ -162,18 +162,21 @@ class TripForm extends Form {
             foreach ($this->tripPhoto as $photo) {
                 // Resize and store the uploaded file
                 $image = $photo->getRealPath();
-                $filePath = 'booking_photos/' . time() . '-' . $photo->hashName() . '.'.$photo->extension();
-                $fullPath = storage_path('app/public/' . $filePath);
 
-                // Use GD to resize the image
-                //Helper::resizeImage($photo->getRealPath(), $fullPath,  525, 351);
+                 // Generate file path and process
+                $filePath = 'booking_photos/' . time() . '-' . $file->hashName().'.'.$file->extension();
+                $storagePath = Storage::disk('public')->path($filePath);
+            
+                \Log::info('File Path: ' . $filePath);
+                \Log::info('Full Path: ' . $fullPath);
+            
+            // Resize the image and save it using the public disk
                 Helper::resizeImage(
-                    $photo->getRealPath(),
-                    Storage::disk('public')->path($filePath), // specifying public disk driver for Hostinger 
+                    $file->getRealPath(),
+                    $storagePath, // Use the public disk path for Hostinger
                     525,
                     351
                 );
-
                 $imageURLs[] = asset(Storage::url($filePath));
             }
 

@@ -239,20 +239,19 @@ class EditTripForm extends Component
         \Log::info('File type after validation: ' . get_class($file));
     
         // Generate file path and process
-        $filePath = 'booking_photos/' . time() . '-' . $file->hashName(). '.'.$file->extension();
-        $fullPath = storage_path('app/public/' . $filePath);
+        $filePath = 'booking_photos/' . time() . '-' . $file->hashName() . '.'.$file->extension();
+        $storagePath = Storage::disk('public')->path($filePath);
     
         \Log::info('File Path: ' . $filePath);
         \Log::info('Full Path: ' . $fullPath);
     
-        // Resize the image using GD or another method
-       // Helper::resizeImage($file->getRealPath(), $fullPath,  525, 351);
-       Helper::resizeImage(
-        $photo->getRealPath(),
-        Storage::disk('public')->path($filePath), // specifying public disk driver for Hostinger 
-        525,
-        351
-    );
+      // Resize the image and save it using the public disk
+        Helper::resizeImage(
+            $file->getRealPath(),
+            $storagePath, // Use the public disk path for Hostinger
+            525,
+            351
+        );
     
         \Log::info('Image resized!');
     
