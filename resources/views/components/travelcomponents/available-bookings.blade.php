@@ -33,7 +33,7 @@
                                         @if (!empty($tripPhotos))
                                             @foreach ($tripPhotos as $index => $photo)
                                                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                                    <img src="{{ $photo }}" class="d-block w-100 card-img-top"
+                                                    <img src="{{asset('storage/booking_photos/'.$photo)}}" class="d-block w-100 card-img-top"
                                                         alt="Photo">
                                                 </div>
                                             @endforeach

@@ -239,13 +239,29 @@ class EditTripForm extends Component
         \Log::info('File type after validation: ' . get_class($file));
     
         // Generate file path and process
-        $filePath = 'booking_photos/' . time() . '-' . $file->hashName() . '.'.$file->extension();
-        $storagePath = Storage::disk('public')->path($filePath);
+        //$filePath = 'booking_photos/' . time() . '-' . $file->hashName() . '.'.$file->extension();
+     //   $storagePath = Storage::disk('public')->path($filePath);
     
-        \Log::info('File Path: ' . $filePath);
-        \Log::info('Stored file path: ' . Storage::disk('public')->path($filePath));
+   //     \Log::info('File Path: ' . $filePath);
+     //   \Log::info('Stored file path: ' . Storage::disk('public')->path($filePath));
 
-        $photo->storeAs('booking_photos', $fileName, 'public');
+       // $photo->storeAs('booking_photos', $fileName, 'public');
+        // $filePath = 'booking_photos/' . $fileName;
+        // $fullPath = storage_path('app/public/' . $filePath);
+        $filePath = 'booking_photos/'.$photo->hashName() . '.' . $photo->extension();
+
+        $storagePath = Storage::disk('public')->path($filePath);
+      //  \Log::info('Resizing Image...');
+      //  Helper::resizeImage($image, $fullPath, 525, 351);
+
+        // Save the image to the file system
+        // $photo->storeAs('booking_photos', $fileName, 'public');
+  
+        // // $imageURLs[] = asset(Storage::url($filePath)); 
+        // // $imagesArray[] = $fileName; 
+        // \Log::info('Current image URLs array: ' . json_encode($imageURLs));
+        // \Log::info('Current images in the array: ' . json_encode($imagesArray));
+    
 
     //   // Resize the image and save it using the public disk
     //     Helper::resizeImage(
@@ -255,11 +271,12 @@ class EditTripForm extends Component
     //         351
     //     );
     
-        \Log::info('Image resized!');
+        //\Log::info('Image resized!');
     
         // Store the new image URL
         $imageURLs[] = asset(Storage::url($filePath));
-        \Log::info('Appended image to the imageURLs array: ' . json_encode($imageURLs));
+        $imagesArray[] = $fileName;
+       // \Log::info('Appended image to the imageURLs array: ' . json_encode($imageURLs));
     
         // Remove the old image if it exists
         $tripPhotos = json_decode($this->trip->tripPhoto, true);
@@ -374,6 +391,9 @@ class EditTripForm extends Component
         
         try {
             $this->purgeCache((string) $this->trip->tripID);
+
+            $imagesArray = [];
+            $imageURLs = [];
             
             $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
             $product = $stripe->products->retrieve($this->trip->stripe_product_id);
@@ -382,13 +402,16 @@ class EditTripForm extends Component
             if ($product) {
                 $product->name = $this->tripLocation;
                 $product->description = $this->tripDescription;
-        
-                $newImageURLs = [];
+                \Log::info('Images in the array: '.json_encode($imagesArray));
+                \Log::info('Image URLs in the array" '.json_encode($imageURLs));
 
-                \Log::info('Current Image URLs array: '.json_encode($newImageURLs));
+
+                //$newImageURLs = [];
+
+              //  \Log::info('Current Image URLs array: '.json_encode($newImageURLs));
 
             
-                $newImageURLs = [];
+                //$newImageURLs = [];
 
             
                 if (!empty($this->tripPhotos) && is_array($this->tripPhotos)) {
@@ -400,17 +423,21 @@ class EditTripForm extends Component
                             if ($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) { 
                                 $image = $photo->getRealPath();
                                 $fileName = $photo->hashName() . '.' . $photo->extension();
-                                $filePath = 'booking_photos/' . $fileName;
-                                $fullPath = storage_path('app/public/' . $filePath);
-                    
-                                \Log::info('Resizing Image...');
-                                Helper::resizeImage($image, $fullPath, 525, 351);
+                                // $filePath = 'booking_photos/' . $fileName;
+                                // $fullPath = storage_path('app/public/' . $filePath);
+                                $filePath = 'booking_photos/'.$fileName; 
+
+                                $storagePath = Storage::disk('public')->path($filePath);
+                              //  \Log::info('Resizing Image...');
+                              //  Helper::resizeImage($image, $fullPath, 525, 351);
                     
                                 // Save the image to the file system
-                                $photo->storeAs('public/booking_photos', $fileName);
+                                $photo->storeAs('booking_photos', $fileName, 'public');
                           
-                                $newImageURLs[] = asset(Storage::url($filePath)); 
-                                \Log::info('Current image URLs array: ' . json_encode($newImageURLs));
+                                $imageURLs[] = asset(Storage::url($filePath)); 
+                                $imagesArray[] = $fileName; 
+                                \Log::info('Current image URLs array: ' . json_encode($imageURLs));
+                                \Log::info('Current images in the array: ' . json_encode($imagesArray));
                             }
                         }
                         
@@ -418,7 +445,7 @@ class EditTripForm extends Component
                     }
                     
                 
-                \Log::info('Current newImageURLs array: '.json_encode($newImageURLs));
+                // \Log::info('Current newImageURLs array: '.json_encode($newImageURLs));
                
                 \Log::info('Current trip availability in DB: ' . $tripModel->tripAvailability);
                 \Log::info('Current trip availability in Livewire: ' . $this->tripAvailability);
@@ -432,7 +459,8 @@ class EditTripForm extends Component
                 }
         
                 $tripModel->tripLocation = $this->tripLocation;
-                $tripModel->tripPhoto = !empty($newImageURLs) ? json_encode($newImageURLs) : json_encode($this->tripPhotos);
+                $tripModel->tripPhoto = json_encode($imagesArray);
+               // $tripModel->tripPhoto = !empty($newImageURLs) ? json_encode($newImageURLs) : json_encode($this->tripPhotos);
                 $tripModel->tripLandscape = json_encode($this->tripLandscape);
                 $tripModel->tripAvailability = $this->tripAvailability;
                 $tripModel->tripDescription = $this->tripDescription;
@@ -459,14 +487,9 @@ class EditTripForm extends Component
         
                 $tripModel->save();
 
-               
-
-                
-                
-        
                 Cache::put($this->cacheKey, [
                     'tripLocation' => $this->tripLocation,
-                    'tripPhotos' => $newImageURLs,
+                    'tripPhotos' => $imagesArray,
                     'tripLandscape' => $this->tripLandscape,
                     'tripAvailability' => $this->tripAvailability,
                     'tripDescription' => $this->tripDescription,

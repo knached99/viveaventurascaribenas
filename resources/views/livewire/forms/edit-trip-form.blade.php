@@ -5,6 +5,7 @@
     $startDate = Carbon::parse($trip->tripStartDate)->format('Y-m-d');
     $endDate = Carbon::parse($trip->tripEndDate)->format('Y-m-d');
     $tripPhotos = json_decode($trip->tripPhoto, true);
+   
     $active = $trip->active;
     $couponID = $trip->stripe_coupon_id;
 
@@ -79,7 +80,8 @@
                                 @foreach ($tripPhotos as $index => $photo)
                                     <div class="position-relative m-2">
                                         @if (is_string($photo))
-                                            <img src="{{ $photo }}"
+                                            
+                                            <img src="{{asset('storage/booking_photos/'.$photo)}}"
                                                 class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer"
                                                 style="max-width: 150px; height: 150px;" alt="Trip Image"
                                                 wire:click="selectImageToReplace({{ $index }})" />

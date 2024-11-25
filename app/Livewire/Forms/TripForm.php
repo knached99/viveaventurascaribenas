@@ -152,6 +152,7 @@ class TripForm extends Form {
 
         try {
             $imageURLs = [];
+            $imagesArray = [];
 
             // Create booking_photos folder if it does not exist
             $dirPath = storage_path('app/public/booking_photos');
@@ -164,20 +165,21 @@ class TripForm extends Form {
                 $image = $photo->getRealPath();
 
                  // Generate file path and process
-                $filePath = 'booking_photos/' . time() . '-' . $file->hashName().'.'.$file->extension();
+                $filePath = 'booking_photos/'.$file->hashName().'.'.$file->extension();
                 $storagePath = Storage::disk('public')->path($filePath);
             
                 \Log::info('File Path: ' . $filePath);
                 \Log::info('Stored file path: ' . Storage::disk('public')->path($filePath));
             
-            // Resize the image and save it using the public disk
-                Helper::resizeImage(
-                    $file->getRealPath(),
-                    $storagePath, // Use the public disk path for Hostinger
-                    525,
-                    351
-                );
-                $imageURLs[] = asset(Storage::url($filePath));
+            // // Resize the image and save it using the public disk
+            //     Helper::resizeImage(
+            //         $file->getRealPath(),
+            //         $storagePath, // Use the public disk path for Hostinger
+            //         525,
+            //         351
+            //     );
+              $imageURLs[] = asset(Storage::url($filePath));
+              $imagesArray[] = $filePath; 
             }
 
             $product = $this->stripe->products->create([
@@ -205,7 +207,8 @@ class TripForm extends Form {
                         'tripActivities' => $this->tripActivities,
                         'tripLandscape' => $tripLandscapeJson,
                         'tripAvailability' => $this->tripAvailability,
-                        'tripPhoto' => json_encode($imageURLs), // Store image URLs as a JSON array
+                       // 'tripPhoto' => json_encode($imageURLs), // Store image URLs as a JSON array
+                        'tripPhoto' => json_encode($imagesArray),
                         'tripStartDate' => !empty($this->tripStartDate) ? $this->tripStartDate : Carbon::now()->format('Y-m-d'),
                         'tripEndDate' => !empty($this->tripEndDate) ? $this->tripEndDate : Carbon::now()->format('Y-m-d'),
                         'tripPrice' => $this->tripPrice,
