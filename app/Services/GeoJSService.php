@@ -77,15 +77,33 @@ class GeoJSService
         ];
     }
     
-private function tryDecrypt($ip)
-{
-    try {
-        return Crypt::decryptString($ip);
-    } catch (\Exception $e) {
-        // Log decryption failure for debugging, proceed with the plain IP
-        Log::info('IP is not encrypted, using as is: ' . $ip);
-        return $ip;
+    // This method attempts to decrypt an encrypted IP and returns that decrypted IP
+    // If the IP cannot be decrypted, it will return null
+    private function tryDecrypt($ip)
+    {
+        try {
+            $decryptedIP = Crypt::decryptString($ip);
+    
+            // Ensure the decrypted value is a valid IP
+            if (filter_var($decryptedIP, FILTER_VALIDATE_IP)) {
+                return $decryptedIP;
+            } else {
+                Log::warning("Decrypted value is not a valid IP: {$decryptedIP}");
+                return null; // Return null to indicate failure
+            }
+        } catch (\Exception $e) {
+            // Log decryption failure
+            Log::info('IP is not encrypted, using as-is: ' . $ip);
+    
+            // Validate the original IP before returning it
+            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                return $ip;
+            } else {
+                Log::warning("Original value is not a valid IP: {$ip}");
+                return null; // Return null to indicate failure
+            }
+        }
     }
-}
+    
 
 }
