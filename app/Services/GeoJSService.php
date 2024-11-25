@@ -51,8 +51,8 @@ class GeoJSService
                 Log::info("Requesting geo-location for IP: {$decryptedIP}");
     
                 // API request
-                $request = $this->client->request('GET', "https://api.ipgeolocation.io/ipgeo?apiKey={$IPGEOLOCATION_API_KEY}&ip={$decryptedIP}");
-              //  $response = $this->client->request('GET', "http://ip-api.com/json/{$decryptedIP}");
+                $request = $this->client->request('GET', "https://api.ipgeolocation.io/ipgeo?apiKey={$geoLocationAPIKey}&ip={$decryptedIP}");
+                //  $response = $this->client->request('GET', "http://ip-api.com/json/{$decryptedIP}");
                 $responseBody = $response->getBody()->getContents();
                 $location = json_decode($responseBody, true);
     
@@ -65,7 +65,7 @@ class GeoJSService
                 // Cache the location for 1 day
                 Cache::put($cacheKey, $location, 1440);
             } catch (\Exception $e) {
-                Log::error('GeoJS lookup failed for IP ' . $ip . ': ' . $e->getMessage());
+                Log::error('GeoJS lookup failed for IP ' . $ip . '. Exception: ' . $e->getMessage(), ['ip' => $ip, 'apiKey' => $geoLocationAPIKey]);
                 $location = null;
             }
         }
