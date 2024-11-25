@@ -30,19 +30,19 @@
                                 <div id="carouselExampleControls{{ $loop->index }}" class="carousel slide"
                                     data-bs-interval="false">
                                     <div class="carousel-inner fixed-carousel-height">
-                                        @if (!empty($tripPhotos))
+                                        {{-- @if (!empty($tripPhotos)) --}}
                                             @foreach ($tripPhotos as $index => $photo)
                                                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                                                     <img src="{{asset('storage/booking_photos/'.$photo)}}" class="d-block w-100 card-img-top"
                                                         alt="Photo">
                                                 </div>
                                             @endforeach
-                                        @else
+                                        {{-- @else
                                             <div class="carousel-item active">
                                                 <img src="{{ asset('assets/images/image_placeholder.jpg') }}"
                                                     class="d-block w-100 card-img-top" alt="Placeholder">
                                             </div>
-                                        @endif
+                                        @endif --}}
                                     </div>
                                     <button class="carousel-control-prev" type="button"
                                         data-bs-target="#carouselExampleControls{{ $loop->index }}"
