@@ -33,7 +33,7 @@
         @foreach ($photoURLs as $photoURL)
             <div class="column hover:ease-in-out hover:duration:300 relative">
                 <a href="{{ route('destination', ['slug' => $photo->trip->slug]) }}">
-                    <img src="{{ asset($photoURL) }}" alt="Photo" style="width: 100%;" />
+                    <img src="{{ asset('storage/photo_gallery/'.$photoURL) }}" alt="Photo" style="width: 100%;" />
                     <div class="overlay">
                         <h4 class="text-white">{{ $photo->photoLabel }}</h4>
                         <p class="text-lg">{{ $photo->photoDescription }}</p>

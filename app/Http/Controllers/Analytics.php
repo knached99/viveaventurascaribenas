@@ -60,7 +60,8 @@ class Analytics extends Controller
         $locations = [];
         $browsers = [];
         $operatingSystems = [];
-    
+        
+        $countries = [];
         // Get location data based on IPs with caching
         foreach ($ips as $ip) {
             // Check cache first before making API call
@@ -79,7 +80,14 @@ class Analytics extends Controller
             $parsedAgent = $this->parseUserAgent($visitor->visitor_user_agent);
             $visitor->browser = $parsedAgent['browser'];
             $visitor->operating_system = $parsedAgent['os'];
+
+            $countries[] =  [
+                'country' => $visitor->country,
+                'count' => 1,
+            ];
         }
+
+        
     
         // Aggregate device data (browsers and OS)
         foreach ($visitors as $url) {
@@ -102,17 +110,19 @@ class Analytics extends Controller
         $topBrowsers = collect($browsers)->sortDesc()->take(5); // Limit to top 5 browsers
         $topOperatingSystems = collect($operatingSystems)->sortDesc()->take(5); // Limit to top 5 OS
     
-        // Prepare heatmap data
-        $heatmapData = $visitors->filter(function ($visitor) {
-            return !empty($visitor->country);
-        })->groupBy(function ($visitor) {
-            return ucfirst(strtolower(trim($visitor->country))); // Normalize country name
-        })->map(function ($group) {
+       // Group by country and calculate count
+        $heatmapData = collect($countries)
+        ->filter(function ($entry) {
+            return !empty($entry['country']); // Filter out empty countries
+        })
+        ->groupBy('country')
+        ->map(function ($group, $country) {
             return [
-                'country' => $group->first()->country,
-                'count' => $group->count()
+                'country' => $country,
+                'count' => $group->sum('count') // Sum counts for each country
             ];
         })->values()->toArray();
+
     
         // Return only the necessary data
         return view('admin.analytics', compact(
