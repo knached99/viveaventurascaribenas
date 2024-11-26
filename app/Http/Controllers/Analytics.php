@@ -87,6 +87,8 @@ class Analytics extends Controller
             ];
         }
 
+        dd($countries);
+
         
     
         // Aggregate device data (browsers and OS)
