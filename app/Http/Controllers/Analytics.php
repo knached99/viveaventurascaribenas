@@ -73,7 +73,7 @@ class Analytics extends Controller
         // Attach city, state, and country to each visitor
         foreach ($visitors as $visitor) {
             $location = $locations[$visitor->visitor_ip_address] ?? null;
-            dd($location['country']);
+            dd($location);
             $visitor->city = $location['city'] ?? null;
             $visitor->state = $location['region'] ?? null;
             $visitor->country = $location['country'] ?? null;
