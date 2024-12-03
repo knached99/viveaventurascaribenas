@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\GeoJSService;
+use App\Services\MaxMindService;
 use App\Models\VisitorModel;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\Cache;
 
 class Analytics extends Controller
 {
-    protected $geoJSService;
+    protected $maxMindService;
 
-    public function __construct(GeoJSService $geoJSService)
+    public function __construct(MaxMindService $maxMindService)
     {
-        $this->geoJSService = $geoJSService;
+        $this->maxMindService = $maxMindService;
     }
 
     
@@ -50,90 +50,60 @@ class Analytics extends Controller
    }
    
 
-    public function showAnalytics()
-    {
-        $visitors = VisitorModel::all();
-    
-        // Unique IPs
-        $ips = $visitors->pluck('visitor_ip_address')->unique();
-    
-        $locations = [];
-        $browsers = [];
-        $operatingSystems = [];
-        
-        $countries = [];
-        // Get location data based on IPs with caching
-        foreach ($ips as $ip) {
-            // Check cache first before making API call
-            $locations[$ip] = Cache::remember("geo_" . substr(md5($ip), 0, 32), 1440, function() use ($ip) {
-                return $this->geoJSService->getLocation($ip);
-            });
-        }
-    
-        // Attach city, state, and country to each visitor
-        foreach ($visitors as $visitor) {
-            $location = $locations[$visitor->visitor_ip_address] ?? null;
-            dd($location);
-            $visitor->city = $location['city'] ?? null;
-            $visitor->state = $location['region'] ?? null;
-            $visitor->country = $location['country'] ?? null;
-            // Parse user agent to get browser and OS
-            $parsedAgent = $this->parseUserAgent($visitor->visitor_user_agent);
-            $visitor->browser = $parsedAgent['browser'];
-            $visitor->operating_system = $parsedAgent['os'];
+   public function showAnalytics()
+   {
+       $visitors = VisitorModel::all();
+   
+       $ips = $visitors->pluck('visitor_ip_address')->unique();
+       $locations = [];
+       $countries = [];
+       $browsers = [];
+       $operatingSystems = [];
+   
+       // Get location data based on IPs
+       foreach ($ips as $ip) {
+           $locations[$ip] = Cache::remember("geo_" . md5($ip), 1440, function () use ($ip) {
+               return app(MaxMindService::class)->getLocation($ip);
+           });
+       }
+   
+       // Process visitors and aggregate data
+       foreach ($visitors as $visitor) {
+           $location = $locations[$visitor->visitor_ip_address] ?? null;
+   
+           $visitor->country = $location['country'] ?? null;
+           $visitor->continent = $location['continent'] ?? null;
+   
+           $parsedAgent = $this->parseUserAgent($visitor->visitor_user_agent);
+           $visitor->browser = $parsedAgent['browser'];
+           $visitor->operating_system = $parsedAgent['os'];
+   
+           if ($visitor->country) {
+               $countries[] = $visitor->country;
+           }
+   
+           $browsers[$visitor->browser] = ($browsers[$visitor->browser] ?? 0) + 1;
+           $os = $visitor->operating_system ?: 'Unknown';
+           $operatingSystems[$os] = ($operatingSystems[$os] ?? 0) + 1;
+       }
+   
+       $topBrowsers = collect($browsers)->sortDesc()->take(5);
+       $topOperatingSystems = collect($operatingSystems)->sortDesc()->take(5);
+   
+       $heatmapData = collect($countries)
+           ->countBy()
+           ->map(function ($count, $country) {
+               return ['country' => $country, 'count' => $count];
+           })
+           ->values()
+           ->toArray();
 
-            $countries[] =  [
-                'country' => $visitor->country,
-                'count' => 1,
-            ];
-        }
-
-       
-
-        
+ 
     
-        // Aggregate device data (browsers and OS)
-        foreach ($visitors as $url) {
-            // Update browser count
-            if (isset($browsers[$url->browser])) {
-                $browsers[$url->browser] += 1;
-            } else {
-                $browsers[$url->browser] = 1;
-            }
-    
-            // Update operating system count, sanitized for valid key
-            $os = isset($url->operating_system) ? preg_replace('/[^a-zA-Z0-9\s]/', '', $url->operating_system) : 'Unknown';
-            if (isset($operatingSystems[$os])) {
-                $operatingSystems[$os] += 1;
-            } else {
-                $operatingSystems[$os] = 1;
-            }
-        }
-    
-        $topBrowsers = collect($browsers)->sortDesc()->take(5); // Limit to top 5 browsers
-        $topOperatingSystems = collect($operatingSystems)->sortDesc()->take(5); // Limit to top 5 OS
-    
-       // Group by country and calculate count
-        $heatmapData = collect($countries)
-        ->filter(function ($entry) {
-            return !empty($entry['country']); // Filter out empty countries
-        })
-        ->groupBy('country')
-        ->map(function ($group, $country) {
-            return [
-                'country' => $country,
-                'count' => $group->sum('count') // Sum counts for each country
-            ];
-        })->values()->toArray();
-
-    
-        // Return only the necessary data
-        return view('admin.analytics', compact(
-            'topBrowsers',
-            'topOperatingSystems',
-            'heatmapData'
-        ));
-    }
+   
+       return view('admin.analytics', compact('topBrowsers', 'topOperatingSystems', 'heatmapData'));
+   }
+   
     
    
 

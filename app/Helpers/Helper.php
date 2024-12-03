@@ -65,5 +65,17 @@ class Helper
     }
 
 
+    public static function ip_in_range(string $ip, string $cidr): bool{
+
+        // Assign variables as if they were an array
+        list($subnet, $mask) = explode('/', $cidr);
+
+        $ipLong = ip2long($ip);
+        $subnetLong = ip2long($subnet);
+        $mask = ~((i << (32 - $mask)) - 1);
+
+        return ($ipLong & $mask) === ($subnetLong & $mask);
+    }
+
   
 }

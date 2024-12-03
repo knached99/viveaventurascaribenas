@@ -8,6 +8,7 @@ use App\Models\TripsModel;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+
 class PhotoGalleryController extends Controller
 {
     
