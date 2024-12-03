@@ -162,10 +162,10 @@ class TripForm extends Form {
 
             foreach ($this->tripPhoto as $photo) {
                 // Resize and store the uploaded file
-                $file = $photo->getRealPath();
+             //   $file = $photo->getRealPath();
 
                  // Generate file path and process
-                $filePath = 'booking_photos/'.$file->hashName().'.'.$file->extension();
+                $filePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
                 $storagePath = Storage::disk('public')->path($filePath);
             
                 \Log::info('File Path: ' . $filePath);
