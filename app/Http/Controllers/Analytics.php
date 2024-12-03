@@ -96,10 +96,7 @@ class Analytics extends Controller
                return ['country' => $country, 'count' => $count];
            })
            ->values()
-           ->toArray();
-        
-        \Log::info(['Heatmap Data' => $heatmapData]);
- 
+           ->toArray(); 
     
    
        return view('admin.analytics', compact('topBrowsers', 'topOperatingSystems', 'heatmapData'));
