@@ -6,7 +6,6 @@
                 <p class="text-secondary">Your feedback helps us improve and inspires other travelers. We'd love to hear
                     about your journey!</p>
 
-
             </div>
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6">
@@ -39,14 +38,17 @@
                                         class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
                                         wire:model="tripID">
                                         <option value="" disabled selected>Where did you travel with us?</option>
-                                        @if (!empty($trips))
+                                        @foreach($trips as $trip)
+                                        <option value="{{$trip['tripID']}}">{{$trip['tripLocation']}}</option>
+                                        @endforeach 
+                                        {{-- @if (!empty($trips))
                                             @foreach ($trips as $trip)
                                                 <option value="{{ $trip['tripID'] }}"> {{ $trip['tripLocation'] }}
                                                 </option>
                                             @endforeach
                                         @else
                                             <option value="" disabled>No trips available</option>
-                                        @endif
+                                        @endif --}}
                                     </select>
 
                                     {{-- <input class="form-control {{$errors->has('trip_location') ? 'border border-danger' : ''}}" wire:model="trip_location" placeholder="Where did you travel with us? (Destination)"> --}}
@@ -126,11 +128,12 @@
 
                             <!-- Status Messages -->
                             <div>
-                                @if (!empty($status))
-                                    <div class="mb-4 alert alert-success" role="alert">
+                                @if($status)
+                                 <div class="mb-4 alert alert-success" role="alert">
                                         {{ $status }}
                                     </div>
-                                @elseif(!empty($error))
+                                   
+                                @elseif(($error))
                                     <div class="mb-4 alert alert-danger" role="alert">
                                         {{ $error }}
                                     </div>
