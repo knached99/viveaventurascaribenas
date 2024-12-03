@@ -4,6 +4,7 @@ namespace App\Services;
 use GeoIp2\Database\Reader;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Crypt;
 
 class MaxMindService
 {
@@ -23,7 +24,11 @@ class MaxMindService
 
     public function getLocation($ip)
     {
-        $cacheKey = 'geo_location_' . md5($ip);
+
+        // Decrypt IP 
+        $decryptedIP = Crypt::decryptString($ip);
+
+        $cacheKey = 'geo_location_' . md5($decryptedIP);
 
         // Check if location is cached
         $location = Cache::get($cacheKey);
@@ -34,12 +39,12 @@ class MaxMindService
         try {
             // Validate IP
             if (!filter_var($ip, FILTER_VALIDATE_IP)) {
-                Log::warning("Invalid IP address: {$ip}");
+                Log::warning("Invalid IP address: {$decryptedIP}");
                 return null;
             }
 
             // Use MaxMind Reader to get location data
-            $record = $this->reader->country($ip);
+            $record = $this->reader->country($decryptedIP);
 
             $location = [
                 'country' => $record->country->isoCode ?? null,
@@ -52,7 +57,7 @@ class MaxMindService
 
             return $location;
         } catch (\Exception $e) {
-            Log::error("MaxMindService lookup failed for IP {$ip}: " . $e->getMessage());
+            Log::error("MaxMindService lookup failed for IP {$decryptedIP}: " . $e->getMessage());
             return null;
         }
     }
