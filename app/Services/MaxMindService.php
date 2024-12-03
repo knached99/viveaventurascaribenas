@@ -38,10 +38,10 @@ class MaxMindService
 
         try {
             // Validate IP
-            if (!filter_var($ip, FILTER_VALIDATE_IP)) {
-                Log::warning("Invalid IP address: {$decryptedIP}");
-                return null;
-            }
+            // if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+            //     Log::warning("Invalid IP address: {$decryptedIP}");
+            //     return null;
+            // }
 
             // Use MaxMind Reader to get location data
             $record = $this->reader->country($decryptedIP);
