@@ -97,7 +97,8 @@ class Analytics extends Controller
            })
            ->values()
            ->toArray();
-
+        
+        \Log::info(['Heatmap Data' => $heatmapData]);
  
     
    
