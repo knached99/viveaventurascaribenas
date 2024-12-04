@@ -53,6 +53,20 @@ class Analytics extends Controller
    public function showAnalytics()
    {
        $visitors = VisitorModel::all();
+
+    // Return the values from a single column in the mostVisitedURLs array
+    $mostVisitedURLs = array_column($visitors, 'visited_url');
+    
+    // Counts all the values of an array
+    $urlCounts = array_count_values($mostVisitedURLs);
+    // Sort an array in reverse order and maintain index association
+    arsort($urlCounts);
+    //Gets the first key of an array
+    // Gets the most visited URL (first element in the sorted array)
+    $mostVisitedURL = array_key_first($urlCounts);
+
+    $totalVisitors = count($visitors);
+
    
        $ips = $visitors->pluck('visitor_ip_address')->unique();
        $locations = [];
@@ -98,8 +112,7 @@ class Analytics extends Controller
            ->values()
            ->toArray(); 
     
-   
-       return view('admin.analytics', compact('topBrowsers', 'topOperatingSystems', 'heatmapData'));
+       return view('admin.analytics', compact('topBrowsers', 'topOperatingSystems', 'heatmapData', 'most_visited_url', 'total_visitors_count'));
    }
    
     

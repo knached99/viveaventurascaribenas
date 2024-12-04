@@ -1,6 +1,23 @@
 <x-authenticated-theme-layout>
     <div class="row">
 
+        <!-- Most Visited URL and total number of visitors -->
+        <div class="col-lg-12 mb-6">
+        <div class="card">
+        <div class="card-body">
+        <h5 class="card-title">
+        Total Number of Visitors
+        </h5>
+        <p class="block"> {{total_visitors_count}}</p>
+        </div>
+
+        <h5 class="card-title">
+        Most Visited URL 
+        </h5>
+        <a href="{{$most_visited_url}}" target="_blank" rel="noopener noreferrer">{{$most_visited_url}}</a>
+        </div>
+        </div>
+        <!-- / Most Visited URL and total number of visitors -->
         <!-- Visitor Devices Chart -->
         <div class="col-lg-12 mb-6">
             <div class="card">
