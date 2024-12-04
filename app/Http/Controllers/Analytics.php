@@ -108,9 +108,13 @@ class Analytics extends Controller
            $operatingSystems[$os] = ($operatingSystems[$os] ?? 0) + 1;
        }
    
-       // Calculate top browsers and operating systems
-       $topBrowsers = array_slice(array_sort($browsers, SORT_DESC), 0, 5, true);
-       $topOperatingSystems = array_slice(array_sort($operatingSystems, SORT_DESC), 0, 5, true);
+       // Sort browsers and operating systems in descending order
+       arsort($browsers);
+       arsort($operatingSystems);
+   
+       // Get the top 5 browsers and operating systems
+       $topBrowsers = array_slice($browsers, 0, 5, true);
+       $topOperatingSystems = array_slice($operatingSystems, 0, 5, true);
    
        // Prepare heatmap data
        $heatmapData = [];
