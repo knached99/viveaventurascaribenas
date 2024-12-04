@@ -8,7 +8,7 @@
         <h5 class="card-title">
         Total Number of Visitors
         </h5>
-        <p class="block"> {{total_visitors_count}}</p>
+        <p class="block"> {{$total_visitors_count}}</p>
         </div>
 
         <h5 class="card-title">
