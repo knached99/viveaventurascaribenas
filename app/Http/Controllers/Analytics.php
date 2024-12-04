@@ -52,70 +52,82 @@ class Analytics extends Controller
 
    public function showAnalytics()
    {
-       $visitors = VisitorModel::all();
-
-    // Return the values from a single column in the mostVisitedURLs array
-    $mostVisitedURLs = array_column($visitors, 'visited_url');
-    
-    // Counts all the values of an array
-    $urlCounts = array_count_values($mostVisitedURLs);
-    // Sort an array in reverse order and maintain index association
-    arsort($urlCounts);
-    //Gets the first key of an array
-    // Gets the most visited URL (first element in the sorted array)
-    $mostVisitedURL = array_key_first($urlCounts);
-
-    $totalVisitors = count($visitors);
-
+       $visitors = VisitorModel::select(
+           'visitor_uuid', 
+           'visitor_ip_address', 
+           'visitor_user_agent', 
+           'visited_url', 
+           'visitor_referrer', 
+           'visited_at', 
+           'unique_identifier'
+       )->get()->toArray();
    
-       $ips = $visitors->pluck('visitor_ip_address')->unique();
+       // Calculate the most visited URL
+       $mostVisitedURLs = array_column($visitors, 'visited_url');
+       $urlCounts = array_count_values($mostVisitedURLs);
+       arsort($urlCounts);
+       $mostVisitedURL = array_key_first($urlCounts);
+   
+       // Count total visitors
+       $totalVisitors = count($visitors);
+   
+       // Extract unique IP addresses
+       $ips = array_unique(array_column($visitors, 'visitor_ip_address'));
+   
+       // Fetch and cache location data for IPs
        $locations = [];
-       $countries = [];
-       $browsers = [];
-       $operatingSystems = [];
-   
-       // Get location data based on IPs
        foreach ($ips as $ip) {
            $locations[$ip] = Cache::remember("geo_" . md5($ip), 1440, function () use ($ip) {
                return app(MaxMindService::class)->getLocation($ip);
            });
        }
    
+       // Initialize aggregation variables
+       $countries = [];
+       $browsers = [];
+       $operatingSystems = [];
+   
        // Process visitors and aggregate data
-       foreach ($visitors as $visitor) {
-           $location = $locations[$visitor->visitor_ip_address] ?? null;
+       foreach ($visitors as &$visitor) {
+           $ip = $visitor['visitor_ip_address'];
+           $location = $locations[$ip] ?? null;
    
-           $visitor->country = $location['country'] ?? null;
-           $visitor->continent = $location['continent'] ?? null;
+           $visitor['country'] = $location['country'] ?? null;
+           $visitor['continent'] = $location['continent'] ?? null;
    
-           $parsedAgent = $this->parseUserAgent($visitor->visitor_user_agent);
-           $visitor->browser = $parsedAgent['browser'];
-           $visitor->operating_system = $parsedAgent['os'];
+           $parsedAgent = $this->parseUserAgent($visitor['visitor_user_agent']);
+           $visitor['browser'] = $parsedAgent['browser'];
+           $visitor['operating_system'] = $parsedAgent['os'];
    
-           if ($visitor->country) {
-               $countries[] = $visitor->country;
+           if (!empty($visitor['country'])) {
+               $countries[] = $visitor['country'];
            }
    
-           $browsers[$visitor->browser] = ($browsers[$visitor->browser] ?? 0) + 1;
-           $os = $visitor->operating_system ?: 'Unknown';
+           $browsers[$visitor['browser']] = ($browsers[$visitor['browser']] ?? 0) + 1;
+           $os = $visitor['operating_system'] ?: 'Unknown';
            $operatingSystems[$os] = ($operatingSystems[$os] ?? 0) + 1;
        }
    
-       $topBrowsers = collect($browsers)->sortDesc()->take(5);
-       $topOperatingSystems = collect($operatingSystems)->sortDesc()->take(5);
+       // Calculate top browsers and operating systems
+       $topBrowsers = array_slice(array_sort($browsers, SORT_DESC), 0, 5, true);
+       $topOperatingSystems = array_slice(array_sort($operatingSystems, SORT_DESC), 0, 5, true);
    
-       $heatmapData = collect($countries)
-           ->countBy()
-           ->map(function ($count, $country) {
-               return ['country' => $country, 'count' => $count];
-           })
-           ->values()
-           ->toArray(); 
-    
-       return view('admin.analytics', compact('topBrowsers', 'topOperatingSystems', 'heatmapData', 'most_visited_url', 'total_visitors_count'));
+       // Prepare heatmap data
+       $heatmapData = [];
+       foreach (array_count_values($countries) as $country => $count) {
+           $heatmapData[] = ['country' => $country, 'count' => $count];
+       }
+   
+       // Return the view with calculated data
+       return view('admin.analytics', [
+           'topBrowsers' => $topBrowsers,
+           'topOperatingSystems' => $topOperatingSystems,
+           'heatmapData' => $heatmapData,
+           'most_visited_url' => $mostVisitedURL,
+           'total_visitors_count' => $totalVisitors,
+       ]);
    }
    
-    
    
 
     /**
