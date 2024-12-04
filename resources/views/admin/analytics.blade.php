@@ -4,12 +4,11 @@
         <!-- Most Visited URL and total number of visitors -->
         <div class="col-lg-12 mb-6">
         <div class="card">
-        <div class="card-body">
+        <div class="card-body m-3 p-2">
         <h5 class="card-title">
         Total Number of Visitors
         </h5>
         <p class="block"> {{$total_visitors_count}}</p>
-        </div>
 
         <h5 class="card-title">
         Most Visited URL 
