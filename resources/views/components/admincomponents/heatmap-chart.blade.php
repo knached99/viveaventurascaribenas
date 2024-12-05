@@ -95,8 +95,8 @@ $geojsonPath = asset('assets/js/countries.geojson');
                                         count > 20 ? '#ed683c' :
                                         count > 10 ? '#f3903f' :
                                         count > 5 ? '#fdc70c' :
-                                        count > 0 ? '#fff33b' :
-                                                    '#fff33b';
+                                        count > 0 ? '#d3d1dd' :
+                                                    '#d3d1dd';
 
                             return {
                                 fillColor: color,
