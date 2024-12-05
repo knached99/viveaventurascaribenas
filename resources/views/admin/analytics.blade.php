@@ -16,7 +16,11 @@
         <a href="{{$most_visited_url}}" target="_blank" rel="noopener noreferrer">{{$most_visited_url}}</a>
         
         <h5 class="card-title">Top Referrer URL</h5>
+        @if($topReferrerURL !== 'unknown')
         <a href="{{$topReferrerURL}}" target="_blank" rel="noopener noreferrer">{{$topReferrerURL}}</a> 
+        @else 
+        <span class="text-secondary">{{$topReferrerURL}}</span>
+        @endif
         </div>
         </div>
         <!-- / Most Visited URL and total number of visitors -->
