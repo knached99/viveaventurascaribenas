@@ -61,31 +61,33 @@ class Analytics extends Controller
            'visited_at', 
            'unique_identifier'
        )->get()->toArray();
-
-       $topReferrerURL = '';
    
        // Calculate the most visited URL
        $mostVisitedURLs = array_column($visitors, 'visited_url');
        $urlCounts = array_count_values($mostVisitedURLs);
        arsort($urlCounts);
        $mostVisitedURL = array_key_first($urlCounts);
-      
+
 
        // Calcualte where most of the referrers are from 
+        $topReferrerURLs = array_column($visitors, 'visitor_referrer');
 
-       $topReferrerURLs = array_column($visitors, 'visitor_referrer');
-       if(count($topReferrerURLs) > 0){
-       
+        // Replacing null or non string values with 'unknown' 
+        $topReferrerURLs = array_map(
+            fn($url) => is_string($url) && $url !== '' ? $url : 'unknown',
+            $topReferrerURLs
+        );
+
+        // counting total number of occurrences of each referrer 
+
         $referrerURLCounts = array_count_values($topReferrerURLs);
-       arsort($referrerURLCounts);
-       $topReferrerURL = array_key_first(referrerURLCounts);
-       
-      }
-      else{
-        $topReferrerURL = '';
-      }
 
-   
+        arsort($referrerURLCounts);
+
+        // Here, we're retrieving the most common referrer url 
+
+        $topReferrerURL = array_key_first($referrerURLCounts);
+        
        // Count total visitors
        $totalVisitors = count($visitors);
    
