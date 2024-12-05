@@ -152,7 +152,7 @@ class TripForm extends Form {
 
         try {
             $imageURLs = [];
-            $imagesArray = [];
+           // $imagesArray = [];
 
             // Create booking_photos folder if it does not exist
             $dirPath = storage_path('app/public/booking_photos');
@@ -160,26 +160,35 @@ class TripForm extends Form {
                 mkdir($dirPath, 0755, true);
             }
 
-            foreach ($this->tripPhoto as $photo) {
-                // Resize and store the uploaded file
-             //   $file = $photo->getRealPath();
+            // foreach ($this->tripPhoto as $photo) {
+            //     // Resize and store the uploaded file
+            //  //   $file = $photo->getRealPath();
 
-                 // Generate file path and process
+            //      // Generate file path and process
+            //     $filePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
+            //     $storagePath = Storage::disk('public')->path($filePath);
+            
+            //     \Log::info('File Path: ' . $filePath);
+            //     \Log::info('Stored file path: ' . Storage::disk('public')->path($filePath));
+            
+            // // // Resize the image and save it using the public disk
+            // //     Helper::resizeImage(
+            // //         $file->getRealPath(),
+            // //         $storagePath, // Use the public disk path for Hostinger
+            // //         525,
+            // //         351
+            // //     );
+            //   $imageURLs[] = asset(Storage::url($filePath));
+            //   $imagesArray[] = $filePath; 
+            // }
+
+            foreach($this->tripPhoto as $photo){
+                $image = $photo->getRealPath();
+
                 $filePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
-                $storagePath = Storage::disk('public')->path($filePath);
-            
-                \Log::info('File Path: ' . $filePath);
-                \Log::info('Stored file path: ' . Storage::disk('public')->path($filePath));
-            
-            // // Resize the image and save it using the public disk
-            //     Helper::resizeImage(
-            //         $file->getRealPath(),
-            //         $storagePath, // Use the public disk path for Hostinger
-            //         525,
-            //         351
-            //     );
-              $imageURLs[] = asset(Storage::url($filePath));
-              $imagesArray[] = $filePath; 
+                $fullPath = storage_path('app/public/'.$filePath);
+
+                $imageURLs[] = asset(Storage::url($filePath));
             }
 
             $product = $this->stripe->products->create([
@@ -208,7 +217,7 @@ class TripForm extends Form {
                         'tripLandscape' => $tripLandscapeJson,
                         'tripAvailability' => $this->tripAvailability,
                        // 'tripPhoto' => json_encode($imageURLs), // Store image URLs as a JSON array
-                        'tripPhoto' => json_encode($imagesArray),
+                        'tripPhoto' => json_encode($imageURLs),
                         'tripStartDate' => !empty($this->tripStartDate) ? $this->tripStartDate : Carbon::now()->format('Y-m-d'),
                         'tripEndDate' => !empty($this->tripEndDate) ? $this->tripEndDate : Carbon::now()->format('Y-m-d'),
                         'tripPrice' => $this->tripPrice,

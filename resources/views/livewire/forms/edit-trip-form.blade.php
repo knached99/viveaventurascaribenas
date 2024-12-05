@@ -81,7 +81,7 @@
                                     <div class="position-relative m-2">
                                         @if (is_string($photo))
                                             
-                                            <img src="{{asset('storage/booking_photos/'.$photo)}}"
+                                            <img src="{{$photo}}"
                                                 class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer"
                                                 style="max-width: 150px; height: 150px;" alt="Trip Image"
                                                 wire:click="selectImageToReplace({{ $index }})" />
