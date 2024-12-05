@@ -16,7 +16,7 @@
                 <div class="col-md-3 ftco-animate">
                     <div class="project-destination">
                         <a href="{{ url('/destination/' . $trip['slug']) }}" class="img"
-                            style="background-image: url({{ !empty($tripPhotos) ? asset('storage/booking_photos/'.$tripPhotos[0]) : asset('assets/images/image_placeholder.jpg') }});">
+                            style="background-image: url({{ !empty($tripPhotos) ? $tripPhotos[0] : asset('assets/images/image_placeholder.jpg') }});">
                             <div class="text">
                                 <h3 style="font-weight: 900; color: #fff;">{{ $trip['name'] }}</h3>
                                 <span>{{ $trip['count'] }} bookings</span>
