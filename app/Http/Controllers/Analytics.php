@@ -67,6 +67,14 @@ class Analytics extends Controller
        $urlCounts = array_count_values($mostVisitedURLs);
        arsort($urlCounts);
        $mostVisitedURL = array_key_first($urlCounts);
+
+
+       // Calcualte where most of the referrers are from 
+
+       $topReferrerURLs = array_column($visitors, 'visitor_referrer');
+       $referrerURLCounts = array_count_values($topReferrerURLs);
+       arsort($referrerURLCounts);
+       $topReferrerURL = array_key_first(referrerURLCounts);
    
        // Count total visitors
        $totalVisitors = count($visitors);
@@ -128,6 +136,7 @@ class Analytics extends Controller
            'topOperatingSystems' => $topOperatingSystems,
            'heatmapData' => $heatmapData,
            'most_visited_url' => $mostVisitedURL,
+           'topReferrerURL' => $topReferrerURL,
            'total_visitors_count' => $totalVisitors,
        ]);
    }

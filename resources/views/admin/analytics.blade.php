@@ -14,6 +14,9 @@
         Most Visited URL 
         </h5>
         <a href="{{$most_visited_url}}" target="_blank" rel="noopener noreferrer">{{$most_visited_url}}</a>
+        
+        <h5 class="card-title">Top Referrer URL</h5>
+        <a href="{{$topReferrerURL}}" target="_blank" rel="noopener noreferrer">{{$topReferrerURL}}</a> 
         </div>
         </div>
         <!-- / Most Visited URL and total number of visitors -->
