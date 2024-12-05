@@ -72,9 +72,17 @@ class Analytics extends Controller
        // Calcualte where most of the referrers are from 
 
        $topReferrerURLs = array_column($visitors, 'visitor_referrer');
-       $referrerURLCounts = array_count_values($topReferrerURLs);
+       if($topReferrerURLs){
+       
+        $referrerURLCounts = array_count_values($topReferrerURLs);
        arsort($referrerURLCounts);
        $topReferrerURL = array_key_first(referrerURLCounts);
+       
+      }
+      else{
+        $topReferrerURL = '';
+      }
+
    
        // Count total visitors
        $totalVisitors = count($visitors);
