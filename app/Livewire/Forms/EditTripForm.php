@@ -419,30 +419,7 @@ class EditTripForm extends Component
                 if (!empty($this->tripPhotos) && is_array($this->tripPhotos)) {
                         \Log::info('User selected new pictures for upload. Iterating over new pictures..');
                         
-                        // foreach ($this->tripPhotos as $photo) {
-                        //     \Log::info('Checking if user selected pictures');
-
-                        //     if ($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) { 
-                        //         $image = $photo->getRealPath();
-                        //         $fileName = $photo->hashName() . '.' . $photo->extension();
-                        //         // $filePath = 'booking_photos/' . $fileName;
-                        //         // $fullPath = storage_path('app/public/' . $filePath);
-                        //         $filePath = 'booking_photos/'.$fileName; 
-
-                        //         $storagePath = Storage::disk('public')->path($filePath);
-                        //       //  \Log::info('Resizing Image...');
-                        //       //  Helper::resizeImage($image, $fullPath, 525, 351);
-                    
-                        //         // Save the image to the file system
-                        //         $photo->storeAs('booking_photos', $fileName, 'public');
-                          
-                        //         $imageURLs[] = asset(Storage::url($filePath)); 
-                        //         $imagesArray[] = $fileName; 
-                        //         \Log::info('Current image URLs array: ' . json_encode($imageURLs));
-                        //         \Log::info('Current images in the array: ' . json_encode($imagesArray));
-                        //     }
-                        // }
-
+ 
                         foreach($this->tripPhotos as $photo){
                             
                             if($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile){
@@ -495,10 +472,7 @@ class EditTripForm extends Component
                 else{
                     $tripModel->num_trips = $this->num_trips;
                 }
-                
-                // $tripModel->num_trips = ($tripModel->num_trips == 0 || $tripModel->num_trips < $reservationsCount) 
-                // ? max($reservationsCount, $tripModel->num_trips) 
-                // : $tripModel->num_trips;
+
 
                 $tripModel->active = $this->active;
                 $tripModel->slug = Str::slug($this->tripLocation);

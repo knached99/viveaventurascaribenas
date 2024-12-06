@@ -5,6 +5,7 @@ namespace App\Livewire\Forms;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\WithFileUploads;
+use Livewire\TemporaryUploadedFile;
 use Livewire\Form;
 use Illuminate\Support\Facades\Cache;
 use App\Models\TripsModel;
@@ -159,36 +160,21 @@ class TripForm extends Form {
             if(!file_exists($dirPath)){
                 mkdir($dirPath, 0755, true);
             }
-
-            // foreach ($this->tripPhoto as $photo) {
-            //     // Resize and store the uploaded file
-            //  //   $file = $photo->getRealPath();
-
-            //      // Generate file path and process
-            //     $filePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
-            //     $storagePath = Storage::disk('public')->path($filePath);
-            
-            //     \Log::info('File Path: ' . $filePath);
-            //     \Log::info('Stored file path: ' . Storage::disk('public')->path($filePath));
-            
-            // // // Resize the image and save it using the public disk
-            // //     Helper::resizeImage(
-            // //         $file->getRealPath(),
-            // //         $storagePath, // Use the public disk path for Hostinger
-            // //         525,
-            // //         351
-            // //     );
-            //   $imageURLs[] = asset(Storage::url($filePath));
-            //   $imagesArray[] = $filePath; 
-            // }
-
             foreach($this->tripPhoto as $photo){
+
+                if($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile){
+
                 $image = $photo->getRealPath();
 
                 $filePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
                 $fullPath = storage_path('app/public/'.$filePath);
 
                 $imageURLs[] = asset(Storage::url($filePath));
+            }
+            else{
+                $this->error = 'Cannot upload the selected files. Please choose other files to upload';
+                \Log::error('File is not a valid instance of Livewire TemporaryUploadedFile');
+            }
             }
 
             $product = $this->stripe->products->create([
@@ -216,7 +202,6 @@ class TripForm extends Form {
                         'tripActivities' => $this->tripActivities,
                         'tripLandscape' => $tripLandscapeJson,
                         'tripAvailability' => $this->tripAvailability,
-                       // 'tripPhoto' => json_encode($imageURLs), // Store image URLs as a JSON array
                         'tripPhoto' => json_encode($imageURLs),
                         'tripStartDate' => !empty($this->tripStartDate) ? $this->tripStartDate : Carbon::now()->format('Y-m-d'),
                         'tripEndDate' => !empty($this->tripEndDate) ? $this->tripEndDate : Carbon::now()->format('Y-m-d'),
