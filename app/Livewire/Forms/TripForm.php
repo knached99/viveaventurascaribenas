@@ -180,8 +180,10 @@ class TripForm extends Form {
                 'name' => $this->tripLocation,
                 'description' => $this->tripDescription,
                 'images' => $imageURLs, // Pass the correct array of image URLs
+                'tax_code'=>'txcd_20030000', // General Services 
+                'tax_behavior'=> 'exclusive', // Exclusive means tax is excluded from total price and added separately 
             ]);
-    
+            
             if ($product) {
                 $price = $this->stripe->prices->create([
                     'unit_amount' => $this->tripPrice * 100, // Stripe uses cents
