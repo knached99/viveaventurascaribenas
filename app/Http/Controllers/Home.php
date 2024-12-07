@@ -207,7 +207,7 @@ class Home extends Controller
     
             // Check if reservationID is provided before finding the reservation
            $reservation = $reservationID ? Reservations::findOrFail($reservationID) : null;
-            if($trip->active == false){
+            if($trip->active == false || $trip->num_trips == 0){
                 abort(404); // If the trip is inactive, return page not found 
             }
 
