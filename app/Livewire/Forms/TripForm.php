@@ -159,15 +159,22 @@ class TripForm extends Form {
             if(!file_exists($dirPath)){
                 mkdir($dirPath, 0755, true);
             }
-            foreach($this->tripPhoto as $photo){
-                                                          
-                $imagePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
-                $photo->storeAs('public', $imagePath);
-                $newImageURLs[] = asset(Storage::url($imagePath));
-                \Log::info('Current image URLs array: ' . json_encode($imageURLs));
 
-        }
-        
+            if (!empty($this->tripPhoto) && is_array($this->tripPhoto)) {
+                \Log::info('User selected new pictures for upload. Iterating over new pictures..');
+                
+
+                foreach($this->tripPhoto as $photo){
+                                                  
+                        $imagePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
+                        $photo->storeAs('public', $imagePath);
+                        $newImageURLs[] = asset(Storage::url($imagePath));
+                        \Log::info('Current image URLs array: ' . json_encode($imageURLs));
+
+                }
+                
+    
+            }
 
             $product = $this->stripe->products->create([
                 'name' => $this->tripLocation,
