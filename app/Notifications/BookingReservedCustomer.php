@@ -36,7 +36,7 @@ class BookingReservedCustomer extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->subject('Reservation Confirmation - '.$this->data['reservationID'])
+                    ->subject('Reservation Confirmation - '.$this->data['tripLocation'])
                     ->greeting('Dear '.$this->data['name'].',')
                     ->line('We are pleased to confirm your reservation for the upcoming trip to '.$this->data['tripLocation'].'.')
                     ->line('Reservation Details:')
