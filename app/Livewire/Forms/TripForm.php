@@ -42,7 +42,7 @@ class TripForm extends Form {
     
     // Validate that 'tripPhoto' is an array of images with specific rules
     #[Validate('required|array|max:3')]
-    public ?array $tripPhotos = [];
+    public ?array $tripPhoto = [];
 
     public string $status = '';
     public string $error = '';
@@ -51,7 +51,7 @@ class TripForm extends Form {
     {
 
         $rules = [
-            'tripPhotos.*' => 'image|mimes:jpeg,png,jpg', // Validation for each file
+            'tripPhoto.*' => 'image|mimes:jpeg,png,jpg', // Validation for each file
             'tripLocation' => 'required|string',
             'tripLandscape' => 'required|array',
             'tripAvailability' => 'required|string',
@@ -73,8 +73,8 @@ class TripForm extends Form {
 
 
     protected $messages =[
-        'tripPhotos.image'=>'The image you selected is not valid',
-        'tripPhotos.mimes'=>'The image you selected must be a valid jpg, jpeg, or png file',
+        'tripPhoto.image'=>'The image you selected is not valid',
+        'tripPhoto.mimes'=>'The image you selected must be a valid jpg, jpeg, or png file',
         'tripLocation.required'=>'Provide the location of this trip',
         'tripLandscape.required'=>'Select the landscapes available in this trip',
         'tripAvailability.required'=>'Select the availability of this trip',
@@ -85,7 +85,7 @@ class TripForm extends Form {
     ];
 
     protected $validattionAttributes = [
-        'tripPhotos'=>'Photos',
+        'tripPhoto'=>'Photos',
         'tripLocation'=> 'Location',
         'tripLandscape'=>'Landscape',
         'tripAvailability'=>'Availability',
@@ -159,8 +159,7 @@ class TripForm extends Form {
             if(!file_exists($dirPath)){
                 mkdir($dirPath, 0755, true);
             }
-
-            foreach($this->tripPhotos as $photo){
+            foreach($this->tripPhoto as $photo){
                                                           
                 $imagePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
                 $photo->storeAs('public', $imagePath);
@@ -168,6 +167,7 @@ class TripForm extends Form {
                 \Log::info('Current image URLs array: ' . json_encode($imageURLs));
 
         }
+        
 
             $product = $this->stripe->products->create([
                 'name' => $this->tripLocation,
@@ -194,7 +194,7 @@ class TripForm extends Form {
                         'tripActivities' => $this->tripActivities,
                         'tripLandscape' => $tripLandscapeJson,
                         'tripAvailability' => $this->tripAvailability,
-                        'tripPhotos' => json_encode($imageURLs),
+                        'tripPhoto' => json_encode($imageURLs),
                         'tripStartDate' => !empty($this->tripStartDate) ? $this->tripStartDate : Carbon::now()->format('Y-m-d'),
                         'tripEndDate' => !empty($this->tripEndDate) ? $this->tripEndDate : Carbon::now()->format('Y-m-d'),
                         'tripPrice' => $this->tripPrice,
@@ -231,7 +231,7 @@ class TripForm extends Form {
         $this->tripActivities = '';
         $this->tripLandscape = [];
         $this->tripAvailability = '';
-        $this->tripPhotos = []; // Reset file array
+        $this->tripPhoto = []; // Reset file array
         $this->tripStartDate = '';
         $this->tripEndDate = '';
         $this->tripPrice = 0;
