@@ -19,7 +19,7 @@ use Carbon\Carbon;
 
 // Dispatch events and notifications to users for trip availability status updates
 use App\Events\TripBecameAvailable;
-use App\Notifications\TripAavailableNotification;
+use App\Notifications\TripAvailableNotification;
 
 // Helper class for image resizing 
 Use App\Helpers\Helper; 
