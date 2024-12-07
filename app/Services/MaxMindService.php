@@ -12,7 +12,7 @@ class MaxMindService
 
     public function __construct()
     {
-        // Path to your GeoLite2 database file
+        
         $databasePath = storage_path('app/mmdb/GeoLite2-Country_20241129/GeoLite2-Country_20241129/GeoLite2-Country.mmdb');
         if (!file_exists($databasePath)) {
             throw new \Exception('GeoLite2-Country database not found at ' . $databasePath);

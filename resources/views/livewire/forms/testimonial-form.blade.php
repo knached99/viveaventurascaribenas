@@ -1,13 +1,13 @@
 <section class="ftco-section py-5">
     <div class="container">
         <div class="row justify-content-center pb-4">
+          
             <div class="col-md-12 heading-section text-center ">
                 <h2 class="mb-4">Share Your Travel Experience with Us!</h2>
                 <p class="text-secondary">Your feedback helps us improve and inspires other travelers. We'd love to hear
                     about your journey!</p>
-
-
             </div>
+
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6">
                     <div class="blog-entry p-4  shadow-md rounded bg-light">

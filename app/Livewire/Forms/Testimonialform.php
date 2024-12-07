@@ -91,11 +91,8 @@ class TestimonialForm extends Component
 
         $this->protectAgainstSpam();
 
-        
-
+    
         // Prevent testimonial submissions unless the user is a legit customer 
-
-       
 
         try {
 
