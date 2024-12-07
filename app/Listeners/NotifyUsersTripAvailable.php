@@ -25,15 +25,15 @@ class NotifyUsersTripAvailable implements ShouldQueue
                 ->notify(new TripAvailableNotification($event->trip, $reservation->reservationID, $reservation->customerName));
         }
 
-        // Trigger the laravel queue worker manually 
-
-        $phpBinary = '/usr/bin/php8.3-cli';
-
-        $artisanPath = base_path('artisan');
-
-        // using process instead of shell_exec() as it is safer 
-
-        $process = new Process([$phpBinary, $artisanPath, 'queue:work', '--once']);
-        $process->start();
+         
+        try {
+            // Using process instead of shell_exec() as it is safer
+            $process = new Process([$phpBinary, $artisanPath, 'queue:work', '--once']);
+            $process->start();
+            \Log::info('Queue worker process started successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error starting the queue worker process: ' . $e->getMessage());
+        }
+        
     }
 }
