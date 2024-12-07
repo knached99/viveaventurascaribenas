@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace App\Listeners;
 
 use App\Events\TripBecameAvailable;
@@ -30,6 +30,7 @@ class NotifyUsersTripAvailable implements ShouldQueue
         $artisanPath = '/homepages/19/d4298629231/htdocs/viveaventurascaribenas/artisan';  // Update artisan path
 
         try {
+            \Log::info('Attempting to run the queue:work process...');
             // Using process instead of shell_exec() as it is safer
             $process = new Process([$phpBinary, $artisanPath, 'queue:work', '--once']);
             $process->run();
