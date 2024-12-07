@@ -16,7 +16,7 @@
                 <div class="ftco-footer-widget mb-4 ml-md-5">
                     <h2 class="ftco-heading-2">Information</h2>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="py-2 d-block">Vacation Agreement</a></li>
+                        <li><a href="{{route('landing.vacation-agreement')}}" class="py-2 d-block">Vacation Agreement</a></li>
                         <li><a href="{{ route('privacy') }}" class="py-2 d-block">Privacy Policy</a></li>
                         <li><a href="{{ route('terms') }}" class="py-2 d-block">Terms and Conditions</a>
                         </li>
