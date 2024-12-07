@@ -180,17 +180,17 @@ class TripForm extends Form {
                 'name' => $this->tripLocation,
                 'description' => $this->tripDescription,
                 'images' => $imageURLs, // Pass the correct array of image URLs
+                'tax_code' => 'txcd_20030000', // Tax code for travel-related services
             ]);
-            
+
             if ($product) {
-                $price = $this->stripe->prices->create([
-                    'unit_amount' => $this->tripPrice * 100, // Stripe uses cents
-                    'currency' => 'usd',
+               $price = $this->stripe->prices->create([
                     'product' => $product->id,
-                    'tax_code'=>'txcd_20030000', // General Services 
-                    'tax_behavior'=> 'exclusive', // Exclusive means tax is excluded from total price and added separately 
+                    'unit_amount' => $this->priceAmount, // Your product's price
+                    'currency' => 'usd', // Currency of the product
+                    'tax_behavior' => 'exclusive', // 'exclusive' or 'inclusive' based on your needs
                 ]);
-    
+                
                 if ($price) {
                     // Reset form and save trip data
                     $this->tripID = Str::uuid(5);
