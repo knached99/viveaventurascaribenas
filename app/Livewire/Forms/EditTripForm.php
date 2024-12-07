@@ -220,10 +220,10 @@ class EditTripForm extends Component
     
         // Validate the uploaded file
         $file = $this->tripPhotos[$index];
-        \Log::info('Validating file...');
+        \Log::info('Validating file: '.$file.'...');
     
         if (!$file instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-            \Log::error('File is not a valid instance of Livewire TemporaryUploadedFile');
+            \Log::error('File: '.$file. ' is not a valid instance of Livewire TemporaryUploadedFile');
             $this->addError('tripPhotos.' . $index, 'Uploaded file is not valid.');
             return;
         }
@@ -248,7 +248,7 @@ class EditTripForm extends Component
        // $photo->storeAs('booking_photos', $fileName, 'public');
         // $filePath = 'booking_photos/' . $fileName;
         // $fullPath = storage_path('app/public/' . $filePath);
-        $filePath = 'booking_photos/'.$photo->hashName() . '.' . $photo->extension();
+        $filePath = 'booking_photos/'.$file->hashName() . '.' . $file->extension();
 
         $storagePath = Storage::disk('public')->path($filePath);
       //  \Log::info('Resizing Image...');
