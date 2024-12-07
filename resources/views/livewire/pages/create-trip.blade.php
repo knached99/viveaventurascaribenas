@@ -77,12 +77,12 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             </div>
                         <!-- Loading Indicator on file upload -->
                         <div class="mb-4">
-                            <label for="tripPhoto" class="form-label">Trip Photos (Choose up to 3 photos)</label>
-                            <input type="file" id="tripPhoto" name="tripPhoto"
-                                class="form-control {{ $errors->has('form.tripPhoto') ? 'is-invalid' : '' }}"
-                                wire:model="form.tripPhoto" multiple />
-                            <x-input-error :messages="$errors->get('form.tripPhoto')" class="invalid-feedback" />
-                            <div wire:loading wire:target="form.tripPhoto" class="mt-2">
+                            <label for="tripPhotos" class="form-label">Trip Photos (Choose up to 3 photos)</label>
+                            <input type="file" id="tripPhotos" name="tripPhotos"
+                                class="form-control {{ $errors->has('form.tripPhotos') ? 'is-invalid' : '' }}"
+                                wire:model="form.tripPhotos" multiple />
+                            <x-input-error :messages="$errors->get('form.tripPhotos')" class="invalid-feedback" />
+                            <div wire:loading wire:target="form.tripPhotos" class="mt-2">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>

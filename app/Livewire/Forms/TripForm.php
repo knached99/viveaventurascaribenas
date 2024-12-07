@@ -42,7 +42,7 @@ class TripForm extends Form {
     
     // Validate that 'tripPhoto' is an array of images with specific rules
     #[Validate('required|array|max:3')]
-    public ?array $tripPhoto = [];
+    public ?array $tripPhotos = [];
 
     public string $status = '';
     public string $error = '';
@@ -160,14 +160,14 @@ class TripForm extends Form {
                 mkdir($dirPath, 0755, true);
             }
 
-            foreach($this->tripPhoto as $photo){
+            foreach($this->tripPhotos as $photo){
+                                                          
                 $imagePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
                 $photo->storeAs('public', $imagePath);
-                $newImageURLs = asset(Storage::url($imagePath));
+                $newImageURLs[] = asset(Storage::url($imagePath));
                 \Log::info('Current image URLs array: ' . json_encode($imageURLs));
 
-            }
-        
+        }
 
             $product = $this->stripe->products->create([
                 'name' => $this->tripLocation,
@@ -231,7 +231,7 @@ class TripForm extends Form {
         $this->tripActivities = '';
         $this->tripLandscape = [];
         $this->tripAvailability = '';
-        $this->tripPhoto = []; // Reset file array
+        $this->tripPhotos = []; // Reset file array
         $this->tripStartDate = '';
         $this->tripEndDate = '';
         $this->tripPrice = 0;
