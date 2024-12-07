@@ -160,10 +160,7 @@ class TripForm extends Form {
                 mkdir($dirPath, 0755, true);
             }
 
-            if (!empty($this->tripPhoto) && is_array($this->tripPhoto)) {
-                \Log::info('User selected new pictures for upload. Iterating over new pictures..');
-                
-
+          
                 foreach($this->tripPhoto as $photo){
                                                   
                         $imagePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
@@ -174,7 +171,7 @@ class TripForm extends Form {
                 }
                 
     
-            }
+          
 
             $product = $this->stripe->products->create([
                 'name' => $this->tripLocation,
