@@ -88,9 +88,9 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                 </div>
                             </div>
                               
-                            @if ($form->tripPhoto)
+                            @if ($form->tripPhotos)
                                 <div class="d-flex flex-wrap gap-2">
-                                    @foreach ($form->tripPhoto as $photo)
+                                    @foreach ($form->tripPhotos as $photo)
                                         <img src="{{ $photo->temporaryUrl() }}" class="img-fluid rounded"
                                             style="max-width: 200px; height: 200px;" />
                                     @endforeach
