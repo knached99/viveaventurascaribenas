@@ -140,56 +140,58 @@ class TripForm extends Form {
 
     public function submitTripForm()
     {
-
         $this->validate();
-
+    
         $tripCostsJson = json_encode($this->tripCosts);
         $tripLandscapeJson = json_encode($this->tripLandscape);
-
-        if(!$this->stripe){
+    
+        if (!$this->stripe) {
             $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
         }
-
+    
         try {
-            $imageURLs = [];
-           // $imagesArray = [];
-
+            $imageURLs = []; // Initialize the correct variable to store image URLs
+    
             // Create booking_photos folder if it does not exist
             $dirPath = storage_path('app/public/booking_photos');
-            if(!file_exists($dirPath)){
+            if (!file_exists($dirPath)) {
                 mkdir($dirPath, 0755, true);
             }
-
-          
-                foreach($this->tripPhoto as $photo){
-                                                  
-                        $imagePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
-                        $photo->storeAs('public', $imagePath);
-                        $newImageURLs[] = asset(Storage::url($imagePath));
-                        \Log::info('Current image URLs array: ' . json_encode($imageURLs));
-
-                }
-                
     
-          
-
+            // Handle uploaded images
+            if (!empty($this->tripPhoto) && is_array($this->tripPhoto)) {
+                foreach ($this->tripPhoto as $photo) {
+                    // Validate that $photo is an UploadedFile instance
+                    if ($photo instanceof \Illuminate\Http\UploadedFile) {
+                        $imagePath = 'booking_photos/' . $photo->hashName();
+                        $photo->storeAs('public', $imagePath); // Save the image
+                        $imageURLs[] = asset(Storage::url($imagePath)); // Store the public URL
+                        \Log::info('Added new image URL: ' . end($imageURLs));
+                    } else {
+                        \Log::warning('Invalid photo skipped: ' . json_encode($photo));
+                    }
+                }
+            } else {
+                \Log::info('No images were selected for upload.');
+            }
+    
+            // Create a product in Stripe
             $product = $this->stripe->products->create([
                 'name' => $this->tripLocation,
                 'description' => $this->tripDescription,
-                'images' => $imageURLs
+                'images' => $imageURLs, // Pass the correct array of image URLs
             ]);
-
+    
             if ($product) {
                 $price = $this->stripe->prices->create([
-                    'unit_amount' => $this->tripPrice * 100, // unit amount in stripe is stored in cents
+                    'unit_amount' => $this->tripPrice * 100, // Stripe uses cents
                     'currency' => 'usd',
                     'product' => $product->id,
                 ]);
-
+    
                 if ($price) {
-                    // Reset the temporary file from Livewire
+                    // Reset form and save trip data
                     $this->tripID = Str::uuid(5);
-
                     $data = [
                         'tripID' => $this->tripID,
                         'stripe_product_id' => $product->id,
@@ -198,37 +200,35 @@ class TripForm extends Form {
                         'tripActivities' => $this->tripActivities,
                         'tripLandscape' => $tripLandscapeJson,
                         'tripAvailability' => $this->tripAvailability,
-                        'tripPhoto' => json_encode($imageURLs),
-                        'tripStartDate' => !empty($this->tripStartDate) ? $this->tripStartDate : Carbon::now()->format('Y-m-d'),
-                        'tripEndDate' => !empty($this->tripEndDate) ? $this->tripEndDate : Carbon::now()->format('Y-m-d'),
+                        'tripPhoto' => json_encode($imageURLs), // Save URLs in the database
+                        'tripStartDate' => $this->tripStartDate ?: Carbon::now()->format('Y-m-d'),
+                        'tripEndDate' => $this->tripEndDate ?: Carbon::now()->format('Y-m-d'),
                         'tripPrice' => $this->tripPrice,
                         'tripCosts' => $tripCostsJson,
                         'num_trips' => intval($this->num_trips) ?? 0,
                         'active' => $this->active ? true : false,
-                        'slug'=>Str::slug($this->tripLocation),
-                        'created_at'=>Carbon::now(),
-                        'updated_at'=>Carbon::now(),
+                        'slug' => Str::slug($this->tripLocation),
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
                     ];
-
-                    // Save trip data
+    
+                    // Save to the database
                     TripsModel::create($data);
-
-                    // Invalidate cache
+    
+                    // Clear cache and reset the form
                     Cache::forget(self::CACHE_KEY_TRIPS);
-
                     $this->resetForm();
-
+    
                     // Set success message
                     $this->status = 'Trip Successfully Created!';
-                  // return redirect('/admin/trip/'.$this->tripID)->with('status', $this->status);
                 }
             }
         } catch (Exception $e) {
             $this->error = 'Something went wrong while creating this trip';
-            \Log::error('Uncaught PHP exception on line: ' . __LINE__ . ' in function: ' . __FUNCTION__ . ' in class: ' . __CLASS__ . ' In file: ' . __FILE__ . ' Error: ' . $e->getMessage());
+            \Log::error('Error on line ' . __LINE__ . ': ' . $e->getMessage());
         }
     }
-
+    
     public function resetForm(): void {
         $this->tripLocation = '';
         $this->tripDescription = '';

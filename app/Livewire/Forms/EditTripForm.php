@@ -405,26 +405,29 @@ class EditTripForm extends Component
               //  \Log::info('Current Image URLs array: '.json_encode($newImageURLs));
 
             
-                $newImageURLs = [];
-                
-                
+           
 
             
                 if (!empty($this->tripPhotos) && is_array($this->tripPhotos)) {
-                        \Log::info('User selected new pictures for upload. Iterating over new pictures..');
-                        
- 
-                        foreach($this->tripPhotos as $photo){
-                                                          
-                                $imagePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
-                                $photo->storeAs('public', $imagePath);
-                                $newImageURLs[] = asset(Storage::url($imagePath));
-                                \Log::info('Current image URLs array: ' . json_encode($imageURLs));
-
+                    \Log::info('User selected new pictures for upload. Iterating over new pictures...');
+                
+                    $newImageURLs = [];
+                
+                    foreach ($this->tripPhotos as $photo) {
+                        // Check if $photo is a valid file object
+                        if ($photo instanceof \Illuminate\Http\UploadedFile) {
+                            $imagePath = 'booking_photos/' . $photo->hashName();
+                            $photo->storeAs('public', $imagePath); // Store the file
+                            $newImageURLs[] = asset(Storage::url($imagePath)); // Generates the URL
+                            \Log::info('Added new image URL: ' . end($newImageURLs));
+                        } else {
+                            \Log::warning('Skipping invalid photo: ' . json_encode($photo));
                         }
-                        
-            
                     }
+                
+                    \Log::info('Final image URLs array: ' . json_encode($newImageURLs));
+                }
+                
                     
                 
                 // \Log::info('Current newImageURLs array: '.json_encode($newImageURLs));
