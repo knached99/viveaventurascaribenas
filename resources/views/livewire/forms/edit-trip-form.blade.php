@@ -84,8 +84,6 @@
                             x-on:livewire-upload-error="uploading = false"
                             x-on:livewire-upload-progress="progress = $event.detail.progress"
                         > 
-                          <!-- File Input -->
-                            <input type="file" wire:model="photo">
                     
                             <!-- Progress Bar -->
                             <div x-show="uploading">
