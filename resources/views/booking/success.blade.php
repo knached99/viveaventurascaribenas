@@ -9,6 +9,9 @@
                 <p>Your payment was successful. We've sent the confirmation details to
                     {{ $customerEmail ?? 'your email' }} <br>
                 </p>
+                <p class="block">
+                If you do not see the email in your inbox, please check your spam folder
+                </p>
                 <a href="/" class="text-indigo-500 font-bold block">Go Home</a>
             </div>
         </div>
