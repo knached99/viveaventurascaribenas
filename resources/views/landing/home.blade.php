@@ -13,7 +13,7 @@
                     class="icon-video popup-vimeo d-flex align-items-center justify-content-center mb-4">
                     <span class="ion-ios-play"></span>
                 </a> --}}
-                <p class="caps" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Beyond the Ordinary. Into the Extraordinary.</p>
+                <p class="caps" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Beyond the Ordinary, Into the Extraordinary </p>
                 <h1 style="font-weight: 900;" data-scrollax="properties: { translateY: '30%', opacity: 1.6 }">Make Your
                     Adventure
                     Amazing With Us</h1>
@@ -113,17 +113,7 @@
             </div>
             <div class="col-md-6">
                 <div class="row">
-                    <div class="col-md-6 d-flex align-self-stretch ftco-animate">
-                        <div class="media block-6 services d-block">
-                            <div class="icon"><span class="flaticon-paragliding"></span></div>
-                            <div class="media-body">
-                                <h3 class="heading mb-3">Activities</h3>
-                                <p>We provide you with a diverse array of activities, perfect for every type of traveler. 
-                                Whether you're seeking adventure, relaxation, or cultural exploration, 
-                                you'll find something to suit your interests at any of our destinations</p>
-                            </div>
-                        </div>
-                    </div>
+                   
                     <div class="col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-route"></span></div>
@@ -141,24 +131,31 @@
                             </div>
                         </div>
                     </div>
+
+                     <div class="col-md-6 d-flex align-self-stretch ftco-animate">
+                        <div class="media block-6 services d-block">
+                            <div class="icon"><span class="flaticon-paragliding"></span></div>
+                            <div class="media-body">
+                                <h3 class="heading mb-3">Activities</h3>
+                                <p>We provide you with a diverse array of activities, perfect for every type of traveler. 
+                                Whether you're seeking adventure, relaxation, or cultural exploration, 
+                                you'll find something to suit your interests at any of our destinations</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-tour-guide"></span></div>
                             <div class="media-body">
-                                <h3 class="heading mb-3">Private Guide</h3>
-                                <p>A small river named Duden flows by their place and supplies it with the necessary</p>
+                                <h3 class="heading mb-3">Transportation Services</h3>
+                                <p>Feel confident in the measures we take to provide you with safety and convenience 
+                                when it comes to exploring your chosen destination! 
+                                With a simple request, enjoy access to beautiful beaches, restaurants, and much more</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 d-flex align-self-stretch ftco-animate">
-                        <div class="media block-6 services d-block">
-                            <div class="icon"><span class="flaticon-map"></span></div>
-                            <div class="media-body">
-                                <h3 class="heading mb-3">Location Manager</h3>
-                                <p>A small river named Duden flows by their place and supplies it with the necessary</p>
-                            </div>
-                        </div>
-                    </div>
+                  
                 </div>
             </div>
         </div>

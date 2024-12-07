@@ -40,6 +40,11 @@ class Home extends Controller
         return view('landing.privacy');
     }
 
+
+    public function vacationAgreement(){
+        return view('landing.vacation-agreement');
+    }
+
     // Optimized for performance 
     public function homePage()
     {

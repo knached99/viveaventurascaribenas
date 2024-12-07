@@ -30,17 +30,7 @@
             </div>
             <div class="col-md-6">
                 <div class="row">
-                    <div class="col-md-6 d-flex align-self-stretch ftco-animate">
-                        <div class="media block-6 services d-block">
-                            <div class="icon"><span class="flaticon-paragliding"></span></div>
-                            <div class="media-body">
-                                <h3 class="heading mb-3">Activities</h3>
-                                <p>Immerse yourself with various activities that are available to you right from day one!
-                                 Allow yourself the opportunity to immerse yourself within a new adventure filled with culture, excitement, & life-long remembering moments. 
-                                 Whether that’s sightseeing, shopping, beach going, night life… Vive tu aventura!</p>
-                            </div>
-                        </div>
-                    </div>
+                   
                     <div class="col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-route"></span></div>
@@ -53,6 +43,18 @@
                                   allowing you to focus on creating memories that will last a lifetime. 
                                   With us, you're not just traveling—you're embarking on an extraordinary adventure.
                                 </p>
+                            </div>
+                        </div>
+                    </div>
+
+                     <div class="col-md-6 d-flex align-self-stretch ftco-animate">
+                        <div class="media block-6 services d-block">
+                            <div class="icon"><span class="flaticon-paragliding"></span></div>
+                            <div class="media-body">
+                                <h3 class="heading mb-3">Activities</h3>
+                                <p>Immerse yourself with various activities that are available to you right from day one!
+                                 Allow yourself the opportunity to immerse yourself within a new adventure filled with culture, excitement, & life-long remembering moments. 
+                                 Whether that’s sightseeing, shopping, beach going, night life… Vive tu aventura!</p>
                             </div>
                         </div>
                     </div>

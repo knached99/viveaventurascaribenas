@@ -16,29 +16,15 @@
                 <div class="ftco-footer-widget mb-4 ml-md-5">
                     <h2 class="ftco-heading-2">Information</h2>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="py-2 d-block">Online Inquiry</a></li>
-                        <li><a href="#" class="py-2 d-block">General Inquiries</a></li>
-                        <li><a href="#" class="py-2 d-block">Booking Agreement</a></li>
+                        <li><a href="#" class="py-2 d-block">Vacation Agreement</a></li>
                         <li><a href="{{ route('privacy') }}" class="py-2 d-block">Privacy Policy</a></li>
                         <li><a href="{{ route('terms') }}" class="py-2 d-block">Terms and Conditions</a>
                         </li>
-                        <li><a href="#" class="py-2 d-block">Call Us</a></li>
+                        <li><a href="tel:+1(607)-373-2208" class="py-2 d-block">Call Us</a></li>
                     </ul>
                 </div>
             </div>
-            {{-- <div class="col-md">
-                <div class="ftco-footer-widget mb-4">
-                    <h2 class="ftco-heading-2">Experience</h2>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="py-2 d-block">Adventure</a></li>
-                        <li><a href="#" class="py-2 d-block">Hotel and Restaurant</a></li>
-                        <li><a href="#" class="py-2 d-block">Beach</a></li>
-                        <li><a href="#" class="py-2 d-block">Nature</a></li>
-                        <li><a href="#" class="py-2 d-block">Camping</a></li>
-                        <li><a href="#" class="py-2 d-block">Party</a></li>
-                    </ul>
-                </div>
-            </div> --}}
+      
             <div class="col-md">
                 <div class="ftco-footer-widget mb-4">
                     <h2 class="ftco-heading-2">Have Any Questions?</h2>
