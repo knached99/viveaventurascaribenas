@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Home;
 use App\Http\Controllers\Analytics;
 use App\Http\Controllers\Admin;
@@ -47,6 +48,25 @@ Route::post('/two-factor-challenge', function(Request $request){
 
     return redirect()->intended();
 })->name('two-factor.verify');
+
+
+// GET URL so IONOS can run the cron jobs 
+
+Route::get('/queue-work', function(){
+
+    $allowedIPs = env('ALLOWED_IPS');
+
+    // Only allow whitelisted IONOS IPs to run the cron job
+
+    if(!in_array($request->ip(), $allowedIPs)){
+        abort(403); 
+    }
+
+    Artisan::call('queue:work', ['--once'=>true]);
+    return 'Queue Processed!';
+
+
+});
 
 
 // Protected Routes 
