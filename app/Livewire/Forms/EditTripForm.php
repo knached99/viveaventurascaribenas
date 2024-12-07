@@ -443,7 +443,7 @@ class EditTripForm extends Component
                         \Log::info('Trip status changed to '.$this->tripAvailability);
                         \Log::info('Fetching all reservations associated with this trip...');
                         $reservations = Reservations::where('tripID', $this->trip->tripID)->get();
-                        \Log::info('Reservations retrieved: ', count($reservations));
+                        \Log::info('Reservations retrieved: ', $reservations->count());
                         // Notify all users who made reservations for this trip
                         foreach ($reservations as $reservation) {
                             \Log::info('Notification being sent to: ' . $reservation->email);
