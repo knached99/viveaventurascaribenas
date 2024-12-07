@@ -188,7 +188,7 @@ class TripForm extends Form {
                     'unit_amount' => $this->tripPrice * 100, // Stripe uses cents
                     'currency' => 'usd',
                     'product' => $product->id,
-                    'tax_behavior'=> 'exclusive', // Exclusive means tax is excluded from total price and added separately 
+                    'tax_behavior'=> 'inclusive', // Inclusive means tax is factored into total price  
 
                 ]);
     
