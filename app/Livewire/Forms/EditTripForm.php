@@ -440,15 +440,18 @@ class EditTripForm extends Component
                         // \Log::info('Dispatching TripBecameAvailable event for trip ID: ' . $tripModel->tripID);
                         // event(new TripBecameAvailable($tripModel));
                         // Fetch reservations associated with this trip
+                        \Log::info('Trip status changed to '.$this->tripAvailability);
+                        \Log::info('Fetching all reservations associated with this trip...');
                         $reservations = Reservations::where('tripID', $this->trip->tripID)->get();
-                                
+                        \Log::info(['Reservations retrieved: ', json_encode($reservations)]);
                         // Notify all users who made reservations for this trip
                         foreach ($reservations as $reservation) {
                             \Log::info('Notification being sent to: ' . $reservation->email);
                             
                             Notification::route('mail', $reservation->email)
                                 ->notify(new TripAvailableNotification($this->trip, $reservation->reservationID, $reservation->customerName));
-                        }
+                                \Log::info('Email sent to '.$reservation->customerName);
+                            }
                     }
                     
                 }
