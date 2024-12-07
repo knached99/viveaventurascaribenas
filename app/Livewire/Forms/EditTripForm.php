@@ -431,10 +431,6 @@ class EditTripForm extends Component
 
                             }
 
-                            else{
-                                \Log::error('File is not a valid instance of Livewire TemporaryUploadedFile');
-                                $this->error = 'Uploaded file is not valid. Please select another file';
-                            }
                         }
                         
             
