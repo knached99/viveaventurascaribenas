@@ -51,7 +51,7 @@ class TripForm extends Form {
     {
 
         $rules = [
-            'tripPhoto.*' => 'image|mimes:jpeg,png,jpg', // Validation for each file
+            'tripPhotos.*' => 'image|mimes:jpeg,png,jpg', // Validation for each file
             'tripLocation' => 'required|string',
             'tripLandscape' => 'required|array',
             'tripAvailability' => 'required|string',
@@ -73,8 +73,8 @@ class TripForm extends Form {
 
 
     protected $messages =[
-        'tripPhoto.image'=>'The image you selected is not valid',
-        'tripPhoto.mimes'=>'The image you selected must be a valid jpg, jpeg, or png file',
+        'tripPhotos.image'=>'The image you selected is not valid',
+        'tripPhotos.mimes'=>'The image you selected must be a valid jpg, jpeg, or png file',
         'tripLocation.required'=>'Provide the location of this trip',
         'tripLandscape.required'=>'Select the landscapes available in this trip',
         'tripAvailability.required'=>'Select the availability of this trip',
@@ -85,7 +85,7 @@ class TripForm extends Form {
     ];
 
     protected $validattionAttributes = [
-        'tripPhoto'=>'Photos',
+        'tripPhotos'=>'Photos',
         'tripLocation'=> 'Location',
         'tripLandscape'=>'Landscape',
         'tripAvailability'=>'Availability',
@@ -194,7 +194,7 @@ class TripForm extends Form {
                         'tripActivities' => $this->tripActivities,
                         'tripLandscape' => $tripLandscapeJson,
                         'tripAvailability' => $this->tripAvailability,
-                        'tripPhoto' => json_encode($imageURLs),
+                        'tripPhotos' => json_encode($imageURLs),
                         'tripStartDate' => !empty($this->tripStartDate) ? $this->tripStartDate : Carbon::now()->format('Y-m-d'),
                         'tripEndDate' => !empty($this->tripEndDate) ? $this->tripEndDate : Carbon::now()->format('Y-m-d'),
                         'tripPrice' => $this->tripPrice,
