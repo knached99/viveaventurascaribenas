@@ -7,6 +7,7 @@ use App\Models\TripsModel;
 use App\Models\Reservations;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Stripe\StripeClient;
@@ -18,8 +19,7 @@ use Carbon\Carbon;
 
 // Dispatch events and notifications to users for trip availability status updates
 use App\Events\TripBecameAvailable;
-use App\Listeners\SendNotificationOfTripAvailability;
-use App\Notifications\TripAvailabilityNotification;
+use App\Notifications\TripAavailableNotification;
 
 // Helper class for image resizing 
 Use App\Helpers\Helper; 
@@ -437,8 +437,18 @@ class EditTripForm extends Component
                 if ($tripModel->tripAvailability !== $this->tripAvailability) {
                     \Log::info('Trip availability has changed.');
                     if (strtolower($this->tripAvailability) === 'available') {
-                        \Log::info('Dispatching TripBecameAvailable event for trip ID: ' . $tripModel->tripID);
-                        event(new TripBecameAvailable($tripModel));
+                        // \Log::info('Dispatching TripBecameAvailable event for trip ID: ' . $tripModel->tripID);
+                        // event(new TripBecameAvailable($tripModel));
+                        // Fetch reservations associated with this trip
+                        $reservations = Reservations::where('tripID', $this->trip->tripID)->get();
+                                
+                        // Notify all users who made reservations for this trip
+                        foreach ($reservations as $reservation) {
+                            \Log::info('Notification being sent to: ' . $reservation->email);
+                            
+                            Notification::route('mail', $reservation->email)
+                                ->notify(new TripAvailableNotification($this->trip, $reservation->reservationID, $reservation->customerName));
+                        }
                     }
                     
                 }
