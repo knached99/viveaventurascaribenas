@@ -5,7 +5,6 @@ namespace App\Livewire\Forms;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\WithFileUploads;
-use Livewire\TemporaryUploadedFile;
 use Livewire\Form;
 use Illuminate\Support\Facades\Cache;
 use App\Models\TripsModel;
@@ -162,19 +161,13 @@ class TripForm extends Form {
             }
             foreach($this->tripPhoto as $photo){
 
-                if($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile){
-
                 $image = $photo->getRealPath();
 
                 $filePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
                 $fullPath = storage_path('app/public/'.$filePath);
 
                 $imageURLs[] = asset(Storage::url($filePath));
-            }
-            else{
-                $this->error = 'Cannot upload the selected files. Please choose other files to upload';
-                \Log::error('File is not a valid instance of Livewire TemporaryUploadedFile');
-            }
+          
             }
 
             $product = $this->stripe->products->create([

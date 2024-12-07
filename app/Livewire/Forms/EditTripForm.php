@@ -3,7 +3,6 @@ namespace App\Livewire\Forms;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Livewire\TemporaryUploadedFile;
 use App\Models\TripsModel;
 use App\Models\Reservations;
 use Illuminate\Support\Facades\Storage;
@@ -222,11 +221,6 @@ class EditTripForm extends Component
         $file = $this->tripPhotos[$index];
         \Log::info('Validating file: '.$file.'...');
     
-        if (!$file instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-            \Log::error('File: '.$file. ' is not a valid instance of Livewire TemporaryUploadedFile');
-            $this->addError('tripPhotos.' . $index, 'Uploaded file is not valid.');
-            return;
-        }
     
         $this->validate([
             'tripPhotos.' . $index => 'required|image|mimes:jpeg,png,jpg|max:5120',
@@ -421,15 +415,11 @@ class EditTripForm extends Component
                         
  
                         foreach($this->tripPhotos as $photo){
-                            
-                            if($photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile){
-                              
+                                                          
                                 $imagePath = 'booking_photos/'.$photo->hashName().'.'.$photo->extension();
                                 $photo->storeAs('public', $imagePath);
                                 $newImageURLs[] = asset(Storage::url($imagePath));
                                 \Log::info('Current image URLs array: ' . json_encode($imageURLs));
-
-                            }
 
                         }
                         
