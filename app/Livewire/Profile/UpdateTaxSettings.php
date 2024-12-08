@@ -61,8 +61,10 @@ class UpdateTaxSettings extends Component
         $tax = $stripe->tax->settings->update([
             'defaults'=>[
                 'tax_behavior'=> 'exclusive',
+                'tax_code'=> 'txcd_20030000', // General Services 
             
             ],
+            
             'head_office'=> [
                 'address' => [
                     'city'=>$this->city,

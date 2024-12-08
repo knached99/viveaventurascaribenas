@@ -220,6 +220,7 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
                         ],
                     ],
                     'unit_amount' => $amount * 100, // Stripe requires amount in cents
+                    'tax_behavior'=>'exclusive',
                 ],
                 'quantity' => 1,
             ]],
@@ -235,15 +236,16 @@ private function createStripeCheckoutSession($customerId, $trip, $tripName, $amo
             'mode' => 'payment',
             'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID='.$this->tripID.'&name='.base64_encode($this->name).'&email='.base64_encode($this->email),
       
-    'cancel_url' => url('/booking/cancel') . '?' . http_build_query([
-        'tripID' => $this->tripID,
-        'name' => $this->name,
-        'email' => $this->email,
-    ]),
+            'cancel_url' => url('/booking/cancel') . '?' . http_build_query([
+                'tripID' => $this->tripID,
+                'name' => $this->name,
+                'email' => $this->email,
+            ]),
 
             'metadata' => [
                 'tripID' => $this->tripID,
                 'stripe_product_id' => $trip->stripe_product_id,
+                'tax_code'=>'txcd_20030000', // General Services 
                 'name' => $this->name,
                 'email' => $this->email,
                 'phone_number' => $this->phone_number,
