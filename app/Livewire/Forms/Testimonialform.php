@@ -18,7 +18,6 @@ use Exception;
 
 class TestimonialForm extends Component
 {
-    public PostForm $form; 
     public HoneypotData $extraFields;
 
    
@@ -139,11 +138,12 @@ class TestimonialForm extends Component
 
         $this->name = '';
         $this->email = '';
-        $this->tripID = ''; // Reset tripID
+        $this->tripID = '';
         $this->trip_date = '';
         $this->trip_rating = 0;
         $this->testimonial = '';
         $this->consent = false;
+
     }
 
 

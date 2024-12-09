@@ -167,7 +167,7 @@
         <div class="row d-flex">
             <div class="col-md-6 d-flex">
                 <div class="img d-flex align-self-stretch"
-                    style="background-image:url({{ asset('assets/images/tropicalParaglider.avif') }});"></div>
+                    style="background-image:url({{ asset('assets/images/homePageBg1.png') }});"></div>
             </div>
             <div class="col-md-6 pl-md-5 py-5">
                 <div class="row justify-content-start pb-3">
