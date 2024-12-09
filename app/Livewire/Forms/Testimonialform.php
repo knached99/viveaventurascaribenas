@@ -24,11 +24,6 @@ class TestimonialForm extends Component
     public array $trips = [];
     public string $testimonialID;
     
-    public function __construct()
-    {
-        $this->testimonialID = (string) Str::uuid(); // Generate UUID for the testimonialID
-    }
-
     public string $name = '';
 
     public string $email = '';
@@ -83,6 +78,8 @@ class TestimonialForm extends Component
             ->orWhere('tripEndDate', '<', Carbon::now())
             ->get()
             ->toArray();
+            //$this->testimonialID = (string) Str::uuid(); // Generate UUID for the testimonialID
+
     }
 
     public function submitTestimonialForm(): void 
@@ -105,10 +102,10 @@ class TestimonialForm extends Component
 
 
             $data = [
-                'testimonialID' => $this->testimonialID,
+                'testimonialID' => Str::uuid(), // Generate UUID for the testimonialID
                 'name' => $this->name,
                 'email' => $this->email,
-                'tripID' => $this->tripID, // Store the selected tripID
+                'tripID' => $this->tripID,
                 'trip_date' => $this->trip_date,
                 'trip_rating' => $this->trip_rating,
                 'testimonial' => $this->testimonial,
