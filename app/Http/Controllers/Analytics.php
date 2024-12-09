@@ -68,26 +68,25 @@ class Analytics extends Controller
        arsort($urlCounts);
        $mostVisitedURL = array_key_first($urlCounts);
 
+       $visitorReferrers = DB::table('visitors')->select('visitor_referrer')->whereNotNull('visitor_referrer')->get();
 
-       // Calcualte where most of the referrers are from 
-        $topReferrerURLs = array_column($visitors, 'visitor_referrer');
+       // Convert collection to an array of visitor_referrer values
+        $topReferrerURLs = $visitorReferrers->pluck('visitor_referrer')->toArray();
 
-        // Replacing null or non string values with 'unknown' 
+        // Replace null or non-string values with 'unknown'
         $topReferrerURLs = array_map(
             fn($url) => is_string($url) && $url !== '' ? $url : 'unknown',
             $topReferrerURLs
         );
 
-        // counting total number of occurrences of each referrer 
-
+        // Count total number of occurrences of each referrer
         $referrerURLCounts = array_count_values($topReferrerURLs);
 
+        // Sort referrers by count in descending order
         arsort($referrerURLCounts);
 
-        // Here, we're retrieving the most common referrer url 
-
+        // Retrieve the most common referrer URL
         $topReferrerURL = array_key_first($referrerURLCounts);
-        
        // Count total visitors
        $totalVisitors = count($visitors);
    
