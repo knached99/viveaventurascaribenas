@@ -1,11 +1,11 @@
 
 <!-- Status Messages -->
 <div>
-   @if ($status)
+   @if (isset($status))
      <div class="mb-4 alert alert-success" role="alert">
           {{$status }}
        </div>
- @elseif($error)
+ @elseif(isset($error))
  <div class="mb-4 alert alert-danger" role="alert">
  {{$error}}
     </div>
