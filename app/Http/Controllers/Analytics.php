@@ -52,7 +52,7 @@ class Analytics extends Controller
 
    public function showAnalytics()
    {
-    
+
         $visitors = VisitorModel::select(
             'visitor_uuid', 
             'visitor_ip_address', 
@@ -62,13 +62,7 @@ class Analytics extends Controller
             'visited_at', 
             'unique_identifier'
         )
-        ->whereNotNull('visitor_uuid')
-        ->whereNotNull('visitor_ip_address')
-        ->whereNotNull('visitor_user_agent')
-        ->whereNotNull('visited_url')
         ->whereNotNull('visitor_referrer')
-        ->whereNotNull('visited_at')
-        ->whereNotNull('unique_identifier')
         ->get()
         ->toArray();
 
