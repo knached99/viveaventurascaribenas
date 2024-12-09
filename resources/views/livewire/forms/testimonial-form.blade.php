@@ -1,5 +1,4 @@
-<section class="ftco-section py-5">
-    <div class="container">
+ <div class="container">
         <div class="row justify-content-center pb-4">
           
             <div class="col-md-12 heading-section text-center ">
@@ -126,14 +125,14 @@
 
                             <!-- Status Messages -->
                             <div>
-                                @if (!empty($status))
+                                  @if ($status)
                                     <div class="mb-4 alert alert-success" role="alert">
-                                        {{ $status }}
+                                        {{$status }}
                                     </div>
-                                @elseif(!empty($error))
-                                    <div class="mb-4 alert alert-danger" role="alert">
-                                        {{ $error }}
-                                    </div>
+                                @elseif($error)
+                                <div class="mb-4 alert alert-danger" role="alert">
+                                {{$error}}
+                                </div>
                                 @endif
                             </div>
                             <!-- / Status Messages -->
@@ -142,4 +141,3 @@
                 </div>
             </div>
         </div>
-</section>
