@@ -1,24 +1,27 @@
-<?php 
+<?php
 
 namespace App\Livewire\Forms;
 
+use Livewire\Attributes\Validate;
+use App\Livewire\Forms\PostForm;
+use Livewire\Component;
 use Carbon\Carbon;
 use App\Models\Testimonials;
 use App\Models\TripsModel;
 use App\Models\BookingModel;
 use Spatie\Honeypot\Http\Livewire\Concerns\UsesSpamProtection;
 use Spatie\Honeypot\Http\Livewire\Concerns\HoneypotData;
-// use App\Mail\TestimonialSubmitted;
-use Livewire\Component;
-use Livewire\Attributes\Validate;
-// use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\TestimonialSubmitted;
 use Exception;
 
-class TestimonialForm extends Component 
+class TestimonialForm extends Component
 {
+    public PostForm $form; 
+    public HoneypotData $extraFields;
+
+   
     use UsesSpamProtection;
 
     public array $trips = [];
@@ -41,7 +44,6 @@ class TestimonialForm extends Component
 
     public string $status = '';
     public string $error = '';
-
 
 
     protected $rules = [
@@ -68,7 +70,6 @@ class TestimonialForm extends Component
         'consent.accepted'=>'You must consent to submitting your testimonial'
     ];
 
-    public HoneypotData $extraFields;
     
     public function mount()
     {
@@ -79,30 +80,26 @@ class TestimonialForm extends Component
             ->get()
             ->toArray();
             //$this->testimonialID = (string) Str::uuid(); // Generate UUID for the testimonialID
-
     }
 
-    public function submitTestimonialForm(): void 
-    {
-        $this->validate();
 
+    public function submitTestimonialForm(): void {
+    
+        $this->validate();
         $this->protectAgainstSpam();
 
-    
-        // Prevent testimonial submissions unless the user is a legit customer 
-
-        try {
+        try{
 
             $booking = BookingModel::where('email', $this->email)->first();
 
             if(empty($booking)){
-                $this->error = 'You cannot submit a testimonial if you have not booked a trip with us';
-                return; // Kills PHP script to prevent form submission 
+
+                $this->error = 'You cannot submit a testimonial unless you\'ve booked a trip with us';
+                return; // Kills the PHP script to prevent form submission 
             }
 
-
             $data = [
-                'testimonialID' => Str::uuid(), // Generate UUID for the testimonialID
+                'testimonialID' => Str::uuid(),
                 'name' => $this->name,
                 'email' => $this->email,
                 'tripID' => $this->tripID,
@@ -110,13 +107,10 @@ class TestimonialForm extends Component
                 'trip_rating' => $this->trip_rating,
                 'testimonial' => $this->testimonial,
                 'consent' => $this->consent,
-                'testimonial_approval_status' => 'Pending'
+                'testimonial_approval_status' => 'Pending',
             ];
 
-
-            // Create a new testimonial with the data
             Testimonials::create($data);
-
             $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com';
             $notificationClass = TestimonialSubmitted::class;
             $this->sendNotification($data, $recipientEmail, $notificationClass);
@@ -124,21 +118,25 @@ class TestimonialForm extends Component
             $this->status = 'Your testimonial has been submitted! Thank you for providing valuable feedback!';
             $this->resetForm();
 
-        } catch (Exception $e) {
+            
+        }
+
+        catch(Exception $e){
             $this->error = 'Unable to submit testimonial form. Please try again later';
             $this->resetForm();
             \Log::error('Uncaught Exception: ' . $e->getMessage());
         }
     }
 
-    public function sendNotification(array $data, string $recipientEmail, string $notificationClass): void 
-    {
+
+    public function sendNotification(array $data, string $recipientEmail, string $notificationClass): void {
+
         Notification::route('mail', $recipientEmail)->notify(new $notificationClass($data));
-        // Mail::to($recipientEmail)->send(new $notificationClass($data));
     }
 
-    public function resetForm(): void 
-    {
+
+    public function resetForm(): void {
+
         $this->name = '';
         $this->email = '';
         $this->tripID = ''; // Reset tripID
@@ -148,10 +146,13 @@ class TestimonialForm extends Component
         $this->consent = false;
     }
 
-    public function render()
-    {
+
+    public function render(){
+
         return view('livewire.forms.testimonial-form', [
-            'trips' => $this->trips
+            'trips'=>$this->trips,
         ]);
     }
+
+
 }
