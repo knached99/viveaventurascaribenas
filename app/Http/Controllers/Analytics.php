@@ -52,15 +52,26 @@ class Analytics extends Controller
 
    public function showAnalytics()
    {
-       $visitors = VisitorModel::select(
-           'visitor_uuid', 
-           'visitor_ip_address', 
-           'visitor_user_agent', 
-           'visited_url', 
-           'visitor_referrer', 
-           'visited_at', 
-           'unique_identifier'
-       )->get()->toArray();
+    
+        $visitors = VisitorModel::select(
+            'visitor_uuid', 
+            'visitor_ip_address', 
+            'visitor_user_agent', 
+            'visited_url', 
+            'visitor_referrer', 
+            'visited_at', 
+            'unique_identifier'
+        )
+        ->whereNotNull('visitor_uuid')
+        ->whereNotNull('visitor_ip_address')
+        ->whereNotNull('visitor_user_agent')
+        ->whereNotNull('visited_url')
+        ->whereNotNull('visitor_referrer')
+        ->whereNotNull('visited_at')
+        ->whereNotNull('unique_identifier')
+        ->get()
+        ->toArray();
+
    
        // Calculate the most visited URL
        $mostVisitedURLs = array_column($visitors, 'visited_url');
@@ -68,25 +79,26 @@ class Analytics extends Controller
        arsort($urlCounts);
        $mostVisitedURL = array_key_first($urlCounts);
 
-       $visitorReferrers = DB::table('visitors')->select('visitor_referrer')->whereNotNull('visitor_referrer')->get();
 
-       // Convert collection to an array of visitor_referrer values
-        $topReferrerURLs = $visitorReferrers->pluck('visitor_referrer')->toArray();
+       // Calcualte where most of the referrers are from 
+        $topReferrerURLs = array_column($visitors, 'visitor_referrer');
 
-        // Replace null or non-string values with 'unknown'
+        // Replacing null or non string values with 'unknown' 
         $topReferrerURLs = array_map(
             fn($url) => is_string($url) && $url !== '' ? $url : 'unknown',
             $topReferrerURLs
         );
 
-        // Count total number of occurrences of each referrer
+        // counting total number of occurrences of each referrer 
+
         $referrerURLCounts = array_count_values($topReferrerURLs);
 
-        // Sort referrers by count in descending order
         arsort($referrerURLCounts);
 
-        // Retrieve the most common referrer URL
+        // Here, we're retrieving the most common referrer url 
+
         $topReferrerURL = array_key_first($referrerURLCounts);
+        
        // Count total visitors
        $totalVisitors = count($visitors);
    
