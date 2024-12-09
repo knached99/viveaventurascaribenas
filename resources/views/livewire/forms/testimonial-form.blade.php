@@ -1,3 +1,16 @@
+  <!-- Status Messages -->
+                            <div>
+                                  @if ($status)
+                                    <div class="mb-4 alert alert-success" role="alert">
+                                        {{$status }}
+                                    </div>
+                                @elseif($error)
+                                <div class="mb-4 alert alert-danger" role="alert">
+                                {{$error}}
+                                </div>
+                                @endif
+                            </div>
+                            <!-- / Status Messages -->
  <div class="container">
         <div class="row justify-content-center pb-4">
           
@@ -123,19 +136,7 @@
 
                             </div>
 
-                            <!-- Status Messages -->
-                            <div>
-                                  @if ($status)
-                                    <div class="mb-4 alert alert-success" role="alert">
-                                        {{$status }}
-                                    </div>
-                                @elseif($error)
-                                <div class="mb-4 alert alert-danger" role="alert">
-                                {{$error}}
-                                </div>
-                                @endif
-                            </div>
-                            <!-- / Status Messages -->
+                           
                         </form>
                     </div>
                 </div>
