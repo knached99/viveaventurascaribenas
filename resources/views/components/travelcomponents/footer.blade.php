@@ -89,7 +89,7 @@
 <script src="{{ asset('assets/js/aos.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.animateNumber.min.js') }}"></script>
 <script src="{{ asset('assets/js/bootstrap-datepicker.js') }}"></script>
-<script src="{{ asset('assets/js/scrollax.min.js') }}"></script>
+{{-- <script src="{{ asset('assets/js/scrollax.min.js') }}"></script> --}}
 <script src="{{ asset('assets/js/main.js') }}"></script>
 <script src="{{ asset('assets/js/carousel.js') }}"></script>
 
