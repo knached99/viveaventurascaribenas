@@ -176,11 +176,10 @@
                                 <span class="warning-badge">{{ $trip->tripAvailability }}</span>
                                 <!-- Add a disclaimer -->
                                 <br />
-                                <span class="text-dark mt-3" style="font-style: italic; ">This trip will be available soon!
-                                    Once
-                                    we have enough travelers,
-                                    dates will be released. Let us know your preferred month to travel, and we’ll do our best to
-                                    accommodate.</span>
+                                <span class="text-dark mt-3" style="font-style: italic; ">Exciting news! This trip will be available soon! 
+                                Let us know your preferred travel dates,
+                                 and we will reach out within 24-48 hours to see how we can accommodate you.
+                                </span>
                             @break
 
                             @case('unavailable')
