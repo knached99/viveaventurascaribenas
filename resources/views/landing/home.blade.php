@@ -102,7 +102,7 @@
 <section class="ftco-section services-section bg-light">
     <div class="container">
         <div class="row d-flex">
-            <div class="col-12 col-md-6 order-md-last heading-section pl-md-5 ftco-animate">
+            <div class="col-md-6 order-md-last heading-section pl-md-5 ftco-animate">
                 <h2 class="mb-4">It's time to start your adventure</h2>
                 <p>Welcome to Vive Aventuras Caribeñas, your gateway to unforgettable travel experiences in the Caribbean and beyond.
                  We specialize in creating immersive, curated journeys that take you to stunning destinations,
@@ -111,9 +111,8 @@
                  making each trip a memory you’ll cherish forever.</p>
                 <p><a href="{{ route('destinations') }}" class="btn btn-primary py-3 px-4">Book a Travel</a></p>
 
-                 <div 
-                    style="background-image:url({{ asset('assets/images/old_san_juan.png') }}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
-                </div>
+            <div style="background-image:url({{asset('assets/images/old_san_juan.png')}}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
+            </div>
 
             
             <div class="col-md-6">
