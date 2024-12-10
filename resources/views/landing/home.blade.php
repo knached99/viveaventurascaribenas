@@ -164,19 +164,11 @@
 
 <section class="ftco-counter img" id="section-counter">
     <div class="container">
-       <div class="row d-flex">
-    <div class="col-md-6 d-flex">
-        <div class="img d-flex align-self-stretch"
-            style="background-image:url({{ asset('assets/images/homeBg.png') }}); 
-                   background-size: contain; 
-                   background-repeat: no-repeat; 
-                   background-position: center; 
-                   width: 100%; 
-                   height: auto;">
+        <div class="row d-flex">
+            <div class="col-md-6 d-flex">
+              <div class="img d-flex align-self-stretch"
+            style="background-image:url({{ asset('assets/images/homeBg.png') }}); background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%;">
         </div>
-        </div>
-    </div>
-
 
             </div>
             <div class="col-md-6 pl-md-5 py-5">
