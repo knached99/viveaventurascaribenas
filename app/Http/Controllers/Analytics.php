@@ -15,10 +15,10 @@ class Analytics extends Controller
     protected $maxMindService;
     protected $CrawlerDetect ; 
 
-    public function __construct(MaxMindService $maxMindService, $CrawlerDetect)
+    public function __construct(MaxMindService $maxMindService, CrawlerDetect $crawlerDetect)
     {
         $this->maxMindService = $maxMindService;
-        $this->CrawlerDetect = new CrawlerDetect;
+        $this->crawlerDetect = $crawlerDetect;
     
     }
 
@@ -235,15 +235,14 @@ class Analytics extends Controller
     {
         $userAgents = array_column($visitors, 'visitor_user_agent');
     
-        $crawlerDetect = new CrawlerDetect();
         $botCounts = [];
         $totalBots = 0;
         $totalVisitors = count($visitors);
     
         foreach ($userAgents as $userAgent) {
-            if ($crawlerDetect->isCrawler($userAgent)) {
+            if ($this->crawlerDetect->isCrawler($userAgent)) {
                 $totalBots++;
-                $botName = $crawlerDetect->getMatches();
+                $botName = $this->crawlerDetect->getMatches();
                 $botCounts[$botName] = ($botCounts[$botName] ?? 0) + 1;
             }
         }
