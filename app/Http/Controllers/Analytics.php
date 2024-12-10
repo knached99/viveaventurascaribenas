@@ -8,15 +8,18 @@ use App\Models\VisitorModel;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-
+use Jaybizzle\CrawlerDetect\CrawlerDetect;
 
 class Analytics extends Controller
 {
     protected $maxMindService;
+    protected $CrawlerDetect ; 
 
-    public function __construct(MaxMindService $maxMindService)
+    public function __construct(MaxMindService $maxMindService, $CrawlerDetect)
     {
         $this->maxMindService = $maxMindService;
+        $this->CrawlerDetect = new CrawlerDetect;
+    
     }
 
     
@@ -61,6 +64,7 @@ class Analytics extends Controller
            'visited_at', 
            'unique_identifier'
        )->get()->toArray();
+
    
        // Calculate the most visited URL
        $mostVisitedURLs = array_column($visitors, 'visited_url');
@@ -146,6 +150,10 @@ class Analytics extends Controller
        foreach (array_count_values($countries) as $country => $count) {
            $heatmapData[] = ['country' => $country, 'count' => $count];
        }
+
+
+       // We will get the bots hitting this site here 
+       $botData = $this->getBotCrawlers($visitors);
    
        // Return the view with calculated data
        return view('admin.analytics', [
@@ -155,6 +163,10 @@ class Analytics extends Controller
            'most_visited_url' => $mostVisitedURL,
            'topReferrerURL' => $topReferrerURL,
            'total_visitors_count' => $totalVisitors,
+           'totalBots'=>$botData['totalBots'],
+           'mostFrequentBot'=>$botData['mostFrequentBot'],
+           'botPercentage'=>$botData['botPercentage'],
+           'realVisitorsPercentage'=>$botData['alVisitorsPercentage'],
        ]);
    }
    
@@ -215,5 +227,40 @@ class Analytics extends Controller
             'os' => $os
         ];
     }
+
+
+    // Determines if user agents are bots and returns number of bots found 
+
+    private function getBotCrawlers(array $visitors)
+    {
+        $userAgents = array_column($visitors, 'visitor_user_agent');
     
+        $crawlerDetect = new CrawlerDetect();
+        $botCounts = [];
+        $totalBots = 0;
+        $totalVisitors = count($visitors);
+    
+        foreach ($userAgents as $userAgent) {
+            if ($crawlerDetect->isCrawler($userAgent)) {
+                $totalBots++;
+                $botName = $crawlerDetect->getMatches();
+                $botCounts[$botName] = ($botCounts[$botName] ?? 0) + 1;
+            }
+        }
+        // This is the most prevelant bot hitting the site 
+
+        $mostFrequentBot = array_keys($botCounts, max($botCounts))[0] ?? 'None';
+        
+
+        // calculate the percentage of fake and real visitors 
+        $botPercentage = ($totalVisitors > 0) ? ($totalBots / $totalVisitors) * 100 : 0;
+        $realVisitorsPercentage = 100 - $botPercentage; 
+
+        return [
+            'totalBots' => $totalBots,
+            'mostFrequentBot' => $mostFrequentBot,
+            'botPercentage'=>$botPercentage,
+            'realVisitorsPercentage'=>$realVisitorsPercentage,
+        ];
+    }
 }

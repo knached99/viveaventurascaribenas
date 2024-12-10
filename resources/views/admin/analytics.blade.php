@@ -25,6 +25,41 @@
         </div>
         </div>
         <!-- / Most Visited URL and total number of visitors -->
+
+
+            <!-- Most frequent bot and total number of bots -->
+        <div class="col-lg-12 mb-6">
+            <div class="card">
+                <div class="card-body m-3 p-2">
+                    <h5 class="card-title">Fake Traffic Overview</h5>
+                    <p class="block">Fake traffic refers to non-human bot visits to your website, which can skew your analytics.</p>
+
+                    <div class="mb-3">
+                        <h6 class="card-title">Total Number of Bots</h6>
+                        <p class="block">{{$totalBots}}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="card-title">Most Frequent Bot</h6>
+                        <p class="block">{{$mostFrequentBot}}</p>
+                    </div>
+
+                    <!-- Percentage of fake vs real visitors -->
+                    <div class="mb-3">
+                        <h6 class="card-title">Percentage of Fake Traffic</h6>
+                        <p class="block">{{$botPercentage}}%</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="card-title">Percentage of Real Traffic</h6>
+                        <p class="block">{{$realVisitorPercentage}}%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- / Most frequent bot and total number of bots -->
+
+
         <!-- Visitor Devices Chart -->
         <div class="col-lg-12 mb-6">
             <div class="card">
