@@ -47,12 +47,12 @@
                     <!-- Percentage of fake vs real visitors -->
                     <div class="mb-3">
                         <h6 class="card-title">Percentage of Fake Traffic</h6>
-                        <p class="block">{{number_format($botPercentage,2,",",".")}}%</p>
+                        <p class="block">{{number_format($botPercentage,2,".",".")}}%</p>
                     </div>
 
                     <div class="mb-3">
                         <h6 class="card-title">Percentage of Real Traffic</h6>
-                        <p class="block">{{number_format($realVisitorsPercentage,2,",",".")}}%</p>
+                        <p class="block">{{number_format($realVisitorsPercentage,2,".",".")}}%</p>
                     </div>
                 </div>
             </div>
