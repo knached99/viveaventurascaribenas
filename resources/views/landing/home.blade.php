@@ -102,64 +102,69 @@
 <section class="ftco-section services-section bg-light">
     <div class="container">
         <div class="row d-flex">
-            <div class="col-md-6 order-md-last heading-section pl-md-5 ftco-animate">
+            <!-- First column (Heading and description) -->
+            <div class="col-12 col-md-6 order-md-last heading-section pl-md-5 ftco-animate">
                 <h2 class="mb-4">It's time to start your adventure</h2>
-                <p>Welcome to Vive Aventuras Caribeñas, your gateway to unforgettable travel experiences in the Caribbean and beyond.
-                 We specialize in creating immersive, curated journeys that take you to stunning destinations,
-                  where every moment is filled with adventure, culture, and natural beauty. 
-                  Our mission is to offer you experiences that leave a lasting impression,
-                 making each trip a memory you’ll cherish forever.</p>
+                <p>Welcome to Vive Aventuras Caribeñas, your gateway to unforgettable travel experiences in the Caribbean and beyond. 
+                   We specialize in creating immersive, curated journeys that take you to stunning destinations, 
+                   where every moment is filled with adventure, culture, and natural beauty. 
+                   Our mission is to offer you experiences that leave a lasting impression, making each trip a memory you’ll cherish forever.</p>
                 <p><a href="{{ route('destinations') }}" class="btn btn-primary py-3 px-4">Book a Travel</a></p>
 
-            <div style="background-image:url({{asset('assets/images/old_san_juan.png')}}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
+                <div 
+                    style="background-image:url({{asset('assets/images/old_san_juan.png')}}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
+                </div>
             </div>
 
-            
-            <div class="col-md-6">
+            <!-- Second column (Services) -->
+            <div class="col-12 col-md-6">
                 <div class="row">
-                   
-                    <div class="col-md-6 d-flex align-self-stretch ftco-animate">
+                    <!-- Travel Arrangements Service -->
+                    <div class="col-12 col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-route"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Travel Arrangements</h3>
                                 <p>At Vive Aventuras Caribeñas, we pride ourselves on offering safe and convenient travel arrangements designed to 
-                                provide our travelers with unparalleled comfort and unforgettable experiences. 
-                                From personalized itineraries to exclusive accommodations and private transportation, 
-                                every detail is meticulously crafted to ensure a stress-free, indulgent journey.
-                                 Whether you're seeking adventure, relaxation, or cultural immersion, 
-                                 our expert team ensures that each trip is tailored to your unique preferences, 
-                                 allowing you to focus on creating memories that will last a lifetime. 
-                                 With us, you're not just traveling—you're embarking on an extraordinary adventure.
+                                   provide our travelers with unparalleled comfort and unforgettable experiences. 
+                                   From personalized itineraries to exclusive accommodations and private transportation, 
+                                   every detail is meticulously crafted to ensure a stress-free, indulgent journey.
+                                   Whether you're seeking adventure, relaxation, or cultural immersion, 
+                                   our expert team ensures that each trip is tailored to your unique preferences, 
+                                   allowing you to focus on creating memories that will last a lifetime. 
+                                   With us, you're not just traveling—you're embarking on an extraordinary adventure.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                     <div class="col-md-6 d-flex align-self-stretch ftco-animate">
+                    <!-- Activities Service -->
+                    <div class="col-12 col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-paragliding"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Activities</h3>
                                 <p>We provide you with a diverse array of activities, perfect for every type of traveler. 
-                                Whether you're seeking adventure, relaxation, or cultural exploration, 
-                                you'll find something to suit your interests at any of our destinations</p>
+                                   Whether you're seeking adventure, relaxation, or cultural exploration, 
+                                   you'll find something to suit your interests at any of our destinations.
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-6 d-flex align-self-stretch ftco-animate">
+                    <!-- Transportation Services -->
+                    <div class="col-12 col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-tour-guide"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Transportation Services</h3>
                                 <p>Feel confident in the measures we take to provide you with safety and convenience 
-                                when it comes to exploring your chosen destination! 
-                                With a simple request, enjoy access to beautiful beaches, restaurants, and much more</p>
+                                   when it comes to exploring your chosen destination! 
+                                   With a simple request, enjoy access to beautiful beaches, restaurants, and much more.
+                                </p>
                             </div>
                         </div>
                     </div>
-                  
                 </div>
             </div>
         </div>
