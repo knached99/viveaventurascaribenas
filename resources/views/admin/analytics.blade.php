@@ -52,7 +52,7 @@
 
                     <div class="mb-3">
                         <h6 class="card-title">Percentage of Real Traffic</h6>
-                        <p class="block">{{$realVisitorPercentage}}%</p>
+                        <p class="block">{{$realVisitorsPercentage}}%</p>
                     </div>
                 </div>
             </div>

@@ -166,7 +166,7 @@ class Analytics extends Controller
            'totalBots'=>$botData['totalBots'],
            'mostFrequentBot'=>$botData['mostFrequentBot'],
            'botPercentage'=>$botData['botPercentage'],
-           'realVisitorsPercentage'=>$botData['alVisitorsPercentage'],
+           'realVisitorsPercentage'=>$botData['realVisitorsPercentage'],
        ]);
    }
    
