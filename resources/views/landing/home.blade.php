@@ -166,7 +166,7 @@
     <div class="container">
         <div class="row d-flex">
             <div class="col-md-6 d-flex">
-              <div class="img d-flex align-self-stretch"
+              <div class="img"
             style="background-image:url({{ asset('assets/images/homeBg.png') }}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%;">
         </div>
 
