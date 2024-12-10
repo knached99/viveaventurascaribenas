@@ -166,8 +166,10 @@
     <div class="container">
         <div class="row d-flex">
             <div class="col-md-6 d-flex">
-                <div class="img d-flex align-self-stretch"
-                    style="background-image:url({{ asset('assets/images/homeBg.png') }});"></div>
+              <div class="img d-flex align-self-stretch"
+            style="background-image:url({{ asset('assets/images/homeBg.png') }}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%;">
+        </div>
+
             </div>
             <div class="col-md-6 pl-md-5 py-5">
                 <div class="row justify-content-start pb-3">
