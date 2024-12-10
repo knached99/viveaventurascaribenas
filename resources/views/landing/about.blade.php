@@ -24,7 +24,9 @@
                 where every moment is filled with adventure, culture, and natural beauty. 
                 Our mission is to offer you experiences that leave a lasting impression, making each trip a memory you’ll cherish forever.
                 </p>
-
+              <div class="img d-flex align-self-stretch"
+            style="background-image:url({{ asset('assets/images/zoni_beach.png') }}); background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%;">
+            </div>
                 {{-- <p><a href="#" class="btn btn-primary py-3 px-4">Search Destination</a></p> --}}
             </div>
             <div class="col-md-6">

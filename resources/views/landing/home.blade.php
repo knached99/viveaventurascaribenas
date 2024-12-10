@@ -110,7 +110,13 @@
                   Our mission is to offer you experiences that leave a lasting impression,
                  making each trip a memory you’ll cherish forever.</p>
                 <p><a href="{{ route('destinations') }}" class="btn btn-primary py-3 px-4">Book a Travel</a></p>
+
+                <div class="col-md-6 d-flex">
+              <div class="img d-flex align-self-stretch"
+            style="background-image:url({{ asset('assets/images/old_san_juan.png') }}); background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%;">
             </div>
+
+            
             <div class="col-md-6">
                 <div class="row">
                    
