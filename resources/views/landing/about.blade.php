@@ -16,21 +16,32 @@
 <section class="ftco-section services-section bg-light">
     <div class="container">
         <div class="row d-flex">
-       <div class="col-12 col-md-6 order-md-last heading-section pl-md-5 ftco-animate">
-        <h2 class="mb-4">Start your adventure with us!</h2>
-        <p>
-            Welcome to Vive Aventuras Caribeñas, your gateway to unforgettable travel experiences in the Caribbean and beyond. 
-            We specialize in creating immersive, curated journeys that take you to stunning destinations, 
-            where every moment is filled with adventure, culture, and natural beauty. 
-            Our mission is to offer you experiences that leave a lasting impression, making each trip a memory you’ll cherish forever.
-        </p>
-       
-        {{-- <p><a href="#" class="btn btn-primary py-3 px-4">Search Destination</a></p> --}}
-    </div>
+            <!-- Column with text and image -->
+            <div class="col-12 col-md-6 order-md-last heading-section pl-md-5 ftco-animate">
+                <h2 class="mb-4">Start your adventure with us!</h2>
+                <p>
+                    Welcome to Vive Aventuras Caribeñas, your gateway to unforgettable travel experiences in the Caribbean and beyond. 
+                    We specialize in creating immersive, curated journeys that take you to stunning destinations, 
+                    where every moment is filled with adventure, culture, and natural beauty. 
+                    Our mission is to offer you experiences that leave a lasting impression, making each trip a memory you’ll cherish forever.
+                </p>
+                <!-- Centered image -->
+                <div class="d-flex justify-content-center mt-4">
+                    <div 
+                        style="background-image: url({{ asset('assets/images/zoni_beach.png') }}); 
+                               background-size: cover; 
+                               background-repeat: no-repeat; 
+                               background-position: center; 
+                               width: 100%; 
+                               max-width: 400px; 
+                               height: 300px;">
+                    </div>
+                </div>
+            </div>
 
-            <div class="col-md-6">
+            <!-- Column with services -->
+            <div class="col-12 col-md-6">
                 <div class="row">
-                   
                     <div class="col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-route"></span></div>
@@ -47,7 +58,7 @@
                         </div>
                     </div>
 
-                     <div class="col-md-6 d-flex align-self-stretch ftco-animate">
+                    <div class="col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-paragliding"></span></div>
                             <div class="media-body">
@@ -58,6 +69,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-tour-guide"></span></div>
@@ -68,83 +80,12 @@
                             </div>
                         </div>
                     </div>
-
-                     <div 
-            style="background-image:url({{ asset('assets/images/zoni_beach.png') }}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
-        </div>
-                
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="ftco-counter img" id="section-counter">
-    <div class="container mb-5">
-        <div class="row d-flex">
-            <div class="col-md-6 d-flex">
-                <div class="img d-flex align-self-stretch"
-                    style="background-image:url({{ asset('assets/images/MapChart_Map.png') }}); background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%;"></div>
-            </div>
-            <div class="col-md-6 pl-md-5 py-5">
-                <div class="row justify-content-start pb-3">
-                    <div class="col-md-12 heading-section ftco-animate">
-                        <h2 class="mb-4">Why Choose Us?</h2>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">
-                                <b>Curated Travel Experiences</b> We offer a fully custom trip that focuses on exclusive lodging accommodations 
-                                & private transportation
-                                 in the destination you choose to explore! 
-                                We ensure a seamless and memorable experience for your adventure packed destination.
-                            </li>
-
-
-
-                            <li class="list-group-item">
-                                <b>Exceptional value</b>
-                                Our trips offer exceptional value, providing you with the best possible experience at your dream destination, 
-                                without compromising on quality
-                            </li>
-
-                            <li class="list-group-item">
-                                <b>Destination Expertise: </b>
-                                We bring firsthand experience and deep knowledge to curate trips that are authentic, 
-                                well-planned, and tailored to your adventure.
-                            </li>
-
-                        </ul>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18 text-center mb-4">
-                            <div class="text">
-                                <strong class="number" data-number="{{ $totalBookings && $totalBookings }}">0</strong>
-                                <span>Successful Bookings</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18 text-center mb-4">
-                            <div class="text">
-                                <strong class="number" data-number="{{ $totalCustomers && $totalCustomers }}">0</strong>
-                                <span>Happy Customers</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18 text-center mb-4">
-                            <div class="text">
-                                <strong class="number" data-number="{{ $totalTrips && $totalCustomers }}">0</strong>
-                                <span>Places Explored</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
 {{-- <section class="ftco-section testimony-section bg-bottom" style="background-image: url(images/bg_3.jpg);">
       <div class="container">
