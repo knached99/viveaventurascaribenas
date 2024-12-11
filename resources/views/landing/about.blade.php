@@ -16,47 +16,42 @@
 <section class="ftco-section services-section bg-light">
     <div class="container">
         <div class="row d-flex">
-       <div class="col-12 col-md-6 order-md-last heading-section pl-md-5 ftco-animate">
-        <h2 class="mb-4">Start your adventure with us!</h2>
-        <p>
-            Welcome to Vive Aventuras Caribeñas, your gateway to unforgettable travel experiences in the Caribbean and beyond. 
-            We specialize in creating immersive, curated journeys that take you to stunning destinations, 
-            where every moment is filled with adventure, culture, and natural beauty. 
-            Our mission is to offer you experiences that leave a lasting impression, making each trip a memory you’ll cherish forever.
-        </p>
-        <div 
-            style="background-image:url({{ asset('assets/images/zoni_beach.png') }}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
-        </div>
-        {{-- <p><a href="#" class="btn btn-primary py-3 px-4">Search Destination</a></p> --}}
-    </div>
+            <div class="col-12 col-md-6 order-md-last heading-section pl-md-5 ftco-animate">
+                <h2 class="mb-4">Start your adventure with us!</h2>
+                <p>
+                    Welcome to Vive Aventuras Caribeñas, your gateway to unforgettable travel experiences in the Caribbean and beyond.
+                    We specialize in creating immersive, curated journeys that take you to stunning destinations,
+                    where every moment is filled with adventure, culture, and natural beauty.
+                    Our mission is to offer you experiences that leave a lasting impression, making each trip a memory you’ll cherish forever.
+                </p>
+            </div>
 
             <div class="col-md-6">
                 <div class="row">
-                   
                     <div class="col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-route"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Travel Arrangements</h3>
-                                <p>At Vive Aventuras Caribeñas, we pride ourselves on offering safe and convenient travel arrangements designed to provide our travelers with unparalleled comfort and unforgettable experiences. 
-                                From personalized itineraries to exclusive accommodations and private transportation, every detail is meticulously crafted to ensure a stress-free,
-                                 indulgent journey. Whether you're seeking adventure, relaxation, or cultural immersion,
-                                  our expert team ensures that each trip is tailored to your unique preferences, 
-                                  allowing you to focus on creating memories that will last a lifetime. 
-                                  With us, you're not just traveling—you're embarking on an extraordinary adventure.
+                                <p>At Vive Aventuras Caribeñas, we pride ourselves on offering safe and convenient travel arrangements designed to provide our travelers with unparalleled comfort and unforgettable experiences.
+                                    From personalized itineraries to exclusive accommodations and private transportation, every detail is meticulously crafted to ensure a stress-free,
+                                    indulgent journey. Whether you're seeking adventure, relaxation, or cultural immersion,
+                                    our expert team ensures that each trip is tailored to your unique preferences,
+                                    allowing you to focus on creating memories that will last a lifetime.
+                                    With us, you're not just traveling—you're embarking on an extraordinary adventure.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                     <div class="col-md-6 d-flex align-self-stretch ftco-animate">
+                    <div class="col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
                             <div class="icon"><span class="flaticon-paragliding"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Activities</h3>
                                 <p>Immerse yourself with various activities that are available to you right from day one!
-                                 Allow yourself the opportunity to immerse yourself within a new adventure filled with culture, excitement, & life-long remembering moments. 
-                                 Whether that’s sightseeing, shopping, beach going, night life… Vive tu aventura!</p>
+                                    Allow yourself the opportunity to immerse yourself within a new adventure filled with culture, excitement, & life-long remembering moments.
+                                    Whether that’s sightseeing, shopping, beach going, night life… Vive tu aventura!</p>
                             </div>
                         </div>
                     </div>
@@ -65,12 +60,25 @@
                             <div class="icon"><span class="flaticon-tour-guide"></span></div>
                             <div class="media-body">
                                 <h3 class="heading mb-3">Transportation Services</h3>
-                                <p>Feel confident in the measures we take to provide you with safety and convenience when it comes to exploring your chosen destination! 
-                                With a simple request, enjoy access to beautiful beaches, restaurants, and much more</p>
+                                <p>Feel confident in the measures we take to provide you with safety and convenience when it comes to exploring your chosen destination!
+                                    With a simple request, enjoy access to beautiful beaches, restaurants, and much more</p>
                             </div>
                         </div>
                     </div>
-                
+                </div>
+            </div>
+        </div>
+
+        <!-- New Row for the Zoni Beach Image -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div style="background-image:url({{ asset('assets/images/zoni_beach.png') }}); 
+                            background-size: cover; 
+                            background-repeat: no-repeat; 
+                            background-position: center; 
+                            width: 100%; 
+                            height: 300px; 
+                            max-height: 400px;">
                 </div>
             </div>
         </div>
