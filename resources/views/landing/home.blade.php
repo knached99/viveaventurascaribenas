@@ -110,24 +110,15 @@
                    where every moment is filled with adventure, culture, and natural beauty. 
                    Our mission is to offer you experiences that leave a lasting impression, making each trip a memory you’ll cherish forever.</p>
                 <p><a href="{{ route('destinations') }}" class="btn btn-primary py-3 px-4">Book a Travel</a></p>
+
+                <div 
+                    style="background-image:url({{asset('assets/images/old_san_juan.png')}}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
+                </div>
             </div>
 
-            <!-- Second column (Services and image) -->
+            <!-- Second column (Services) -->
             <div class="col-12 col-md-6">
                 <div class="row">
-                    <!-- Image Section -->
-                    <div class="col-12 d-flex justify-content-center mb-4">
-                        <div 
-                            style="background-image: url({{asset('assets/images/old_san_juan.png')}}); 
-                                   background-size: cover; 
-                                   background-repeat: no-repeat; 
-                                   background-position: center; 
-                                   width: 100%; 
-                                   max-width: 400px; 
-                                   height: 300px;">
-                        </div>
-                    </div>
-
                     <!-- Travel Arrangements Service -->
                     <div class="col-12 col-md-6 d-flex align-self-stretch ftco-animate">
                         <div class="media block-6 services d-block">
@@ -179,7 +170,6 @@
         </div>
     </div>
 </section>
-
 
 <section class="ftco-counter img" id="section-counter">
     <div class="container">
