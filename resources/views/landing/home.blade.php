@@ -174,27 +174,21 @@
 <section class="ftco-counter img" id="section-counter">
     <div class="container">
         <div class="row d-flex">
-            <!-- Left column with image -->
             <div class="col-md-6 d-flex">
-                <div class="img d-flex align-self-stretch"
-                    style="background-image:url({{ asset('assets/images/homeBg.png') }}); 
-                           background-size: contain; 
-                           background-repeat: no-repeat; 
-                           background-position: center; 
-                           width: 100%;">
-                </div>
+              <div class="img d-flex align-self-stretch"
+            style="background-image:url({{ asset('assets/images/homeBg.png') }}); background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%;">
+        </div>
+
             </div>
-            
-            <!-- Right column with text -->
             <div class="col-md-6 pl-md-5 py-5">
                 <div class="row justify-content-start pb-3">
                     <div class="col-md-12 heading-section ftco-animate">
                         <h2 class="mb-4">Make Your Experience Memorable and Safe With Us</h2>
                         <p>At Vive Aventuras Caribeñas, we’re dedicated to helping you embrace new adventures with excitement and ease. 
                         Our experts will thoughtfully craft itineraries designed to offer you a journey filled with discovery, fun, and unique experiences.
-                        Every moment is an opportunity to explore something new, immerse yourself in vibrant cultures, 
-                        and create lasting memories—all while enjoying the thrill of the unknown without a care in the world. 
-                        Let us handle the details, so you can focus on the adventure ahead!</p>
+                         Every moment is an opportunity to explore something new, immerse yourself in vibrant cultures, 
+                         and create lasting memories—all while enjoying the thrill of the unknown without a care in the world. 
+                         Let us handle the details, so you can focus on the adventure ahead!</p>
                     </div>
                 </div>
                 <div class="row">
@@ -225,23 +219,8 @@
                 </div>
             </div>
         </div>
-        <!-- New row for additional image -->
-        <div class="row mt-5">
-            <div class="col-12 d-flex justify-content-center">
-                <div style="
-                        background-image: url({{ asset('assets/images/zoni_beach.png') }}); 
-                        background-size: cover; 
-                        background-repeat: no-repeat; 
-                        background-position: center; 
-                        width: 100%; 
-                        max-width: 800px; 
-                        height: 300px;">
-                </div>
-            </div>
-        </div>
     </div>
 </section>
-
 
 
 <!-- Most Popular Attractions -->
