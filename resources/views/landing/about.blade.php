@@ -25,7 +25,7 @@
             Our mission is to offer you experiences that leave a lasting impression, making each trip a memory you’ll cherish forever.
         </p>
         <div 
-            style="background-image:url({{ asset('assets/images/zoni_beach.png') }}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
+            style="background-image:url({{ asset('assets/images/zoni_beach.png') }}); margin-top: 50px; background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
         </div>
         {{-- <p><a href="#" class="btn btn-primary py-3 px-4">Search Destination</a></p> --}}
     </div>
