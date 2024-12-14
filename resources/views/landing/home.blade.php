@@ -175,16 +175,16 @@
     <div class="container">
         <div class="row d-flex">
             <div class="col-md-6 d-flex">
-            <div class="img d-flex align-self-stretch"
+          <div class="img d-flex align-self-stretch"
             style="background-image: url({{ asset('assets/images/homeBg.png') }}); 
                     margin-top: 250px; 
                     background-size: contain; 
                     background-repeat: no-repeat; 
                     background-position: center; 
                     width: 100%; 
-                    padding-top: 56.25%; 
-                    height: auto;">
+                    height: 500px;"> <!-- Set an appropriate height -->
         </div>
+
 
 
             </div>
