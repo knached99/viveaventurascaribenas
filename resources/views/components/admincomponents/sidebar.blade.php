@@ -36,7 +36,7 @@
 
           @endphp 
         <!-- Dashboards -->
-        <li class="menu-item {{$isActive}}">
+        <li class="menu-item {{$isAdminActive}}">
             <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bxs-dashboard"></i>
 
