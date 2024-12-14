@@ -16,17 +16,24 @@
 
     <ul class="menu-inner py-1">
         @php 
-           $activeRoutes = [
+           $activeAdminRoutes = [
             'admin.dashboard',
             'admin.profile',
             'admin.testimonials',
             'admin.analytics',
-            'admin.create-trip',
-            'admin.all-trips',
-            'admin.photo-gallery'
+         
         ];
         
-         $isActive = in_array(request()->route()->getName(), $activeRoutes) ? 'active open' : '';
+         $isAdminActive = in_array(request()->route()->getName(), $activeAdminRoutes) ? 'active open' : '';
+
+         $activeTripRoutes = [
+          'admin.create-trip',
+          'admin.all-trips',
+          'admin.photo-gallery'
+         ];
+
+         $isTripsActive = in_array(request()->route()->getName(), $activeTripRoutes) ? 'active open' : '';
+
           @endphp 
         <!-- Dashboards -->
         <li class="menu-item {{$isActive}}">
@@ -70,7 +77,7 @@
         </li>
 
         <!-- Layouts -->
-        <li class="menu-item {{$isActive}}">
+        <li class="menu-item {{$isTripsActive}}">
             <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bx-map-alt"></i>
                 <div class="text-truncate" data-i18n="Trips">Trips</div>
