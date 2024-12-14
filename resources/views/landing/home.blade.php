@@ -178,7 +178,7 @@
             <div class="img d-flex align-self-stretch"
                 style="background-image: url({{ asset('assets/images/homeBg.png') }}); 
                        margin-top: 250px; 
-                       background-size: contain; 
+                       background-size: cover; 
                        background-repeat: no-repeat; 
                        background-position: center; 
                        width: 100%; 
