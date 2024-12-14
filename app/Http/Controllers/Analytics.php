@@ -13,7 +13,7 @@ use Jaybizzle\CrawlerDetect\CrawlerDetect;
 class Analytics extends Controller
 {
     protected $maxMindService;
-    protected $CrawlerDetect ; 
+    protected $CrawlerDetect; 
 
     public function __construct(MaxMindService $maxMindService, CrawlerDetect $crawlerDetect)
     {
