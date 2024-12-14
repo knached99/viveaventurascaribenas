@@ -178,12 +178,13 @@
             <div class="img d-flex align-self-stretch"
                 style="background-image: url({{ asset('assets/images/homeBg.png') }}); 
                        margin-top: 250px; 
-                       background-size: cover; 
+                       background-size: contain; 
                        background-repeat: no-repeat; 
                        background-position: center; 
                        width: 100%; 
                        height: 100%; 
-                       min-height: 500px;"> <!-- Adjust min-height as needed -->
+                       max-width: 100%; 
+                       min-height: 500px;">
             </div>
         </div>
         <div class="col-md-6 pl-md-5 py-5">
