@@ -171,17 +171,17 @@
     </div>
 </section>
 
-<section class="ftco-counter img" id="section-counter">
+<section class="ftco-counter" id="section-counter">
     <div class="container">
         <div class="row d-flex">
             <div class="col-md-6 d-flex">
-          <div class="img d-flex align-self-stretch"
+          <div class=""
             style="background-image: url({{ asset('assets/images/homeBg.png') }}); 
                     margin-top: 250px; 
                     background-size: contain; 
                     background-repeat: no-repeat; 
                     background-position: center; 
-                    width: 1000px; 
+                    width: 100%; 
                     height: 500px;"> <!-- Set an appropriate height -->
         </div>
 
