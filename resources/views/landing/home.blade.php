@@ -181,7 +181,7 @@
                     background-size: contain; 
                     background-repeat: no-repeat; 
                     background-position: center; 
-                    width: 100%; 
+                    width: 1000px; 
                     height: 500px;"> <!-- Set an appropriate height -->
         </div>
 
