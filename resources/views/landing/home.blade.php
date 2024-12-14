@@ -173,61 +173,61 @@
 
 <section class="ftco-counter" id="section-counter">
     <div class="container">
-        <div class="row d-flex">
-            <div class="col-md-6 d-flex">
-          <div class=""
-            style="background-image: url({{ asset('assets/images/homeBg.png') }}); 
-                    margin-top: 250px; 
-                    background-size: contain; 
-                    background-repeat: no-repeat; 
-                    background-position: center; 
-                    width: 100%; 
-                    height: 500px;"> <!-- Set an appropriate height -->
-        </div>
-
-
-
+    <div class="row d-flex">
+        <div class="col-md-6 d-flex" style="height: auto; min-height: 500px;">
+            <div class="img d-flex align-self-stretch"
+                style="background-image: url({{ asset('assets/images/homeBg.png') }}); 
+                       margin-top: 250px; 
+                       background-size: contain; 
+                       background-repeat: no-repeat; 
+                       background-position: center; 
+                       width: 100%; 
+                       height: 100%; 
+                       min-height: 500px;"> <!-- Adjust min-height as needed -->
             </div>
-            <div class="col-md-6 pl-md-5 py-5">
-                <div class="row justify-content-start pb-3">
-                    <div class="col-md-12 heading-section ftco-animate">
-                        <h2 class="mb-4">Make Your Experience Memorable and Safe With Us</h2>
-                        <p>At Vive Aventuras Caribeñas, we’re dedicated to helping you embrace new adventures with excitement and ease. 
+        </div>
+        <div class="col-md-6 pl-md-5 py-5">
+            <div class="row justify-content-start pb-3">
+                <div class="col-md-12 heading-section ftco-animate">
+                    <h2 class="mb-4">Make Your Experience Memorable and Safe With Us</h2>
+                    <p>At Vive Aventuras Caribeñas, we’re dedicated to helping you embrace new adventures with excitement and ease. 
                         Our experts will thoughtfully craft itineraries designed to offer you a journey filled with discovery, fun, and unique experiences.
-                         Every moment is an opportunity to explore something new, immerse yourself in vibrant cultures, 
-                         and create lasting memories—all while enjoying the thrill of the unknown without a care in the world. 
-                         Let us handle the details, so you can focus on the adventure ahead!</p>
+                        Every moment is an opportunity to explore something new, immerse yourself in vibrant cultures, 
+                        and create lasting memories—all while enjoying the thrill of the unknown without a care in the world. 
+                        Let us handle the details, so you can focus on the adventure ahead!
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
+                    <div class="block-18 text-center mb-4">
+                        <div class="text">
+                            <strong class="number" data-number="{{ $totalBookings }}">0</strong>
+                            <span>Successful Bookings</span>
+                        </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18 text-center mb-4">
-                            <div class="text">
-                                <strong class="number" data-number="{{ $totalBookings }}">0</strong>
-                                <span>Successful Bookings</span>
-                            </div>
+                <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
+                    <div class="block-18 text-center mb-4">
+                        <div class="text">
+                            <strong class="number" data-number="{{ $totalCustomers }}">0</strong>
+                            <span>Happy Customers</span>
                         </div>
                     </div>
-                    <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18 text-center mb-4">
-                            <div class="text">
-                                <strong class="number" data-number="{{ $totalCustomers }}">0</strong>
-                                <span>Happy Customers</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
-                        <div class="block-18 text-center mb-4">
-                            <div class="text">
-                                <strong class="number" data-number="{{ $totalTrips }}">0</strong>
-                                <span>Place Explored</span>
-                            </div>
+                </div>
+                <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
+                    <div class="block-18 text-center mb-4">
+                        <div class="text">
+                            <strong class="number" data-number="{{ $totalTrips }}">0</strong>
+                            <span>Place Explored</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
 </section>
 
 
