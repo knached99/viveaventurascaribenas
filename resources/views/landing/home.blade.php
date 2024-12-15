@@ -113,12 +113,14 @@
 
             </div>
 
-             <div 
-                    style="background-image:url({{asset('assets/images/old_san_juan.png')}}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
-                </div>
+             
 
             <!-- Second column (Services) -->
             <div class="col-12 col-md-6">
+            <div 
+                    style="background-image:url({{asset('assets/images/old_san_juan.png')}}); background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
+                </div>
+                
                 <div class="row">
                     <!-- Travel Arrangements Service -->
                     <div class="col-12 col-md-6 d-flex align-self-stretch ftco-animate">
