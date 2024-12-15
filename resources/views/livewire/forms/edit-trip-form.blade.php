@@ -254,7 +254,7 @@
 
 
                     <div class="mb-4">
-                        <label for="tripCosts" class="form-label block text-xl font-bold">Trip Costs</label>
+                        <h3 for="tripCosts" class="block fw-bold">Trip Costs</h3>
                         @foreach ($tripCosts as $index => $cost)
                             @php
                                 $index = (int) $index; // Ensure $index is an integer
