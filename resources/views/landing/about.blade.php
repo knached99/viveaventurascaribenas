@@ -25,7 +25,7 @@
             Our mission is to offer you experiences that leave a lasting impression, making each trip a memory you’ll cherish forever.
         </p>
         <div 
-            style="background-image:url({{ asset('assets/images/zoni_beach.png') }}); margin-top: 150px; background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%; height: 800px; max-height: 800px;">
+            style="background-image:url({{ asset('assets/images/zoni_beach.png') }}); margin-top: 150px; background-size: cover; background-repeat: no-repeat; background-position: center; width: 100%; height: 300px; max-height: 400px;">
         </div>
         {{-- <p><a href="#" class="btn btn-primary py-3 px-4">Search Destination</a></p> --}}
     </div>
@@ -82,7 +82,7 @@
         <div class="row d-flex">
             <div class="col-md-6 d-flex">
                 <div class="img d-flex align-self-stretch"
-                    style="background-image:url({{ asset('assets/images/MapChart_Map.png') }}); background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%; height: 800px; max-height: 800px;"></div>
+                    style="background-image:url({{ asset('assets/images/MapChart_Map.png') }}); background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%;"></div>
             </div>
             <div class="col-md-6 pl-md-5 py-5">
                 <div class="row justify-content-start pb-3">
