@@ -254,7 +254,7 @@
 
 
                     <div class="mb-4">
-                        <h3 for="tripCosts" class="block fw-bold">Trip Costs</h3>
+                        <h3 for="tripCosts" class="block">Trip Costs</h3>
                         @foreach ($tripCosts as $index => $cost)
                             @php
                                 $index = (int) $index; // Ensure $index is an integer
