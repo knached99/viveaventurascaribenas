@@ -65,7 +65,6 @@ new #[Layout('layouts.theme')] class extends Component
             id="email"
             name="email-username"
             placeholder="Enter your email"
-            autofocus
             wire:model="email" />
             <x-input-error :messages="$errors->get('email')" class="mt-2"/>
     </div>
