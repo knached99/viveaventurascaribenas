@@ -48,7 +48,7 @@ new #[Layout('layouts.theme')] class extends Component {
                             <input type="text"
                                 class="form-control {{ $errors->has('form.email') ? 'border border-danger' : '' }}"
                                 id="email" name="email-username" placeholder="Enter your email or username"
-                                autofocus wire:model="form.email" />
+                                 wire:model="form.email" />
                             <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
                         </div>
                         <div class="mb-6 form-password-toggle">
