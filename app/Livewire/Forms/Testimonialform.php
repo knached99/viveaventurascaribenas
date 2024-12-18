@@ -110,7 +110,7 @@ class TestimonialForm extends Component
             ];
 
             Testimonials::create($data);
-            $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com';
+            $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'travel@viveaventurascaribenas.net';
             $notificationClass = TestimonialSubmitted::class;
             $this->sendNotification($data, $recipientEmail, $notificationClass);
 
