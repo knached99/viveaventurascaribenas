@@ -363,7 +363,7 @@
 
 <x-travelcomponents.footer />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const colorThief = new ColorThief();
@@ -419,4 +419,4 @@
         updateBackgroundColor(); // Initial call
         carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
     });
-</script>
+</script> --}}
