@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use Livewire\Attributes\Validate;
 use App\Models\PhotoGalleryModel;
 use App\Models\TripsModel;
+use app\Helpers\Helper;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
@@ -60,24 +61,7 @@ class PhotoGalleryUpload extends Form {
                 
             }
 
-            // foreach ($this->photos as $photo) {
-            //     // Resize and store the uploaded file
-            //     $image = $photo->getRealPath();
-            //     $filePath = 'photo_gallery/'. $photo->hashName() . '.'.$photo->extension();
-            //     $fullPath = storage_path('app/public/' . $filePath);
-
-            //     // Use GD to resize the image
-            //     $this->resizeImage($photo->getRealPath(), $fullPath,  525, 351);
-
-            //     $photosArray[] = asset(Storage::url($filePath));
-            // }
-            // $data = [
-            //     'photoID'=>Str::uuid(),
-            //     'tripID'=> $this->tripID,
-            //     'photos'=>json_encode($photosArray),
-            //     'photoLabel'=>$this->photoLabel,
-            //     'photoDescription'=>$this->photoDescription
-            // ];
+      
 
             foreach ($this->photos as $photo) {
                 // Resize and store the uploaded file
@@ -129,61 +113,6 @@ class PhotoGalleryUpload extends Form {
             return view('livewire.pages.photo-gallery-upload', [
             ]);
         }
-
-
-        private function resizeImage($sourcePath, $destinationPath, $newWidth, $newHeight) {
-            $imageType = exif_imagetype($sourcePath);
-        
-            switch ($imageType) {
-                case IMAGETYPE_JPEG: 
-                    $image = imagecreatefromjpeg($sourcePath);
-                    break;
-                case IMAGETYPE_PNG:
-                    $image = imagecreatefrompng($sourcePath);
-                    break;
-                default:
-                    throw new Exception('The image you selected is not supported. Please select a JPEG or PNG image');
-            }
-        
-            $originalWidth = imagesx($image);
-            $originalHeight = imagesy($image);
-        
-            $aspectRatio = $originalWidth / $originalHeight;
-        
-            if ($newWidth / $newHeight > $aspectRatio) {
-                $newWidth = $newHeight * $aspectRatio;
-            } else {
-                $newHeight = $newWidth / $aspectRatio;
-            }
-        
-            $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
-        
-            if ($imageType == IMAGETYPE_PNG) {
-                imagealphablending($resizedImage, false);
-                imagesavealpha($resizedImage, true);
-                $transparent = imagecolorallocatealpha($resizedImage, 255, 255, 255, 127);
-                imagefill($resizedImage, 0, 0, $transparent);
-            }
-        
-            imagecopyresampled($resizedImage, $image, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
-        
-            switch ($imageType) {
-                case IMAGETYPE_JPEG:
-                    $quality = 90; 
-                    imagejpeg($resizedImage, $destinationPath, $quality);
-                    break;
-                case IMAGETYPE_PNG:
-                    $compression = 1; // Lowest compression setting
-                    imagepng($resizedImage, $destinationPath, $compression);
-                    break;
-            }
-        
-            // Free up memory
-            imagedestroy($image);
-            imagedestroy($resizedImage);
-        }
-        
-
 
 
 }

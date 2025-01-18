@@ -538,6 +538,7 @@
         .trip-description {
             font-size: 16px;
             margin: 20px 0;
+            color: #1e293b !important;
         }
 
         .trip-info {

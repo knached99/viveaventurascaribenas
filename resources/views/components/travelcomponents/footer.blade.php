@@ -19,7 +19,7 @@
                         <li><a href="{{ route('privacy') }}" class="py-2 d-block">Privacy Policy</a></li>
                         <li><a href="{{ route('terms') }}" class="py-2 d-block">Terms and Conditions</a>
                         </li>
-                        <li><a href="tel:+1(607)-373-2208" class="py-2 d-block">Call Us</a></li>
+                        <li><a href="tel://3153136068" class="py-2 d-block">Call Us</a></li>
                     </ul>
                 </div>
             </div>

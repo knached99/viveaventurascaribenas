@@ -35,18 +35,10 @@
                         <span class="icon-phone2"></span>
                     </div>
                     <h3 class="mb-2">Contact Number</h3>
-                    <p><a href="tel://6073732208">+1(607)-373-2208</a></p>
+                    <p><a href="tel://3153136068">+1(315)-313-6068</a></p>
                 </div>
             </div>
-            <div class="col-md-3 d-flex">
-                <div class="align-self-stretch box p-4 text-center">
-                    <div class="icon d-flex align-items-center justify-content-center">
-                        <span class="icon-paper-plane"></span>
-                    </div>
-                    <h3 class="mb-2">Email Address</h3>
-                    <p><a href="mailto:projas@viveaventurascaribenas.com">projas@viveaventurascaribenas.com</a></p>
-                </div>
-            </div>
+          
 
         </div>
     </div>
