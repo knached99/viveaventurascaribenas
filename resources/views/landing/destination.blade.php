@@ -187,7 +187,7 @@
                             @break
                         @endswitch
                     </p>
-                    <p style="font-size:16px; margin: 20px 0; color: #1e293b !important;"> {!! $trip->tripDescription !!}</p>
+                    <p style="font-size:16px; margin: 20px 0; color: #0f172a !important;"> {!! $trip->tripDescription !!}</p>
 
                     <h5 class="block mb-3 mt-5 fw-bold">Trip Dates</h5>
                     <ul class="trip-info">
@@ -277,7 +277,7 @@
                 <div class="border-bottom-1 border-secondary"> </div>
                 <div style="border-bottom: 1px solid #1e293b"></div>
                 <h2 class="m-3" style="font-weight: 900;">Trip Activities</h2>
-                <p style="font-size:16px; margin: 20px 0; color: #1e293b !important;">{!! $trip->tripActivities !!}</p>
+                <p style="font-size:16px; margin: 20px 0; color: #0f172a !important;">{!! $trip->tripActivities !!}</p>
                 <!-- End Activities Section -->
 
                 <!-- Testimonials Slider -->
@@ -363,7 +363,7 @@
 
 <x-travelcomponents.footer />
 
-{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.2/color-thief.umd.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const colorThief = new ColorThief();
@@ -419,4 +419,4 @@
         updateBackgroundColor(); // Initial call
         carouselElement.addEventListener('slid.bs.carousel', updateBackgroundColor);
     });
-</script> --}}
+</script>
