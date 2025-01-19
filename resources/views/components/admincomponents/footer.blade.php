@@ -90,7 +90,7 @@
 
 
  @if (\Route::currentRouteName() === 'admin.create-trip')
-   <script>
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize CKEditor for all elements with the class "ckeditor"
         document.querySelectorAll('.ckeditor').forEach(element => {
@@ -99,23 +99,27 @@
                     // Additional configuration options for the editor
                     toolbar: [
                         'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
-                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo'
+                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor'
                     ],
+                    // Enable fontColor plugin for the color wheel
                     fontColor: {
                         colors: [
                             { color: '#000000', label: 'Black' },
                             { color: '#FFFFFF', label: 'White' },
                             { color: '#172554', label: 'Super Dark Blue' },
-                            {color: '#1e293b', label: 'Slate Dark'},
-                            {color: '#0f172a', label: 'Slate Super Dark'},
+                            { color: '#1e293b', label: 'Slate Dark' },
+                            { color: '#0f172a', label: 'Slate Super Dark' },
+                        ]
+                    },
+                    // Enable font plugin to provide font color options in the toolbar
+                    fontFamily: {
+                        options: [
+                            'default', 'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'
                         ]
                     }
                 })
                 .then(editor => {
-                    // Apply default styling by prepending the style tag to the editor data
-                    const style = '<style>body { color: #172554; }</style>';
-                    editor.setData(style + editor.getData()); // Prepend style to the content
-
+                    // No need to inject <style> tags here for color - CKEditor will handle it
                     // Sync the CKEditor content with Livewire or other backend models
                     editor.model.document.on('change:data', () => {
                         const editorData = editor.getData();
@@ -149,69 +153,75 @@
     });
 </script>
 
+
  @elseif(\Route::currentRouteName() === 'admin.trip')
-     <script>
-         document.addEventListener('DOMContentLoaded', function() {
-             // Initialize CKEditor for all elements with the class "ckeditor"
-             document.querySelectorAll('.ckeditor').forEach(element => {
-                 ClassicEditor
-                     ClassicEditor
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize CKEditor for all elements with the class "ckeditor"
+        document.querySelectorAll('.ckeditor').forEach(element => {
+            ClassicEditor
                 .create(element, {
                     // Additional configuration options for the editor
                     toolbar: [
                         'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
-                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo'
+                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor'
                     ],
+                    // Enable fontColor plugin for the color wheel
                     fontColor: {
                         colors: [
                             { color: '#000000', label: 'Black' },
                             { color: '#FFFFFF', label: 'White' },
                             { color: '#172554', label: 'Super Dark Blue' },
-                            {color: '#1e293b', label: 'Slate Dark'},
-                            {color: '#0f172a', label: 'Slate Super Dark'},
+                            { color: '#1e293b', label: 'Slate Dark' },
+                            { color: '#0f172a', label: 'Slate Super Dark' },
+                        ]
+                    },
+                    // Enable font plugin to provide font color options in the toolbar
+                    fontFamily: {
+                        options: [
+                            'default', 'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'
                         ]
                     }
                 })
-                     .then(editor => {
+                .then(editor => {
+                    // Set initial data if needed
+                    const initialData = element.getAttribute('data-initial-content');
+                    if (initialData) {
+                        editor.setData(initialData);
+                    }
 
-                         // Set initial data if needed
-                         const initialData = element.getAttribute('data-initial-content');
-                         if (initialData) {
-                             editor.setData(initialData);
-                         }
+                    // Sync the CKEditor content with Livewire or other backend models
+                    editor.model.document.on('change:data', () => {
+                        const editorData = editor.getData();
+                        const name = element.getAttribute('name');
 
-                         // Sync the CKEditor content with Livewire or other backend models
-                         editor.model.document.on('change:data', () => {
-                             const editorData = editor.getData();
-                             const name = element.getAttribute('name');
+                        // Sync the CKEditor content with Livewire
+                        if (window.Livewire) {
+                            const livewireElement = element.closest('[wire\\:id]');
+                            if (livewireElement) {
+                                const componentId = livewireElement.getAttribute('wire:id');
 
-                             // Sync the CKEditor content with Livewire
-                             if (window.Livewire) {
-                                 const livewireElement = element.closest('[wire\\:id]');
-                                 if (livewireElement) {
-                                     const componentId = livewireElement.getAttribute('wire:id');
+                                // Ensure the property name matches the public properties in the Livewire component
+                                if (name === 'tripDescription' || name === 'tripActivities') {
+                                    window.Livewire.find(componentId).set(name, editorData);
+                                } else {
+                                    console.error('Unexpected property name:', name);
+                                }
+                            } else {
+                                console.error('Livewire element not found for:', element);
+                            }
+                        } else {
+                            console.error('Livewire is not available.');
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error during initialization of the editor:', error);
+                });
+        });
+    });
+</script>
 
-                                     // Ensure the property name matches the public properties in the Livewire component
-                                     if (name === 'tripDescription' || name ===
-                                         'tripActivities') {
-                                         window.Livewire.find(componentId).set(name, editorData);
-                                     } else {
-                                         console.error('Unexpected property name:', name);
-                                     }
-                                 } else {
-                                     console.error('Livewire element not found for:', element);
-                                 }
-                             } else {
-                                 console.error('Livewire is not available.');
-                             }
-                         });
-                     })
-                     .catch(error => {
-                         console.error('Error during initialization of the editor:', error);
-                     });
-             });
-         });
-     </script>
  @endif
 
 
