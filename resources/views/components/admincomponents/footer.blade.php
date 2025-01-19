@@ -91,6 +91,10 @@
 
  @if (\Route::currentRouteName() === 'admin.create-trip')
   <script>
+    // Ensure CKEditor and necessary plugins are imported
+    import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+    import Font from '@ckeditor/ckeditor5-font'; // Import Font plugin for font features
+
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize CKEditor for all elements with the class "ckeditor"
         document.querySelectorAll('.ckeditor').forEach(element => {
@@ -98,113 +102,36 @@
                 .create(element, {
                     // Additional configuration options for the editor
                     toolbar: [
-                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
-                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor'
+                        'bold', 'italic', 'link', 'bulletedList', 'numberedList',
+                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo',
+                        'fontColor', 'fontBackgroundColor' // Add fontColor and fontBackgroundColor to toolbar
                     ],
-                    // Enable fontColor plugin for the color wheel
-                    fontSize: {
-                        options: [
-                            'tiny',
-                            'default', 
-                            'medium',
-                            'big',
-                        ],
+                    fontColor: {
+                        colors: [
+                            { color: 'hsl(0, 0%, 0%)', label: 'Black' },
+                            { color: 'hsl(0, 0%, 30%)', label: 'Dim grey' },
+                            { color: 'hsl(0, 0%, 60%)', label: 'Grey' },
+                            { color: 'hsl(0, 0%, 90%)', label: 'Light grey' },
+                            { color: 'hsl(0, 0%, 100%)', label: 'White', hasBorder: true },
+                            { color: 'hsl(222, 47%, 11%)', label: 'Dark Slate' },
+                            { color: 'hsl(221, 39%, 11%)', label: 'Dark Gray' },
+                            { color: 'hsl(226, 57%, 21%)', label: 'Dark Blue' },
+                            { color: 'hsl(272, 72%, 47%)', label: 'Grimace Shake Purple' }
+                        ]
                     },
-   fontColor: {
-            colors: [
-                
-                  {
-                    color: 'hsl(222, 47%, 11%)',
-                    label: 'Dark Slate',
-                },
-
-                {
-                    color: 'hsl(221, 39%, 11%)',
-                    label: 'Dark Gray',
-                },
-
-                {
-                 color: 'hsl(226, 57%, 21%)',
-                 label: 'Dark Blue',
-                },
-
-                {
-                  color: 'hsl(272, 72%, 47%)',
-                  label: 'Grimace Shake Purple',
-                },
-
-                {
-                    color: 'hsl(0, 0%, 0%)',
-                    label: 'Black'
-                },
-                {
-                    color: 'hsl(0, 0%, 30%)',
-                    label: 'Dim grey'
-                },
-                {
-                    color: 'hsl(0, 0%, 60%)',
-                    label: 'Grey'
-                },
-                {
-                    color: 'hsl(0, 0%, 90%)',
-                    label: 'Light grey'
-                },
-                {
-                    color: 'hsl(0, 0%, 100%)',
-                    label: 'White',
-                    hasBorder: true
-                },
-                // More colors.
-                // ...
-            ]
-        },
-        fontBackgroundColor: {
-            colors: [
-                
-                {
-                    color: 'hsl(222, 47%, 11%)',
-                    label: 'Dark Slate',
-                },
-
-                {
-                    color: 'hsl(221, 39%, 11%)',
-                    label: 'Dark Gray',
-                },
-
-                {
-                 color: 'hsl(226, 57%, 21%)',
-                 label: 'Dark Blue',
-                },
-
-                {
-                  color: 'hsl(272, 72%, 47%)',
-                  label: 'Grimace Shake Purple',
-                },
-
-                {
-                    color: 'hsl(0, 75%, 60%)',
-                    label: 'Red'
-                },
-                {
-                    color: 'hsl(30, 75%, 60%)',
-                    label: 'Orange'
-                },
-                {
-                    color: 'hsl(60, 75%, 60%)',
-                    label: 'Yellow'
-                },
-                {
-                    color: 'hsl(90, 75%, 60%)',
-                    label: 'Light green'
-                },
-                {
-                    color: 'hsl(120, 75%, 60%)',
-                    label: 'Green'
-                },
-              
-            ]
-        },
-                    // Enable font plugin to provide font color options in the toolbar
+                    fontBackgroundColor: {
+                        colors: [
+                            { color: 'hsl(0, 75%, 60%)', label: 'Red' },
+                            { color: 'hsl(30, 75%, 60%)', label: 'Orange' },
+                            { color: 'hsl(60, 75%, 60%)', label: 'Yellow' },
+                            { color: 'hsl(90, 75%, 60%)', label: 'Light green' },
+                            { color: 'hsl(120, 75%, 60%)', label: 'Green' },
+                            { color: 'hsl(222, 47%, 11%)', label: 'Dark Slate' },
+                            { color: 'hsl(221, 39%, 11%)', label: 'Dark Gray' },
+                            { color: 'hsl(226, 57%, 21%)', label: 'Dark Blue' },
+                            { color: 'hsl(272, 72%, 47%)', label: 'Grimace Shake Purple' }
+                        ]
+                    },
                     fontFamily: {
                         options: [
                             'default', 'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'
@@ -212,10 +139,16 @@
                     }
                 })
                 .then(editor => {
-                    // No need to inject <style> tags here for color - CKEditor will handle it
+                    // Set initial data if needed
+                    const initialData = element.getAttribute('data-initial-content');
+                    if (initialData) {
+                        editor.setData(initialData);
+                    }
+
                     // Sync the CKEditor content with Livewire or other backend models
                     editor.model.document.on('change:data', () => {
                         const editorData = editor.getData();
+                        const name = element.getAttribute('name');
 
                         // Sync the CKEditor content with Livewire
                         if (window.Livewire) {
@@ -248,7 +181,11 @@
 
 
  @elseif(\Route::currentRouteName() === 'admin.trip')
-  <script>
+ <script>
+    // Ensure CKEditor and necessary plugins are imported
+    import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+    import Font from '@ckeditor/ckeditor5-font'; // Import Font plugin for font features
+
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize CKEditor for all elements with the class "ckeditor"
         document.querySelectorAll('.ckeditor').forEach(element => {
@@ -256,113 +193,36 @@
                 .create(element, {
                     // Additional configuration options for the editor
                     toolbar: [
-                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
-                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor'
+                        'bold', 'italic', 'link', 'bulletedList', 'numberedList',
+                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo',
+                        'fontColor', 'fontBackgroundColor' // Add fontColor and fontBackgroundColor to toolbar
                     ],
-                    // Enable fontColor plugin for the color wheel
-                    fontSize: {
-                        options: [
-                            'tiny',
-                            'default', 
-                            'medium',
-                            'big',
-                        ],
+                    fontColor: {
+                        colors: [
+                            { color: 'hsl(0, 0%, 0%)', label: 'Black' },
+                            { color: 'hsl(0, 0%, 30%)', label: 'Dim grey' },
+                            { color: 'hsl(0, 0%, 60%)', label: 'Grey' },
+                            { color: 'hsl(0, 0%, 90%)', label: 'Light grey' },
+                            { color: 'hsl(0, 0%, 100%)', label: 'White', hasBorder: true },
+                            { color: 'hsl(222, 47%, 11%)', label: 'Dark Slate' },
+                            { color: 'hsl(221, 39%, 11%)', label: 'Dark Gray' },
+                            { color: 'hsl(226, 57%, 21%)', label: 'Dark Blue' },
+                            { color: 'hsl(272, 72%, 47%)', label: 'Grimace Shake Purple' }
+                        ]
                     },
-   fontColor: {
-            colors: [
-                
-                  {
-                    color: 'hsl(222, 47%, 11%)',
-                    label: 'Dark Slate',
-                },
-
-                {
-                    color: 'hsl(221, 39%, 11%)',
-                    label: 'Dark Gray',
-                },
-
-                {
-                 color: 'hsl(226, 57%, 21%)',
-                 label: 'Dark Blue',
-                },
-
-                {
-                  color: 'hsl(272, 72%, 47%)',
-                  label: 'Grimace Shake Purple',
-                },
-                
-                {
-                    color: 'hsl(0, 0%, 0%)',
-                    label: 'Black'
-                },
-                {
-                    color: 'hsl(0, 0%, 30%)',
-                    label: 'Dim grey'
-                },
-                {
-                    color: 'hsl(0, 0%, 60%)',
-                    label: 'Grey'
-                },
-                {
-                    color: 'hsl(0, 0%, 90%)',
-                    label: 'Light grey'
-                },
-                {
-                    color: 'hsl(0, 0%, 100%)',
-                    label: 'White',
-                    hasBorder: true
-                },
-                // More colors.
-                // ...
-            ]
-        },
-        fontBackgroundColor: {
-            colors: [
-                
-                {
-                    color: 'hsl(222, 47%, 11%)',
-                    label: 'Dark Slate',
-                },
-
-                {
-                    color: 'hsl(221, 39%, 11%)',
-                    label: 'Dark Gray',
-                },
-
-                {
-                 color: 'hsl(226, 57%, 21%)',
-                 label: 'Dark Blue',
-                },
-
-                {
-                  color: 'hsl(272, 72%, 47%)',
-                  label: 'Grimace Shake Purple',
-                },
-
-                {
-                    color: 'hsl(0, 75%, 60%)',
-                    label: 'Red'
-                },
-                {
-                    color: 'hsl(30, 75%, 60%)',
-                    label: 'Orange'
-                },
-                {
-                    color: 'hsl(60, 75%, 60%)',
-                    label: 'Yellow'
-                },
-                {
-                    color: 'hsl(90, 75%, 60%)',
-                    label: 'Light green'
-                },
-                {
-                    color: 'hsl(120, 75%, 60%)',
-                    label: 'Green'
-                },
-              
-            ]
-        },
-                    // Enable font plugin to provide font color options in the toolbar
+                    fontBackgroundColor: {
+                        colors: [
+                            { color: 'hsl(0, 75%, 60%)', label: 'Red' },
+                            { color: 'hsl(30, 75%, 60%)', label: 'Orange' },
+                            { color: 'hsl(60, 75%, 60%)', label: 'Yellow' },
+                            { color: 'hsl(90, 75%, 60%)', label: 'Light green' },
+                            { color: 'hsl(120, 75%, 60%)', label: 'Green' },
+                            { color: 'hsl(222, 47%, 11%)', label: 'Dark Slate' },
+                            { color: 'hsl(221, 39%, 11%)', label: 'Dark Gray' },
+                            { color: 'hsl(226, 57%, 21%)', label: 'Dark Blue' },
+                            { color: 'hsl(272, 72%, 47%)', label: 'Grimace Shake Purple' }
+                        ]
+                    },
                     fontFamily: {
                         options: [
                             'default', 'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'
@@ -370,10 +230,16 @@
                     }
                 })
                 .then(editor => {
-                    // No need to inject <style> tags here for color - CKEditor will handle it
+                    // Set initial data if needed
+                    const initialData = element.getAttribute('data-initial-content');
+                    if (initialData) {
+                        editor.setData(initialData);
+                    }
+
                     // Sync the CKEditor content with Livewire or other backend models
                     editor.model.document.on('change:data', () => {
                         const editorData = editor.getData();
+                        const name = element.getAttribute('name');
 
                         // Sync the CKEditor content with Livewire
                         if (window.Livewire) {
@@ -403,6 +269,7 @@
         });
     });
 </script>
+
 
  @endif
 
