@@ -91,155 +91,317 @@
 
  @if (\Route::currentRouteName() === 'admin.create-trip')
   <script>
-   import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import Font from '@ckeditor/ckeditor5-font';
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize CKEditor for all elements with the class "ckeditor"
-    document.querySelectorAll('.ckeditor').forEach(element => {
-        ClassicEditor
-            .create(element, {
-                plugins: [Font, ...ClassicEditor.builtinPlugins],
-                toolbar: [
-                    'bold', 'italic', 'link', 'bulletedList', 'numberedList',
-                    'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo',
-                    'fontFamily', 'fontSize', 'fontColor'
-                ],
-                fontColor: {
-                    colors: [
-                        { color: '#000000', label: 'Black' },
-                        { color: '#FFFFFF', label: 'White' },
-                        { color: '#172554', label: 'Super Dark Blue' },
-                        { color: '#1e293b', label: 'Slate Dark' },
-                        { color: '#0f172a', label: 'Slate Super Dark' },
-                    ]
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize CKEditor for all elements with the class "ckeditor"
+        document.querySelectorAll('.ckeditor').forEach(element => {
+            ClassicEditor
+                .create(element, {
+                    // Additional configuration options for the editor
+                    toolbar: [
+                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
+                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor'
+                    ],
+                    // Enable fontColor plugin for the color wheel
+                    fontSize: {
+                        options: [
+                            'tiny',
+                            'default', 
+                            'medium',
+                            'big',
+                        ],
+                    },
+   fontColor: {
+            colors: [
+                
+                  {
+                    color: 'hsl(222, 47%, 11%)',
+                    label: 'Dark Slate',
                 },
-                fontFamily: {
-                    options: [
-                        'default', 'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'
-                    ]
+
+                {
+                    color: 'hsl(221, 39%, 11%)',
+                    label: 'Dark Gray',
                 },
-                fontSize: {
-                    options: [
-                        'tiny', 'small', 'default', 'big', 'huge'
-                    ]
-                }
-            })
-            .then(editor => {
-                // Set initial data if needed
-                const initialData = element.getAttribute('data-initial-content');
-                if (initialData) {
-                    editor.setData(initialData);
-                }
 
-                // Sync the CKEditor content with Livewire or other backend models
-                editor.model.document.on('change:data', () => {
-                    const editorData = editor.getData();
-                    const name = element.getAttribute('name');
+                {
+                 color: 'hsl(226, 57%, 21%)',
+                 label: 'Dark Blue',
+                },
 
-                    // Sync the CKEditor content with Livewire
-                    if (window.Livewire) {
-                        const livewireElement = element.closest('[wire\\:id]');
-                        if (livewireElement) {
-                            const componentId = livewireElement.getAttribute('wire:id');
+                {
+                  color: 'hsl(272, 72%, 47%)',
+                  label: 'Grimace Shake Purple',
+                },
 
-                            // Ensure the property name matches the public properties in the Livewire component
-                            if (name === 'tripDescription' || name === 'tripActivities') {
-                                window.Livewire.find(componentId).set(name, editorData);
+                {
+                    color: 'hsl(0, 0%, 0%)',
+                    label: 'Black'
+                },
+                {
+                    color: 'hsl(0, 0%, 30%)',
+                    label: 'Dim grey'
+                },
+                {
+                    color: 'hsl(0, 0%, 60%)',
+                    label: 'Grey'
+                },
+                {
+                    color: 'hsl(0, 0%, 90%)',
+                    label: 'Light grey'
+                },
+                {
+                    color: 'hsl(0, 0%, 100%)',
+                    label: 'White',
+                    hasBorder: true
+                },
+                // More colors.
+                // ...
+            ]
+        },
+        fontBackgroundColor: {
+            colors: [
+                
+                {
+                    color: 'hsl(222, 47%, 11%)',
+                    label: 'Dark Slate',
+                },
+
+                {
+                    color: 'hsl(221, 39%, 11%)',
+                    label: 'Dark Gray',
+                },
+
+                {
+                 color: 'hsl(226, 57%, 21%)',
+                 label: 'Dark Blue',
+                },
+
+                {
+                  color: 'hsl(272, 72%, 47%)',
+                  label: 'Grimace Shake Purple',
+                },
+
+                {
+                    color: 'hsl(0, 75%, 60%)',
+                    label: 'Red'
+                },
+                {
+                    color: 'hsl(30, 75%, 60%)',
+                    label: 'Orange'
+                },
+                {
+                    color: 'hsl(60, 75%, 60%)',
+                    label: 'Yellow'
+                },
+                {
+                    color: 'hsl(90, 75%, 60%)',
+                    label: 'Light green'
+                },
+                {
+                    color: 'hsl(120, 75%, 60%)',
+                    label: 'Green'
+                },
+              
+            ]
+        },
+                    // Enable font plugin to provide font color options in the toolbar
+                    fontFamily: {
+                        options: [
+                            'default', 'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'
+                        ]
+                    }
+                })
+                .then(editor => {
+                    // No need to inject <style> tags here for color - CKEditor will handle it
+                    // Sync the CKEditor content with Livewire or other backend models
+                    editor.model.document.on('change:data', () => {
+                        const editorData = editor.getData();
+
+                        // Sync the CKEditor content with Livewire
+                        if (window.Livewire) {
+                            const livewireElement = element.closest('[wire\\:id]');
+                            if (livewireElement) {
+                                const componentId = livewireElement.getAttribute('wire:id');
+                                const propertyName = element.getAttribute('name');
+
+                                // Ensure propertyName is correct
+                                if (propertyName) {
+                                    window.Livewire.find(componentId).set(
+                                        `form.${propertyName}`, editorData);
+                                } else {
+                                    console.error('Property name not found on element:', element);
+                                }
                             } else {
-                                console.error('Unexpected property name:', name);
+                                console.error('Livewire element not found for:', element);
                             }
                         } else {
-                            console.error('Livewire element not found for:', element);
+                            console.error('Livewire is not available.');
                         }
-                    } else {
-                        console.error('Livewire is not available.');
-                    }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error during initialization of the editor', error);
                 });
-            })
-            .catch(error => {
-                console.error('Error during initialization of the editor:', error);
-            });
+        });
     });
-});
-
 </script>
 
 
  @elseif(\Route::currentRouteName() === 'admin.trip')
   <script>
- import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import Font from '@ckeditor/ckeditor5-font';
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize CKEditor for all elements with the class "ckeditor"
-    document.querySelectorAll('.ckeditor').forEach(element => {
-        ClassicEditor
-            .create(element, {
-                plugins: [Font, ...ClassicEditor.builtinPlugins],
-                toolbar: [
-                    'bold', 'italic', 'link', 'bulletedList', 'numberedList',
-                    'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo',
-                    'fontFamily', 'fontSize', 'fontColor'
-                ],
-                fontColor: {
-                    colors: [
-                        { color: '#000000', label: 'Black' },
-                        { color: '#FFFFFF', label: 'White' },
-                        { color: '#172554', label: 'Super Dark Blue' },
-                        { color: '#1e293b', label: 'Slate Dark' },
-                        { color: '#0f172a', label: 'Slate Super Dark' },
-                    ]
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize CKEditor for all elements with the class "ckeditor"
+        document.querySelectorAll('.ckeditor').forEach(element => {
+            ClassicEditor
+                .create(element, {
+                    // Additional configuration options for the editor
+                    toolbar: [
+                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
+                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor'
+                    ],
+                    // Enable fontColor plugin for the color wheel
+                    fontSize: {
+                        options: [
+                            'tiny',
+                            'default', 
+                            'medium',
+                            'big',
+                        ],
+                    },
+   fontColor: {
+            colors: [
+                
+                  {
+                    color: 'hsl(222, 47%, 11%)',
+                    label: 'Dark Slate',
                 },
-                fontFamily: {
-                    options: [
-                        'default', 'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'
-                    ]
+
+                {
+                    color: 'hsl(221, 39%, 11%)',
+                    label: 'Dark Gray',
                 },
-                fontSize: {
-                    options: [
-                        'tiny', 'small', 'default', 'big', 'huge'
-                    ]
-                }
-            })
-            .then(editor => {
-                // Set initial data if needed
-                const initialData = element.getAttribute('data-initial-content');
-                if (initialData) {
-                    editor.setData(initialData);
-                }
 
-                // Sync the CKEditor content with Livewire or other backend models
-                editor.model.document.on('change:data', () => {
-                    const editorData = editor.getData();
-                    const name = element.getAttribute('name');
+                {
+                 color: 'hsl(226, 57%, 21%)',
+                 label: 'Dark Blue',
+                },
 
-                    // Sync the CKEditor content with Livewire
-                    if (window.Livewire) {
-                        const livewireElement = element.closest('[wire\\:id]');
-                        if (livewireElement) {
-                            const componentId = livewireElement.getAttribute('wire:id');
+                {
+                  color: 'hsl(272, 72%, 47%)',
+                  label: 'Grimace Shake Purple',
+                },
+                
+                {
+                    color: 'hsl(0, 0%, 0%)',
+                    label: 'Black'
+                },
+                {
+                    color: 'hsl(0, 0%, 30%)',
+                    label: 'Dim grey'
+                },
+                {
+                    color: 'hsl(0, 0%, 60%)',
+                    label: 'Grey'
+                },
+                {
+                    color: 'hsl(0, 0%, 90%)',
+                    label: 'Light grey'
+                },
+                {
+                    color: 'hsl(0, 0%, 100%)',
+                    label: 'White',
+                    hasBorder: true
+                },
+                // More colors.
+                // ...
+            ]
+        },
+        fontBackgroundColor: {
+            colors: [
+                
+                {
+                    color: 'hsl(222, 47%, 11%)',
+                    label: 'Dark Slate',
+                },
 
-                            // Ensure the property name matches the public properties in the Livewire component
-                            if (name === 'tripDescription' || name === 'tripActivities') {
-                                window.Livewire.find(componentId).set(name, editorData);
+                {
+                    color: 'hsl(221, 39%, 11%)',
+                    label: 'Dark Gray',
+                },
+
+                {
+                 color: 'hsl(226, 57%, 21%)',
+                 label: 'Dark Blue',
+                },
+
+                {
+                  color: 'hsl(272, 72%, 47%)',
+                  label: 'Grimace Shake Purple',
+                },
+
+                {
+                    color: 'hsl(0, 75%, 60%)',
+                    label: 'Red'
+                },
+                {
+                    color: 'hsl(30, 75%, 60%)',
+                    label: 'Orange'
+                },
+                {
+                    color: 'hsl(60, 75%, 60%)',
+                    label: 'Yellow'
+                },
+                {
+                    color: 'hsl(90, 75%, 60%)',
+                    label: 'Light green'
+                },
+                {
+                    color: 'hsl(120, 75%, 60%)',
+                    label: 'Green'
+                },
+              
+            ]
+        },
+                    // Enable font plugin to provide font color options in the toolbar
+                    fontFamily: {
+                        options: [
+                            'default', 'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'
+                        ]
+                    }
+                })
+                .then(editor => {
+                    // No need to inject <style> tags here for color - CKEditor will handle it
+                    // Sync the CKEditor content with Livewire or other backend models
+                    editor.model.document.on('change:data', () => {
+                        const editorData = editor.getData();
+
+                        // Sync the CKEditor content with Livewire
+                        if (window.Livewire) {
+                            const livewireElement = element.closest('[wire\\:id]');
+                            if (livewireElement) {
+                                const componentId = livewireElement.getAttribute('wire:id');
+                                const propertyName = element.getAttribute('name');
+
+                                // Ensure propertyName is correct
+                                if (propertyName) {
+                                    window.Livewire.find(componentId).set(
+                                        `form.${propertyName}`, editorData);
+                                } else {
+                                    console.error('Property name not found on element:', element);
+                                }
                             } else {
-                                console.error('Unexpected property name:', name);
+                                console.error('Livewire element not found for:', element);
                             }
                         } else {
-                            console.error('Livewire element not found for:', element);
+                            console.error('Livewire is not available.');
                         }
-                    } else {
-                        console.error('Livewire is not available.');
-                    }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error during initialization of the editor', error);
                 });
-            })
-            .catch(error => {
-                console.error('Error during initialization of the editor:', error);
-            });
+        });
     });
-});
-
 </script>
 
  @endif
