@@ -201,11 +201,14 @@
         },
 
          // Additional configuration options for the editor
-                    toolbar: [
+                  /*  toolbar: [
                         'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
                         'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor'
-                    ],
-                    
+                    ], */
+                 toolbar: [
+                'heading', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'fontColor', 'fontBackgroundColor', 'undo', 'redo'
+                ]
+                            
                     // Enable font plugin to provide font color options in the toolbar
                     fontFamily: {
                         options: [
