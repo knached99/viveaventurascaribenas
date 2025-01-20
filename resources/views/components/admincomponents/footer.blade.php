@@ -96,8 +96,12 @@
         document.querySelectorAll('.ckeditor').forEach(element => {
             ClassicEditor
                 .create(element, {
-                   
-                    
+                    // Additional configuration options for the editor
+                    toolbar: [
+                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
+                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor'
+                    ],
+                    // Enable fontColor plugin for the color wheel
                     fontSize: {
                         options: [
                             'tiny',
@@ -150,7 +154,8 @@
                     label: 'White',
                     hasBorder: true
                 },
-            
+                // More colors.
+                // ...
             ]
         },
         fontBackgroundColor: {
@@ -199,16 +204,6 @@
               
             ]
         },
-
-         // Additional configuration options for the editor
-                  /*  toolbar: [
-                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
-                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor'
-                    ], */
-                 toolbar: [
-                'heading', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'fontColor', 'fontBackgroundColor', 'undo', 'redo'
-                ],
-                            
                     // Enable font plugin to provide font color options in the toolbar
                     fontFamily: {
                         options: [
