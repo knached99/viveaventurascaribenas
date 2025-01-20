@@ -97,119 +97,50 @@
             ClassicEditor
                 .create(element, {
                     // Additional configuration options for the editor
+                    plugins: [
+                     Essentials, Bold, Italic, Link, List, BlockQuote, InsertTable, MediaEmbed,
+                        Undo, Redo, FontColor, FontBackgroundColor, FontSize, FontFamily
+                    ],
 
                     toolbar: [
-                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
-                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor', 'fontBackgroundColor',
+                         'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
+                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 
+                        'fontColor', 'fontBackgroundColor'
                     ],
                     // Enable fontColor plugin for the color wheel
                     fontSize: {
-                        options: [
-                            'tiny',
-                            'default', 
-                            'medium',
-                            'big',
-                        ],
+                        options: ['tiny', 'default', 'medium', 'big'],
                     },
    fontColor: {
             colors: [
-                
-                  {
-                    color: 'hsl(222, 47%, 11%)',
-                    label: 'Dark Slate',
-                },
-
-                {
-                    color: 'hsl(221, 39%, 11%)',
-                    label: 'Dark Gray',
-                },
-
-                {
-                 color: 'hsl(226, 57%, 21%)',
-                 label: 'Dark Blue',
-                },
-
-                {
-                  color: 'hsl(272, 72%, 47%)',
-                  label: 'Grimace Shake Purple',
-                },
-
-                {
-                    color: 'hsl(0, 0%, 0%)',
-                    label: 'Black'
-                },
-                {
-                    color: 'hsl(0, 0%, 30%)',
-                    label: 'Dim grey'
-                },
-                {
-                    color: 'hsl(0, 0%, 60%)',
-                    label: 'Grey'
-                },
-                {
-                    color: 'hsl(0, 0%, 90%)',
-                    label: 'Light grey'
-                },
-                {
-                    color: 'hsl(0, 0%, 100%)',
-                    label: 'White',
-                    hasBorder: true
-                },
-                // More colors.
-                // ...
-            ]
+                            { color: 'hsl(222, 47%, 11%)', label: 'Dark Slate' },
+                            { color: 'hsl(221, 39%, 11%)', label: 'Dark Gray' },
+                            { color: 'hsl(226, 57%, 21%)', label: 'Dark Blue' },
+                            { color: 'hsl(272, 72%, 47%)', label: 'Grimace Shake Purple' },
+                            { color: 'hsl(0, 0%, 0%)', label: 'Black' },
+                            { color: 'hsl(0, 0%, 30%)', label: 'Dim grey' },
+                            { color: 'hsl(0, 0%, 60%)', label: 'Grey' },
+                            { color: 'hsl(0, 0%, 90%)', label: 'Light grey' },
+                            { color: 'hsl(0, 0%, 100%)', label: 'White', hasBorder: true }
+                        ]
         },
         fontBackgroundColor: {
-            colors: [
-                
-                {
-                    color: 'hsl(222, 47%, 11%)',
-                    label: 'Dark Slate',
-                },
+                        colors: [
+                            { color: 'hsl(222, 47%, 11%)', label: 'Dark Slate' },
+                            { color: 'hsl(221, 39%, 11%)', label: 'Dark Gray' },
+                            { color: 'hsl(226, 57%, 21%)', label: 'Dark Blue' },
+                            { color: 'hsl(272, 72%, 47%)', label: 'Grimace Shake Purple' },
+                            { color: 'hsl(0, 75%, 60%)', label: 'Red' },
+                            { color: 'hsl(30, 75%, 60%)', label: 'Orange' },
+                            { color: 'hsl(60, 75%, 60%)', label: 'Yellow' },
+                            { color: 'hsl(90, 75%, 60%)', label: 'Light green' },
+                            { color: 'hsl(120, 75%, 60%)', label: 'Green' }
+                        ]
+                    },
 
-                {
-                    color: 'hsl(221, 39%, 11%)',
-                    label: 'Dark Gray',
-                },
-
-                {
-                 color: 'hsl(226, 57%, 21%)',
-                 label: 'Dark Blue',
-                },
-
-                {
-                  color: 'hsl(272, 72%, 47%)',
-                  label: 'Grimace Shake Purple',
-                },
-
-                {
-                    color: 'hsl(0, 75%, 60%)',
-                    label: 'Red'
-                },
-                {
-                    color: 'hsl(30, 75%, 60%)',
-                    label: 'Orange'
-                },
-                {
-                    color: 'hsl(60, 75%, 60%)',
-                    label: 'Yellow'
-                },
-                {
-                    color: 'hsl(90, 75%, 60%)',
-                    label: 'Light green'
-                },
-                {
-                    color: 'hsl(120, 75%, 60%)',
-                    label: 'Green'
-                },
-              
-            ]
-        },
                     // Enable font plugin to provide font color options in the toolbar
                     fontFamily: {
-                        options: [
-                            'default', 'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana'
-                        ]
+                        options: ['default', 'Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana']
                     }
                 })
                 .then(editor => {
