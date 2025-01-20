@@ -97,9 +97,11 @@
             ClassicEditor
                 .create(element, {
                     // Additional configuration options for the editor
+
+                    plugins: [Font, FontFamily],
                     toolbar: [
-                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
-                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor'
+                       'fontSize', 'fontFamily', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
+                        'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor', 'fontBackgroundColor',
                     ],
                     // Enable fontColor plugin for the color wheel
                     fontSize: {
