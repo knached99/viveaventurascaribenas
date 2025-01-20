@@ -98,9 +98,8 @@
                 .create(element, {
                     // Additional configuration options for the editor
 
-                    plugins: [Font, FontFamily],
                     toolbar: [
-                       'fontSize', 'fontFamily', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
+                        'bold', 'italic', 'link', 'bulletedList', 'numberedList', 
                         'blockQuote', 'insertTable', 'mediaEmbed', 'undo', 'redo', 'fontColor', 'fontBackgroundColor',
                     ],
                     // Enable fontColor plugin for the color wheel
