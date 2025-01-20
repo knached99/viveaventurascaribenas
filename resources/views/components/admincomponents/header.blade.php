@@ -19,9 +19,6 @@
 
     <!-- CKEDITOR 5 CDN -->
     <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
-        {{-- <link rel="stylesheet" href="{{asset('assets/css/ckeditor5.css')}}">
-		<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/44.1.0/ckeditor5.css" crossorigin>
-		<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5-premium-features/44.1.0/ckeditor5-premium-features.css" crossorigin> --}}
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -82,7 +79,6 @@
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ asset('assets/theme_assets/assets/js/config.js') }}"></script>
 
-    {{-- <script src="{{ asset('assets/js/ckeditor5.js') }}"></script> --}}
 
     <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
 
