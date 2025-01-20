@@ -207,7 +207,7 @@
                     ], */
                  toolbar: [
                 'heading', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'fontColor', 'fontBackgroundColor', 'undo', 'redo'
-                ]
+                ],
                             
                     // Enable font plugin to provide font color options in the toolbar
                     fontFamily: {
