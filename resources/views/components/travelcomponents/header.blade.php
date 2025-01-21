@@ -797,7 +797,7 @@
     // then we target all child elements of the parent 
     // we then iterate over each child element and apply the chosen font-color 
      document.addEventListener('DOMContentLoaded', () => {
-    const textDescription = document.querySelector('.text-description');
+    const textDescription = document.querySelectorAll('.text-description');
 
         if (textDescription) {
             const childElements = textDescription.querySelectorAll('*');
