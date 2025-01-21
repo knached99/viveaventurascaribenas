@@ -791,20 +791,23 @@
     @livewireStyles
 
     <script>
-     const textDescription = document.querySelector('.text-description');
 
-     // Checking if the element exists 
-     // and then retrieving all child elements within the parent. 
-     // After that, we loop through each child and set the font-color to #0f172a
+    // After the browser fully loaded HTML, and the DOM tree is built
+    // we target the parent element containing the class: 'text-description'
+    // then we target all child elements of the parent 
+    // we then iterate over each child element and apply the chosen font-color 
+     document.addEventListener('DOMContentLoaded', () => {
+    const textDescription = document.querySelector('.text-description');
 
-     if(textDescription){
-        
-        const childElements = textDescription.querySelectorAll('*');
+        if (textDescription) {
+            const childElements = textDescription.querySelectorAll('*');
+            
+            childElements.forEach(child => {
+                child.style.color = '#1e293b';
+            });
+        }
+    });
 
-        childElements.forEach(child => {
-            child.style.color = '#0f172a';
-        });
-     }
     </script>
 
 </head>
