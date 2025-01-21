@@ -789,6 +789,24 @@
     @endif
     <!-- End Booking Page Styling -->
     @livewireStyles
+
+    <script>
+     const textDescription = document.querySelector('.text-description');
+
+     // Checking if the element exists 
+     // and then retrieving all child elements within the parent. 
+     // After that, we loop through each child and set the font-color to #0f172a
+
+     if(textDescription){
+        
+        const childElements = textDescription.querySelectorAll('*');
+
+        childElements.forEach(child => {
+            child.style.color = '#0f172a';
+        });
+     }
+    </script>
+
 </head>
 
 <body>
