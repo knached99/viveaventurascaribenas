@@ -799,16 +799,16 @@
      
      document.addEventListener('DOMContentLoaded', () => {
         const textDescriptions = document.querySelectorAll('.text-description');
-        console.log(`Found ${textDescriptions.length} elements with class 'text-description'`);
+       // console.log(`Found ${textDescriptions.length} elements with class 'text-description'`);
 
         textDescriptions.forEach((textDescription, index) => {
-            console.log(`Processing element ${index + 1}:`, textDescription);
+          //  console.log(`Processing element ${index + 1}:`, textDescription);
 
             const childElements = textDescription.querySelectorAll('*');
-            console.log(`Found ${childElements.length} child elements in element ${index + 1}`);
+           // console.log(`Found ${childElements.length} child elements in element ${index + 1}`);
 
             childElements.forEach((child, childIndex) => {
-                console.log(`Applying color to child ${childIndex + 1}:`, child);
+             //   console.log(`Applying color to child ${childIndex + 1}:`, child);
                 child.style.color = '#1e293b';
             });
         });
