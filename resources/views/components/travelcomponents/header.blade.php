@@ -796,17 +796,25 @@
     // we target the parent element containing the class: 'text-description'
     // then we target all child elements of the parent 
     // we then iterate over each child element and apply the chosen font-color 
+     
      document.addEventListener('DOMContentLoaded', () => {
-    const textDescription = document.querySelectorAll('.text-description');
 
-        if (textDescription) {
-            const childElements = textDescription.querySelectorAll('*');
+        const textDescriptions = document.querySelectorAll('.text-description');
+        console.log(`Found ${textDescriptions.length} elements with class 'text-description'`);
+        
+        textDescriptions.forEach((textDescription, index) => {
+
+            console.log(`Processing element ${index + 1}`);
             
+            const childElements = textdescription.querySelectorAll('*');
+
+            console.log(`Found ${childElements.length} child elements`);
+
             childElements.forEach(child => {
                 child.style.color = '#1e293b';
             });
-        }
-    });
+        });
+     });
 
     </script>
 
