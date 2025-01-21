@@ -89,7 +89,7 @@
  </script>
 
 
- @if (\Route::currentRouteName() === 'admin.create-trip')
+ @if (\Route::currentRouteName() === 'admin.create-trip' || \Route::currentRouteName() === 'admin.trip')
      <script>
          document.addEventListener('DOMContentLoaded', function() {
              // Initialize CKEditor for all elements with the class "ckeditor"
@@ -138,7 +138,7 @@
              });
          });
      </script>
- @elseif(\Route::currentRouteName() === 'admin.trip')
+ {{-- @elseif(\Route::currentRouteName() === 'admin.trip')
      <script>
          document.addEventListener('DOMContentLoaded', function() {
              // Initialize CKEditor for all elements with the class "ckeditor"
@@ -184,7 +184,7 @@
                      });
              });
          });
-     </script>
+     </script> --}}
  @endif
 
 
