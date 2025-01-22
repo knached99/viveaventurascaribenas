@@ -321,9 +321,9 @@
                     @else
                         <p style="font-size: 25px; color: #000; margin-left: 10px;">Be the first to leave a review!
 
-                        <button type="button" style="color: #4f46e5; text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#testimonial-form-popup">
+                        <a href="#" style="color: #4f46e5; text-decoration: underline; font-weight: semibold;" data-bs-toggle="modal" data-bs-target="#testimonial-form-popup">
                         Submit a review
-                        </button>
+                        </a>
                         </p>
                     @endif
                 </div>
@@ -484,7 +484,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Understood</button>
+        <button type="reset" class="btn btn-danger">Reset Form</button>
       </div>
     </div>
   </div>
