@@ -42,25 +42,28 @@
     </div>
 
     <!-- Trip Selection -->
-    @if (\Route::currentRouteName() === '/')
-    <div class="col-12">
-        <div class="form-group">
-            <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}" wire:model="tripID">
-                <option value="" disabled selected>Where did you travel with us?</option>
-                @forelse ($trips as $trip)
-                    <option value="{{ $trip['tripID'] }}">{{ $trip['tripLocation'] }}</option>
-                @empty
-                    <option value="" disabled>No trips available</option>
-                @endforelse
-            </select>
-            @error('tripID')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
+   @if (\Route::currentRouteName() === '/')
+        <div class="col-12">
+            <div class="form-group">
+                <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}" wire:model="tripID">
+                    <option value="" disabled selected>Where did you travel with us?</option>
+                    @forelse ($trips as $trip)
+                        <option value="{{ $trip['tripID'] }}">{{ $trip['tripLocation'] }}</option>
+                    @empty
+                        <option value="" disabled>No trips available</option>
+                    @endforelse
+                </select>
+                @error('tripID')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
+            </div>
         </div>
-    </div>
-    @elseif (\Route::currentRouteName() === 'destination')
-    <input type="hidden" wire:model="tripID" value="{{ $trip['tripID'] }}" />
-    @endif
+        @elseif (\Route::currentRouteName() === 'destination')
+        <div class="col-12">
+            <input type="hidden" wire:model="tripID" value="{{ $tripID }}" />
+        </div>
+        @endif
+
 
     <!-- Travel Date -->
     <div class="col-12">

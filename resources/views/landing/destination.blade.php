@@ -373,7 +373,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-       <livewire:forms.testimonial-form />
+       <livewire:testimonial-form :tripID="$trip->tripID" />
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
