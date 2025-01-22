@@ -59,7 +59,7 @@
         </div>
     </div>
     @elseif (\Route::currentRouteName() === 'destination')
-    <input type="hidden" wire:model="tripID" value="{{ $trip->tripID }}" />
+    <input type="hidden" wire:model="tripID" value="{{ $trip['tripID'] }}" />
     @endif
 
     <!-- Travel Date -->
