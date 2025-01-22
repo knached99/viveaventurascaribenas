@@ -79,6 +79,23 @@ class TestimonialForm extends Component
             ->get()
             ->toArray();
             //$this->testimonialID = (string) Str::uuid(); // Generate UUID for the testimonialID
+
+            if (\Route::currentRouteName() === 'destination') {
+                // Get the tripID from the route parameter
+                $this->tripID = request()->route('tripID');
+        
+                // Check if the tripID exists in the database
+                $trip = TripsModel::find($this->tripID);
+        
+                // If the trip does not exist, set an error message and stop further execution
+                if (!$trip) {
+                    $this->error = 'The trip you are trying to reference does not exist.';
+                    return; // Prevent further form processing
+                }
+        
+                // If the trip exists, you can safely use $this->tripID in the form
+                $this->tripID = $trip->tripID; // Optionally, ensure it's set to the valid tripID
+            }
     }
 
 
@@ -90,8 +107,9 @@ class TestimonialForm extends Component
         try{
 
             $booking = BookingModel::where('email', $this->email)->first();
+            $trip = TripsModel::where('tripID', $this->tripID)->where('active', true)->first();
 
-            if(empty($booking)){
+            if(!$trip){
 
                 $this->error = 'You cannot submit a testimonial unless you\'ve booked a trip with us';
                 return; // Kills the PHP script to prevent form submission 
@@ -147,12 +165,24 @@ class TestimonialForm extends Component
     }
 
 
-    public function render(){
+    // public function render(){
 
-        return view('livewire.forms.testimonial-form', [
-            'trips'=>$this->trips,
-        ]);
-    }
+    //     return view('livewire.forms.testimonial-form', [
+    //         'trips'=>$this->trips,
+    //     ]);
+    // }
+
+
+    public function render()
+{
+    // Fetch trips for '/' route
+    $trips = \Route::currentRouteName() === '/' ? $this->trips : [];
+
+    // Get specific tripID for 'destination' route
+    $tripID = \Route::currentRouteName() === 'destination' ? $this->tripID : null;
+
+    return view('livewire.forms.testimonial-form', compact('trips', 'tripID'));
+}
 
 
 }
