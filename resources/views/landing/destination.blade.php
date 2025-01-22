@@ -321,9 +321,9 @@
                     @else
                         <p style="font-size: 25px; color: #000; margin-left: 10px;">Be the first to leave a review!
                         </p>
-                         <a href="#" style="color: #4f46e5; text-decoration: underline; font-weight: semibold; font-size: 16px; display: block;" data-bs-toggle="modal" data-bs-target="#testimonial-form-popup">
+                         <button style="color: #4f46e5; text-decoration: underline; font-weight: semibold; font-size: 16px; display: block; background-color: transparent;" data-bs-toggle="modal" data-bs-target="#testimonial-form-popup">
                         Submit a review
-                        </a>
+                        </button>
                     @endif
                 </div>
                 <!-- End Testimonials Slider -->

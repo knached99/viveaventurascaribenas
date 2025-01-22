@@ -136,25 +136,7 @@ class TripForm extends Form {
         // Initializing to today's date
         $this->tripStartDate = Carbon::now()->format('Y-m-d');
         $this->tripEndDate = Carbon::now()->format('Y-m-d');
-        
-        if (\Route::currentRouteName() === 'destination') {
-            // Get the tripID from the route parameter
-            $this->tripID = request()->route('tripID');
-    
-            // Check if the tripID exists in the database
-            $trip = TripsModel::find($this->tripID);
-    
-            // If the trip does not exist, set an error message and stop further execution
-            if (!$trip) {
-                $this->error = 'The trip you are trying to reference does not exist.';
-                return; // Prevent further form processing
-            }
-    
-            // If the trip exists, you can safely use $this->tripID in the form
-            $this->tripID = $trip->tripID; // Optionally, ensure it's set to the valid tripID
-        }
     }
-    
 
     public function submitTripForm()
     {
@@ -270,15 +252,8 @@ class TripForm extends Form {
 
     public function render()
     {
-        // Fetching all available trips for '/' route
-        $trips = \Route::currentRouteName() === '/' ? $this->trips : [];
-    
-        // Retrieve specific tripID for 'destination' route
-        $tripID = \Route::currentRouteName() === 'destination' ? $this->tripID : null;
-    
-        return view('livewire.forms.testimonial-form', compact('trips', 'tripID'));
+        return view('livewire.pages.create-trip');
     }
-    
 
   
 
