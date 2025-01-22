@@ -320,6 +320,10 @@
                         </div>
                     @else
                         <p style="font-size: 25px; color: #000; margin-left: 10px;">Be the first to leave a review!
+
+                        <button type="button" style="color: #4f46e5; text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#testimonial-form-popup">
+                        Submit a review
+                        </button>
                         </p>
                     @endif
                 </div>
@@ -359,6 +363,134 @@
             @endif
         </div>
     </div>
+    
+    <!-- Form appears when user clicks on popup button -->
+   <!-- Modal -->
+<div class="modal fade" id="testimonial-form-popup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="testimonial-form-popup-label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="testimonial-form-popup-label">Submit review for {{$trip->tripLocation}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+         <form class="row g-3" wire:submit.prevent="submitTestimonialForm">
+                            <x-honeypot livewire-model="extraFields" />
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <input type="text" wire:model="name" name="name"
+                                        class="form-control {{ $errors->has('name') ? 'border border-danger' : '' }}"
+                                        placeholder="First Name">
+                                    @error('name')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <input type="email" wire:model="email"
+                                        class="form-control {{ $errors->has('email') ? 'border border-danger' : '' }}"
+                                        placeholder="Email (required for follow-up only)">
+                                    @error('email')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <input type="hidden" wire:model="tripID" value="{{$trip->tripID}}"/>
+                         
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-label">Travel Date</label>
+                                    <input wire:model="trip_date" type="month" max="{{ date('Y-m') }}"
+                                        value="{{ date('Y-m') }}"
+                                        class="form-control {{ $errors->has('trip_date') ? 'border border-danger' : '' }}">
+                                    @error('trip_date')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div
+                                    class="form-group {{ $errors->has('trip_rating') ? 'border border-danger' : '' }}">
+                                    <label class="form-label">Rate Your Experience (1-5 Stars)</label>
+                                    <div class="rating">
+                                        <input wire:model="trip_rating" type="radio" name="rating" value="5"
+                                            id="5">
+                                        <label for="5">☆</label>
+                                        <input wire:model="trip_rating" type="radio" name="rating" value="4"
+                                            id="4">
+                                        <label for="4">☆</label>
+                                        <input wire:model="trip_rating" type="radio" name="rating" value="3"
+                                            id="3">
+                                        <label for="3">☆</label>
+                                        <input wire:model="trip_rating" type="radio" name="rating" value="2"
+                                            id="2">
+                                        <label for="2">☆</label>
+                                        <input wire:model="trip_rating" type="radio" name="rating" value="1"
+                                            id="1">
+                                        <label for="1">☆</label>
+
+                                        @error('trip_rating')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <textarea wire:model="testimonial" class="form-control {{ $errors->has('testimonial') ? 'border border-danger' : '' }}"
+                                        rows="7" placeholder="Tell us about your experience (What made your trip special?)"></textarea>
+                                    @error('testimonial')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div
+                                    class="form-group d-flex align-items-center {{ $errors->has('consent') ? 'border border-danger' : '' }}">
+                                    <input wire:model="consent" type="checkbox" class="form-check-input me-2"
+                                        id="consent" name="consent">
+                                    <label class="form-label mb-0 m-3" for="consent">I consent to my testimonial being
+                                        used on the website</label>
+                                    @error('consent')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary w-100 py-3" wire:loading.remove>Submit
+                                        Testimonial</button>
+                                    <div class="spinner-border text-primary" role="status" wire:loading></div>
+                                </div>
+
+                            </div>
+
+                            <!-- Status Messages -->
+                            <div>
+                                @if (!empty($status))
+                                    <div class="mb-4 alert alert-success" role="alert">
+                                        {{ $status }}
+                                    </div>
+                                @elseif(!empty($error))
+                                    <div class="mb-4 alert alert-danger" role="alert">
+                                        {{ $error }}
+                                    </div>
+                                @endif
+                            </div>
+                            <!-- / Status Messages -->
+                        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Understood</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+   <!-- End Form popup window -->
 </section>
 
 <x-travelcomponents.footer />
