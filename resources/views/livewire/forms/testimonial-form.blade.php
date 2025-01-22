@@ -1,3 +1,4 @@
+@if(\Route::currentRouteName()=== '/')
 <section class="ftco-section py-5">
     <div class="container">
         <div class="row justify-content-center pb-4">
@@ -11,6 +12,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6">
                     <div class="blog-entry p-4  shadow-md rounded bg-light">
+                    @endif 
                         <form class="row g-3" wire:submit.prevent="submitTestimonialForm">
                             <x-honeypot livewire-model="extraFields" />
                             <div class="col-12">
@@ -33,6 +35,7 @@
                                     @enderror
                                 </div>
                             </div>
+                            @if(\Route::currentRouteName() === '')
                             <div class="col-12">
                                 <div class="form-group">
                                     <select
@@ -55,6 +58,9 @@
                                     @enderror
                                 </div>
                             </div>
+                            @elseif(\Route::currentRouteName() === 'destination')
+                            <input type="hidden" wire:model="tripID" value="{{$trip->tripID}}" />
+                            @endif 
                             <div class="col-12">
                                 <div class="form-group">
                                     <label class="form-label">Travel Date</label>
