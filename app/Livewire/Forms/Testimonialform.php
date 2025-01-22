@@ -109,7 +109,7 @@ class TestimonialForm extends Component
             $booking = BookingModel::where('email', $this->email)->first();
             $trip = TripsModel::where('tripID', $this->tripID)->where('active', true)->first();
 
-            if(!$trip){
+            if(empty($booking) || !$trip){
 
                 $this->error = 'You cannot submit a testimonial unless you\'ve booked a trip with us';
                 return; // Kills the PHP script to prevent form submission 
