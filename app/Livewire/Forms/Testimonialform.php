@@ -44,7 +44,7 @@ class TestimonialForm extends Component
     public string $status = '';
     public string $error = '';
 
-    public bool $isHomePage = false;
+    // public bool $isHomePage = false;
 
 
     protected $rules = [
@@ -76,7 +76,7 @@ class TestimonialForm extends Component
     public function mount()
     {
         $this->extraFields = new HoneypotData();
-        $this->isHomePage = \Route::currentRouteName() === '/';
+        // $this->isHomePage = \Route::currentRouteName() === '/';
         $this->trips = TripsModel::select('tripID', 'tripLocation')
             ->where('tripStartDate', '<', Carbon::now())
             ->orWhere('tripEndDate', '<', Carbon::now())
@@ -121,7 +121,13 @@ class TestimonialForm extends Component
 
             $this->status = 'Your testimonial has been submitted! Thank you for providing valuable feedback!';
             $this->resetForm();
-
+              // Re-fetch trips to ensure the select options are available on 
+           // component recycle
+            $this->trips = TripsModel::select('tripID', 'tripLocation')
+            ->where('tripStartDate', '<', Carbon::now())
+            ->orWhere('tripEndDate', '<', Carbon::now())
+            ->get()
+            ->toArray();
             
         }
 
