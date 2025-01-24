@@ -72,33 +72,6 @@ class TestimonialForm extends Component
     ];
 
     
-    // public function mount()
-    // {
-    //     $this->extraFields = new HoneypotData();
-    //     $this->trips = TripsModel::select('tripID', 'tripLocation')
-    //         ->where('tripStartDate', '<', Carbon::now())
-    //         ->orWhere('tripEndDate', '<', Carbon::now())
-    //         ->get()
-    //         ->toArray();
-    //         //$this->testimonialID = (string) Str::uuid(); // Generate UUID for the testimonialID
-
-    //         if (\Route::currentRouteName() === 'destination') {
-                           
-    //             // Check if the tripID exists in the database
-    //             $trip = TripsModel::find($this->tripID);
-                
-        
-    //             // If the trip does not exist, set an error message and stop further execution
-    //             if (!$trip) {
-    //                 $this->error = 'The trip you are trying to reference does not exist.';
-    //                 return; // Prevent further form processing
-    //             }
-        
-    //             // If the trip exists, you can safely use $this->tripID in the form
-    //             $this->tripID = $trip->tripID; // Optionally, ensure it's set to the valid tripID
-    //         }
-    // }
-
 
     public function mount()
     {
@@ -195,15 +168,17 @@ class TestimonialForm extends Component
 
 
     public function render()
-{
-    // Fetch trips for '/' route
-    $trips = \Route::currentRouteName() === '/' ? $this->trips : [];
-
-    // Get specific tripID for 'destination' route
-    $tripID = \Route::currentRouteName() === 'destination' ? $this->tripID : null;
-
-    return view('livewire.forms.testimonial-form', compact('trips', 'tripID'));
-}
+    {
+        $trips = \Route::currentRouteName() === '/' ? $this->trips : [];
+        $tripID = \Route::currentRouteName() === 'destination' ? $this->tripID : null;
+    
+        return view('livewire.forms.testimonial-form', [
+            'trips' => $trips,
+            'tripID' => $tripID,
+            'isHomePage' => $this->isHomePage, 
+        ]);
+    }
+    
 
 
 }
