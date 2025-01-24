@@ -30,7 +30,6 @@ class Home extends Controller
          $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
          $this->bookingID = Str::uuid();
         $this->isHomePage = \Route::currentRouteName() === '/';
-        \Log::info('Value of isHomePage variable: '.$this->isHomePage. ' from method: '.__FUNCTION__ .' from class: '.__CLASS__ .' on line '.__LINE__);
 
     }
     
@@ -47,6 +46,8 @@ class Home extends Controller
     // Optimized for performance 
     public function homePage()
     {
+        \Log::info('Value of isHomePage variable: '.$this->isHomePage. ' from method: '.__FUNCTION__ .' from class: '.__CLASS__ .' on line '.__LINE__);
+
         $totalBookings = BookingModel::count();
         $totalTrips = TripsModel::count();
         $customers = $this->stripe->customers->all();
@@ -113,7 +114,8 @@ class Home extends Controller
     public function getDestinationDetails($slug){
        
         $trip = TripsModel::where('slug', $slug)->where('active', true)->firstOrFail();
-        
+        \Log::info('Value of isHomePage variable: '.$this->isHomePage. ' from method: '.__FUNCTION__ .' from class: '.__CLASS__ .' on line '.__LINE__);
+
         $tripID = $trip->tripID;
 
         $testimonials = Testimonials::with('trip')
