@@ -175,7 +175,6 @@ class TestimonialForm extends Component
         return view('livewire.forms.testimonial-form', [
             'trips' => $trips,
             'tripID' => $tripID,
-            'isHomePage' => $this->isHomePage, 
         ]);
     }
     
