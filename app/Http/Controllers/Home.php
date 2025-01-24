@@ -30,6 +30,8 @@ class Home extends Controller
          $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
          $this->bookingID = Str::uuid();
         $this->isHomePage = \Route::currentRouteName() === '/';
+        \Log::info('Value of isHomePage variable: '.$this->isHomePage. ' from method: '.__FUNCTION__ .' from class: '.__CLASS__ .' on line '.__LINE__);
+
     }
     
    

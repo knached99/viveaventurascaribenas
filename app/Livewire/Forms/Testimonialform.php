@@ -82,7 +82,7 @@ class TestimonialForm extends Component
             ->orWhere('tripEndDate', '<', Carbon::now())
             ->get()
             ->toArray();
-
+            \Log::info('Value of isHomePage variable: '.$this->isHomePage. ' from method: '.__FUNCTION__ .' from class: '.__CLASS__ .' on line '.__LINE__);
     }
 
 
