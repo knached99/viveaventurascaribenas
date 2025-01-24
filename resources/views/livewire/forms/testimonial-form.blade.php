@@ -39,7 +39,7 @@
                             <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
                                 wire:model="tripID">
                                 <option value="" disabled selected>Where did you travel with us?</option>
-                                @if (isset($tripID))
+                                @if (\Route::currentRouteName() === 'destination' && isset($tripID))
                                     <option value="{{ $tripID }}" selected disabled>Trip Selected</option>
                                 @else
                                     @forelse ($trips as $trip)
