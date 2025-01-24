@@ -33,7 +33,7 @@
                     </div>
 
                     <!-- Trip Selection -->
-                    @if (isset($isHomePage))
+                    @if (isset($isHomePage) && $isHomePage)
                         <div class="col-12">
                             <div class="form-group">
                                 <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
