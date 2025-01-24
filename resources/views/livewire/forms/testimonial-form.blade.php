@@ -40,7 +40,7 @@
                                 wire:model="tripID">
                                 <option value="" disabled selected>Where did you travel with us?</option>
                                 @if (\Route::currentRouteName() === 'destination' && isset($tripID))
-                                    <option value="{{ $tripID }}" selected disabled wire:ignore>Trip Selected</option>
+                                    <option value="{{ $tripID }}" selected disabled>Trip Selected</option>
                                 @else
                                     @forelse ($trips as $trip)
                                         <option value="{{ $trip['tripID'] }}">{{ $trip['tripLocation'] }}</option>
