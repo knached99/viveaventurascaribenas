@@ -23,13 +23,11 @@ use Illuminate\Support\Facades\URL;
 class Home extends Controller
 {
 
-    public bool $isHomePage = false;
 
     public function __construct(){
          Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
          $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
          $this->bookingID = Str::uuid();
-        $this->isHomePage = \Route::currentRouteName() === '/';
 
     }
     
@@ -46,7 +44,6 @@ class Home extends Controller
     // Optimized for performance 
     public function homePage()
     {
-        \Log::info('Value of isHomePage variable: '.$this->isHomePage. ' from method: '.__FUNCTION__ .' from class: '.__CLASS__ .' on line '.__LINE__);
 
         $totalBookings = BookingModel::count();
         $totalTrips = TripsModel::count();
@@ -104,7 +101,6 @@ class Home extends Controller
             'totalBookings' => $totalBookings,
             'totalTrips' => $totalTrips,
             'totalCustomers'=>$totalCustomers, 
-            'isHomePage' => $this->isHomePage
         ]);
     }
 
@@ -114,7 +110,6 @@ class Home extends Controller
     public function getDestinationDetails($slug){
        
         $trip = TripsModel::where('slug', $slug)->where('active', true)->firstOrFail();
-        \Log::info('Value of isHomePage variable: '.$this->isHomePage. ' from method: '.__FUNCTION__ .' from class: '.__CLASS__ .' on line '.__LINE__);
 
         $tripID = $trip->tripID;
 
@@ -149,7 +144,6 @@ class Home extends Controller
             'testimonials' => $testimonials,
             'averageTestimonialRating' => $averageTestimonialRating,
             'isMostPopular' => $isMostPopular,
-            'isHomePage' => $this->isHomePage
         ]);
     }
     

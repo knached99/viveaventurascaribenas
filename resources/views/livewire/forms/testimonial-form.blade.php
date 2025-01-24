@@ -33,26 +33,29 @@
                     </div>
 
                     <!-- Trip Selection -->
-                    @if (isset($isHomePage) && $isHomePage)
-                        <div class="col-12">
-                            <div class="form-group">
-                                <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
-                                    wire:model="tripID">
-                                    <option value="" disabled selected>Where did you travel with us?</option>
+
+                    <div class="col-12">
+                        <div class="form-group">
+                            <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
+                                wire:model="tripID">
+                                <option value="" disabled selected>Where did you travel with us?</option>
+                                @if (isset($tripID) && isset($tripLocation))
+                                    <option value="{{ $tripID }}" selected disabled>Trip Selected</option>
+                                @else
                                     @forelse ($trips as $trip)
                                         <option value="{{ $trip['tripID'] }}">{{ $trip['tripLocation'] }}</option>
                                     @empty
                                         <option value="" disabled>No trips available</option>
                                     @endforelse
-                                </select>
-                                @error('tripID')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
+                                @endif
+                            </select>
+                            @error('tripID')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
-                    @else
-                        <input type="hidden" wire:model="tripID" value="{{ $tripID }}" />
-                    @endif
+                    </div>
+
+                    {{-- <input type="hidden" wire:model="tripID" value="{{ $tripID }}" /> --}}
                     <!-- Trip Selection -->
 
 

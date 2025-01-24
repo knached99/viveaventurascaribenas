@@ -44,7 +44,6 @@ class TestimonialForm extends Component
     public string $status = '';
     public string $error = '';
 
-      public bool $isHomePage = false;
 
 
     protected $rules = [
@@ -76,13 +75,11 @@ class TestimonialForm extends Component
     public function mount()
     {
         $this->extraFields = new HoneypotData();
-         $this->isHomePage = \Route::currentRouteName() === '/';
         $this->trips = TripsModel::select('tripID', 'tripLocation')
             ->where('tripStartDate', '<', Carbon::now())
             ->orWhere('tripEndDate', '<', Carbon::now())
             ->get()
             ->toArray();
-            \Log::info('Value of isHomePage variable: '.$this->isHomePage. ' from method: '.__FUNCTION__ .' from class: '.__CLASS__ .' on line '.__LINE__);
     }
 
 
@@ -166,7 +163,6 @@ class TestimonialForm extends Component
     return view('livewire.forms.testimonial-form', [
         'trips' => $this->trips, 
         'tripID' => $this->tripID,
-        'isHomePage' => $this->isHomePage
     ]);
 }
 

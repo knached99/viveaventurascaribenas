@@ -274,7 +274,7 @@
             about your journey!</p>
     </div>
 </div>
-<livewire:forms.testimonial-form :isHomePage="$isHomePage" />
+<livewire:forms.testimonial-form />
 <!-- Testimonial Submission -->
 
 <!-- Photo Galleries Component -->
