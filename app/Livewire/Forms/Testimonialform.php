@@ -44,6 +44,8 @@ class TestimonialForm extends Component
     public string $status = '';
     public string $error = '';
 
+    public bool $isHomePage = false;
+
 
     protected $rules = [
         'name' => 'required|string',
@@ -70,33 +72,45 @@ class TestimonialForm extends Component
     ];
 
     
+    // public function mount()
+    // {
+    //     $this->extraFields = new HoneypotData();
+    //     $this->trips = TripsModel::select('tripID', 'tripLocation')
+    //         ->where('tripStartDate', '<', Carbon::now())
+    //         ->orWhere('tripEndDate', '<', Carbon::now())
+    //         ->get()
+    //         ->toArray();
+    //         //$this->testimonialID = (string) Str::uuid(); // Generate UUID for the testimonialID
+
+    //         if (\Route::currentRouteName() === 'destination') {
+                           
+    //             // Check if the tripID exists in the database
+    //             $trip = TripsModel::find($this->tripID);
+                
+        
+    //             // If the trip does not exist, set an error message and stop further execution
+    //             if (!$trip) {
+    //                 $this->error = 'The trip you are trying to reference does not exist.';
+    //                 return; // Prevent further form processing
+    //             }
+        
+    //             // If the trip exists, you can safely use $this->tripID in the form
+    //             $this->tripID = $trip->tripID; // Optionally, ensure it's set to the valid tripID
+    //         }
+    // }
+
+
     public function mount()
     {
         $this->extraFields = new HoneypotData();
+        $this->isHomePage = \Route::currentRouteName() === '/';
         $this->trips = TripsModel::select('tripID', 'tripLocation')
             ->where('tripStartDate', '<', Carbon::now())
             ->orWhere('tripEndDate', '<', Carbon::now())
             ->get()
             ->toArray();
-            //$this->testimonialID = (string) Str::uuid(); // Generate UUID for the testimonialID
-
-            if (\Route::currentRouteName() === 'destination') {
-                // Get the tripID from the route parameter
-                $this->tripID = request()->route('tripID');
-        
-                // Check if the tripID exists in the database
-                $trip = TripsModel::find($this->tripID);
-        
-                // If the trip does not exist, set an error message and stop further execution
-                if (!$trip) {
-                    $this->error = 'The trip you are trying to reference does not exist.';
-                    return; // Prevent further form processing
-                }
-        
-                // If the trip exists, you can safely use $this->tripID in the form
-                $this->tripID = $trip->tripID; // Optionally, ensure it's set to the valid tripID
-            }
     }
+
 
 
     public function submitTestimonialForm(): void {
@@ -161,6 +175,13 @@ class TestimonialForm extends Component
         $this->trip_rating = 0;
         $this->testimonial = '';
         $this->consent = false;
+           // Re-fetch trips to ensure the select options are available on 
+           // component recycle
+        $this->trips = TripsModel::select('tripID', 'tripLocation')
+        ->where('tripStartDate', '<', Carbon::now())
+        ->orWhere('tripEndDate', '<', Carbon::now())
+        ->get()
+        ->toArray();
 
     }
 

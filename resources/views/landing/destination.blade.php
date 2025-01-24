@@ -89,6 +89,11 @@
                                 style="width: 100px; height: 100px;" />
                         @endif
                     </h2>
+                    <button
+                        style="margin: 10px; color: #4f46e5; text-decoration: underline; font-weight: semibold; font-size: 16px; display: block; background-color: transparent; border: none;"
+                        data-bs-toggle="modal" data-bs-target="#testimonial-form-popup">
+                        Submit a review
+                    </button>
 
 
 
@@ -176,9 +181,10 @@
                                 <span class="warning-badge">{{ $trip->tripAvailability }}</span>
                                 <!-- Add a disclaimer -->
                                 <br />
-                                <span class="text-dark mt-3" style="font-style: italic; ">Exciting news! This trip will be available soon! 
-                                Let us know your preferred travel dates,
-                                 and we will reach out within 24-48 hours to see how we can accommodate you.
+                                <span class="text-dark mt-3" style="font-style: italic; ">Exciting news! This trip will be
+                                    available soon!
+                                    Let us know your preferred travel dates,
+                                    and we will reach out within 24-48 hours to see how we can accommodate you.
                                 </span>
                             @break
 
@@ -321,9 +327,7 @@
                     @else
                         <p style="font-size: 25px; color: #000; margin-left: 10px;">Be the first to leave a review!
                         </p>
-                         <button style="color: #4f46e5; text-decoration: underline; font-weight: semibold; font-size: 16px; display: block; background-color: transparent; border: none;" data-bs-toggle="modal" data-bs-target="#testimonial-form-popup">
-                        Submit a review
-                        </button>
+
                     @endif
                 </div>
                 <!-- End Testimonials Slider -->
@@ -355,34 +359,36 @@
                             class="btn">{{ $trip->tripAvailability === 'coming soon'
                                 ? 'Reserve Now'
                                 : 'Book
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            Now' }}</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            Now' }}</a>
 
                     </div>
                 </div>
             @endif
         </div>
     </div>
-    
-    <!-- Form appears when user clicks on popup button -->
-   <!-- Modal -->
-<div class="modal fade" id="testimonial-form-popup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="testimonial-form-popup-label" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="testimonial-form-popup-label">Submit review for {{$trip->tripLocation}}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-       <livewire:forms.testimonial-form :tripID="$trip->tripID" />
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
 
-   <!-- End Form popup window -->
+    <!-- Form appears when user clicks on popup button -->
+    <!-- Modal -->
+    <div class="modal fade" id="testimonial-form-popup" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="testimonial-form-popup-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="testimonial-form-popup-label">Submit review for
+                        {{ $trip->tripLocation }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <livewire:forms.testimonial-form :tripID="$trip->tripID" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Form popup window -->
 </section>
 
 <x-travelcomponents.footer />
