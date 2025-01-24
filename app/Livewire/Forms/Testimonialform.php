@@ -44,7 +44,7 @@ class TestimonialForm extends Component
     public string $status = '';
     public string $error = '';
 
-    // public bool $isHomePage = false;
+     public bool $isHomePage = false;
 
 
     protected $rules = [
@@ -76,7 +76,7 @@ class TestimonialForm extends Component
     public function mount()
     {
         $this->extraFields = new HoneypotData();
-        // $this->isHomePage = \Route::currentRouteName() === '/';
+         $this->isHomePage = \Route::currentRouteName() === '/';
         $this->trips = TripsModel::select('tripID', 'tripLocation')
             ->where('tripStartDate', '<', Carbon::now())
             ->orWhere('tripEndDate', '<', Carbon::now())
@@ -165,6 +165,7 @@ class TestimonialForm extends Component
     return view('livewire.forms.testimonial-form', [
         'trips' => $this->trips, 
         'tripID' => $this->tripID,
+        'isHomePage' => $this->isHomePage
     ]);
 }
 
