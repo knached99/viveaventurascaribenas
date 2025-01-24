@@ -23,12 +23,13 @@ use Illuminate\Support\Facades\URL;
 class Home extends Controller
 {
 
+    public bool $isHomePage = false;
 
     public function __construct(){
          Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
          $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
          $this->bookingID = Str::uuid();
-
+        $this->isHomePage = \Route::currentRouteName() === '/';
     }
     
    
@@ -48,6 +49,7 @@ class Home extends Controller
         $totalTrips = TripsModel::count();
         $customers = $this->stripe->customers->all();
         $totalCustomers = count($customers);
+       
 
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'slug',  'num_trips', 'stripe_product_id', 'stripe_coupon_id')->where('active', true)->get();
         $testimonials = Testimonials::with('trip')->where('testimonial_approval_status', 'Approved')->get();
@@ -99,6 +101,7 @@ class Home extends Controller
             'totalBookings' => $totalBookings,
             'totalTrips' => $totalTrips,
             'totalCustomers'=>$totalCustomers, 
+            'isHomePage' => $this->isHomePage
         ]);
     }
 
@@ -141,7 +144,8 @@ class Home extends Controller
             'trip' => $trip,
             'testimonials' => $testimonials,
             'averageTestimonialRating' => $averageTestimonialRating,
-            'isMostPopular' => $isMostPopular
+            'isMostPopular' => $isMostPopular,
+            'isHomePage' => $this->isHomePage
         ]);
     }
     

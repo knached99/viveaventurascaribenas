@@ -44,7 +44,7 @@ class TestimonialForm extends Component
     public string $status = '';
     public string $error = '';
 
-     public bool $isHomePage = false;
+      public bool $isHomePage = false;
 
 
     protected $rules = [

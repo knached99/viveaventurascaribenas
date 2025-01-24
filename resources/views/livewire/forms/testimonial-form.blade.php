@@ -1,3 +1,5 @@
+@props(['isHomePage'])
+
 <section class="ftco-section py-5">
     <div class="container">
 
@@ -32,8 +34,7 @@
                     </div>
 
                     <!-- Trip Selection -->
-
-                    @if ($this->isHomePage)
+                    @if ($isHomePage)
                         <div class="col-12">
                             <div class="form-group">
                                 <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
