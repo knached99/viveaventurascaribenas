@@ -121,13 +121,7 @@ class TestimonialForm extends Component
 
             $this->status = 'Your testimonial has been submitted! Thank you for providing valuable feedback!';
             $this->resetForm();
-              // Re-fetch trips to ensure the select options are available on 
-           // component recycle
-            $this->trips = TripsModel::select('tripID', 'tripLocation')
-            ->where('tripStartDate', '<', Carbon::now())
-            ->orWhere('tripEndDate', '<', Carbon::now())
-            ->get()
-            ->toArray();
+            
             
         }
 
@@ -154,14 +148,6 @@ class TestimonialForm extends Component
         $this->trip_rating = 0;
         $this->testimonial = '';
         $this->consent = false;
-           // Re-fetch trips to ensure the select options are available on 
-           // component recycle
-        $this->trips = TripsModel::select('tripID', 'tripLocation')
-        ->where('tripStartDate', '<', Carbon::now())
-        ->orWhere('tripEndDate', '<', Carbon::now())
-        ->get()
-        ->toArray();
-
     }
 
 
@@ -173,16 +159,15 @@ class TestimonialForm extends Component
     // }
 
 
+
     public function render()
-    {
-        $trips = \Route::currentRouteName() === '/' ? $this->trips : [];
-        $tripID = \Route::currentRouteName() === 'destination' ? $this->tripID : null;
-    
-        return view('livewire.forms.testimonial-form', [
-            'trips' => $trips,
-            'tripID' => $tripID,
-        ]);
-    }
+{
+    return view('livewire.forms.testimonial-form', [
+        'trips' => $this->trips, 
+        'tripID' => $this->tripID,
+    ]);
+}
+
     
 
 
