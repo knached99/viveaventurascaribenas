@@ -268,7 +268,7 @@ class Analytics extends Controller
     
         // Store the timestamp for when the data was last refreshed
         $currentTimestamp = now()->toDateTimeString();
-        $cacheExpirationTimestamp = $cacheDuration->toDateTimeString();
+        $cache_expiration_date = $cacheDuration->toDateTimeString();
         // Prepare analytics data
         $analyticsData = [
             'topBrowsers' => $topBrowsers,
@@ -282,7 +282,7 @@ class Analytics extends Controller
             'botPercentage' => $botData['botPercentage'],
             'realVisitorsPercentage' => $botData['realVisitorsPercentage'],
             'data_current_as_of' => $currentTimestamp, // Add timestamp
-            'cache_expiration_date' => $cacheExpirationTimestamp // when the data will refresh
+            'cache_expiration_date' => $cache_expiration_date // when the data will refresh
         ];
     
         // Store in cache for one week
