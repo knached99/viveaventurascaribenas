@@ -520,146 +520,263 @@ class EditTripForm extends Component
     // Create a coupon to apply discounts to a specific destination pacakge 
   
 
-    public function createDiscount()
-    {
-        try {
-            $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+    // public function createDiscount()
+    // {
+    //     try {
+    //         $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
     
-            $trip = TripsModel::findOrFail($this->trip->tripID);
+    //         $trip = TripsModel::findOrFail($this->trip->tripID);
     
-            // Validation rules
-            $rules = [
-                'discountType' => 'required|in:percentage,amount',
-                'discountDuration'=>'required|integer|min:1|max:12',
-                'discountValue' => 'required|numeric',
-                'promotionCode' => 'nullable|string'
-            ];
+    //         // Validation rules
+    //         $rules = [
+    //             'discountType' => 'required|in:percentage,amount',
+    //             'discountDuration'=>'required|integer|min:1|max:12',
+    //             'discountValue' => 'required|numeric',
+    //             'promotionCode' => 'nullable|string'
+    //         ];
     
-            $validationMessages = [
-                'discountType.required' => 'You must choose the discount type',
-                'discountType.in' => 'The discount type must be either percentage or amount',
-                'discountDuration.required'=>'Please provide the duration of this discount in months. (Example 1 = 1 month)',
-                'discountDuration.min'=>'Duration must be at least 1 month',
-                'discountDuration.max'=>'Duration must be a max of 12 months',
-                'discountValue.required' => 'You must enter the discount amount',
-                'discountValue.numeric' => 'Discount value must be numeric',
-            ];
+    //         $validationMessages = [
+    //             'discountType.required' => 'You must choose the discount type',
+    //             'discountType.in' => 'The discount type must be either percentage or amount',
+    //             'discountDuration.required'=>'Please provide the duration of this discount in months. (Example 1 = 1 month)',
+    //             'discountDuration.min'=>'Duration must be at least 1 month',
+    //             'discountDuration.max'=>'Duration must be a max of 12 months',
+    //             'discountValue.required' => 'You must enter the discount amount',
+    //             'discountValue.numeric' => 'Discount value must be numeric',
+    //         ];
     
-            $this->validate($rules, $validationMessages);
+    //         $this->validate($rules, $validationMessages);
     
-            if ($this->discountType === 'percentage' && ($this->discountValue < 1 || $this->discountValue > 100)) {
-                $this->discountCreateError = 'Discount percentage must be between 1% and 100%';
-                return;
-            } elseif ($this->discountType === 'amount' && $this->discountValue <= 0) {
-                $this->discountCreateError = 'Amount discounted must be greater than $0';
-                return;
-            }
+    //         if ($this->discountType === 'percentage' && ($this->discountValue < 1 || $this->discountValue > 100)) {
+    //             $this->discountCreateError = 'Discount percentage must be between 1% and 100%';
+    //             return;
+    //         } elseif ($this->discountType === 'amount' && $this->discountValue <= 0) {
+    //             $this->discountCreateError = 'Amount discounted must be greater than $0';
+    //             return;
+    //         }
     
-            // Prepare coupon data based on discount type
-            $couponData = [];
-            if ($this->discountType === 'percentage') {
-                $couponData = [
-                    'percent_off' => round($this->discountValue, 2),
-                    'duration' => 'repeating',
-                    'duration_in_months' => $this->discountDuration,
-                ];
-            } elseif ($this->discountType === 'amount') {
-                $couponData = [
-                    'amount_off' => intval($this->discountValue * 100),
-                    'currency' => 'usd',
-                    'duration' => 'repeating',
-                    'duration_in_months' => $this->discountDuration,
-                ];
-            }
+    //         // Prepare coupon data based on discount type
+    //         $couponData = [];
+    //         if ($this->discountType === 'percentage') {
+    //             $couponData = [
+    //                 'percent_off' => round($this->discountValue, 2),
+    //                 'duration' => 'repeating',
+    //                 'duration_in_months' => $this->discountDuration,
+    //             ];
+    //         } elseif ($this->discountType === 'amount') {
+    //             $couponData = [
+    //                 'amount_off' => intval($this->discountValue * 100),
+    //                 'currency' => 'usd',
+    //                 'duration' => 'repeating',
+    //                 'duration_in_months' => $this->discountDuration,
+    //             ];
+    //         }
     
-            // Get all coupons and find the one that matches the product and discount type
-            $existingCoupons = $stripe->coupons->all(['limit' => 100]); // Fetch all coupons
-            $coupon = null;
+    //         // Get all coupons and find the one that matches the product and discount type
+    //         $existingCoupons = $stripe->coupons->all(['limit' => 100]); // Fetch all coupons
+    //         $coupon = null;
     
-            foreach ($existingCoupons->data as $existingCoupon) {
-                // Check if coupon matches the discount type and value 
-                if (($this->discountType === 'percentage' && isset($existingCoupon->percent_off) && $existingCoupon->percent_off == $couponData['percent_off']) ||
-                    ($this->discountType === 'amount' && isset($existingCoupon->amount_off) && $existingCoupon->amount_off == $couponData['amount_off'])) {
-                    $coupon = $existingCoupon;
-                    break;
-                }
-            }
+    //         foreach ($existingCoupons->data as $existingCoupon) {
+    //             // Check if coupon matches the discount type and value 
+    //             if (($this->discountType === 'percentage' && isset($existingCoupon->percent_off) && $existingCoupon->percent_off == $couponData['percent_off']) ||
+    //                 ($this->discountType === 'amount' && isset($existingCoupon->amount_off) && $existingCoupon->amount_off == $couponData['amount_off'])) {
+    //                 $coupon = $existingCoupon;
+    //                 break;
+    //             }
+    //         }
     
-            if (!$coupon) {
-                // Create a new coupon if none exists
-                $coupon = $stripe->coupons->create($couponData);
-                \Log::info('Coupon created in Stripe with ID: ' . $coupon->id);
-            } else {
-                \Log::info('Using existing coupon: ' . $coupon->id);
-            }
+    //         if (!$coupon) {
+    //             // Create a new coupon if none exists
+    //             $coupon = $stripe->coupons->create($couponData);
+    //             \Log::info('Coupon created in Stripe with ID: ' . $coupon->id);
+    //         } else {
+    //             \Log::info('Using existing coupon: ' . $coupon->id);
+    //         }
     
-            // Get all promotion codes and check if one exists for the coupon
-            $existingPromoCodes = $stripe->promotionCodes->all(['limit' => 100]); // Fetch all promo codes
-            $promoCode = null;
+    //         // Get all promotion codes and check if one exists for the coupon
+    //         $existingPromoCodes = $stripe->promotionCodes->all(['limit' => 100]); // Fetch all promo codes
+    //         $promoCode = null;
     
-            foreach ($existingPromoCodes->data as $existingPromoCode) {
-                if ($existingPromoCode->coupon === $coupon->id) {
-                    $promoCode = $existingPromoCode;
-                    break;
-                }
-            }
+    //         foreach ($existingPromoCodes->data as $existingPromoCode) {
+    //             if ($existingPromoCode->coupon === $coupon->id) {
+    //                 $promoCode = $existingPromoCode;
+    //                 break;
+    //             }
+    //         }
     
-            if (!$promoCode) {
-                // Create a new promotion code if none exists
-                $promoCode = $stripe->promotionCodes->create([
-                    'coupon' => $coupon->id,
-                    'code' => $this->promotionCode ? $this->promotionCode : strtoupper(Str::random(8)),
-                ]);
-                \Log::info('Promotion code created successfully: ' . $promoCode->id);
-            } else {
-                \Log::info('Using existing promotion code: ' . $promoCode->id);
-            }
+    //         if (!$promoCode) {
+    //             // Create a new promotion code if none exists
+    //             $promoCode = $stripe->promotionCodes->create([
+    //                 'coupon' => $coupon->id,
+    //                 'code' => $this->promotionCode ? $this->promotionCode : strtoupper(Str::random(8)),
+    //             ]);
+    //             \Log::info('Promotion code created successfully: ' . $promoCode->id);
+    //         } else {
+    //             \Log::info('Using existing promotion code: ' . $promoCode->id);
+    //         }
     
-            // Update trip with Stripe coupon and promo code IDs
-            $trip->stripe_coupon_id = $coupon->id;
-            $trip->stripe_promo_id = $promoCode->id;
-            $trip->save();
+    //         // Update trip with Stripe coupon and promo code IDs
+    //         $trip->stripe_coupon_id = $coupon->id;
+    //         $trip->stripe_promo_id = $promoCode->id;
+    //         $trip->save();
     
-            $this->discountCreateSuccess = 'Discount created successfully!';
-        } catch (Stripe\Exception\ApiErrorException $e) {
-            \Log::error('Error creating discount on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' in method: ' . __FUNCTION__ . ' Error: ' . $e->getMessage());
-            $this->discountCreateError = 'Failed to create discount. Something went wrong';
-        }
-    }
-    
+    //         $this->discountCreateSuccess = 'Discount created successfully!';
+    //     } catch (Stripe\Exception\ApiErrorException $e) {
+    //         \Log::error('Error creating discount on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' in method: ' . __FUNCTION__ . ' Error: ' . $e->getMessage());
+    //         $this->discountCreateError = 'Failed to create discount. Something went wrong';
+    //     }
+    // }
 
-    public function deleteCoupon()
-    {
+    public function createDiscount()
+{
+    try {
         $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
         $trip = TripsModel::findOrFail($this->trip->tripID);
+
+        // Validation rules
+        $rules = [
+            'discountType' => 'required|in:percentage,amount',
+            'discountDuration' => 'required|integer|min:1|max:12',
+            'discountValue' => 'required|numeric',
+            'promotionCode' => 'nullable|string'
+        ];
+
+        $this->validate($rules, [
+            'discountType.required' => 'You must choose the discount type',
+            'discountType.in' => 'The discount type must be either percentage or amount',
+            'discountDuration.required' => 'Please provide the duration of this discount in months.',
+            'discountDuration.min' => 'Duration must be at least 1 month',
+            'discountDuration.max' => 'Duration must be a max of 12 months',
+            'discountValue.required' => 'You must enter the discount amount',
+            'discountValue.numeric' => 'Discount value must be numeric',
+        ]);
+
+        if ($this->discountType === 'percentage' && ($this->discountValue < 1 || $this->discountValue > 100)) {
+            $this->discountCreateError = 'Discount percentage must be between 1% and 100%';
+            return;
+        } elseif ($this->discountType === 'amount' && $this->discountValue <= 0) {
+            $this->discountCreateError = 'Amount discounted must be greater than $0';
+            return;
+        }
+
+        // Prepare coupon data
+        $couponData = $this->discountType === 'percentage' 
+            ? ['percent_off' => round($this->discountValue, 2), 'duration' => 'repeating', 'duration_in_months' => $this->discountDuration] 
+            : ['amount_off' => intval($this->discountValue * 100), 'currency' => 'usd', 'duration' => 'repeating', 'duration_in_months' => $this->discountDuration];
+
+        // Check for existing coupon
+        $existingCoupons = $stripe->coupons->all(['limit' => 100]);
+
+        // Replaced foreach loop with laravel collect() as it is more memory efficient
+        $coupon = collect($existingCoupons->data)->first(fn($c) => 
+            ($this->discountType === 'percentage' && isset($c->percent_off) && $c->percent_off == $couponData['percent_off']) ||
+            ($this->discountType === 'amount' && isset($c->amount_off) && $c->amount_off == $couponData['amount_off'])
+        );
+
+        if (!$coupon) {
+            $coupon = $stripe->coupons->create($couponData);
+            \Log::info('Coupon created in Stripe with ID: ' . $coupon->id);
+        } else {
+            \Log::info('Using existing coupon: ' . $coupon->id);
+        }
+
+        // Check for existing promotion code
+        $existingPromoCodes = $stripe->promotionCodes->all(['limit' => 100]);
+        $promoCode = collect($existingPromoCodes->data)->first(fn($p) => $p->coupon === $coupon->id);
+
+        if (!$promoCode) {
+            $promoCode = $stripe->promotionCodes->create([
+                'coupon' => $coupon->id,
+                'code' => $this->promotionCode ?: strtoupper(Str::random(8)),
+            ]);
+            \Log::info('Promotion code created successfully: ' . $promoCode->id);
+        } else {
+            \Log::info('Using existing promotion code: ' . $promoCode->id);
+        }
+
+        // Update trip model
+        $trip->stripe_coupon_id = $coupon->id;
+        $trip->stripe_promo_id = $promoCode->id;
+        $trip->save();
+
+        // Purge old cache after successful update
+        $this->purgeCache($this->trip->tripID);
+
+        $this->discountCreateSuccess = 'Discount created successfully!';
+    } catch (Stripe\Exception\ApiErrorException $e) {
+        \Log::error('Error creating discount: ' . $e->getMessage());
+        $this->discountCreateError = 'Failed to create discount. Something went wrong';
+    }
+}
+
     
-        $couponID = $trip->stripe_coupon_id;
+
+    // public function deleteCoupon()
+    // {
+    //     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+    //     $trip = TripsModel::findOrFail($this->trip->tripID);
+    
+    //     $couponID = $trip->stripe_coupon_id;
         
-        try {
-            if (!empty($couponID)) {  // Ensure couponID is not null or empty
-                $deleteCouponStripe = $stripe->coupons->delete($couponID, []);
+    //     try {
+    //         if (!empty($couponID)) {  // Ensure couponID is not null or empty
+    //             $deleteCouponStripe = $stripe->coupons->delete($couponID, []);
                 
-                if ($deleteCouponStripe) {
-                    $trip->stripe_coupon_id = '';
+    //             if ($deleteCouponStripe) {
+    //                 $trip->stripe_coupon_id = '';
     
-                    $deleteCouponDB = $trip->save();
+    //                 $deleteCouponDB = $trip->save();
     
-                    $this->couponDeleteSuccess = $deleteCouponDB
-                        ? 'The coupon has been deleted and is no longer available'
-                        : 'Unable to delete the coupon. Something went wrong in the database.';
+    //                 $this->couponDeleteSuccess = $deleteCouponDB
+    //                     ? 'The coupon has been deleted and is no longer available'
+    //                     : 'Unable to delete the coupon. Something went wrong in the database.';
+    //             } else {
+    //                 $this->couponDeleteError = 'Unable to delete the coupon from Stripe.';
+    //             }
+    //         } else {
+    //             $this->couponDeleteError = 'Coupon ID is missing.';
+    //             \Log::error('Unable to delete coupon because couponID is missing.');
+    //         }
+    //     } catch (\Exception $e) {
+    //         \Log::error('Unable to delete coupon. This error occurred: '.$e->getMessage());
+    //         $this->couponDeleteError = 'Unable to delete the coupon, something went wrong!';
+    //     }
+    // }
+    
+    public function deleteCoupon()
+{
+    $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+    $trip = TripsModel::findOrFail($this->trip->tripID);
+    $couponID = $trip->stripe_coupon_id;
+    
+    try {
+        if (!empty($couponID)) {  
+            $deleteCouponStripe = $stripe->coupons->delete($couponID, []);
+            
+            if ($deleteCouponStripe) {
+                $trip->stripe_coupon_id = '';
+                $deleteCouponDB = $trip->save();
+
+                if ($deleteCouponDB) {
+                    // Purge cache after successful deletion
+                    $this->purgeCache($this->trip->tripID);
+                    $this->couponDeleteSuccess = 'The coupon has been deleted and is no longer available';
                 } else {
-                    $this->couponDeleteError = 'Unable to delete the coupon from Stripe.';
+                    $this->couponDeleteError = 'Unable to delete the coupon from the database.';
                 }
             } else {
-                $this->couponDeleteError = 'Coupon ID is missing.';
-                \Log::error('Unable to delete coupon because couponID is missing.');
+                $this->couponDeleteError = 'Unable to delete the coupon from Stripe.';
             }
-        } catch (\Exception $e) {
-            \Log::error('Unable to delete coupon. This error occurred: '.$e->getMessage());
-            $this->couponDeleteError = 'Unable to delete the coupon, something went wrong!';
+        } else {
+            $this->couponDeleteError = 'Coupon ID is missing.';
+            \Log::error('Unable to delete coupon because couponID is missing.');
         }
+    } catch (\Exception $e) {
+        \Log::error('Unable to delete coupon. Error: ' . $e->getMessage());
+        $this->couponDeleteError = 'Unable to delete the coupon, something went wrong!';
     }
-    
+}
+
     
     
 
