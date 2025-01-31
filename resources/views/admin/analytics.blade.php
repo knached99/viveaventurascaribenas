@@ -6,8 +6,10 @@
         <div class="card">
         <div class="card-body m-3 p-2">
         <div class="fs-4 block m-5">
+        <span class="d-block fs-4">For performance reasons, we will refresh the data every week.</span>
         Data current as of {{ date('F jS, Y \a\t g:i A', strtotime($data_current_as_of)) }}  
-    <span class="text-secondary d-block">Data will be refreshed every week for performance reasons</span>
+    <span class="text-secondary d-block"> Data will be refreshed on {{ date('F jS, Y \a\t g:i A', strtotime($cache_expiration_date)) }}
+</span>
     </div>
 
         <h5 class="card-title">

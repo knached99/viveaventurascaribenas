@@ -175,6 +175,8 @@ class Analytics extends Controller
     // caching both location and IP data for a week 
     public function showAnalytics()
     {
+        $cacheDuration = now()->addWeek(); // Set cache expiration date
+
         // Check if analytics data is already cached
         if (Cache::has('analytics_data')) {
             $analyticsData = Cache::get('analytics_data');
@@ -266,7 +268,7 @@ class Analytics extends Controller
     
         // Store the timestamp for when the data was last refreshed
         $currentTimestamp = now()->toDateTimeString();
-    
+        $cacheExpirationTimestamp = $cacheDuration->toDateTimeString();
         // Prepare analytics data
         $analyticsData = [
             'topBrowsers' => $topBrowsers,
@@ -280,6 +282,7 @@ class Analytics extends Controller
             'botPercentage' => $botData['botPercentage'],
             'realVisitorsPercentage' => $botData['realVisitorsPercentage'],
             'data_current_as_of' => $currentTimestamp, // Add timestamp
+            'cache_expiration_date' => $cacheExpirationTimestamp // when the data will refresh
         ];
     
         // Store in cache for one week
