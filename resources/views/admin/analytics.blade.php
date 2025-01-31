@@ -5,7 +5,7 @@
         <div class="col-lg-12 mb-6">
         <div class="card">
         <div class="card-body m-3 p-2">
-        <span class="fs-4 block">Data current as of {{date('F jS, Y, H:i', strtotime($data_current_as_of))}}</span>
+        <span class="fs-4 block">Data current as of {{date('F jS, Y, h:i', strtotime($data_current_as_of))}}</span>
         <h5 class="card-title">
         Total Number of Visitors
         </h5>
