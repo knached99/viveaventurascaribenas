@@ -53,123 +53,241 @@ class Analytics extends Controller
    }
    
 
-   public function showAnalytics()
-   {
-       $visitors = VisitorModel::select(
-           'visitor_uuid', 
-           'visitor_ip_address', 
-           'visitor_user_agent', 
-           'visited_url', 
-           'visitor_referrer', 
-           'visited_at', 
-           'unique_identifier'
-       )->get()->toArray();
+//    public function showAnalytics()
+//    {
+//        $visitors = VisitorModel::select(
+//            'visitor_uuid', 
+//            'visitor_ip_address', 
+//            'visitor_user_agent', 
+//            'visited_url', 
+//            'visitor_referrer', 
+//            'visited_at', 
+//            'unique_identifier'
+//        )->get()->toArray();
 
    
-       // Calculate the most visited URL
-       $mostVisitedURLs = array_column($visitors, 'visited_url');
-       $urlCounts = array_count_values($mostVisitedURLs);
-       arsort($urlCounts);
-       $mostVisitedURL = array_key_first($urlCounts);
+//        // Calculate the most visited URL
+//        $mostVisitedURLs = array_column($visitors, 'visited_url');
+//        $urlCounts = array_count_values($mostVisitedURLs);
+//        arsort($urlCounts);
+//        $mostVisitedURL = array_key_first($urlCounts);
 
 
-            $visitorReferrers = DB::table('visitors')
+//             $visitorReferrers = DB::table('visitors')
+//             ->select('visitor_referrer')
+//             ->whereNotNull('visitor_referrer')
+//             ->get();
+
+//         // Convert collection to an array of visitor_referrer values
+//         $topReferrerURLs = $visitorReferrers->pluck('visitor_referrer')->toArray();
+
+//         // Replace null or non-string values with 'unknown'
+//         $topReferrerURLs = array_map(
+//             fn($url) => is_string($url) && $url !== '' ? $url : 'unknown',
+//             $topReferrerURLs
+//         );
+
+//         // Count total number of occurrences of each referrer
+//         $referrerURLCounts = array_count_values($topReferrerURLs);
+
+//         // Sort referrers by count in descending order
+//         arsort($referrerURLCounts);
+
+//         // Retrieve the most common referrer URL
+//         $topReferrerURL = array_key_first($referrerURLCounts);
+
+        
+//        // Count total visitors
+//        $totalVisitors = count($visitors);
+   
+//        // Extract unique IP addresses
+//        $ips = array_unique(array_column($visitors, 'visitor_ip_address'));
+   
+//        // Fetch and cache location data for IPs
+//        $locations = [];
+//        foreach ($ips as $ip) {
+//            $locations[$ip] = Cache::remember("geo_" . md5($ip), 1440, function () use ($ip) {
+//                return app(MaxMindService::class)->getLocation($ip);
+//            });
+//        }
+   
+//        // Initialize aggregation variables
+//        $countries = [];
+//        $browsers = [];
+//        $operatingSystems = [];
+   
+//        // Process visitors and aggregate data
+//        foreach ($visitors as &$visitor) {
+//            $ip = $visitor['visitor_ip_address'];
+//            $location = $locations[$ip] ?? null;
+   
+//            $visitor['country'] = $location['country'] ?? null;
+//            $visitor['continent'] = $location['continent'] ?? null;
+   
+//            $parsedAgent = $this->parseUserAgent($visitor['visitor_user_agent']);
+//            $visitor['browser'] = $parsedAgent['browser'];
+//            $visitor['operating_system'] = $parsedAgent['os'];
+   
+//            if (!empty($visitor['country'])) {
+//                $countries[] = $visitor['country'];
+//            }
+   
+//            $browsers[$visitor['browser']] = ($browsers[$visitor['browser']] ?? 0) + 1;
+//            $os = $visitor['operating_system'] ?: 'Unknown';
+//            $operatingSystems[$os] = ($operatingSystems[$os] ?? 0) + 1;
+//        }
+   
+//        // Sort browsers and operating systems in descending order
+//        arsort($browsers);
+//        arsort($operatingSystems);
+   
+//        // Get the top 5 browsers and operating systems
+//        $topBrowsers = array_slice($browsers, 0, 5, true);
+//        $topOperatingSystems = array_slice($operatingSystems, 0, 5, true);
+   
+//        // Prepare heatmap data
+//        $heatmapData = [];
+//        foreach (array_count_values($countries) as $country => $count) {
+//            $heatmapData[] = ['country' => $country, 'count' => $count];
+//        }
+
+
+//        // We will get the bots hitting this site here 
+//        $botData = $this->getBotCrawlers($visitors);
+   
+//        // Return the view with calculated data
+//        return view('admin.analytics', [
+//            'topBrowsers' => $topBrowsers,
+//            'topOperatingSystems' => $topOperatingSystems,
+//            'heatmapData' => $heatmapData,
+//            'most_visited_url' => $mostVisitedURL,
+//            'topReferrerURL' => $topReferrerURL,
+//            'total_visitors_count' => $totalVisitors,
+//            'totalBots'=>$botData['totalBots'],
+//            'mostFrequentBot'=>$botData['mostFrequentBot'],
+//            'botPercentage'=>$botData['botPercentage'],
+//            'realVisitorsPercentage'=>$botData['realVisitorsPercentage'],
+//        ]);
+//    }
+   
+
+    // Implementing a more effective caching strategy 
+    // caching both location and IP data for a week 
+    public function showAnalytics()
+    {
+        // Check if analytics data is already cached
+        if (Cache::has('analytics_data')) {
+            $analyticsData = Cache::get('analytics_data');
+            return view('admin.analytics', $analyticsData);
+        }
+    
+        // Fetch and process data if cache is missing
+        $visitors = VisitorModel::select(
+            'visitor_uuid', 
+            'visitor_ip_address', 
+            'visitor_user_agent', 
+            'visited_url', 
+            'visitor_referrer', 
+            'visited_at', 
+            'unique_identifier'
+        )->get()->toArray();
+    
+        // Calculate the most visited URL
+        $mostVisitedURLs = array_column($visitors, 'visited_url');
+        $urlCounts = array_count_values($mostVisitedURLs);
+        arsort($urlCounts);
+        $mostVisitedURL = array_key_first($urlCounts);
+    
+        // Get referrer data
+        $visitorReferrers = DB::table('visitors')
             ->select('visitor_referrer')
             ->whereNotNull('visitor_referrer')
             ->get();
-
-        // Convert collection to an array of visitor_referrer values
-        $topReferrerURLs = $visitorReferrers->pluck('visitor_referrer')->toArray();
-
-        // Replace null or non-string values with 'unknown'
-        $topReferrerURLs = array_map(
-            fn($url) => is_string($url) && $url !== '' ? $url : 'unknown',
-            $topReferrerURLs
-        );
-
-        // Count total number of occurrences of each referrer
-        $referrerURLCounts = array_count_values($topReferrerURLs);
-
-        // Sort referrers by count in descending order
-        arsort($referrerURLCounts);
-
-        // Retrieve the most common referrer URL
-        $topReferrerURL = array_key_first($referrerURLCounts);
-
         
-       // Count total visitors
-       $totalVisitors = count($visitors);
-   
-       // Extract unique IP addresses
-       $ips = array_unique(array_column($visitors, 'visitor_ip_address'));
-   
-       // Fetch and cache location data for IPs
-       $locations = [];
-       foreach ($ips as $ip) {
-           $locations[$ip] = Cache::remember("geo_" . md5($ip), 1440, function () use ($ip) {
-               return app(MaxMindService::class)->getLocation($ip);
-           });
-       }
-   
-       // Initialize aggregation variables
-       $countries = [];
-       $browsers = [];
-       $operatingSystems = [];
-   
-       // Process visitors and aggregate data
-       foreach ($visitors as &$visitor) {
-           $ip = $visitor['visitor_ip_address'];
-           $location = $locations[$ip] ?? null;
-   
-           $visitor['country'] = $location['country'] ?? null;
-           $visitor['continent'] = $location['continent'] ?? null;
-   
-           $parsedAgent = $this->parseUserAgent($visitor['visitor_user_agent']);
-           $visitor['browser'] = $parsedAgent['browser'];
-           $visitor['operating_system'] = $parsedAgent['os'];
-   
-           if (!empty($visitor['country'])) {
-               $countries[] = $visitor['country'];
-           }
-   
-           $browsers[$visitor['browser']] = ($browsers[$visitor['browser']] ?? 0) + 1;
-           $os = $visitor['operating_system'] ?: 'Unknown';
-           $operatingSystems[$os] = ($operatingSystems[$os] ?? 0) + 1;
-       }
-   
-       // Sort browsers and operating systems in descending order
-       arsort($browsers);
-       arsort($operatingSystems);
-   
-       // Get the top 5 browsers and operating systems
-       $topBrowsers = array_slice($browsers, 0, 5, true);
-       $topOperatingSystems = array_slice($operatingSystems, 0, 5, true);
-   
-       // Prepare heatmap data
-       $heatmapData = [];
-       foreach (array_count_values($countries) as $country => $count) {
-           $heatmapData[] = ['country' => $country, 'count' => $count];
-       }
-
-
-       // We will get the bots hitting this site here 
-       $botData = $this->getBotCrawlers($visitors);
-   
-       // Return the view with calculated data
-       return view('admin.analytics', [
-           'topBrowsers' => $topBrowsers,
-           'topOperatingSystems' => $topOperatingSystems,
-           'heatmapData' => $heatmapData,
-           'most_visited_url' => $mostVisitedURL,
-           'topReferrerURL' => $topReferrerURL,
-           'total_visitors_count' => $totalVisitors,
-           'totalBots'=>$botData['totalBots'],
-           'mostFrequentBot'=>$botData['mostFrequentBot'],
-           'botPercentage'=>$botData['botPercentage'],
-           'realVisitorsPercentage'=>$botData['realVisitorsPercentage'],
-       ]);
-   }
-   
+        $topReferrerURLs = $visitorReferrers->pluck('visitor_referrer')->toArray();
+        $topReferrerURLs = array_map(fn($url) => is_string($url) && $url !== '' ? $url : 'unknown', $topReferrerURLs);
+        $referrerURLCounts = array_count_values($topReferrerURLs);
+        arsort($referrerURLCounts);
+        $topReferrerURL = array_key_first($referrerURLCounts);
+    
+        // Count total visitors
+        $totalVisitors = count($visitors);
+    
+        // Extract unique IP addresses and cache location data
+        $ips = array_unique(array_column($visitors, 'visitor_ip_address'));
+        $locations = [];
+    
+        foreach ($ips as $ip) {
+            $locations[$ip] = Cache::remember("geo_" . md5($ip), now()->addWeek(), function () use ($ip) {
+                return app(MaxMindService::class)->getLocation($ip);
+            });
+        }
+    
+        // Initialize aggregation variables
+        $countries = [];
+        $browsers = [];
+        $operatingSystems = [];
+    
+        // Process visitors and aggregate data
+        foreach ($visitors as &$visitor) {
+            $ip = $visitor['visitor_ip_address'];
+            $location = $locations[$ip] ?? null;
+    
+            $visitor['country'] = $location['country'] ?? null;
+            $visitor['continent'] = $location['continent'] ?? null;
+    
+            $parsedAgent = $this->parseUserAgent($visitor['visitor_user_agent']);
+            $visitor['browser'] = $parsedAgent['browser'];
+            $visitor['operating_system'] = $parsedAgent['os'];
+    
+            if (!empty($visitor['country'])) {
+                $countries[] = $visitor['country'];
+            }
+    
+            $browsers[$visitor['browser']] = ($browsers[$visitor['browser']] ?? 0) + 1;
+            $os = $visitor['operating_system'] ?: 'Unknown';
+            $operatingSystems[$os] = ($operatingSystems[$os] ?? 0) + 1;
+        }
+    
+        arsort($browsers);
+        arsort($operatingSystems);
+    
+        $topBrowsers = array_slice($browsers, 0, 5, true);
+        $topOperatingSystems = array_slice($operatingSystems, 0, 5, true);
+    
+        // Prepare heatmap data
+        $heatmapData = [];
+        foreach (array_count_values($countries) as $country => $count) {
+            $heatmapData[] = ['country' => $country, 'count' => $count];
+        }
+    
+        // Get bot crawler data
+        $botData = $this->getBotCrawlers($visitors);
+    
+        // Store the timestamp for when the data was last refreshed
+        $currentTimestamp = now()->toDateTimeString();
+    
+        // Prepare analytics data
+        $analyticsData = [
+            'topBrowsers' => $topBrowsers,
+            'topOperatingSystems' => $topOperatingSystems,
+            'heatmapData' => $heatmapData,
+            'most_visited_url' => $mostVisitedURL,
+            'topReferrerURL' => $topReferrerURL,
+            'total_visitors_count' => $totalVisitors,
+            'totalBots' => $botData['totalBots'],
+            'mostFrequentBot' => $botData['mostFrequentBot'],
+            'botPercentage' => $botData['botPercentage'],
+            'realVisitorsPercentage' => $botData['realVisitorsPercentage'],
+            'data_current_as_of' => $currentTimestamp, // Add timestamp
+        ];
+    
+        // Store in cache for one week
+        Cache::put('analytics_data', $analyticsData, now()->addWeek());
+    
+        return view('admin.analytics', $analyticsData);
+    }
+    
    
 
     /**
