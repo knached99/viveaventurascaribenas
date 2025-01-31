@@ -6,7 +6,7 @@
         <div class="card">
         <div class="card-body m-3 p-2">
         <span class="fs-4 block m-5">Data current as of {{date('F jS, Y \a\t g:i A', strtotime($data_current_as_of))}}</span>
-        <span class="text-secondary mb-4">Data will be refreshed every week for performance reasons</span>
+        <span class="text-secondary">Data will be refreshed every week for performance reasons</span>
         <h5 class="card-title">
         Total Number of Visitors
         </h5>
