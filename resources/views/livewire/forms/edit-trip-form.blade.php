@@ -315,7 +315,7 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <strong>Net Profit:</strong>
-                            <span class="{{ $netProfit < 0 ? 'text-danger' : 'text-success' }}">
+                            <span class="{{ $netProfit <= 0 ? 'text-danger' : 'text-success' }}">
                                 ${{ number_format($netProfit, 2) }}
                             </span>
                         </div>
