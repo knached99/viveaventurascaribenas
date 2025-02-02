@@ -46,11 +46,11 @@
     });
 </script> --}}
 
-<!-- Line Chart -->
+<!-- Bar Chart for User Agents --> 
 
 @props(['topBrowsers', 'topOperatingSystems'])
 
-<div id="userAgentLineChart"></div>
+<div id="userAgentBarChart"></div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -67,7 +67,7 @@
 
         const options = {
             chart: {
-                type: 'line',
+                type: 'bar',
                 height: 350,
             },
             series: [
@@ -100,7 +100,7 @@
             }]
         };
 
-        const chart = new ApexCharts(document.querySelector("#userAgentLineChart"), options);
+        const chart = new ApexCharts(document.querySelector("#userAgentBarChart"), options);
         chart.render();
     });
 </script>
