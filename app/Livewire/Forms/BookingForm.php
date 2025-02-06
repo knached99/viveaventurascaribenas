@@ -374,6 +374,16 @@ private function getOrCreateStripeCustomer(string $email, string $name){
     
             // Redirect to Stripe session
             return redirect()->away($stripe_session->url);
+
+            $data = [
+                'name'=>$this->name,
+                'email'=>$this->email,
+                'phone'=>$this->phone_number,
+                'tripLocation'=>$trip->tripLocation,
+                'tripDescription'=>$trip->tripDescription,
+                'preferredStartDate'=>$this->preferred_start_date,
+                'preferredEndDate'=>$this->preferred_end_date,
+            ];
             
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Handle specific error: Trip not found
@@ -383,16 +393,24 @@ private function getOrCreateStripeCustomer(string $email, string $name){
         } catch (\Stripe\Exception\ApiErrorException $e) {
             // Handle Stripe API error
             \Log::error('Stripe API error: ' . $e->getMessage());
+           
+            \Log::error('Booking information', json_encode($data));
+            \Log::error('Error ocurred on file: '.__FILE__ . ' in method: '.__FUNCTION__ . ' in class: '.__CLASS__. ' on line: ' . __LINE__);
             $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
             
         } catch (\InvalidArgumentException $e) {
             // Handle validation or invalid argument error
             \Log::error('Invalid argument error: ' . $e->getMessage());
+            \Log::error('Booking information', json_encode($data));
+            \Log::error('Error ocurred on file: '.__FILE__ . ' in method: '.__FUNCTION__ . ' in class: '.__CLASS__. ' on line: ' . __LINE__);
+
             $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
     
         } catch (\Exception $e) {
             // Catch all other exceptions
             \Log::critical('Unexpected error in ' . __CLASS__ . '::' . __FUNCTION__ . ' on line ' . __LINE__ . ': ' . $e->getMessage());
+            \Log::error('Booking information', json_encode($data));
+            \Log::error('Error ocurred on file: '.__FILE__ . ' in method: '.__FUNCTION__ . ' in class: '.__CLASS__. ' on line: ' . __LINE__);
             $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
         }
     }
