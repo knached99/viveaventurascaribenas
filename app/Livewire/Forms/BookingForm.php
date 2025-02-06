@@ -358,7 +358,7 @@ private function getOrCreateStripeCustomer(string $email, string $name){
     
             // Check trip availability
             if ($trip->num_trips === 0 || $this->tripAvailability === 'unavailable') {
-                return redirect()->route('destination', ['tripID' => $this->tripID])->with('error', 'This trip is unavailable.');
+                $this->error = 'This trip is unavailable right now. Please check again later';
             }
     
             if ($this->tripAvailability === 'coming soon') {
@@ -378,22 +378,22 @@ private function getOrCreateStripeCustomer(string $email, string $name){
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Handle specific error: Trip not found
             \Log::error('Trip not found for tripID: ' . $this->tripID);
-            return redirect()->route('destination', ['tripID' => $this->tripID])->with('error', 'Trip not found.');
+            $this->error = 'The trip you are looking for was not found';
             
         } catch (\Stripe\Exception\ApiErrorException $e) {
             // Handle Stripe API error
             \Log::error('Stripe API error: ' . $e->getMessage());
-            return redirect()->route('destination', ['tripID' => $this->tripID])->with('error', 'There was an issue processing your payment. Please try again.');
+            $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
             
         } catch (\InvalidArgumentException $e) {
             // Handle validation or invalid argument error
             \Log::error('Invalid argument error: ' . $e->getMessage());
-            return redirect()->route('destination', ['tripID' => $this->tripID])->with('error', 'There was an issue with the input data. Please check and try again.');
+            $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
     
         } catch (\Exception $e) {
             // Catch all other exceptions
             \Log::critical('Unexpected error in ' . __CLASS__ . '::' . __FUNCTION__ . ' on line ' . __LINE__ . ': ' . $e->getMessage());
-            return redirect()->route('destination', ['tripID' => $this->tripID])->with('error', 'An unexpected error occurred. Please try again later.');
+            $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
         }
     }
     
