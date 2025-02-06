@@ -408,6 +408,7 @@ private function getOrCreateStripeCustomer(string $email, string $name){
     
         } catch (\Exception $e) {
             // Catch all other exceptions
+            \Log::error('Unexpected Exception Caught: ' . $e->getMessage());
             \Log::error('Booking information', $data);
             \Log::error('Error ocurred on file: '.__FILE__ . ' in method: '.__FUNCTION__ . ' in class: '.__CLASS__. ' on line: ' . __LINE__);
             $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
