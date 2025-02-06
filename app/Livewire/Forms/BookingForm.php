@@ -349,31 +349,54 @@ private function getOrCreateStripeCustomer(string $email, string $name){
     {
         $this->validate();
     
-        $trip = TripsModel::findOrFail($this->tripID);
-        $reservationID = Str::uuid();
+        try {
+            // Find the trip record
+            $trip = TripsModel::findOrFail($this->tripID);
+            $reservationID = Str::uuid();
     
-        $tripName = $this->tripName ?? 'Trip Reservation';
+            $tripName = $this->tripName ?? 'Trip Reservation';
     
-        if ($trip->num_trips === 0 || $this->tripAvailability === 'unavailable') {
-            return redirect()->route('destination', ['tripID' => $this->tripID]);
+            // Check trip availability
+            if ($trip->num_trips === 0 || $this->tripAvailability === 'unavailable') {
+                return redirect()->route('destination', ['tripID' => $this->tripID])->with('error', 'This trip is unavailable.');
+            }
+    
+            if ($this->tripAvailability === 'coming soon') {
+                return $this->handleComingSoonReservation($trip, $reservationID);
+            }
+    
+            $existingCustomer = $this->getOrCreateStripeCustomer($this->email, $this->name);
+    
+            $amount = $trip->tripPrice;
+    
+            // Create Stripe checkout session
+            $stripe_session = $this->createStripeCheckoutSession($existingCustomer->id, $trip, $tripName, $amount);
+    
+            // Redirect to Stripe session
+            return redirect()->away($stripe_session->url);
+            
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Handle specific error: Trip not found
+            \Log::error('Trip not found for tripID: ' . $this->tripID);
+            return redirect()->route('destination', ['tripID' => $this->tripID])->with('error', 'Trip not found.');
+            
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            // Handle Stripe API error
+            \Log::error('Stripe API error: ' . $e->getMessage());
+            return redirect()->route('destination', ['tripID' => $this->tripID])->with('error', 'There was an issue processing your payment. Please try again.');
+            
+        } catch (\InvalidArgumentException $e) {
+            // Handle validation or invalid argument error
+            \Log::error('Invalid argument error: ' . $e->getMessage());
+            return redirect()->route('destination', ['tripID' => $this->tripID])->with('error', 'There was an issue with the input data. Please check and try again.');
+    
+        } catch (\Exception $e) {
+            // Catch all other exceptions
+            \Log::critical('Unexpected error in ' . __CLASS__ . '::' . __FUNCTION__ . ' on line ' . __LINE__ . ': ' . $e->getMessage());
+            return redirect()->route('destination', ['tripID' => $this->tripID])->with('error', 'An unexpected error occurred. Please try again later.');
         }
-    
-        if ($this->tripAvailability === 'coming soon') {
-            return $this->handleComingSoonReservation($trip, $reservationID);
-        }
-    
-        $existingCustomer = $this->getOrCreateStripeCustomer($this->email, $this->name);
-    
-        // Correct amount calculation (in dollars)
-    
-        // Now calculate the correct amount in dollars and later convert to cents where needed
-        $amount = $trip->tripPrice; // Amount is still in dollars here, do not multiply by 100 yet
-    
-        // Create Stripe checkout session (amount will be multiplied by 100 in this method)
-        $stripe_session = $this->createStripeCheckoutSession($existingCustomer->id, $trip, $tripName, $amount);
-    
-    return redirect()->away($stripe_session->url);
     }
+    
 
 
 
