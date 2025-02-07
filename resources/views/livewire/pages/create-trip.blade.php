@@ -77,7 +77,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             </div>
                         <!-- Loading Indicator on file upload -->
                         <div class="mb-4">
-                            <label for="tripPhoto" class="form-label">Trip Photos (Choose up to 3 photos)</label>
+                            <label for="tripPhoto" class="form-label">Trip Photos (Choose up to 6 photos)</label>
                             <input type="file" id="tripPhoto" name="tripPhoto"
                                 class="form-control {{ $errors->has('form.tripPhoto') ? 'is-invalid' : '' }}"
                                 wire:model="form.tripPhoto" multiple />

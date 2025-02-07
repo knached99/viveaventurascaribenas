@@ -232,41 +232,10 @@ class EditTripForm extends Component
         \Log::info('File validated successfully!');
         \Log::info('File type after validation: ' . get_class($file));
     
-        // Generate file path and process
-        //$filePath = 'booking_photos/' . time() . '-' . $file->hashName() . '.'.$file->extension();
-     //   $storagePath = Storage::disk('public')->path($filePath);
-    
-   //     \Log::info('File Path: ' . $filePath);
-     //   \Log::info('Stored file path: ' . Storage::disk('public')->path($filePath));
-
-       // $photo->storeAs('booking_photos', $fileName, 'public');
-        // $filePath = 'booking_photos/' . $fileName;
-        // $fullPath = storage_path('app/public/' . $filePath);
         $filePath = 'booking_photos/'.$file->hashName() . '.' . $file->extension();
 
         $storagePath = Storage::disk('public')->path($filePath);
-      //  \Log::info('Resizing Image...');
-      //  Helper::resizeImage($image, $fullPath, 525, 351);
-
-        // Save the image to the file system
-        // $photo->storeAs('booking_photos', $fileName, 'public');
-  
-        // // $imageURLs[] = asset(Storage::url($filePath)); 
-        // // $imagesArray[] = $fileName; 
-        // \Log::info('Current image URLs array: ' . json_encode($imageURLs));
-        // \Log::info('Current images in the array: ' . json_encode($imagesArray));
-    
-
-    //   // Resize the image and save it using the public disk
-    //     Helper::resizeImage(
-    //         $file->getRealPath(),
-    //         $storagePath, // Use the public disk path for Hostinger
-    //         525,
-    //         351
-    //     );
-    
-        //\Log::info('Image resized!');
-    
+   
         // Store the new image URL
         $imageURLs[] = asset(Storage::url($filePath));
       //  $imagesArray[] = $fileName;
@@ -364,6 +333,7 @@ class EditTripForm extends Component
         \Log::info('Editing trip with costs: ' . json_encode($this->tripCosts));
         
         $rules = [
+        
             'tripLocation' => 'required|string|max:255',
             'tripLandscape' => 'required|array',
             'tripAvailability' => 'required|string',
@@ -399,15 +369,6 @@ class EditTripForm extends Component
               //  \Log::info('Images in the array: '.json_encode($imagesArray));
                 \Log::info('Image URLs in the array" '.json_encode($imageURLs));
 
-
-                //$newImageURLs = [];
-
-              //  \Log::info('Current Image URLs array: '.json_encode($newImageURLs));
-
-            
-           
-
-            
                 if (!empty($this->tripPhotos) && is_array($this->tripPhotos)) {
                     \Log::info('User selected new pictures for upload. Iterating over new pictures...');
                 
@@ -428,18 +389,13 @@ class EditTripForm extends Component
                     \Log::info('Final image URLs array: ' . json_encode($newImageURLs));
                 }
                 
-                    
-                
-                // \Log::info('Current newImageURLs array: '.json_encode($newImageURLs));
                
                 \Log::info('Current trip availability in DB: ' . $tripModel->tripAvailability);
                 \Log::info('Current trip availability in Livewire: ' . $this->tripAvailability);
                 if ($tripModel->tripAvailability !== $this->tripAvailability) {
                     \Log::info('Trip availability has changed.');
                     if (strtolower($this->tripAvailability) === 'available') {
-                        // \Log::info('Dispatching TripBecameAvailable event for trip ID: ' . $tripModel->tripID);
-                        // event(new TripBecameAvailable($tripModel));
-                        // Fetch reservations associated with this trip
+                  
                         \Log::info('Trip status changed to '.$this->tripAvailability);
                         \Log::info('Fetching all reservations associated with this trip...');
                         $reservations = Reservations::where('tripID', $this->trip->tripID)->get();
@@ -456,7 +412,6 @@ class EditTripForm extends Component
                 }
         
                 $tripModel->tripLocation = $this->tripLocation;
-               // $tripModel->tripPhoto = json_encode($imagesArray);
                 $tripModel->tripPhoto = !empty($newImageURLs) ? json_encode($newImageURLs) : json_encode($this->tripPhotos);
                 $tripModel->tripLandscape = json_encode($this->tripLandscape);
                 $tripModel->tripAvailability = $this->tripAvailability;
@@ -515,117 +470,6 @@ class EditTripForm extends Component
         Cache::forget('trip_' . $tripId);
     }
 
-
-
-    // Create a coupon to apply discounts to a specific destination pacakge 
-  
-
-    // public function createDiscount()
-    // {
-    //     try {
-    //         $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-    
-    //         $trip = TripsModel::findOrFail($this->trip->tripID);
-    
-    //         // Validation rules
-    //         $rules = [
-    //             'discountType' => 'required|in:percentage,amount',
-    //             'discountDuration'=>'required|integer|min:1|max:12',
-    //             'discountValue' => 'required|numeric',
-    //             'promotionCode' => 'nullable|string'
-    //         ];
-    
-    //         $validationMessages = [
-    //             'discountType.required' => 'You must choose the discount type',
-    //             'discountType.in' => 'The discount type must be either percentage or amount',
-    //             'discountDuration.required'=>'Please provide the duration of this discount in months. (Example 1 = 1 month)',
-    //             'discountDuration.min'=>'Duration must be at least 1 month',
-    //             'discountDuration.max'=>'Duration must be a max of 12 months',
-    //             'discountValue.required' => 'You must enter the discount amount',
-    //             'discountValue.numeric' => 'Discount value must be numeric',
-    //         ];
-    
-    //         $this->validate($rules, $validationMessages);
-    
-    //         if ($this->discountType === 'percentage' && ($this->discountValue < 1 || $this->discountValue > 100)) {
-    //             $this->discountCreateError = 'Discount percentage must be between 1% and 100%';
-    //             return;
-    //         } elseif ($this->discountType === 'amount' && $this->discountValue <= 0) {
-    //             $this->discountCreateError = 'Amount discounted must be greater than $0';
-    //             return;
-    //         }
-    
-    //         // Prepare coupon data based on discount type
-    //         $couponData = [];
-    //         if ($this->discountType === 'percentage') {
-    //             $couponData = [
-    //                 'percent_off' => round($this->discountValue, 2),
-    //                 'duration' => 'repeating',
-    //                 'duration_in_months' => $this->discountDuration,
-    //             ];
-    //         } elseif ($this->discountType === 'amount') {
-    //             $couponData = [
-    //                 'amount_off' => intval($this->discountValue * 100),
-    //                 'currency' => 'usd',
-    //                 'duration' => 'repeating',
-    //                 'duration_in_months' => $this->discountDuration,
-    //             ];
-    //         }
-    
-    //         // Get all coupons and find the one that matches the product and discount type
-    //         $existingCoupons = $stripe->coupons->all(['limit' => 100]); // Fetch all coupons
-    //         $coupon = null;
-    
-    //         foreach ($existingCoupons->data as $existingCoupon) {
-    //             // Check if coupon matches the discount type and value 
-    //             if (($this->discountType === 'percentage' && isset($existingCoupon->percent_off) && $existingCoupon->percent_off == $couponData['percent_off']) ||
-    //                 ($this->discountType === 'amount' && isset($existingCoupon->amount_off) && $existingCoupon->amount_off == $couponData['amount_off'])) {
-    //                 $coupon = $existingCoupon;
-    //                 break;
-    //             }
-    //         }
-    
-    //         if (!$coupon) {
-    //             // Create a new coupon if none exists
-    //             $coupon = $stripe->coupons->create($couponData);
-    //             \Log::info('Coupon created in Stripe with ID: ' . $coupon->id);
-    //         } else {
-    //             \Log::info('Using existing coupon: ' . $coupon->id);
-    //         }
-    
-    //         // Get all promotion codes and check if one exists for the coupon
-    //         $existingPromoCodes = $stripe->promotionCodes->all(['limit' => 100]); // Fetch all promo codes
-    //         $promoCode = null;
-    
-    //         foreach ($existingPromoCodes->data as $existingPromoCode) {
-    //             if ($existingPromoCode->coupon === $coupon->id) {
-    //                 $promoCode = $existingPromoCode;
-    //                 break;
-    //             }
-    //         }
-    
-    //         if (!$promoCode) {
-    //             // Create a new promotion code if none exists
-    //             $promoCode = $stripe->promotionCodes->create([
-    //                 'coupon' => $coupon->id,
-    //                 'code' => $this->promotionCode ? $this->promotionCode : strtoupper(Str::random(8)),
-    //             ]);
-    //             \Log::info('Promotion code created successfully: ' . $promoCode->id);
-    //         } else {
-    //             \Log::info('Using existing promotion code: ' . $promoCode->id);
-    //         }
-    
-    //         // Update trip with Stripe coupon and promo code IDs
-    //         $trip->stripe_coupon_id = $coupon->id;
-    //         $trip->stripe_promo_id = $promoCode->id;
-    //         $trip->save();
-    
-    //         $this->discountCreateSuccess = 'Discount created successfully!';
-    //     } catch (Stripe\Exception\ApiErrorException $e) {
-    //         \Log::error('Error creating discount on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' in method: ' . __FUNCTION__ . ' Error: ' . $e->getMessage());
-    //         $this->discountCreateError = 'Failed to create discount. Something went wrong';
-    //     }
-    // }
 
     public function createDiscount()
 {
@@ -711,38 +555,6 @@ class EditTripForm extends Component
 
     
 
-    // public function deleteCoupon()
-    // {
-    //     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-    //     $trip = TripsModel::findOrFail($this->trip->tripID);
-    
-    //     $couponID = $trip->stripe_coupon_id;
-        
-    //     try {
-    //         if (!empty($couponID)) {  // Ensure couponID is not null or empty
-    //             $deleteCouponStripe = $stripe->coupons->delete($couponID, []);
-                
-    //             if ($deleteCouponStripe) {
-    //                 $trip->stripe_coupon_id = '';
-    
-    //                 $deleteCouponDB = $trip->save();
-    
-    //                 $this->couponDeleteSuccess = $deleteCouponDB
-    //                     ? 'The coupon has been deleted and is no longer available'
-    //                     : 'Unable to delete the coupon. Something went wrong in the database.';
-    //             } else {
-    //                 $this->couponDeleteError = 'Unable to delete the coupon from Stripe.';
-    //             }
-    //         } else {
-    //             $this->couponDeleteError = 'Coupon ID is missing.';
-    //             \Log::error('Unable to delete coupon because couponID is missing.');
-    //         }
-    //     } catch (\Exception $e) {
-    //         \Log::error('Unable to delete coupon. This error occurred: '.$e->getMessage());
-    //         $this->couponDeleteError = 'Unable to delete the coupon, something went wrong!';
-    //     }
-    // }
-    
     public function deleteCoupon()
 {
     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));

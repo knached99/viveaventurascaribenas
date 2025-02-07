@@ -41,7 +41,7 @@ class TripForm extends Form {
     public bool $active = false;
     
     // Validate that 'tripPhoto' is an array of images with specific rules
-    #[Validate('required|array|max:3')]
+    #[Validate('required|array|max:6')]
     public ?array $tripPhoto = [];
 
     public string $status = '';
