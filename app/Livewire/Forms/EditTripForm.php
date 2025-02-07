@@ -351,6 +351,14 @@ class EditTripForm extends Component
             $rules['tripEndDate'] = 'required|date|after_or_equal:tripStartDate';
         }
         
+        // check if this trip already has images uploaded 
+        $tripModel = TripsModel::findOrFail($this->trip->tripID);
+        if(empty($tripModel->tripPhoto)){
+            // validate the uploaded images only if no images exist 
+            $rules['tripPhotos'] = 'array|max:6';
+            $rules['tripPhotos'] = 'image|mimes:jpeg,png,jpg|max:2048';
+        }
+        
         $this->validate($rules);
         
         try {
