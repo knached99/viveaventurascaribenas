@@ -97,6 +97,7 @@
 
 
 
+                    @if(!$testimonials->isEmpty())
                     <!-- Average Star Rating -->
                     <div class="star-rating mb-3 text-dark">
                         @php
@@ -130,16 +131,12 @@
                             <i class="bx bxs-star star-icon text-secondary"></i>
                         @endfor
 
-
-
                         <!-- Display the average rating -->
-                        @if(!$testimonials->isEmpty())
-
                         <span class="text-dark">({{ number_format($averageTestimonialRating, 1) }} / 5.0)</span>
-                        
+                        </div>
                         @endif 
                         
-                    </div>
+                    
 
 
                     @if ($trip->tripAvailability == 'available')
@@ -284,9 +281,10 @@
                 <!-- End Activities Section -->
 
                 <!-- Testimonials Slider -->
-                <div class="testimonials-slider mt-4">
-                    <h3>What other travellers have to say</h3>
+                    
                     @if (!$testimonials->isEmpty())
+                    <div class="testimonials-slider mt-4">
+                    <h3>What other travellers have to say</h3>
                         <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel">
                             <div class="carousel-inner">
                                 @foreach ($testimonials as $key => $testimonial)
@@ -321,9 +319,9 @@
                                 <span class="visually-hidden">Next</span>
                             </button>
                         </div>
-                
+                     </div>
                     @endif
-                </div>
+                
                 <!-- End Testimonials Slider -->
 
 
