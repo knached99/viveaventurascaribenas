@@ -133,15 +133,12 @@
 
 
                         <!-- Display the average rating -->
+                        @if(!$testimonials->isEmpty())
 
                         <span class="text-dark">({{ number_format($averageTestimonialRating, 1) }} / 5.0)</span>
-                        <span class="mt-3 block text-dark">
-                            <br />
-                            @if ($testimonials->isEmpty())
-                                Be among the first to experience this trip and share your review! Your feedback will
-                                help others discover this amazing adventure.
-                            @endif
-                        </span>
+                        
+                        @endif 
+                        
                     </div>
 
 
@@ -324,10 +321,7 @@
                                 <span class="visually-hidden">Next</span>
                             </button>
                         </div>
-                    @else
-                        <p style="font-size: 25px; color: #000; margin-left: 10px;">Be the first to leave a review!
-                        </p>
-
+                
                     @endif
                 </div>
                 <!-- End Testimonials Slider -->
