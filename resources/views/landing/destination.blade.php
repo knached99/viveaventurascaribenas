@@ -5,33 +5,33 @@
 
     $startDate = Carbon::parse($trip->tripStartDate);
     $endDate = Carbon::parse($trip->tripEndDate);
-    $tripPhotos = json_decode($trip->tripPhoto, true);
-    $landscapes = isset($trip->tripLandscape) ? json_decode($trip->tripLandscape, true) : [];
 
-    $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+    $tripPhotos = is_string($trip->tripPhoto) ? json_decode($trip->tripPhoto, true) : $trip->tripPhoto;
+
+    $landscapes = is_string($trip->tripLandscape) ? json_decode($trip->tripLandscape, true) : $trip->tripLandscape;
+    // $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
     $tripPrice = $trip->tripPrice; // Initial trip price
 
     $newPrice = 0; // Initializing to $0
     // Calculate and apply any available discounts for this trip
-    if (!empty($trip->stripe_coupon_id)) {
-        try {
-            $coupon = $stripe->coupons->retrieve($trip->stripe_coupon_id);
+    // if (!empty($trip->stripe_coupon_id)) {
+    //     try {
+    //         $coupon = $stripe->coupons->retrieve($trip->stripe_coupon_id);
 
-            if (isset($coupon) && $coupon->percent_off) {
-                $discount = ($coupon->percent_off / 100) * $tripPrice;
-                $newPrice = $tripPrice - $discount;
-            }
+    //         if (isset($coupon) && $coupon->percent_off) {
+    //             $discount = ($coupon->percent_off / 100) * $tripPrice;
+    //             $newPrice = $tripPrice - $discount;
+    //         }
 
-            if (isset($coupon) && $coupon->amount_off) {
-                $newPrice = $tripPrice - $coupon->amount_off;
-            }
-        } catch (\Exception $e) {
-            \Log::error('Unable to retrieve coupon: ' . $e->getMessage());
-        }
-    } else {
-        \Log::warning('No Coupon ID provided for trip: ' . $tripID);
-    }
-
+    //         if (isset($coupon) && $coupon->amount_off) {
+    //             $newPrice = $tripPrice - $coupon->amount_off;
+    //         }
+    //     } catch (\Exception $e) {
+    //         \Log::error('Unable to retrieve coupon: ' . $e->getMessage());
+    //     }
+    // } else {
+    //     \Log::warning('No Coupon ID provided for trip: ' . $tripID);
+    // }
 @endphp
 
 <x-travelcomponents.header />
@@ -351,7 +351,7 @@
                             class="btn">{{ $trip->tripAvailability === 'coming soon'
                                 ? 'Reserve Now'
                                 : 'Book
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Now' }}</a>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Now' }}</a>
 
                     </div>
                 </div>

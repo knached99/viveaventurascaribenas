@@ -9,10 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('trips', function (Blueprint $table) {
-            $table->uuid('tripID')->primary();
-            $table->string('stripe_product_id')->unique();
-            $table->string('stripe_coupon_id')->nullable();
-            $table->string('stripe_promo_id')->nullable();
+            $table->string('tripID', 255)->primary();
+            // $table->string('square_catalog_object_id')->unqiue();
             $table->string('tripLocation');
             $table->json('tripPhoto');
             $table->text('tripDescription');
@@ -26,6 +24,7 @@ return new class extends Migration
             $table->boolean('active')->default(false);
             $table->json('tripCosts')->nullable();
             $table->string('slug')->unique()->nullable(); // URL slug replacing uuid for SEO
+            // $table->string('square_product_id')->unique(); 
             $table->timestamps();
         });
     }
@@ -35,3 +34,4 @@ return new class extends Migration
         Schema::dropIfExists('trips');
     }
 };
+

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\TripsModel;
@@ -12,272 +13,151 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\ModelNotFoundException; 
-use Stripe\Stripe;
-use Stripe\Product;
-use Stripe\StripeClient;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Square\SquareClient;
+use Square\Models\CatalogQueryResponse;
+use Square\Models\SearchPaymentsResponse;
 use Carbon\Carbon;
 use App\Jobs\ProcessStripeCharges;
 use Illuminate\Support\Facades\Cache;
-use App\Http\Controllers\Analytics; 
+use App\Http\Controllers\Analytics;
+
 
 class Admin extends Controller
 {
 
-    public function __construct(){
-        Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
-         $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-    
+    public $squareClient;
+    public $catalog;
 
+    public function __construct()
+    {
+        $this->squareClient = new \Square\SquareClient([
+            'accessToken' => env('SQUARE_ACCESS_TOKEN'),
+            'environment' => \Square\Environment::SANDBOX, // or \Square\Environment::PRODUCTION
+        ]);
     }
+
     
-    public function dashboardPage()
-    {   
+    public function dashboardPage(){
+        
         $visitors = Analytics::quickAnalytics();
 
-        // Cache Stripe products and charges
-        $cacheKeyProducts = 'stripe_products';
-        $cacheKeyCharges = 'stripe_charges';
+        // caching data to avoid repeated API calls 
+        $cacheKeyProducts = 'square_products';
+        $cacheKeyPayments = 'square_payments';
         $popularTrips = [];
-        $stripeProducts = Cache::remember($cacheKeyProducts, 3600, function () {
-            return $this->stripe->products->all(['limit' => 100]); 
-        });
-    
-        $charges = Cache::remember($cacheKeyCharges, 3600, function () {
-            return $this->stripe->charges->search([
-                'query' => "status:'succeeded'",
-            ]);
+        
+        $squareProducts = Cache::remember($cacheKeyProducts, 3600, function() {
+
+            $catalogApi = $this->squareClient->getCatalogApi();
+            $response = $catalogApi->listCatalog(null, 'ITEM');
+            return $response->isSuccess() ? $response->getResult()->getObjects() : [];
+
         });
 
-    
-        // We need to get all transactions that weren't refunded
-        $transactions = array_filter($charges->data, function ($charge) {
-            return !$charge->refunded && isset($charge->amount_captured) && $charge->amount_captured > 0;
+            // Safely handle when Square API doesn't return any payments
+        $payments = Cache::remember($cacheKeyPayments, 3600, function () {
+            $paymentsApi = $this->squareClient->getPaymentsApi();
+            $response = $paymentsApi->listPayments();
+            return $response->isSuccess() ? $response->getResult()->getPayments() : [];
         });
-    
-        $transactionsPerDay = [];
-        foreach ($transactions as $charge) {
-            $date = Carbon::parse($charge->created)->format('Y-m-d');
-            $transactionsPerDay[$date] = ($transactionsPerDay[$date] ?? 0) + (float) $charge->amount_captured / 100;
+
+        // Filtering transactions to exclude refunds, ensuring $payments is not null and is an array
+        $transactions = [];
+        if (is_array($payments)) {
+            $transactions = array_filter($payments, function ($payment) {
+                return $payment->getRefunds() === null && $payment->getAmountMoney()->getAmount() > 0;
+            });
         }
-        
-        // Sort transactions array by date in ascending order using built in ksort() method to sort the returned array by key 
-        ksort($transactionsPerDay);
-        
-        // Format transaction data for the current year
-        $transactionData = array_map(function ($date, $amount) {
-            return [
-                'date' => $date,
-                'amount' => $amount
-            ];
-        }, array_keys($transactionsPerDay), $transactionsPerDay);
-        
-        // Calculate gross profit
-        $grossProfit = array_reduce($transactions, function ($carry, $charge) {
-            return $carry + (float) $charge->amount_captured / 100; // Convert from cents to dollars
-        }, 0);
-    
-     
-        $totalNetCosts = TripsModel::select('tripCosts')->where('active', true)->get()
-            ->flatMap(function ($trip) {
-                return json_decode($trip->tripCosts, true) ?? [];
-            })
-            ->sum(function ($cost) {
-                return isset($cost['amount']) ? (float)$cost['amount'] : 0;
-            });
-    
-        $netProfit = $grossProfit - $totalNetCosts;
-    
-        // Fetch bookings and reservations
-        $bookings = BookingModel::with('trip')
-            ->select('bookingID', 'name', 'stripe_checkout_id', 'stripe_product_id', 'tripID', 'created_at')
-            ->get();
-    
-        $reservations = Reservations::with(['trip'])->select('reservationID', 'stripe_product_id', 'tripID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code', 'stripe_product_id')->get();
-        // Optimizing Stripe API calls here
-        $allProductIds = $bookings->pluck('stripe_product_id')
-            ->merge($reservations->pluck('stripe_product_id'))
-            ->unique()
-            ->values()
-            ->toArray();
-    
-        $productMap = collect($stripeProducts->data)
-            ->mapWithKeys(function ($product) {
-                return [$product->id => $product->name];
-            });
-    
-        // This query retrieves the most popular booking
-        $mostPopularBookings = BookingModel::select('bookings.stripe_product_id', DB::raw('COUNT(*) as booking_count'))
-            ->join('trips', 'bookings.stripe_product_id', '=', 'trips.stripe_product_id')
-            ->groupBy('bookings.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
-            ->having('booking_count', '>', 2)
-            ->orderByDesc('booking_count')
-            ->first();
 
+        $transactionsPerDay = [];
+        foreach ($transactions as $payment) {
+            $date = Carbon::parse($payment->getCreatedAt())->format('Y-m-d');
+            $transactionsPerDay[$date] = ($transactionsPerDay[$date] ?? 0) + $payment->getAmountMoney()->getAmount() / 100;
+        }
+
+        ksort($transactionsPerDay);
+        $transactionData = array_map(fn($date, $amount) => ['date' => $date, 'amount' => $amount], array_keys($transactionsPerDay), $transactionsPerDay);
+
+
+        /* 
+        array_reduce()
+        Iteratively reduces the array to a single value
+        using a callback function
+        */
+
+        $grossProfit = array_reduce($transactions, fn($carry, $payment) => $carry + $payment->getAmountMoney()->getAmount() / 100, 0);
+      
+        $totalNetCosts = TripsModel::where('active', true)->pluck('tripCosts')->map(fn($cost) => json_decode($cost, true))->sum(fn($costs) => collect($costs)->sum('amount'));
+
+        $netProfit = $grossProfit - $totalNetCosts;
         
-            // Retrieve the most popular reserved trip containing a count of 2 or more reservations 
-        $mostPopularReservations = Reservations::select('reservations.stripe_product_id', DB::raw('COUNT(*) as reservation_count'))
-        ->join('trips', 'reservations.stripe_product_id', '=', 'trips.stripe_product_id')
-        ->groupBy('reservations.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
-        ->having('reservation_count', '>', 2)
-        ->orderByDesc('reservation_count')
-        ->first();
+        $bookings = BookingModel::with('trip')->select('bookingID', 'tripID', 'created_at')->get();
+
+        $reservations = Reservations::with('trip')->select('reservationID', 'tripID', 'name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code')->get();
+
+        // optimizing square api calls 
         
+        $allCatalogObjectIds = $bookings->pluck('bookingID')->merge($reservations->pluck('reservationID'))->unique()->values()->toArray();
+        $productMap = collect($squareProducts)->mapWithKeys(fn($product) => [$product->getId() => $product->getItemData()->getName()]);
         
-        $mostPopularReservedTripName = '';
-        $mostReservedTrips = [];
-        
+        // most popular booking 
+        $mostPopularBookings = BookingModel::select('bookingID', DB::raw('COUNT(*) as booking_count'))
+        ->groupBy('bookingID')->having('booking_count', '>', 2)->orderByDesc('booking_count')->first();
+
+         $mostPopularReservations = Reservations::select('reservationID', DB::raw('COUNT(*) as reservation_count'))
+        ->groupBy('reservationID')->having('reservation_count', '>', 2)->orderByDesc('reservation_count')->first();
     
         $mostPopularTripName = $mostPopularTripPhoto = null;
 
-        if ($mostPopularBookings) {
-            $product = $this->stripe->products->retrieve($mostPopularBookings->stripe_product_id);
-            $trip = TripsModel::where('stripe_product_id', $mostPopularBookings->stripe_product_id)->first();
-    
-            if ($trip) {
-                $mostPopularTripName = $product->name;
+        if($mostPopularBookings){
+
+            $trip = TripsModel::where('tripID', $mostPopularBookings->tripID)->first();
+
+            if($trip){
+                $mostPopularTripName = $productMap[$mostPopularBookings->square_catalog_object_id] ?? 'Unknown';
                 $mostPopularTripPhoto = json_decode($trip->tripPhoto, true)[0] ?? null;
-    
-                $popularTrips[] = [
-                    'id' => $trip->tripID,
-                    'name' => $mostPopularTripName,
-                    'count' => $mostPopularBookings->booking_count,
-                    'image' => $mostPopularTripPhoto,
-                ];
+                $popularTrips[] = ['id' => $trip->tripID, 'name' => $mostPopularTripName, 'count' => $mostPopularBookings->booking_count, 'image' => $mostPopularTripPhoto];
             }
         }
 
-        
-        // Calculate data for most reseserved trip 
+        // most popular reserved trip 
 
-        if ($mostPopularReservations) {
-            $reservedTrip = Tripsmodel::where('stripe_product_id', $mostPopularReservations->stripe_product_id)->first();
-        
-            if ($reservedTrip) {
-                // Extract the trip photo
-                $tripPhotos = json_decode($reservedTrip->tripPhoto, true);
+        $mostPopularReservedTripName = '';
+        $mostReservedTrips = [];
+
+        if($mostPopularReservations){
+
+            $reservedTrip = TripsModel::where('square_catalog_object_id', $mostPopularReservations->square_catalog_object_id)->first();
+
+            if($reservedTrip){
+
                 $mostPopularReservedTripName = $reservedTrip->tripLocation;
-                $mostPopularReservedTripPhoto = $tripPhotos[0] ?? null;  // Get the first photo or null if none exists
-        
-                // Extracting all reservations for this trip
+                $mostPopularReservedTripPhoto = json_decode($reservedTrip->tripPhoto, true)[0] ?? null;
                 $reservations = Reservations::where('tripID', $reservedTrip->tripID)->get();
-        
-                // Initialize variables to store total start and end dates
-                $totalStartDates = 0;
-                $totalEndDates = 0;
-                $totalDays = 0;
                 $reservationCount = $reservations->count();
-        
-                foreach ($reservations as $reservation) {
-                    $startDate = Carbon::parse($reservation->preferred_start_date);
-                    $endDate = Carbon::parse($reservation->preferred_end_date);
-                    $dateRange = abs($endDate->diffInDays($startDate));  
-        
-                    // Summing up the timestamp values of start and end dates for calculating the average
-                    $totalStartDates += $startDate->timestamp;
-                    $totalEndDates += $endDate->timestamp;
-        
-                    // Adding to the total days for calculating the average duration
-                    $totalDays += $dateRange;
-                }
-        
-                if ($reservationCount > 0) {
-                    // Calculating the average start and end dates
-                    $averageStartDate = Carbon::createFromTimestamp($totalStartDates / $reservationCount);
-                    $averageEndDate = Carbon::createFromTimestamp($totalEndDates / $reservationCount);
-        
-                    // Calculating the average number of days between the start and end dates
-                    $averageDateRange = round($totalDays / $reservationCount);
-                } else {
-                    $averageStartDate = null;
-                    $averageEndDate = null;
-                    $averageDateRange = 0;
-                }
-        
-                // Build the most reserved trips array
-                $mostReservedTrips[] = [
-                    'tripID' => $reservedTrip->tripID,
-                    'location' => $reservedTrip->tripLocation,
-                    'count' => $mostPopularReservations->reservation_count,
-                    'image' => $mostPopularReservedTripPhoto,
-                    'averageStartDate' => $averageStartDate ? $averageStartDate->format('m/d/Y') : null,
-                    'averageEndDate' => $averageEndDate ? $averageEndDate->format('m/d/Y') : null,
-                    'averageDateRange' => round($averageDateRange, 2),
-                  
-                ];
+                $totalDays = $reservations->sum(fn($r) => Carbon::parse($r->preferred_end_date)->diffInDays(Carbon::parse($r->preferred_start_date)));
+                $avgTripDays = $reservationCount > 0 ? round($totalDays / $reservationCount) : 0;
+                $mostReservedTrips[] = ['id' => $reservedTrip->tripID, 'name' => $mostPopularReservedTripName, 'count' => $reservationCount, 'average_trip_days' => $avgTripDays, 'image' => $mostPopularReservedTripPhoto];
+
             }
         }
-        
-    
+
         return view('admin.dashboard', compact(
-            'transactionData',
-            'bookings',
-            'reservations',
-            'mostPopularTripName',
-            'mostPopularReservedTripName',
-            'mostPopularTripPhoto',
-            'productMap',
-            'grossProfit',
-            'totalNetCosts',
-            'netProfit',
-            'popularTrips',
-            'mostReservedTrips',
-            'visitors',
+            'visitors', 'squareProducts', 'totalNetCosts', 'grossProfit', 'netProfit', 'transactionsPerDay', 'transactionData',
+            'popularTrips', 'mostReservedTrips', 'bookings', 'reservations'
         ));
+
     }
 
-    
-    
-    
 
-    
     public function profilePage(){
         return view('admin/profile');
     }
 
-    public function bookingInfo($bookingID)
-    {
-        try {
-            $booking = BookingModel::with('trip')->where('bookingID', $bookingID)->firstOrFail();
-         
-        
-            return view('admin.booking', [
-                'bookingID' => $bookingID,
-                'booking' => $booking
-            ]);
-
-           
-    
-        } catch (ModelNotFoundException $e) {
-            \Log::error('ModelNotFoundException encountered on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' Error Message: ' . $e->getMessage());
-            abort(404);
-        } catch (\Exception $e) {
-            \Log::error('Exception encountered on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' Error Message: ' . $e->getMessage());
-            abort(500);
-        }
-    }
-
-
-    public function getReservationDetails($reservationID){
-        try{
-            
-            $reservation = Reservations::with(['trip'])->findOrFail($reservationID);
-
-            return view('admin.reservation', ['reservationID' => $reservationID, 'reservation'=>$reservation]);
-        
-    }
-    catch(ModelNotFoundException $e){
-        \Log::error('ModelNotFoundException encountered on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' Error Message: ' . $e->getMessage());
-        abort(404);
-    }
-
-}
-
-
-
     public function allTripsPage(){
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'active', 'tripPrice', 'created_at', 'updated_at')->get();
-        return view('admin/all-trips', compact('trips'));
+         return view('admin/all-trips', compact('trips'));
     }
 
     public function testimonialsPage()
@@ -360,8 +240,7 @@ class Admin extends Controller
 
     public function getTripDetails($tripID)
 {
-
-    $cacheKey = "trip_details_{$tripID}";
+    $cacheKey = "trip_details_#trip_id_{$tripID}";
     $cachedData = Cache::get($cacheKey);
 
 
@@ -370,12 +249,15 @@ class Admin extends Controller
     }
 
     try {
-        $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
-
-                   // Retrieve the most popular reserved trip containing a count of 2 or more reservations 
-        $mostPopularReservations = Reservations::select('reservations.stripe_product_id', DB::raw('COUNT(*) as reservation_count'))
-        ->join('trips', 'reservations.stripe_product_id', '=', 'trips.stripe_product_id')
-        ->groupBy('reservations.stripe_product_id', 'trips.tripID', 'trips.tripPhoto')
+        // Browser does not send #trip_ to the server so we will
+        // need to decode and encode it to be sent properly 
+        
+        $trip = TripsModel::where('tripID', '#trip_id_'.$tripID)->firstOrFail();
+        
+        // Retrieve the most popular reserved trip containing a count of 2 or more reservations 
+        $mostPopularReservations = Reservations::select('reservations.tripID', DB::raw('COUNT(*) as reservation_count'))
+        ->join('trips', 'reservations.tripID', '=', 'trips.tripID')
+        ->groupBy('reservations.tripID', 'trips.tripID', 'trips.tripPhoto')
         ->having('reservation_count', '>', 2)
         ->orderByDesc('reservation_count')
         ->first();
@@ -408,7 +290,7 @@ class Admin extends Controller
         // Calculate data for most reseserved trip 
 
         if ($mostPopularReservations) {
-            $reservedTrip = Tripsmodel::where('stripe_product_id', $mostPopularReservations->stripe_product_id)->first();
+            $reservedTrip = Tripsmodel::where('tripID', $mostPopularReservations->tripID)->first();
           
             if ($reservedTrip && $reservedTrip->tripID == $tripID) {
                 // Extract the trip photo
@@ -491,6 +373,8 @@ class Admin extends Controller
         abort(500);
     }
 }
+
+
 
 
     

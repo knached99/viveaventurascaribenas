@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('bookings', function(Blueprint $table){
             $table->uuid('bookingID')->primary();
-            $table->string('stripe_checkout_id');
+            // $table->string('square_checkout_id');
             $table->string('name');
             $table->string('email');
             $table->string('phone_number');
@@ -25,18 +25,20 @@ return new class extends Migration
             $table->string('preferred_start_date');
             $table->string('preferred_end_date');
             $table->float('amount_captured');
-            $table->uuid('tripID');
-            $table->string('stripe_product_id');
+            $table->string('tripID', 255);
+            // $table->string('square_product_id');
+            // $table->string('square_catalog_object_id');
+            // $table->string('square_payment_id');
 
             $table->foreign('tripID')
             ->references('tripID')
             ->on('trips')
             ->onDelete('cascade');
 
-            $table->foreign('stripe_product_id')
-            ->references('stripe_product_id')
-            ->on('trips')
-            ->onDelete('cascade');
+            // $table->foreign('square_product_id')
+            // ->references('square_product_id')
+            // ->on('trips')
+            // ->onDelete('cascade');
             $table->timestamps();
         });
     }

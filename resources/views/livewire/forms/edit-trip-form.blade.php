@@ -4,42 +4,42 @@
 
     $startDate = Carbon::parse($trip->tripStartDate)->format('Y-m-d');
     $endDate = Carbon::parse($trip->tripEndDate)->format('Y-m-d');
-    $tripPhotos = json_decode($trip->tripPhoto, true);
-   
-    $active = $trip->active;
-    $couponID = $trip->stripe_coupon_id;
 
-    $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+    $tripPhotos = is_string($trip->tripPhoto) ? json_decode($trip->tripPhoto, true) : $trip->tripPhoto;
+    // $active = $trip->active;
+    // $couponID = $trip->stripe_coupon_id;
+
+    // $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
     $tripPrice = $trip->tripPrice;
     $newPrice = 0;
     $coupon = null;
 
-    if (!empty($trip->stripe_coupon_id)) {
-        try {
-            $coupon = $stripe->coupons->retrieve($couponID);
-            if (isset($coupon) && $coupon->percent_off) {
-                $discount = ($coupon->percent_off / 100) * $tripPrice;
-                $newPrice = $tripPrice - $discount;
-            }
+    // if (!empty($trip->stripe_coupon_id)) {
+    //     try {
+    //         $coupon = $stripe->coupons->retrieve($couponID);
+    //         if (isset($coupon) && $coupon->percent_off) {
+    //             $discount = ($coupon->percent_off / 100) * $tripPrice;
+    //             $newPrice = $tripPrice - $discount;
+    //         }
 
-            if (isset($coupon) && $coupon->amount_off) {
-                $newPrice = $tripPrice - $coupon->amount_off;
-            }
-        } catch (\Exception $e) {
-            \Log::error('Unable to retrieve coupon: ' . $e->getMessage());
-        }
-    } else {
-        \Log::warning('No coupon ID found for trip: ' . $trip->tripID);
-    }
+    //         if (isset($coupon) && $coupon->amount_off) {
+    //             $newPrice = $tripPrice - $coupon->amount_off;
+    //         }
+    //     } catch (\Exception $e) {
+    //         \Log::error('Unable to retrieve coupon: ' . $e->getMessage());
+    //     }
+    // } else {
+    //     \Log::warning('No coupon ID found for trip: ' . $trip->tripID);
+    // }
 
     $redeemByDate = '';
 
-    if (isset($coupon) && isset($coupon->duration_in_months)) {
-        $redeemByDate = Carbon::now()->addMonths($coupon->duration_in_months);
-    } else {
-        $redeemByDate = '';
-    }
+    // if (isset($coupon) && isset($coupon->duration_in_months)) {
+    //     $redeemByDate = Carbon::now()->addMonths($coupon->duration_in_months);
+    // } else {
+    //     $redeemByDate = '';
+    // }
 
 @endphp
 
@@ -75,21 +75,18 @@
                     <!-- Editable Images -->
                     <div class="text-center mb-4">
 
-                    <!-- Loading Indicator on file upload -->
-                        <div
-                            x-data="{ uploading: false, progress: 0 }"
-                            x-on:livewire-upload-start="uploading = true"
+                        <!-- Loading Indicator on file upload -->
+                        <div x-data="{ uploading: false, progress: 0 }" x-on:livewire-upload-start="uploading = true"
                             x-on:livewire-upload-finish="uploading = false"
                             x-on:livewire-upload-cancel="uploading = false"
                             x-on:livewire-upload-error="uploading = false"
-                            x-on:livewire-upload-progress="progress = $event.detail.progress"
-                        > 
-                    
+                            x-on:livewire-upload-progress="progress = $event.detail.progress">
+
                             <!-- Progress Bar -->
                             <div x-show="uploading">
                                 <progress max="100" x-bind:value="progress"></progress>
                             </div>
-                            </div>
+                        </div>
                         <!-- Loading Indicator on file upload -->
                         <label for="tripPhotos" class="form-label fw-semibold d-block mb-2">Trip Photos</label>
                         <div class="d-flex flex-wrap justify-content-center">
@@ -97,8 +94,7 @@
                                 @foreach ($tripPhotos as $index => $photo)
                                     <div class="position-relative m-2">
                                         @if (is_string($photo))
-                                            
-                                            <img src="{{$photo}}"
+                                            <img src="{{ $photo }}"
                                                 class="img-fluid img-thumbnail rounded shadow-sm cursor-pointer"
                                                 style="max-width: 150px; height: 150px;" alt="Trip Image"
                                                 wire:click="selectImageToReplace({{ $index }})" />
@@ -395,9 +391,10 @@
                         </div>
 
                         <div class="form-group">
-                        <label class="form-label">Enter duration in months</label>
-                        <input type="number" wire:model="discountDuration" id="discountDuration" class="form-control {{$errors->has('discountDuration') ? 'is-invalid' : ''}}" />
-                        <x-input-error :messages="$errors->get('discountDuration')" class="invalid-feedback"/>
+                            <label class="form-label">Enter duration in months</label>
+                            <input type="number" wire:model="discountDuration" id="discountDuration"
+                                class="form-control {{ $errors->has('discountDuration') ? 'is-invalid' : '' }}" />
+                            <x-input-error :messages="$errors->get('discountDuration')" class="invalid-feedback" />
                         </div>
 
                         <div class="form-group">

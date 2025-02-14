@@ -37,7 +37,8 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 <div class="container-fluid p-4">
     <h6 style="font-weight: 800;">
         When you create your trip, the changes are automatically reflected on the <a href="/"
-            target="_blank">home</a> and <a href="{{ route('destinations') }}" target="_blank">destinations</a> pages after setting the trip to 'Active'
+            target="_blank">home</a> and <a href="{{ route('destinations') }}" target="_blank">destinations</a> pages after
+        setting the trip to 'Active'
     </h6>
     <p class="text-slate-500 font-medium">You may also add your expenses accrued for this trip which will be used to
         calculate the net cost.
@@ -61,20 +62,17 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                         </div>
 
                         <!-- Loading Indicator on file upload -->
-                        <div
-                            x-data="{ uploading: false, progress: 0 }"
-                            x-on:livewire-upload-start="uploading = true"
+                        <div x-data="{ uploading: false, progress: 0 }" x-on:livewire-upload-start="uploading = true"
                             x-on:livewire-upload-finish="uploading = false"
                             x-on:livewire-upload-cancel="uploading = false"
                             x-on:livewire-upload-error="uploading = false"
-                            x-on:livewire-upload-progress="progress = $event.detail.progress"
-                        > 
-           
+                            x-on:livewire-upload-progress="progress = $event.detail.progress">
+
                             <!-- Progress Bar -->
                             <div x-show="uploading">
                                 <progress max="100" x-bind:value="progress"></progress>
                             </div>
-                            </div>
+                        </div>
                         <!-- Loading Indicator on file upload -->
                         <div class="mb-4">
                             <label for="tripPhoto" class="form-label">Trip Photos (Choose up to 6 photos)</label>
@@ -87,7 +85,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </div>
-                              
+
                             @if ($form->tripPhoto)
                                 <div class="d-flex flex-wrap gap-2">
                                     @foreach ($form->tripPhoto as $photo)

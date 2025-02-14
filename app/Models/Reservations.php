@@ -16,7 +16,8 @@ class Reservations extends Model
 
     protected $fillable = [
         'reservationID',
-        'stripe_product_id',
+        // 'square_product_id',
+        // 'square_catalog_object_id',
         'tripID',
         'name',
         'email',
@@ -32,7 +33,7 @@ class Reservations extends Model
 
     protected $casts = [
         'reservationID'=>'string',
-        'stripe_product_id'=>'string',
+        'tripID'=>'string',
     ];
 
 
