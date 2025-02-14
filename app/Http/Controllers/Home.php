@@ -43,7 +43,7 @@ class Home extends Controller
         }
         
        
-        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'slug',  'num_trips', 'square_product_id')
+        $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPrice', 'slug',  'num_trips')
             ->where('active', true)
             ->get();
 
@@ -52,10 +52,10 @@ class Home extends Controller
         $photos = PhotoGalleryModel::with(['trip'])->select('photoID', 'photoLabel', 'photoDescription', 'photos', 'tripID')->get();
 
 
-        $mostPopularBookings = BookingModel::select('bookings.square_product_id', DB::raw('COUNT(*) as booking_count'))
+        $mostPopularBookings = BookingModel::select('bookings.tripID', DB::raw('COUNT(*) as booking_count'))
             ->where('trips.active', true)
-            ->join('trips', 'bookings.square_product_id', '=', 'trips.square_product_id')
-            ->groupBy('bookings.square_product_id', 'trips.tripID', 'trips.slug',  'trips.tripPhoto')
+            ->join('trips', 'bookings.tripID', '=', 'trips.tripID')
+            ->groupBy('bookings.tripID', 'trips.tripID', 'trips.slug',  'trips.tripPhoto')
             ->having('booking_count', '>', 2)
             ->orderByDesc('booking_count')
             ->take(4)
@@ -66,7 +66,7 @@ class Home extends Controller
         $highestBookingCount = 0;
     
         foreach ($mostPopularBookings as $booking) {
-            $trip = TripsModel::where('square_product_id', $booking->square_product_id)->first();
+            $trip = TripsModel::where('tripID', $booking->tripID)->first();
             
             if ($trip) {
                 $popularTrips[] = [
@@ -105,6 +105,46 @@ class Home extends Controller
         return view('reservation-confirmed', ['reservationID'=>$reservationID, 'customerName' => $customerName, 'customerEmail' => $customerEmail]);
     }
 
+
+    public function getDestinationDetails($slug){
+       
+        $trip = TripsModel::where('slug', $slug)->where('active', true)->firstOrFail();
+        $tripID = $trip->tripID;
+
+        $testimonials = Testimonials::with('trip')
+        ->where('tripID', $tripID)
+        ->where('testimonial_approval_status', 'approved')
+        ->get();
+
+        $averageTestimonialRating = $testimonials->isNotEmpty() ? $testimonials->avg('trip_rating') : 0;
+        $mostPopularBooking = BookingModel::select('bookingID')
+        ->selectRaw('COUNT(*) as booking_count')
+        ->groupBy('bookingID')
+        ->having('booking_count', '>', 2)
+        ->orderByDesc('booking_count')
+        ->first();
+
+        $isMostPopular = true; // default is false
+
+        // Old logic using Stripe, need to update to use Square
+        
+        // if ($mostPopularBooking) {
+        //     // Retrieve the product from Stripe
+        //     $product = $this->stripe->products->retrieve($mostPopularBooking->stripe_product_id);
+    
+        //     // Check if the current trip is the most popular
+        //     $isMostPopular = $trip->stripe_product_id === $mostPopularBooking->stripe_product_id;
+
+        // }
+        
+        return view('/landing/destination', [
+            'tripID' => $tripID,
+            'trip' => $trip,
+            'testimonials' => $testimonials,
+            'averageTestimonialRating' => $averageTestimonialRating,
+            'isMostPopular' => $isMostPopular,
+        ]);
+    }
 
     public function destinationsPage(){
         // Fetch all trips

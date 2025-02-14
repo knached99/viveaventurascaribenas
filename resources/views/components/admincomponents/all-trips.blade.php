@@ -1,4 +1,5 @@
 @props(['trips'])
+
 <table class="table dataTable">
     <thead>
         <tr>
@@ -20,7 +21,11 @@
     <tbody>
         @foreach ($trips as $trip)
             @php
-                $tripPhotos = json_decode($trip->tripPhoto, true);
+                // Check if tripPhotos and landscapes are already arrays, if not decode them
+                $tripPhotos = is_string($trip->tripPhoto) ? json_decode($trip->tripPhoto, true) : $trip->tripPhoto;
+                $landscapes = is_string($trip->tripLandscape)
+                    ? json_decode($trip->tripLandscape, true)
+                    : $trip->tripLandscape;
             @endphp
             <tr>
                 <td>
@@ -46,17 +51,13 @@
                             </button>
                         </div>
                     @elseif(isset($tripPhotos) && is_array($tripPhotos) && count($tripPhotos) === 1)
-                        <img src="{{ $tripPhotos[0] }}" class="img-thumbnail rounded"
-                            style="width: 100px; height: 100px;" />
+                        <img src="{{ $tripPhotos[0] }}" class="d-block w-100 card-img-top" />
                     @else
-                        <img src="{{ asset('assets/images/image_placeholder.jpg') }}" class="img-thumbnail rounded"
-                            style="width: 100px; height: 100px;" />
+                        <img src="{{ asset('assets/images/image_placeholder.jpg') }}"
+                            class="d-block w-100 card-img-top" />
                     @endif
                 </td>
                 <td>{{ $trip->tripLocation }}</td>
-                @php
-                    $landscapes = json_decode($trip->tripLandscape, true); // Assuming tripLandscape is a JSON array
-                @endphp
 
                 <td>
                     @if (is_array($landscapes))
@@ -113,12 +114,14 @@
                         <td class="m-5 text-white badge rounded-pill bg-danger">{{ $trip->tripAvailability }}</td>
                     @break
                 @endswitch
+
                 <td>{{ date('F jS, Y', strtotime($trip->tripStartDate)) }}</td>
                 <td>{{ date('F jS, Y', strtotime($trip->tripEndDate)) }}</td>
                 <td>{{ \Carbon\Carbon::parse($trip->tripStartDate)->diffInDays($trip->tripEndDate) }}</td>
                 <td>${{ number_format($trip->tripPrice, 2) }}</td>
                 <td>{{ date('F jS, Y', strtotime($trip->created_at)) }}</td>
                 <td>{{ date('F jS, Y', strtotime($trip->updated_at)) }}</td>
+
                 @switch($trip->active)
                     @case(true)
                         <td class="m-3 text-white badge rounded-pill bg-success">Active</td>
@@ -127,17 +130,20 @@
                     @case(false)
                         <td class="m-3 text-white badge rounded-pill bg-secondary">Inactive</td>
                     @endswitch
+
                     <td>
                         <a href="{{ route('admin.trip', ['tripID' => $trip->tripID]) }}" class="btn btn-primary">
                             <i class="fa-solid fa-eye mr-2"></i> View
                         </a>
                     </td>
+
                     <td>
                         <form method="post" action="{{ route('admin.trip.delete', ['tripID' => $trip->tripID]) }}">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger text-white"><i class="fa-solid fa-trash mr-2"></i>
-                                Delete</button>
+                            <button type="submit" class="btn btn-danger text-white">
+                                <i class="fa-solid fa-trash mr-2"></i> Delete
+                            </button>
                         </form>
                     </td>
                 </tr>
