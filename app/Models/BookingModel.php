@@ -17,8 +17,9 @@ class BookingModel extends Model
     protected $fillable = [
         'bookingID',
         'tripID',
-        'stripe_checkout_id',
-        'stripe_product_id',
+        // 'square_product_id',
+        // 'square_payment_id',
+        // 'square_catalog_object_id',
         'name',
         'email',
         'phone_number',
@@ -34,8 +35,8 @@ class BookingModel extends Model
 
     protected $casts = [
         'bookingID'=>'string',
-        'stripe_checkout_id'=>'string',
-        'stripe_product_id'=>'string'
+        // 'stripe_checkout_id'=>'string',
+        // 'stripe_product_id'=>'string'
     ];
 
 

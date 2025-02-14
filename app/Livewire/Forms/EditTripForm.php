@@ -10,9 +10,15 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
-use Stripe\StripeClient;
-use Stripe\Coupon;
-use Stripe\PromotionCode;
+// use Stripe\StripeClient;
+// use Stripe\Coupon;
+// use Stripe\PromotionCode;
+// Importing Square classes
+use Square\SquareClient;
+use Square\Models\CatalogObject;
+use Square\Models\CatalogItem;
+use Square\Models\CatalogItemVariation;
+use Square\Models\Money;
 use Exception;
 use Stripe\Exception\ApiErrorException;
 use Carbon\Carbon;
@@ -357,157 +363,106 @@ class EditTripForm extends Component
     
 
 
-    public function editTrip(): void
-    {
-        $reservationsCount = Reservations::count(); 
-        
-        \Log::info('Editing trip with costs: ' . json_encode($this->tripCosts));
-        
-        $rules = [
-            'tripLocation' => 'required|string|max:255',
-            'tripLandscape' => 'required|array',
-            'tripAvailability' => 'required|string',
-            'tripDescription' => 'required|string',
-            'tripActivities' => 'required|string',
-            'tripCosts' => 'nullable|array',
-            'tripCosts.*.name' => 'required|string|max:255',
-            'tripCosts.*.amount' => 'required|numeric|min:0',
-            'num_trips' => 'required|min:1',
-        ];
-
-        if(!in_array($this->tripAvailability, ['coming soon', 'unavailable'])){
-            $rules['tripPrice'] = 'required|numeric|min:1';
-            $rules['tripStartDate'] = 'required|date|before_or_equal:tripEndDate';
-            $rules['tripEndDate'] = 'required|date|after_or_equal:tripStartDate';
-        }
-        
-        $this->validate($rules);
-        
-        try {
-            $this->purgeCache((string) $this->trip->tripID);
-
-           // $imagesArray = [];
-            $imageURLs = [];
+        public function editTrip(): void
+        {
+            $reservationsCount = Reservations::count();
             
-            $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-            $product = $stripe->products->retrieve($this->trip->stripe_product_id);
-            $tripModel = TripsModel::findOrFail($this->trip->tripID);
+            \Log::info('Editing trip with costs: ' . json_encode($this->tripCosts));
         
-            if ($product) {
-                $product->name = $this->tripLocation;
-                $product->description = $this->tripDescription;
-              //  \Log::info('Images in the array: '.json_encode($imagesArray));
-                \Log::info('Image URLs in the array" '.json_encode($imageURLs));
-
-
-                //$newImageURLs = [];
-
-              //  \Log::info('Current Image URLs array: '.json_encode($newImageURLs));
-
-            
-           
-
-            
+            $rules = [
+                'tripLocation' => 'required|string|max:255',
+                'tripLandscape' => 'required|array',
+                'tripAvailability' => 'required|string',
+                'tripDescription' => 'required|string',
+                'tripActivities' => 'required|string',
+                'tripCosts' => 'nullable|array',
+                'tripCosts.*.name' => 'required|string|max:255',
+                'tripCosts.*.amount' => 'required|numeric|min:0',
+                'num_trips' => 'required|min:1',
+            ];
+        
+            if (!in_array($this->tripAvailability, ['coming soon', 'unavailable'])) {
+                $rules['tripPrice'] = 'required|numeric|min:1';
+                $rules['tripStartDate'] = 'required|date|before_or_equal:tripEndDate';
+                $rules['tripEndDate'] = 'required|date|after_or_equal:tripStartDate';
+            }
+        
+            $this->validate($rules);
+        
+            try {
+                $this->purgeCache((string) $this->trip->tripID);
+        
+                $imageURLs = [];
+                $tripModel = TripsModel::findOrFail($this->trip->tripID);
+        
                 if (!empty($this->tripPhotos) && is_array($this->tripPhotos)) {
-                    \Log::info('User selected new pictures for upload. Iterating over new pictures...');
-                
-                    $newImageURLs = [];
-                
                     foreach ($this->tripPhotos as $photo) {
-                        // Check if $photo is a valid file object
                         if ($photo instanceof \Illuminate\Http\UploadedFile) {
                             $imagePath = 'booking_photos/' . $photo->hashName();
-                            $photo->storeAs('public', $imagePath); // Store the file
-                            $newImageURLs[] = asset(Storage::url($imagePath)); // Generates the URL
-                            \Log::info('Added new image URL: ' . end($newImageURLs));
-                        } else {
-                            \Log::warning('Skipping invalid photo: ' . json_encode($photo));
+                            $photo->storeAs('public', $imagePath);
+                            $imageURLs[] = asset(Storage::url($imagePath));
                         }
                     }
-                
-                    \Log::info('Final image URLs array: ' . json_encode($newImageURLs));
                 }
-                
-                    
-                
-                // \Log::info('Current newImageURLs array: '.json_encode($newImageURLs));
-               
-                \Log::info('Current trip availability in DB: ' . $tripModel->tripAvailability);
-                \Log::info('Current trip availability in Livewire: ' . $this->tripAvailability);
+        
+                // Update Square Catalog Item
+                $catalogApi = $this->squareClient->getCatalogApi();
+                $response = $catalogApi->updateCatalogObject([
+                    'idempotency_key' => (string) Str::uuid(),
+                    'object' => new CatalogObject(
+                        'ITEM',
+                        $tripModel->tripID, // Square Catalog Item ID
+                        null,
+                        new CatalogItem([
+                            'name' => $this->tripLocation,
+                            'description' => $this->tripDescription,
+                            'available_online' => true,
+                        ])
+                    )
+                ]);
+        
+                if ($response->isSuccess()) {
+                    \Log::info('Square catalog item updated successfully');
+                } else {
+                    \Log::error('Error updating Square catalog item: ' . json_encode($response->getErrors()));
+                    $this->error = 'Error updating trip in Square';
+                    return;
+                }
+        
                 if ($tripModel->tripAvailability !== $this->tripAvailability) {
-                    \Log::info('Trip availability has changed.');
                     if (strtolower($this->tripAvailability) === 'available') {
-                        // \Log::info('Dispatching TripBecameAvailable event for trip ID: ' . $tripModel->tripID);
-                        // event(new TripBecameAvailable($tripModel));
-                        // Fetch reservations associated with this trip
-                        \Log::info('Trip status changed to '.$this->tripAvailability);
-                        \Log::info('Fetching all reservations associated with this trip...');
                         $reservations = Reservations::where('tripID', $this->trip->tripID)->get();
-                        \Log::info('Reservations retrieved!');
-                        // Notify all users who made reservations for this trip
                         foreach ($reservations as $reservation) {
-                            \Log::info('Notification being sent to: ' . $reservation->email);
-                            
                             Notification::route('mail', $reservation->email)
                                 ->notify(new TripAvailableNotification($this->trip, $reservation->reservationID, $reservation->customerName));
-                            }
+                        }
                     }
-                    
                 }
         
-                $tripModel->tripLocation = $this->tripLocation;
-               // $tripModel->tripPhoto = json_encode($imagesArray);
-                $tripModel->tripPhoto = !empty($newImageURLs) ? json_encode($newImageURLs) : json_encode($this->tripPhotos);
-                $tripModel->tripLandscape = json_encode($this->tripLandscape);
-                $tripModel->tripAvailability = $this->tripAvailability;
-                $tripModel->tripDescription = $this->tripDescription;
-                $tripModel->tripActivities = $this->tripActivities;
-                $tripModel->tripStartDate = Carbon::parse($this->tripStartDate)->format('Y-m-d');
-                $tripModel->tripEndDate = Carbon::parse($this->tripEndDate)->format('Y-m-d');
-                $tripModel->tripPrice = $this->tripPrice ?? 0;
-                $tripModel->num_trips = $this->num_trips;
-                
-                if($reservationsCount > 0 && $tripModel->num_trips == 0 || $tripModel->num_trips < $reservationsCount){
-                 $tripModel->num_trips = max($reservationsCount, $tripModel->num_trips);
-                }
-                else{
-                    $tripModel->num_trips = $this->num_trips;
-                }
-
-
-                $tripModel->active = $this->active;
-                $tripModel->slug = Str::slug($this->tripLocation);
-                $tripModel->tripCosts = json_encode($this->tripCosts);
-        
-                $tripModel->save();
-
-                Cache::put($this->cacheKey, [
+                // Update the database
+                $tripModel->update([
                     'tripLocation' => $this->tripLocation,
-                    'tripPhotos' => $imageURLs,
-                    'tripLandscape' => $this->tripLandscape,
+                    'tripPhoto' => json_encode($imageURLs),
+                    'tripLandscape' => json_encode($this->tripLandscape),
                     'tripAvailability' => $this->tripAvailability,
                     'tripDescription' => $this->tripDescription,
                     'tripActivities' => $this->tripActivities,
-                    'tripStartDate' => $this->tripStartDate,
-                    'tripEndDate' => $this->tripEndDate,
-                    'tripPrice' => $this->tripPrice,
-                    'stripe_product_id' => $this->stripe_product_id,
-                    'tripCosts' => $this->tripCosts,
-                    'num_trips' => $this->num_trips,
+                    'tripStartDate' => Carbon::parse($this->tripStartDate)->format('Y-m-d'),
+                    'tripEndDate' => Carbon::parse($this->tripEndDate)->format('Y-m-d'),
+                    'tripPrice' => $this->tripPrice ?? 0,
+                    'tripCosts' => json_encode($this->tripCosts),
+                    'num_trips' => max($reservationsCount, $this->num_trips),
                     'active' => $this->active,
-                    'slug'=> Str::slug($this->slug),
-                ], 600); // Cache for 10 minutes
+                    'slug' => Str::slug($this->tripLocation),
+                ]);
         
-                $this->success = 'Trip details have been updated successfully.';
-            } else {
-                $this->error = 'Product not found.';
+                $this->success = 'Trip details updated successfully.';
+            } catch (Exception $e) {
+                \Log::error('Error updating trip: ' . $e->getMessage());
+                $this->error = 'There was an error updating the trip.';
             }
-        } catch (Exception $e) {
-            \Log::error('Error updating trip: ' . $e->getMessage());
-            $this->error = 'There was an error updating the trip.';
         }
-    }
-    
+        
 
     private function purgeCache(string $tripId): void
     {

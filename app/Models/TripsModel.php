@@ -23,8 +23,9 @@ class TripsModel extends Model
     }
 
     protected $fillable = [
+        // 'tripID',
         'tripID',
-        'stripe_product_id',
+        // 'square_catalog_object_id',
         'tripLocation',
         'tripPhoto',
         'tripDescription',

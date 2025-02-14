@@ -1,9 +1,9 @@
 @props(['trips', 'mostPopularTripId'])
-@php
+{{-- @php
 
     use Stripe\StripeClient;
     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-@endphp
+@endphp --}}
 
 <section class="ftco-section ftco-no-pt">
     <div class="container">
@@ -18,7 +18,6 @@
                     soon for exciting upcoming adventures.</h5>
             @else
                 @foreach ($trips as $trip)
-               
                     @php
                         // Decode tripPhoto if it exists
                         $tripPhotos = isset($trip->tripPhoto) ? json_decode($trip->tripPhoto, true) : [];
@@ -33,7 +32,7 @@
                                         @if (!empty($tripPhotos))
                                             @foreach ($tripPhotos as $index => $photo)
                                                 <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                                    <img src="{{$photo}}" class="d-block w-100 card-img-top"
+                                                    <img src="{{ $photo }}" class="d-block w-100 card-img-top"
                                                         alt="Photo">
                                                 </div>
                                             @endforeach
@@ -65,7 +64,7 @@
                                 </div>
                                 <div class="text p-4 card-body">
 
-                                    @php
+                                    {{-- @php
                                         $tripPrice = $trip->tripPrice; // Start with the original price
                                         $newPrice = $tripPrice; // Default to original price
 
@@ -94,7 +93,7 @@
                                             // Handle case where coupon ID is not set
                                             \Log::warning('No coupon ID provided for trip: ' . $trip->id);
                                         }
-                                    @endphp
+                                    @endphp --}}
                                     @if ($trip->tripAvailability == 'available')
                                         <span class="price">
                                             @if (isset($newPrice) && $newPrice < $tripPrice)
@@ -123,34 +122,34 @@
                                     {{-- <h3><a style="text-decoration:underline; text-decoration-color: #3b82f6;" href="{{ route('destination', ['slug' => $trip->slug]) }}">{{ $trip->tripLocation }}</a> --}}
                                     {{-- </h3> --}}
                                     <h3 class="fw-bold">{{ $trip->tripLocation }}</h3>
-                                   @php
-                                    $badgeClass = '';
-                                    $badgeText = '';
-                                    
-                                    if ($trip->num_trips == 0) {
-                                        $badgeClass = 'danger-badge';
-                                        $badgeText = 'Unavailable to book';
-                                    } else {
-                                        switch ($trip->tripAvailability) {
-                                            case 'available':
-                                                $badgeClass = 'success-badge';
-                                                $badgeText = $trip->tripAvailability;
-                                                break;
-                                            case 'coming soon':
-                                                $badgeClass = 'warning-badge';
-                                                $badgeText = $trip->tripAvailability;
-                                                break;
-                                            case 'unavailable':
-                                                $badgeClass = 'danger-badge';
-                                                $badgeText = $trip->tripAvailability;
-                                                break;
+                                    @php
+                                        $badgeClass = '';
+                                        $badgeText = '';
+
+                                        if ($trip->num_trips == 0) {
+                                            $badgeClass = 'danger-badge';
+                                            $badgeText = 'Unavailable to book';
+                                        } else {
+                                            switch ($trip->tripAvailability) {
+                                                case 'available':
+                                                    $badgeClass = 'success-badge';
+                                                    $badgeText = $trip->tripAvailability;
+                                                    break;
+                                                case 'coming soon':
+                                                    $badgeClass = 'warning-badge';
+                                                    $badgeText = $trip->tripAvailability;
+                                                    break;
+                                                case 'unavailable':
+                                                    $badgeClass = 'danger-badge';
+                                                    $badgeText = $trip->tripAvailability;
+                                                    break;
+                                            }
                                         }
-                                    }
-                                @endphp
+                                    @endphp
 
-                                <span class="{{ $badgeClass }}">{{ $badgeText }}</span>
+                                    <span class="{{ $badgeClass }}">{{ $badgeText }}</span>
 
-                                  
+
                                     <ul>
                                         <li>
                                             <img src="{{ asset('assets/images/calendar.png') }}"

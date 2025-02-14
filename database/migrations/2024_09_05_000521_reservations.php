@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table){
             $table->uuid('reservationID')->primary();
-            $table->string('stripe_product_id');
-            $table->uuid('tripID');
+            // $table->string('square_product_id');
+            // $table->string('square_catalog_object_id');
+            $table->string('tripID', 255);
             $table->string('name');
             $table->string('email');
             $table->string('phone_number');

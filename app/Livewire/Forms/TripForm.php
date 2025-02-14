@@ -8,15 +8,21 @@ use Livewire\WithFileUploads;
 use Livewire\Form;
 use Illuminate\Support\Facades\Cache;
 use App\Models\TripsModel;
-use Stripe\Stripe;
-use Stripe\Product;
-use Stripe\StripeClient;
+use App\Helpers\Helper;
 use Illuminate\Support\Facades\Storage;
 use Stripe\Exception\InvalidRequestException;
 use Carbon\Carbon;
+use Square\SquareClientBuilder;
+use Square\Environment;
+use Square\Models\Money;
+use Square\Models\CatalogItemVariation;
+use Square\Models\CatalogObject;
+use Square\Models\CatalogItem;
+use Square\Models\UpsertCatalogObjectRequest;
+use Square\Authentication\BearerAuthCredentialsBuilder;
+use Square\Exceptions\ApiException;
 use Exception;
 
-use App\Helpers\Helper;
 
 class TripForm extends Form {
 
@@ -27,7 +33,7 @@ class TripForm extends Form {
 
     protected $stripe;
 
-    public string $tripID = '';
+    public string $squareID = '';
     public string $tripLocation = '';
     public ?array $tripLandscape = [];
     public string $tripAvailability = '';
@@ -39,9 +45,10 @@ class TripForm extends Form {
     public array $tripCosts = [];
     public ?int $num_trips = 0;
     public bool $active = false;
+    public $client; // Square Client 
     
     // Validate that 'tripPhoto' is an array of images with specific rules
-    #[Validate('required|array|max:3')]
+    #[Validate('required|array|max:6')]
     public ?array $tripPhoto = [];
 
     public string $status = '';
@@ -111,11 +118,9 @@ class TripForm extends Form {
     }
 
     public function mount(){
-        Stripe::setApiKey(env('STRIPE_SECRET_KEY'));
-        $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        
+    
 
-        // Log to see if Str::uuid() is being executed
-        \Log::info('Generating UUID in mount method.');
 
         $this->emit('setEditorContent', [
             'property' => 'form.tripDescription',
@@ -136,102 +141,103 @@ class TripForm extends Form {
         // Initializing to today's date
         $this->tripStartDate = Carbon::now()->format('Y-m-d');
         $this->tripEndDate = Carbon::now()->format('Y-m-d');
+        // $squareID = '#trip_'.Str::uuid(10);
     }
+
 
     public function submitTripForm()
-    {
-        $this->validate();
-    
-        $tripCostsJson = json_encode($this->tripCosts);
-        $tripLandscapeJson = json_encode($this->tripLandscape);
-    
-        if (!$this->stripe) {
-            $this->stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
-        }
-    
-        try {
-            $imageURLs = []; // Initialize the correct variable to store image URLs
-    
-            // Create booking_photos folder if it does not exist
-            $dirPath = storage_path('app/public/booking_photos');
-            if (!file_exists($dirPath)) {
-                mkdir($dirPath, 0755, true);
-            }
-    
-            // Handle uploaded images
-            if (!empty($this->tripPhoto) && is_array($this->tripPhoto)) {
-                foreach ($this->tripPhoto as $photo) {
-                    // Validate that $photo is an UploadedFile instance
-                    if ($photo instanceof \Illuminate\Http\UploadedFile) {
-                        $imagePath = 'booking_photos/' . $photo->hashName();
-                        $photo->storeAs('public', $imagePath); // Save the image
-                        $imageURLs[] = asset(Storage::url($imagePath)); // Store the public URL
-                        \Log::info('Added new image URL: ' . end($imageURLs));
-                    } else {
-                        \Log::warning('Invalid photo skipped: ' . json_encode($photo));
-                    }
-                }
-            } else {
-                \Log::info('No images were selected for upload.');
-            }
-    
-            // Create a product in Stripe
-            $product = $this->stripe->products->create([
-                'name' => $this->tripLocation,
-                'description' => $this->tripDescription,
-                'images' => $imageURLs, // Pass the correct array of image URLs
-                'tax_code'=>'txcd_20030000', // General Services 
-            ]);
-            
-            if ($product) {
-                $price = $this->stripe->prices->create([
-                    'unit_amount' => $this->tripPrice * 100, // Stripe uses cents
-                    'currency' => 'usd',
-                    'product' => $product->id,
-                    'tax_behavior'=> 'exclusive', // Exclusive means tax is not factored into total price  
+{
+    // Validate the form data
+    $this->validate();
 
-                ]);
-    
-                if ($price) {
-                    // Reset form and save trip data
-                    $this->tripID = Str::uuid(5);
-                    $data = [
-                        'tripID' => $this->tripID,
-                        'stripe_product_id' => $product->id,
-                        'tripLocation' => $this->tripLocation,
-                        'tripDescription' => $this->tripDescription,
-                        'tripActivities' => $this->tripActivities,
-                        'tripLandscape' => $tripLandscapeJson,
-                        'tripAvailability' => $this->tripAvailability,
-                        'tripPhoto' => json_encode($imageURLs), // Save URLs in the database
-                        'tripStartDate' => $this->tripStartDate ?: Carbon::now()->format('Y-m-d'),
-                        'tripEndDate' => $this->tripEndDate ?: Carbon::now()->format('Y-m-d'),
-                        'tripPrice' => $this->tripPrice,
-                        'tripCosts' => $tripCostsJson,
-                        'num_trips' => intval($this->num_trips) ?? 0,
-                        'active' => $this->active ? true : false,
-                        'slug' => Str::slug($this->tripLocation),
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ];
-    
-                    // Save to the database
-                    TripsModel::create($data);
-    
-                    // Clear cache and reset the form
-                    Cache::forget(self::CACHE_KEY_TRIPS);
-                    $this->resetForm();
-    
-                    // Set success message
-                    $this->status = 'Trip Successfully Created!';
-                }
-            }
-        } catch (Exception $e) {
-            $this->error = 'Something went wrong while creating this trip';
-            \Log::error('Error on line ' . __LINE__ . ': ' . $e->getMessage());
+    // Prepare data for saving
+    $tripCostsJson = json_encode($this->tripCosts);
+    $tripLandscapeJson = json_encode($this->tripLandscape);
+
+    try {
+        // Initializing Square client
+        $accessToken = getenv('SQUARE_ACCESS_TOKEN');
+
+        $client = SquareClientBuilder::init()
+            ->bearerAuthCredentials(
+                BearerAuthCredentialsBuilder::init($accessToken)
+            )
+            ->environment(Environment::SANDBOX) // Change to Environment::PRODUCTION for live
+            ->build();
+
+        // Generate a consistent Item ID
+        $item_id = '#trip_' . Str::uuid();
+        $variation_id = '#variation_' . Str::uuid(); // Unique variation ID
+
+        // Handle image uploads
+        $imageURLs = $this->handleUploadedImages();
+
+        // Pricing setup
+        $price_money = new Money();
+        $price_money->setAmount($this->tripPrice);
+        $price_money->setCurrency('USD');
+
+        // Create Item Variation (Variation must reference the correct Item ID)
+        $item_variation_data = new CatalogItemVariation();
+        $item_variation_data->setItemId($item_id); // Must match the Item's ID
+        $item_variation_data->setName($this->tripLocation);
+        $item_variation_data->setPricingType('FIXED_PRICING');
+        $item_variation_data->setPriceMoney($price_money);
+
+        // Catalog Object for Item Variation
+        $catalog_variation_object = new CatalogObject('ITEM_VARIATION', $variation_id);
+        $catalog_variation_object->setItemVariationData($item_variation_data);
+
+        // Create Catalog Item
+        $item_data = new CatalogItem();
+        $item_data->setName($this->tripLocation);
+        $item_data->setDescription(strip_tags($this->tripDescription));
+        $item_data->setAbbreviation(substr($this->tripLocation, 0, 2));
+        $item_data->setVariations([$catalog_variation_object]); // Attach variations
+
+        // Catalog Object for Item (Uses the same Item ID)
+        $catalog_item_object = new CatalogObject('ITEM', $item_id);
+        $catalog_item_object->setItemData($item_data);
+
+        // Upsert request body
+        $body = new UpsertCatalogObjectRequest(uniqid(), $catalog_item_object);
+
+        // API Call to upsert catalog object
+        $api_response = $client->getCatalogApi()->upsertCatalogObject($body);
+
+        if ($api_response->isSuccess()) {
+            // Save trip to database
+            TripsModel::create([
+                'tripID' => $item_id, // Store the Square trip ID
+                'tripLocation' => $this->tripLocation,
+                'tripPhoto' => $imageURLs,
+                'tripDescription' => $this->tripDescription,
+                'tripActivities' => $this->tripActivities,
+                'tripLandscape' => $tripLandscapeJson,
+                'tripAvailability' => $this->tripAvailability,
+                'tripStartDate' => $this->tripStartDate,
+                'tripEndDate' => $this->tripEndDate,
+                'tripPrice' => $this->tripPrice,
+                'tripCosts' => $tripCostsJson,
+                'num_trips' => $this->num_trips,
+                'active' => true,
+            ]);
+
+            $this->status = 'Trip created successfully!';
+            \Log::info('API response: ' . json_encode($api_response->getResult()));
+        } else {
+            $this->error = 'Error communicating with Square SDK';
+            \Log::error('API Error: ' . json_encode($api_response->getErrors()));
         }
+    } catch (ApiException $e) {
+        // Handle errors, logging, etc.
+        \Log::error('Square API Error: ' . $e->getMessage());
+        $this->error = 'Failed to create the trip. Check logs for more details';
     }
-    
+}
+
+
+        
     public function resetForm(): void {
         $this->tripLocation = '';
         $this->tripDescription = '';
@@ -248,6 +254,43 @@ class TripForm extends Form {
 
         $this->status = ''; // Reset status
         $this->error = '';  // Reset error
+    }
+
+
+    /**
+ * Handle the image upload and return the URLs of the stored images.
+ *
+ * @return array
+ */
+
+    private function handleUploadedImages(): array {
+
+        $imageURLs = [];
+
+        // ensuring directory exists, if not, we create it 
+        $dirPath = storage_path('app/public/booking_photos');
+        
+        if(!file_exists($dirPath)){
+            mkdir($dirPath, 0755, true);
+        }
+
+        // if there are any uploaded images, we handle them here 
+
+        if(!empty($this->tripPhoto) && is_array($this->tripPhoto)){
+
+            foreach($this->tripPhoto as $photo){
+                if($photo instanceof \Illuminate\Http\UploadedFile){
+
+                    // storing images and retrieving the URLs
+
+                    $imagePath = 'booking_photos/'.$photo->hashName(). '.'.$photo->extension();
+                    $photo->storeAs('public', $imagePath);
+                    $imageURLs[] = asset(Storage::url($imagePath));
+                }
+            }
+        }
+
+        return $imageURLs;
     }
 
     public function render()
