@@ -112,89 +112,116 @@ class Search extends Component
     // This method leverages the levenshtein distance algorithm which 
     // dynamically retrieves the terms that closely match the user's search query
     // We also enable caching to reduce number of database queries 
+    // Replacing soundex with metaphone as it is more accurate phonetically 
 
-    private function findSimilarTerm($query)
-    {
-        // Cache terms for 1 hour
-        $terms = Cache::remember('search_terms', 60, function () {
+
+    private function findSimilarTerm($query){
+
+        // caching terms for an hour to avoid DB calls for repeated queries 
+        if(!Cache::get('search_terms')){
+        $terms = Cache::remember('search_terms', 60, function(){
+
             $terms = [];
-    
-            // Collect terms from different models
+
             $tripTerms = TripsModel::select('tripLocation', 'tripDescription', 'tripLandscape', 'tripAvailability')->distinct()->get();
-            foreach ($tripTerms as $trip) {
-                $terms[] = $trip->tripLocation;
-                $terms[] = $trip->tripDescription;
-                $terms[] = $trip->tripLandscape;
-                $terms[] = $trip->tripAvailability;
+            
+            foreach($tripTerms as $trip){
+
+                $terms[] = strtolower(trim($trip->tripLocation)); 
+                $terms[] = strtolower(trim($trip->tripDescription));
+                $terms[] = strtolower(trim($trip->tripLandscape));
+                $terms[] = strtolower(trim($trip->tripAvailability));
             }
-    
+
             $testimonialTerms = Testimonials::select('name', 'email', 'testimonial')->distinct()->get();
             foreach ($testimonialTerms as $testimonial) {
-                $terms[] = $testimonial->name;
-                $terms[] = $testimonial->email;
-                $terms[] = $testimonial->testimonial;
+                $terms[] = strtolower(trim($testimonial->name));
+                $terms[] = strtolower(trim($testimonial->email));
+                $terms[] = strtolower(trim($testimonial->testimonial));
             }
-    
             $bookingTerms = BookingModel::select('name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code')->distinct()->get();
             foreach ($bookingTerms as $booking) {
-                $terms[] = $booking->name;
-                $terms[] = $booking->email;
-                $terms[] = $booking->phone_number;
-                $terms[] = $booking->address_line_1;
-                $terms[] = $booking->address_line_2;
-                $terms[] = $booking->city;
-                $terms[] = $booking->state;
-                $terms[] = $booking->zip_code;
+                $terms[] = strtolower(trim($booking->name));
+                $terms[] = strtolower(trim($booking->email));
+                $terms[] = strtolower(trim($booking->phone_number));
+                $terms[] = strtolower(trim($booking->address_line_1));
+                $terms[] = strtolower(trim($booking->address_line_2));
+                $terms[] = strtolower(trim($booking->city));
+                $terms[] = strtolower(trim($booking->state));
+                $terms[] = strtolower(trim($booking->zip_code));
             }
-    
             $reservationTerms = Reservations::select('name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code')->distinct()->get();
             foreach ($reservationTerms as $reservation) {
-                $terms[] = $reservation->name;
-                $terms[] = $reservation->email;
-                $terms[] = $reservation->phone_number;
-                $terms[] = $reservation->address_line_1;
-                $terms[] = $reservation->address_line_2;
-                $terms[] = $reservation->city;
-                $terms[] = $reservation->state;
-                $terms[] = $reservation->zip_code;
+                $terms[] = strtolower(trim($reservation->name));
+                $terms[] = strtolower(trim($reservation->email));
+                $terms[] = strtolower(trim($reservation->phone_number));
+                $terms[] = strtolower(trim($reservation->address_line_1));
+                $terms[] = strtolower(trim($reservation->address_line_2));
+                $terms[] = strtolower(trim($reservation->city));
+                $terms[] = strtolower(trim($reservation->state));
+                $terms[] = strtolower(trim($reservation->zip_code));
             }
-    
-            // Clean up terms list by removing duplicates, empty values, and normalizing
-            return array_unique(array_filter(array_map('trim', $terms)));
+
+            // returning unique search suggestions
+            return array_unique(array_filter($terms));
+
+            $queryNormalized = strtolower(trim($query));
+            $queryMetaphone = metaphone($queryNormalized);
+            $closest = null;
+            $shortestDistance = PHP_INT_MAX; 
+            $threshold = 3;
+
+            // First, we filter for terms by 
+            // their metaphone value 
+
+            $candidateTerms = [];
+
+            foreach($terms as $term){
+                if(metaphone($term) === $queryMetaphone){
+
+                    $candidateTerms[] = $term;
+                }
+            }
+
+            // if any candidates match phonetically, 
+            // we pick the one with the smallest 
+            // levenshtein distance
+
+            if(!empty($candidateTerms)){
+                
+                foreach($candidateTerms as $candidate){
+
+                    $lev = levenshtein($queryNormalized, $candidate);
+
+                    if($lev < $shortestDistance){
+                        $closest = $candidate;
+                        $shortestDistance = $lev;
+                    }
+                }
+
+                if($shortestDistance <= $threshold){
+                    return $closest;
+                }
+            }
+
+            // fallback: check all terms with levenshtein
+            // if no close metaphone candidates were found 
+
+            foreach($terms as $term){
+
+                $lev = levenshtein($queryNormalized, $term);
+
+                if($lev < $shortestDistance && $lev <= $threshold){
+
+                    $closest = $term;
+                    $shortestDistance = $lev;
+                }
+            }
+
+            return $closest;
         });
-        
-        $query = strtolower(trim($query));
-        $closest = null;
-        $shortestDistance = PHP_INT_MAX;
-    
-        foreach ($terms as $term) {
-            $term = strtolower(trim($term));
-    
-            // Calculate Levenshtein distance
-            $lev = levenshtein($query, $term);
-    
-            if ($lev === 0) {
-                // Exact match found
-                return $term;
-            }
-    
-            // Update closest match if distance is smaller
-            if ($lev < $shortestDistance) {
-                $closest = $term;
-                $shortestDistance = $lev;
-            }
+
         }
-    
-        // Fallback: check Soundex matches if no close Levenshtein matches found
-        $querySoundex = soundex($query);
-        foreach ($terms as $term) {
-            if (soundex($term) === $querySoundex) {
-                $closest = $term;
-                break; // Prioritize first Soundex match
-            }
-        }
-        
-        return $closest;
     }
     
     
