@@ -165,60 +165,36 @@ class Search extends Component
             // returning unique search suggestions
             return array_unique(array_filter($terms));
 
-            $queryNormalized = strtolower(trim($query));
-            $queryMetaphone = metaphone($queryNormalized);
+
+            // First we normalize the search query 
+            $query = trim(strtolower($query)); 
+
             $closest = null;
-            $shortestDistance = PHP_INT_MAX; 
-            $threshold = 3;
 
-            // First, we filter for terms by 
-            // their metaphone value 
-
-            $candidateTerms = [];
-
-            foreach($terms as $term){
-                if(metaphone($term) === $queryMetaphone){
-
-                    $candidateTerms[] = $term;
-                }
-            }
-
-            // if any candidates match phonetically, 
-            // we pick the one with the smallest 
-            // levenshtein distance
-
-            if(!empty($candidateTerms)){
-                
-                foreach($candidateTerms as $candidate){
-
-                    $lev = levenshtein($queryNormalized, $candidate);
-
-                    if($lev < $shortestDistance){
-                        $closest = $candidate;
-                        $shortestDistance = $lev;
-                    }
-                }
-
-                if($shortestDistance <= $threshold){
-                    return $closest;
-                }
-            }
-
-            // fallback: check all terms with levenshtein
-            // if no close metaphone candidates were found 
+            //  initializing the shortest distance variable 
+            //with the largest possible integer value in PHP.
+            $shortestDistance = PHP_INT_MAX;
 
             foreach($terms as $term){
 
-                $lev = levenshtein($queryNormalized, $term);
+                $lev = levenshtein($query, $term);
 
-                if($lev < $shortestDistance && $lev <= $threshold){
+                // If exact match is found, immediately return the suggested term 
 
-                    $closest = $term;
+                if($lev === 0){
+                    return ucfirst($term);
+                }
+
+                // If distance is smaller, then we update closest match 
+
+                if($lev < $shortestDistance){
+
+                    $closet = $term;
                     $shortestDistance = $lev;
                 }
             }
 
-            return $closest;
+            return $closest ? ucfirst($closest) : null;
         });
 
         }
