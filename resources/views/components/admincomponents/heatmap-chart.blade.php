@@ -91,19 +91,14 @@ $geojsonPath = asset('assets/js/countries.geojson');
                             var count = countryCounts[isoCode] || 0;
 
                             // Define colors based on count
-                          /*  var color = count > 50 ? '#800026' :
-                                        count > 20 ? '#BD0026' :
-                                        count > 10 ? '#E31A1C' :
-                                        count > 5 ? '#FC4E2A' :
-                                        count > 0 ? '#FD8D3C' :
-                                                    '#FFEDA0';
-                                                    */
-
                             var color = count > 50 ? '#6f00ff' :
-                                        count > 20 ? '#903bff' : 
+                                        count > 20 ? '#903bff' :
                                         count > 10 ? '#8fb4ff' :
                                         count > 5 ? '#b5cdff' :
-                                        count > 0 ? '#edf3ff'; 
+                                        count > 0 ? '#edf3ff' :
+                                                    '#FFEDA0';
+                                                    
+
 
                             return {
                                 fillColor: color,
