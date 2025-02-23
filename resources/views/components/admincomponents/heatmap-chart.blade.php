@@ -99,9 +99,8 @@ $geojsonPath = asset('assets/js/countries.geojson');
                                                     '#FFEDA0';
                                                     */
 
-                            var color = count > 100 ? '#6f00ff' :
-                                        count > 50 ? '#903bff' : 
-                                        count > 20 ? '#78a5ff' :
+                            var color = count > 50 ? '#6f00ff' :
+                                        count > 20 ? '#903bff' : 
                                         count > 10 ? '#8fb4ff' :
                                         count > 5 ? '#b5cdff' :
                                         count > 0 ? '#edf3ff'; 
