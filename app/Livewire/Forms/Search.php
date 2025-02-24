@@ -23,178 +23,234 @@ class Search extends Component
     public string $searchQuery = '';
 
     
-    public function search()
-    {
+    public function search(){
+
         $this->validate();
-    
+
         try {
-            // Trips Search
-            $tripsResults = TripsModel::where('tripID', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('tripLocation', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('tripDescription', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('tripLandscape', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('tripAvailability', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('tripStartDate', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('tripEndDate', 'LIKE', "%{$this->searchQuery}%")
-                ->select('tripID', 'tripLocation', 'tripPhoto', 'tripDescription', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPhoto')
-                ->get()
-                ->map(function ($trip) {
-                    $trip['type'] = 'trip';
-                    return $trip;
-                })
-                ->toArray();
-    
-            // Testimonials Search
-            $testimonialsResults = Testimonials::with(['trip'])->where('name', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('email', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('testimonial', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('testimonial_approval_status', 'LIKE', "%{$this->searchQuery}%")
-                ->select('testimonialID', 'tripID', 'name', 'email', 'testimonial')
-                ->get()
-                ->map(function ($testimonial) {
-                    $testimonial['type'] = 'testimonial';
-                    return $testimonial;
-                })
-                ->toArray();
-    
-            // Bookings Search
-            $bookingResults = BookingModel::with(['trip'])->where('bookingID', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('name', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('email', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('phone_number', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('address_line_1', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('address_line_2', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('city', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('state', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('zip_code', 'LIKE', "%{$this->searchQuery}%")
-                ->select('bookingID', 'tripID', 'name', 'email', 'phone_number')
-                ->get()
-                ->map(function ($booking) {
-                    $booking['type'] = 'booking';
-                    return $booking;
-                })
-                ->toArray();
-    
-            // Reservations Search
-            $reservationsResults = Reservations::with(['trip'])->where('reservationID', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('name', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('email', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('phone_number', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('address_line_1', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('address_line_2', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('city', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('state', 'LIKE', "%{$this->searchQuery}%")
-                ->orWhere('zip_code', 'LIKE', "%{$this->searchQuery}%")
-                ->select('reservationID', 'tripID', 'name', 'email', 'phone_number',)
-                ->get()
-                ->map(function ($reservation) {
-                    $reservation['type'] = 'reservation';
-                    return $reservation;
-                })
-                ->toArray();
-    
+            
+            // Performing full-text search using Scout 
+
+            $tripsResults = TripsModel::search($this->searchQuery)->get();
+            $testimonialsResults = Testimonials::search($this->searchQuery)->get();
+            $bookingResults = BookingModel::search($this->searchQuery)->get();
+            $reservationResults = Reservations::search($this->searchQuery)->get();
+
+            // mapping results to include the type attribute 
+
+            $tripsResults = $tripsResults->map(function($trip){
+                $trip['type'] = 'trip';
+                return $trip;
+            })->toArray();
+
+            $testimonialsResults = $testimonialsResults->map(function($testimonial){
+             $testimonial['type'] = 'testimonial';
+             
+             return $testimonial;
+            })->toArray();
+
+            $bookingResults = $bookingResults->map(function($booking){
+
+                $booking['type'] = 'booking';
+            })->toArray();
+
+            $reservationsResults = $reservationResults->map(function($reservation){
+
+                $reservation['type'] = 'reservation';
+            })->toArray();
+
             $this->searchResults = array_merge($tripsResults, $testimonialsResults, $bookingResults, $reservationsResults);
-    
-            // Suggest similar term if no results found
-            if (empty($this->searchResults)) {
+
+
+            // suggest similar term if no results are found 
+
+            if(empty($this->searchResults)){
                 $this->suggestion = $this->findSimilarTerm($this->searchQuery);
             }
-    
-        } catch (\Exception $e) {
+        }
+
+        catch(\Exception $e){
             $this->searchResults = [];
             $this->searchError = 'Unable to perform search';
             \Log::error("Search Error: {$e->getMessage()}");
+
         }
     }
+    // public function search()
+    // {
+    //     $this->validate();
+    
+    //     try {
+    //         // Trips Search
+    //         $tripsResults = TripsModel::where('tripID', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('tripLocation', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('tripDescription', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('tripLandscape', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('tripAvailability', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('tripStartDate', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('tripEndDate', 'LIKE', "%{$this->searchQuery}%")
+    //             ->select('tripID', 'tripLocation', 'tripPhoto', 'tripDescription', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'tripPhoto')
+    //             ->get()
+    //             ->map(function ($trip) {
+    //                 $trip['type'] = 'trip';
+    //                 return $trip;
+    //             })
+    //             ->toArray();
+    
+    //         // Testimonials Search
+    //         $testimonialsResults = Testimonials::with(['trip'])->where('name', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('email', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('testimonial', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('testimonial_approval_status', 'LIKE', "%{$this->searchQuery}%")
+    //             ->select('testimonialID', 'tripID', 'name', 'email', 'testimonial')
+    //             ->get()
+    //             ->map(function ($testimonial) {
+    //                 $testimonial['type'] = 'testimonial';
+    //                 return $testimonial;
+    //             })
+    //             ->toArray();
+    
+    //         // Bookings Search
+    //         $bookingResults = BookingModel::with(['trip'])->where('bookingID', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('name', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('email', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('phone_number', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('address_line_1', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('address_line_2', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('city', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('state', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('zip_code', 'LIKE', "%{$this->searchQuery}%")
+    //             ->select('bookingID', 'tripID', 'name', 'email', 'phone_number', 'stripe_product_id')
+    //             ->get()
+    //             ->map(function ($booking) {
+    //                 $booking['type'] = 'booking';
+    //                 return $booking;
+    //             })
+    //             ->toArray();
+    
+    //         // Reservations Search
+    //         $reservationsResults = Reservations::with(['trip'])->where('reservationID', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('name', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('email', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('phone_number', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('address_line_1', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('address_line_2', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('city', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('state', 'LIKE', "%{$this->searchQuery}%")
+    //             ->orWhere('zip_code', 'LIKE', "%{$this->searchQuery}%")
+    //             ->select('reservationID', 'tripID', 'name', 'email', 'phone_number', 'stripe_product_id')
+    //             ->get()
+    //             ->map(function ($reservation) {
+    //                 $reservation['type'] = 'reservation';
+    //                 return $reservation;
+    //             })
+    //             ->toArray();
+    
+    //         $this->searchResults = array_merge($tripsResults, $testimonialsResults, $bookingResults, $reservationsResults);
+    
+    //         // Suggest similar term if no results found
+    //         if (empty($this->searchResults)) {
+    //             $this->suggestion = $this->findSimilarTerm($this->searchQuery);
+    //         }
+    
+    //     } catch (\Exception $e) {
+    //         $this->searchResults = [];
+    //         $this->searchError = 'Unable to perform search';
+    //         \Log::error("Search Error: {$e->getMessage()}");
+    //     }
+    // }
     
     
     
     // This method leverages the levenshtein distance algorithm which 
     // dynamically retrieves the terms that closely match the user's search query
     // We also enable caching to reduce number of database queries 
+    // Replacing soundex with metaphone as it is more accurate phonetically 
 
-    private function findSimilarTerm($query)
-    {
-        // Cache terms for 1 hour
-        $terms = Cache::remember('search_terms', 60, function () {
+
+    private function findSimilarTerm($query){
+
+        // caching terms for an hour to avoid DB calls for repeated queries 
+        if(!Cache::get('search_terms')){
+        $terms = Cache::remember('search_terms', 60, function(){
+
             $terms = [];
-    
-            // Collect terms from different models
+
             $tripTerms = TripsModel::select('tripLocation', 'tripDescription', 'tripLandscape', 'tripAvailability')->distinct()->get();
-            foreach ($tripTerms as $trip) {
-                $terms[] = $trip->tripLocation;
-                $terms[] = $trip->tripDescription;
-                $terms[] = $trip->tripLandscape;
-                $terms[] = $trip->tripAvailability;
+            
+            foreach($tripTerms as $trip){
+
+                $terms[] = strtolower(trim($trip->tripLocation)); 
+                $terms[] = strtolower(trim($trip->tripDescription));
+                $terms[] = strtolower(trim($trip->tripLandscape));
+                $terms[] = strtolower(trim($trip->tripAvailability));
             }
-    
+
             $testimonialTerms = Testimonials::select('name', 'email', 'testimonial')->distinct()->get();
             foreach ($testimonialTerms as $testimonial) {
-                $terms[] = $testimonial->name;
-                $terms[] = $testimonial->email;
-                $terms[] = $testimonial->testimonial;
+                $terms[] = strtolower(trim($testimonial->name));
+                $terms[] = strtolower(trim($testimonial->email));
+                $terms[] = strtolower(trim($testimonial->testimonial));
             }
-    
             $bookingTerms = BookingModel::select('name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code')->distinct()->get();
             foreach ($bookingTerms as $booking) {
-                $terms[] = $booking->name;
-                $terms[] = $booking->email;
-                $terms[] = $booking->phone_number;
-                $terms[] = $booking->address_line_1;
-                $terms[] = $booking->address_line_2;
-                $terms[] = $booking->city;
-                $terms[] = $booking->state;
-                $terms[] = $booking->zip_code;
+                $terms[] = strtolower(trim($booking->name));
+                $terms[] = strtolower(trim($booking->email));
+                $terms[] = strtolower(trim($booking->phone_number));
+                $terms[] = strtolower(trim($booking->address_line_1));
+                $terms[] = strtolower(trim($booking->address_line_2));
+                $terms[] = strtolower(trim($booking->city));
+                $terms[] = strtolower(trim($booking->state));
+                $terms[] = strtolower(trim($booking->zip_code));
             }
-    
             $reservationTerms = Reservations::select('name', 'email', 'phone_number', 'address_line_1', 'address_line_2', 'city', 'state', 'zip_code')->distinct()->get();
             foreach ($reservationTerms as $reservation) {
-                $terms[] = $reservation->name;
-                $terms[] = $reservation->email;
-                $terms[] = $reservation->phone_number;
-                $terms[] = $reservation->address_line_1;
-                $terms[] = $reservation->address_line_2;
-                $terms[] = $reservation->city;
-                $terms[] = $reservation->state;
-                $terms[] = $reservation->zip_code;
+                $terms[] = strtolower(trim($reservation->name));
+                $terms[] = strtolower(trim($reservation->email));
+                $terms[] = strtolower(trim($reservation->phone_number));
+                $terms[] = strtolower(trim($reservation->address_line_1));
+                $terms[] = strtolower(trim($reservation->address_line_2));
+                $terms[] = strtolower(trim($reservation->city));
+                $terms[] = strtolower(trim($reservation->state));
+                $terms[] = strtolower(trim($reservation->zip_code));
             }
-    
-            // Clean up terms list by removing duplicates, empty values, and normalizing
-            return array_unique(array_filter(array_map('trim', $terms)));
+
+            // returning unique search suggestions
+            return array_unique(array_filter($terms));
+
+
+            // First we normalize the search query 
+            $query = trim(strtolower($query)); 
+
+            $closest = null;
+
+            //  initializing the shortest distance variable 
+            //with the largest possible integer value in PHP.
+            $shortestDistance = PHP_INT_MAX;
+
+            foreach($terms as $term){
+
+                $lev = levenshtein($query, $term);
+
+                // If exact match is found, immediately return the suggested term 
+
+                if($lev === 0){
+                    return ucfirst($term);
+                }
+
+                // If distance is smaller, then we update closest match 
+
+                if($lev < $shortestDistance){
+
+                    $closet = $term;
+                    $shortestDistance = $lev;
+                }
+            }
+
+            return $closest ? ucfirst($closest) : null;
         });
-        
-        $query = strtolower(trim($query));
-        $closest = null;
-        $shortestDistance = PHP_INT_MAX;
-    
-        foreach ($terms as $term) {
-            $term = strtolower(trim($term));
-    
-            // Calculate Levenshtein distance
-            $lev = levenshtein($query, $term);
-    
-            if ($lev === 0) {
-                // Exact match found
-                return $term;
-            }
-    
-            // Update closest match if distance is smaller
-            if ($lev < $shortestDistance) {
-                $closest = $term;
-                $shortestDistance = $lev;
-            }
+
         }
-    
-        // Fallback: check Soundex matches if no close Levenshtein matches found
-        $querySoundex = soundex($query);
-        foreach ($terms as $term) {
-            if (soundex($term) === $querySoundex) {
-                $closest = $term;
-                break; // Prioritize first Soundex match
-            }
-        }
-        
-        return $closest;
     }
     
     
