@@ -357,16 +357,16 @@ private function getOrCreateStripeCustomer(string $email, string $name){
                 $this->error = 'This trip is unavailable right now. Please check again later';
             }
     
-            if ($this->tripAvailability === 'coming soon') {
+            if ($this->tripAvailability === 'available' || $this->tripAvailability === 'coming soon') {
                 return $this->handleComingSoonReservation($trip, $reservationID);
             }
     
-            $existingCustomer = $this->getOrCreateStripeCustomer($this->email, $this->name);
+            // $existingCustomer = $this->getOrCreateStripeCustomer($this->email, $this->name);
     
-            $amount = $trip->tripPrice;
+            // $amount = $trip->tripPrice;
     
             // Create Stripe checkout session
-            $stripe_session = $this->createStripeCheckoutSession($existingCustomer->id, $trip, $tripName, $amount);
+            // $stripe_session = $this->createStripeCheckoutSession($existingCustomer->id, $trip, $tripName, $amount);
     
             // Booking information to log in case of error
             $data = [
