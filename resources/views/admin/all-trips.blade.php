@@ -31,40 +31,5 @@
     @endif
     <!-- End Trips Table -->
 
-    <!-- Catalog Items Table -->
-    @if (!empty($catalogItems))
-        <div class="card shadow-sm bg-white rounded mt-4">
-            <h5 class="m-3">Here are all catalog items</h5>
 
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Item ID</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Abbreviation</th>
-                            <th>Product Type</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($catalogItems as $item)
-                            @if ($item->getType() === 'ITEM' && $item->getItemData())
-                                <tr>
-                                    <td>{{ $item->getId() }}</td>
-                                    <td>{{ $item->getItemData()->getName()['value'] ?? 'N/A' }}</td>
-                                    <td>{{ $item->getItemData()->getDescription()['value'] ?? 'N/A' }}</td>
-                                    <td>{{ $item->getItemData()->getAbbreviation()['value'] ?? 'N/A' }}</td>
-                                    <td>{{ $item->getItemData()->getProductType() ?? 'N/A' }}</td>
-                                </tr>
-                            @endif
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    @else
-        <h3 class="text-secondary">No Catalog Items Available</h3>
-    @endif
-    <!-- End Catalog Items Table -->
 </x-authenticated-theme-layout>

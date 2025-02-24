@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('trips', function (Blueprint $table) {
             $table->string('tripID', 255)->primary();
-            // $table->string('square_catalog_object_id')->unqiue();
+            $table->string('idempotencyKey', 255)->nullable();
             $table->string('tripLocation');
             $table->json('tripPhoto');
             $table->text('tripDescription');

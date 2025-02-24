@@ -22,19 +22,34 @@ use App\Jobs\ProcessStripeCharges;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Analytics;
 
+use Square\SquareClientBuilder;
+use Square\Environment;
+use Square\Models\Money;
+use Square\Models\CatalogItemVariation;
+use Square\Models\CatalogObject;
+use Square\Models\CatalogItem;
+use Square\Models\UpsertCatalogObjectRequest;
+use Square\Authentication\BearerAuthCredentialsBuilder;
+use Square\Exceptions\ApiException;
+
 
 class Admin extends Controller
 {
 
-    public $squareClient;
+    public $client;
     public $catalog;
+    public $accessToken;
 
     public function __construct()
     {
-        $this->squareClient = new \Square\SquareClient([
-            'accessToken' => env('SQUARE_ACCESS_TOKEN'),
-            'environment' => \Square\Environment::SANDBOX, // or \Square\Environment::PRODUCTION
-        ]);
+        $this->accessToken = getenv('SQUARE_ACCESS_TOKEN');
+
+        $this->client = SquareClientBuilder::init()
+            -> bearerAuthCredentials(
+                BearerAuthCredentialsBuilder::init($this->accessToken)
+            )
+            ->environment(Environment::SANDBOX)
+            ->build();
     }
 
     
@@ -49,7 +64,7 @@ class Admin extends Controller
         
         $squareProducts = Cache::remember($cacheKeyProducts, 3600, function() {
 
-            $catalogApi = $this->squareClient->getCatalogApi();
+            $catalogApi = $this->client->getCatalogApi();
             $response = $catalogApi->listCatalog(null, 'ITEM');
             return $response->isSuccess() ? $response->getResult()->getObjects() : [];
 
@@ -57,7 +72,7 @@ class Admin extends Controller
 
             // Safely handle when Square API doesn't return any payments
         $payments = Cache::remember($cacheKeyPayments, 3600, function () {
-            $paymentsApi = $this->squareClient->getPaymentsApi();
+            $paymentsApi = $this->client->getPaymentsApi();
             $response = $paymentsApi->listPayments();
             return $response->isSuccess() ? $response->getResult()->getPayments() : [];
         });
@@ -152,6 +167,28 @@ class Admin extends Controller
 
 
     public function profilePage(){
+        $objectIDs = [];
+        $response = $this->client->getCatalogApi()->listCatalog();
+     
+            $result = $response->getResult();
+            // dd($result);
+            $resultArray = json_decode(json_encode($result), true);
+            foreach ($resultArray['objects'] as $object) {
+                $objectIDs[] = $object['id'];
+            }
+
+           $body = new \Square\Models\BatchDeleteCatalogObjectsRequest();
+           $body->setObjectIds($objectIDs);
+           $response = $this->client->getCatalogApi()->batchDeleteCatalogObjects($body);
+            
+        if($response){
+            dd($response->getResult());
+        }
+
+        // else{
+        //     $errors = $response->getErrors();
+        //     dd($errors);
+        // }
         return view('admin/profile');
     }
 
@@ -240,7 +277,7 @@ class Admin extends Controller
 
     public function getTripDetails($tripID)
 {
-    $cacheKey = "trip_details_#trip_id_{$tripID}";
+    $cacheKey = "trip_details_{$tripID}";
     $cachedData = Cache::get($cacheKey);
 
 
@@ -252,7 +289,7 @@ class Admin extends Controller
         // Browser does not send #trip_ to the server so we will
         // need to decode and encode it to be sent properly 
         
-        $trip = TripsModel::where('tripID', '#trip_id_'.$tripID)->firstOrFail();
+        $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
         
         // Retrieve the most popular reserved trip containing a count of 2 or more reservations 
         $mostPopularReservations = Reservations::select('reservations.tripID', DB::raw('COUNT(*) as reservation_count'))
@@ -375,65 +412,58 @@ class Admin extends Controller
 }
 
 
+    
+public function deleteTrip($tripID) {
+    try {
+        
+        $trip = TripsModel::where('tripID', $tripID)->firstOrFail();
+        \Log::info('Logging trip details: ' . json_encode($tripID));
 
+        \Log::info('Deleting trip details for trip ID: ' . $tripID);
 
-    
-    
-    
-    public function deleteTrip($tripID) {
-        try {
-            $trip = TripsModel::findOrFail($tripID);
-            \Log::info('Logging trip details: ' . json_encode($trip));
-            \Log::info('Stripe Product ID: ' . $trip->stripe_product_id);
-    
-            \Log::info('Deleting trip details for trip ID: ' . $tripID);
-    
-            \Log::info('Checking if photo exists');
-    
-            // Assuming tripPhoto is an array of URLs, convert it back to its original format for deletion
-            $photos = json_decode($trip->tripPhoto, true);
-    
-            if ($photos && is_array($photos)) {
-                foreach ($photos as $photoUrl) {
-                    $filePath = str_replace(asset(Storage::url('')), '', $photoUrl);
-    
-                    // Check if the file exists
-                    if (Storage::disk('public')->exists($filePath)) {
-    
-                        // Delete the file
-                        Storage::disk('public')->delete($filePath);
-                    } else {
-                        throw new \Exception('Cannot delete Image!');
-                    }
+        // Delete associated photos
+        \Log::info('Checking if photo exists');
+        $photos = json_decode($trip->tripPhoto, true);
+
+        if (!empty($photos) && is_array($photos)) {
+            foreach ($photos as $photoUrl) {
+                $filePath = parse_url($photoUrl, PHP_URL_PATH);
+                $filePath = ltrim($filePath, '/'); // Ensure relative path
+
+                // Check if the file exists before attempting to delete
+                if (Storage::disk('public')->exists($filePath)) {
+                    Storage::disk('public')->delete($filePath);
+                    \Log::info("Deleted photo: {$filePath}");
+                } else {
+                    \Log::warning("Photo not found: {$filePath}");
                 }
             }
-    
-            // Retrieve all prices associated with the Stripe product
-            $prices = $this->stripe->prices->all(['product' => $trip->stripe_product_id]);
-    
-            foreach ($prices->data as $price) {
-                \Log::info('Setting Stripe price inactive: ' . $price->id);
-                $this->stripe->prices->update($price->id, ['active' => false]);
-            }
-    
-            $this->stripe->products->update($trip->stripe_product_id, ['active' => false]);
-            // $this->stripe->products->delete($trip->stripe_product_id);
-            // Delete the trip from the database
-            $trip->delete();
-            \Log::info('Deleted Trip.');
-    
-    
-            if (!$trip->exists) {
-            }
-    
-            return redirect()->back()->with('trip_deleted', 'That trip was successfully deleted');
-        } catch (ModelNotFoundException $e) {
-            \Log::error('ModelNotFoundException in class: ' . __CLASS__ . ' on line: ' . __LINE__ . ' Error: ' . $e->getMessage());
-        } catch (\Exception $e) {
-            \Log::error('Exception in class: ' . __CLASS__ . ' on line: ' . __LINE__ . ' Error: ' . $e->getMessage());
         }
+
+        // Delete trip record from database
+        $trip->delete();
+        \Log::info("Deleted trip record from database: {$tripID}");
+
+        // Delete from Square as well 
+        $squareTrip = $this->client->getCatalogApi()->retrieveCatalogObject($tripID, false);
+
+        if ($squareTrip->isSuccess()) {
+            \Log::info("Successfully retrieved Square trip: " . json_encode($squareTrip->getResult()));
+        } else {
+            \Log::error("Square API error: " . json_encode($squareTrip->getErrors()));
+        }
+
+        return response()->json(['success' => true, 'message' => 'Trip deleted successfully']);
+
+    } catch (ModelNotFoundException $e) {
+        \Log::error("Trip not found: {$tripID}. Error: " . $e->getMessage());
+        return response()->json(['success' => false, 'message' => 'Trip not found'], 404);
+    } catch (\Exception $e) {
+        \Log::error("Exception deleting trip ID {$tripID}: " . $e->getMessage());
+        return response()->json(['success' => false, 'message' => 'An error occurred while deleting the trip'], 500);
     }
-    
+}
+
     
     
 

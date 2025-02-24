@@ -320,8 +320,17 @@
 
                     <!-- Buttons -->
                     <div class="mb-3 text-center">
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <!-- Hide button when loading -->
+                        <button type="submit" class="btn btn-primary" wire:loading.remove wire:target="editTrip">
+                            Save Changes
+                        </button>
+
+                        <!-- Show spinner when loading -->
+                        <div class="spinner-border text-primary" role="status" wire:loading wire:target="editTrip">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
+
 
                     <!-- Success and Error Messages -->
                     @if ($success)

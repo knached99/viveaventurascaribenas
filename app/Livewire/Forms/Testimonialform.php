@@ -62,6 +62,7 @@ class TestimonialForm extends Component
         'email.email'=>'You\'ve entered an invalid email',
         'email.unique'=>'You\'ve already submitted a testimonial with us before',
         'tripID.required'=>'You must select the trip you went on',
+        'tripID.uuid'=> 'Option selected is not valid',
         'trip_date.required'=>'You must provide the month you went on this trip',
         'trip_rating.required'=>'You need to provide a rating for this trip',
         'testimonial.required'=>'Your testimonial is required',
@@ -72,7 +73,7 @@ class TestimonialForm extends Component
 
     
 
-    public function mount()
+    public function mount(?string $tripID = null)
     {
         $this->extraFields = new HoneypotData();
         $this->trips = TripsModel::select('tripID', 'tripLocation')
@@ -80,21 +81,35 @@ class TestimonialForm extends Component
             ->orWhere('tripEndDate', '<', Carbon::now())
             ->get()
             ->toArray();
+
+            if ($tripID && Str::isUuid($tripID)) {
+                $this->tripID = $tripID;
+            }
+    
     }
 
 
+     // 🔹 This method is triggered when the event is emitted
+     public function tripSelected($tripID)
+     {
+         if (Str::isUuid($tripID)) {
+             $this->tripID = $tripID;
+         }
+     }
+ 
 
     public function submitTestimonialForm(): void {
-    
+
         $this->validate();
         $this->protectAgainstSpam();
+        
 
         try{
 
             $booking = BookingModel::where('email', $this->email)->first();
             $trip = TripsModel::where('tripID', $this->tripID)->where('active', true)->first();
 
-            if(empty($booking) || !$trip){
+            if(empty($booking) || empty($trip)){
 
                 $this->error = 'You cannot submit a testimonial unless you\'ve booked a trip with us';
                 return; // Kills the PHP script to prevent form submission 
@@ -116,7 +131,10 @@ class TestimonialForm extends Component
             $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'travel@viveaventurascaribenas.net';
             $notificationClass = TestimonialSubmitted::class;
             $this->sendNotification($data, $recipientEmail, $notificationClass);
-
+            
+            // 🔹 Emit tripID to maintain selection
+            $this->emit('tripSelected', $this->tripID);
+            
             $this->status = 'Your testimonial has been submitted! Thank you for providing valuable feedback!';
             $this->resetForm();
             
@@ -141,7 +159,6 @@ class TestimonialForm extends Component
 
         $this->name = '';
         $this->email = '';
-        $this->tripID = '';
         $this->trip_date = '';
         $this->trip_rating = 0;
         $this->testimonial = '';

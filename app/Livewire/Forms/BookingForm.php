@@ -49,7 +49,6 @@ class BookingForm extends Component
 
     public function mount($tripID, $reservationID)
     {
-        \Log::info('Initializing Stripe client...');
         $this->tripID = $tripID;
         $trip = TripsModel::findOrFail($this->tripID);
         
@@ -194,9 +193,6 @@ class BookingForm extends Component
     
    
 
-
-    
-
 private function createStripeCheckoutSession($customerId, $trip, $tripName, $amount)
 {
     
@@ -340,7 +336,7 @@ private function getOrCreateStripeCustomer(string $email, string $name){
         ];
 
         Notification::route('mail',  $this->email)->notify(new BookingReservedCustomer($data));
-        Notification::route('mail', config('mail.mailers.smtp.to_email'))->notify(new BookingReservedAdmin($data));
+        Notification::route('mail', env('MAIL_FROM_ADDRESS'))->notify(new BookingReservedAdmin($data));
 
         return redirect()->route('reservation-confirmed', ['reservationID'=>$reservationID]);
     }

@@ -14,7 +14,6 @@ use Illuminate\Http\UploadedFile;
 // use Stripe\Coupon;
 // use Stripe\PromotionCode;
 // Importing Square classes
-use Square\SquareClient;
 use Square\SquareClientBuilder;
 use Square\Environment;
 use Square\Models\Money;
@@ -25,7 +24,6 @@ use Square\Models\UpsertCatalogObjectRequest;
 use Square\Authentication\BearerAuthCredentialsBuilder;
 use Square\Exceptions\ApiException;
 use Exception;
-use Stripe\Exception\ApiErrorException;
 use Carbon\Carbon;
 
 // Dispatch events and notifications to users for trip availability status updates
@@ -41,9 +39,8 @@ class EditTripForm extends Component
 
     public $trip;
 
-    public ?string $couponID = '';
-    public ?string $promoID = '';
-
+    public $client; // Square Access Client 
+    public $idempotencyKey;
     public string $tripLocation = '';
     public array $tripLandscape = []; 
     public array $tripPhotos = [];
@@ -79,7 +76,6 @@ class EditTripForm extends Component
     public ?string $averageStartDate = null;
     public ?string $averageEndDate = null; 
     public ?string $averageDateRange = null;
-    private string $stripe_product_id = '';
     private string $cacheKey = '';
     public ?int $reservationsCount = null;
 
@@ -203,7 +199,7 @@ class EditTripForm extends Component
         if(isset($this->tripCosts[$index])){
             unset($this->tripCosts[$index]);
         
-
+            
         try{
             $tripModel = TripsModel::findOrFail($tripID);
             $tripModel->tripCosts = $this->tripCosts;
@@ -305,8 +301,8 @@ class EditTripForm extends Component
         public function removeImage($index)
         {
             
-            $tripPhotos = json_decode($this->trip->tripPhoto, true);
-    
+            // $tripPhotos = json_decode($this->trip->tripPhoto, true);
+            $tripPhotos = is_string($this->trip->tripPhoto) ? json_decode($this->trip->tripPhoto, true) : $this->trip->tripPhoto;
             // Remove the selected image
             if (isset($tripPhotos[$index])) {
                 $oldImage = $tripPhotos[$index];
@@ -341,14 +337,10 @@ class EditTripForm extends Component
 
 
  
-    
-
+       
         public function editTrip(): void
         {
-            $reservationsCount = Reservations::count();
-            
-            \Log::info('Editing trip with costs: ' . json_encode($this->tripCosts));
-        
+            // Validate input data
             $rules = [
                 'tripLocation' => 'required|string|max:255',
                 'tripLandscape' => 'required|array',
@@ -367,95 +359,119 @@ class EditTripForm extends Component
                 $rules['tripEndDate'] = 'required|date|after_or_equal:tripStartDate';
             }
         
+            if (empty($this->trip->tripPhoto)) {
+                $rules['tripPhotos'] = 'array|max:6';
+                $rules['tripPhotos.*'] = 'image|mimes:jpeg,png,jpg|max:2048';
+            }
+        
             $this->validate($rules);
         
             try {
-                $this->purgeCache((string) $this->trip->tripID);
-        
-                $imageURLs = [];
                 $tripModel = TripsModel::findOrFail($this->trip->tripID);
         
-                if (!empty($this->tripPhotos) && is_array($this->tripPhotos)) {
-                    foreach ($this->tripPhotos as $photo) {
-                        if ($photo instanceof \Illuminate\Http\UploadedFile) {
-                            $imagePath = 'booking_photos/' . $photo->hashName();
-                            $photo->storeAs('public', $imagePath);
-                            $imageURLs[] = asset(Storage::url($imagePath));
-                        }
+                $newImageURLs = [];
+                foreach ($this->tripPhotos as $photo) {
+                    if ($photo instanceof \Illuminate\Http\UploadedFile) {
+                        $imagePath = 'booking_photos/' . $photo->hashName();
+                        $photo->storeAs('public', $imagePath);
+                        $newImageURLs[] = asset(Storage::url($imagePath));
                     }
                 }
         
-                // Connect to Square API
-                $accessToken = getenv('SQUARE_ACCESS_TOKEN');
-                $client = SquareClientBuilder::init()
-                    ->bearerAuthCredentials(
-                        BearerAuthCredentialsBuilder::init($accessToken)
-                    )
-                    ->environment(Environment::SANDBOX) // or Environment::PRODUCTION in live mode
-                    ->build();
-        
-                // Dynamic Square API request setup
-                $price_money = new \Square\Models\Money();
-                $price_money->setAmount($this->tripPrice * 100); // Assuming trip price is in dollars
-                $price_money->setCurrency('USD');
-        
-                $team_member_ids = ['2_uNFkqPYqV-AZB-7neN']; // Replace with dynamic team member IDs if applicable
-                $item_variation_data = new \Square\Models\CatalogItemVariation();
-                $item_variation_data->setItemId($tripModel->tripID); // Using tripID as item ID for Square catalog
-                $item_variation_data->setName('Regular');
-                $item_variation_data->setPricingType('FIXED_PRICING');
-                $item_variation_data->setPriceMoney($price_money);
-                $item_variation_data->setServiceDuration(3600000); // Service duration, e.g., 1 hour (in milliseconds)
-                $item_variation_data->setTeamMemberIds($team_member_ids);
-        
-                $object = new CatalogObject($tripModel->tripID);
-                $object->setType('ITEM_VARIATION');
-                $object->setVersion(time()); // Use current timestamp for versioning
-                $object->setItemVariationData($item_variation_data);
-            
-                $idempotencyKey = $this->tripID.'-'.time();
-
-                $body = new UpsertCatalogObjectRequest($idempotencyKey, $object);
-        
-                $api_response = $client->getCatalogApi()->upsertCatalogObject($body);
-        
-                if ($api_response->isSuccess()) {
-                    \Log::info('Square catalog item updated successfully');
-                } else {
-                    \Log::error('Error updating Square catalog item: ' . json_encode($api_response->getErrors()));
-                    $this->error = 'Error updating trip in Square';
-                    return;
+                if ($tripModel->tripAvailability !== $this->tripAvailability && strtolower($this->tripAvailability) === 'available') {
+                    $reservations = Reservations::where('tripID', $this->trip->tripID)->get();
+                    foreach ($reservations as $reservation) {
+                        Notification::route('mail', $reservation->email)
+                            ->notify(new TripAvailableNotification($this->trip, $reservation->reservationID, $reservation->customerName));
+                    }
                 }
         
-                // Update the database
-                $tripModel->update([
-                    'tripLocation' => $this->tripLocation,
-                    'tripPhoto' => json_encode($imageURLs),
-                    'tripLandscape' => json_encode($this->tripLandscape),
-                    'tripAvailability' => $this->tripAvailability,
-                    'tripDescription' => $this->tripDescription,
-                    'tripActivities' => $this->tripActivities,
-                    'tripStartDate' => Carbon::parse($this->tripStartDate)->format('Y-m-d'),
-                    'tripEndDate' => Carbon::parse($this->tripEndDate)->format('Y-m-d'),
-                    'tripPrice' => $this->tripPrice ?? 0,
-                    'tripCosts' => json_encode($this->tripCosts),
-                    'num_trips' => max($reservationsCount, $this->num_trips),
-                    'active' => $this->active,
-                    'slug' => Str::slug($this->tripLocation),
+                $accessToken = env('SQUARE_ACCESS_TOKEN');
+                $client = new \Square\SquareClient([
+                    'accessToken' => $accessToken,
+                    'environment' => \Square\Environment::SANDBOX,
                 ]);
         
-                $this->success = 'Trip details updated successfully.';
-            } catch (Exception $e) {
-                \Log::error('Error updating trip: ' . $e->getMessage());
-                $this->error = 'There was an error updating the trip.';
+                $catalogApi = $client->getCatalogApi();
+                $retrieveResponse = $catalogApi->retrieveCatalogObject($this->trip->tripID);
+        
+                if ($retrieveResponse->isSuccess()) {
+                    $catalogObject = $retrieveResponse->getResult()->getObject();
+                    $version = $catalogObject->getVersion();
+        
+                    $itemData = $catalogObject->getItemData();
+                    $itemData->setName($this->tripLocation);
+                    $itemData->setDescription(strip_tags($this->tripDescription));
+                    $itemData->setAbbreviation(substr($this->tripLocation, 0, 2));
+        
+                    $variations = $itemData->getVariations();
+                    if (isset($this->tripPrice) && is_numeric($this->tripPrice) && $this->tripPrice > 0) {
+                         // Retrieve the variations from the item data
+                        $variation = $variations[0]->getItemVariationData();
+                        
+                        // Ensure that the variation's price is set
+                        $priceMoney = new \Square\Models\Money($this->tripPrice * 100, 'USD');
+                        $variation->setPriceMoney($priceMoney);
+                        \Log::info('Setting price for variation: ' . $priceMoney->getAmount());
+
+                    }
+
+                    else {
+                        $this->error = 'Invalid or missing trip price.';
+                        \Log::error('Invalid trip price: ' . $this->tripPrice);
+                        return;
+                    }
+        
+                    $idempotencyKey = (string) Str::uuid();
+                    $upsertRequest = new \Square\Models\UpsertCatalogObjectRequest($idempotencyKey, $catalogObject);
+                    $upsertResponse = $catalogApi->upsertCatalogObject($upsertRequest);
+        
+                    if ($upsertResponse->isSuccess()) {
+                        $tripModel->update([
+                            'tripLocation' => $this->tripLocation,
+                            'tripPhoto' => !empty($newImageURLs) ? json_encode($newImageURLs) : $tripModel->tripPhoto,
+                            'tripLandscape' => json_encode($this->tripLandscape),
+                            'tripAvailability' => $this->tripAvailability,
+                            'tripDescription' => $this->tripDescription,
+                            'tripActivities' => $this->tripActivities,
+                            'tripStartDate' => $this->tripStartDate ? Carbon::parse($this->tripStartDate)->format('Y-m-d') : $tripModel->tripStartDate,
+                            'tripEndDate' => $this->tripEndDate ? Carbon::parse($this->tripEndDate)->format('Y-m-d') : $tripModel->tripEndDate,
+                            'tripPrice' => $this->tripPrice ?? $tripModel->tripPrice,
+                            'num_trips' => max($this->num_trips, Reservations::where('tripID', $this->trip->tripID)->count()),
+                            'active' => $this->active,
+                            'slug' => Str::slug($this->tripLocation),
+                            'tripCosts' => json_encode($this->tripCosts),
+                        ]);
+        
+                        Cache::put($this->cacheKey, $tripModel->toArray(), 600);
+                        $this->success = 'Trip information updated successfully!';
+                    } else {
+                        $this->error = 'Failed to update trip in Square.';
+                        \Log::error('Square Error: ', $upsertResponse->getErrors());
+                    }
+                } else {
+                    $this->error = 'Failed to retrieve trip from Square.';
+                    \Log::error('Square Retrieve Error: ', $retrieveResponse->getErrors());
+                }
+            } catch (\Exception $e) {
+                $this->error = 'An error occurred while updating the trip.';
+                \Log::error($e->getMessage());
             }
         }
         
 
-    private function purgeCache(string $tripId): void
+    private function purgeCache(string $tripID): void
     {
-        \Log::info('Invalidating cache for trip ID: ' . $tripId);
-        Cache::forget('trip_' . $tripId);
+        \Log::info('Purging cache for trip ID: trip_'.$tripID);
+       $forget = Cache::forget('trip_' . $tripID);
+       if($forget){
+        \Log::info('Cache purged for trip ID: trip_'.$tripID);
+        \Log::info('Cache info now:'.Cache::get('trip_'.$tripID));
+
+        }
+       else{
+        \Log::error('error purging cache for trip ID: trip_'.$tripID);
+       }
     }
 
 

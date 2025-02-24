@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\TripsModel;
 use App\Helpers\Helper;
 use Illuminate\Support\Facades\Storage;
-use Stripe\Exception\InvalidRequestException;
 use Carbon\Carbon;
 use Square\SquareClientBuilder;
 use Square\Environment;
@@ -31,9 +30,7 @@ class TripForm extends Form {
     // Define the constant for cache key
     const CACHE_KEY_TRIPS = 'trips_cache_key';
 
-    protected $stripe;
-
-    public string $squareID = '';
+    public $idempotencyKey;
     public string $tripLocation = '';
     public ?array $tripLandscape = [];
     public string $tripAvailability = '';
@@ -120,8 +117,6 @@ class TripForm extends Form {
     public function mount(){
         
     
-
-
         $this->emit('setEditorContent', [
             'property' => 'form.tripDescription',
             'value' => $this->tripDescription,
@@ -141,101 +136,109 @@ class TripForm extends Form {
         // Initializing to today's date
         $this->tripStartDate = Carbon::now()->format('Y-m-d');
         $this->tripEndDate = Carbon::now()->format('Y-m-d');
-        // $squareID = '#trip_'.Str::uuid(10);
+
     }
 
 
     public function submitTripForm()
-{
-    // Validate the form data
-    $this->validate();
+    {
+        // Validate the form data
+        $this->validate();
+    
+        // Prepare data for saving
+        $tripCostsJson = json_encode($this->tripCosts);
+        $tripLandscapeJson = json_encode($this->tripLandscape);
+    
+        try {
+            // Initializing Square client
+            $accessToken = getenv('SQUARE_ACCESS_TOKEN');
+    
+            $client = SquareClientBuilder::init()
+                ->bearerAuthCredentials(
+                    BearerAuthCredentialsBuilder::init($accessToken)
+                )
+                ->environment(Environment::SANDBOX) // Change to Environment::PRODUCTION in live mode
+                ->build();
+    
+            // Generate a consistent Item ID
+            $item_id = '#trip_id_'.Str::uuid();  // This is the ID format for your trip
+            $variation_id = '#variation_' . Str::uuid(); // Unique variation ID
+            $this->idempotencyKey = (string) Str::uuid();
+            
+            // Handle image uploads
+            $imageURLs = $this->handleUploadedImages();
+    
+            // Pricing setup
+            $price_money = new Money();
+            $price_money->setAmount($this->tripPrice);
+            $price_money->setCurrency('USD');
+    
+            // Create Item Variation (Variation must reference the correct Item ID)
+            $item_variation_data = new CatalogItemVariation();
+            $item_variation_data->setItemId($item_id); // Must match the Item's ID
+            $item_variation_data->setName($this->tripLocation);
+            $item_variation_data->setPricingType('FIXED_PRICING');
+            $item_variation_data->setPriceMoney($price_money);
+    
+            // Catalog Object for Item Variation
+            $catalog_variation_object = new CatalogObject('ITEM_VARIATION', $variation_id);
+            $catalog_variation_object->setItemVariationData($item_variation_data);
+    
+            // Create Catalog Item
+            $item_data = new CatalogItem();
+            $item_data->setName($this->tripLocation);
+            $item_data->setDescription(strip_tags($this->tripDescription));
+            $item_data->setAbbreviation(substr($this->tripLocation, 0, 2));
+            $item_data->setVariations([$catalog_variation_object]); // Attach variations
+    
+            // Catalog Object for Item (Uses the same Item ID)
+            $catalog_item_object = new CatalogObject('ITEM', $item_id);
+            $catalog_item_object->setItemData($item_data);
+    
+            // Upserting to Square backend 
+            $body = new UpsertCatalogObjectRequest($this->idempotencyKey, $catalog_item_object);
+    
+            // API Call to upsert catalog object
+            $api_response = $client->getCatalogApi()->upsertCatalogObject($body);
+    
 
-    // Prepare data for saving
-    $tripCostsJson = json_encode($this->tripCosts);
-    $tripLandscapeJson = json_encode($this->tripLandscape);
+            if ($api_response->isSuccess()) {
+                // Extract the generated Catalog Item ID
+                $squareItemId = $api_response->getResult()->getCatalogObject()->getId();
+            
+                // Save trip to database
+                TripsModel::create([
+                    'tripID' => $squareItemId, // Store the Square trip ID
+                    'idempotencyKey' => $this->idempotencyKey,
+                    'tripLocation' => $this->tripLocation,
+                    'tripPhoto' => $imageURLs,
+                    'tripDescription' => $this->tripDescription,
+                    'tripActivities' => $this->tripActivities,
+                    'tripLandscape' => $tripLandscapeJson,
+                    'tripAvailability' => $this->tripAvailability,
+                    'tripStartDate' => $this->tripStartDate,
+                    'tripEndDate' => $this->tripEndDate,
+                    'tripPrice' => $this->tripPrice,
+                    'tripCosts' => $tripCostsJson,
+                    'num_trips' => $this->num_trips,
+                    'active' => true,
+                ]);
+            
+                $this->status = 'Trip created successfully!';
+                \Log::info('API response: ' . json_encode($api_response->getResult()));
+            } else {
+                $this->error = 'Error communicating with Square SDK';
+                \Log::error('API Error: ' . json_encode($api_response->getErrors()));
+            }
+            
 
-    try {
-        // Initializing Square client
-        $accessToken = getenv('SQUARE_ACCESS_TOKEN');
-
-        $client = SquareClientBuilder::init()
-            ->bearerAuthCredentials(
-                BearerAuthCredentialsBuilder::init($accessToken)
-            )
-            ->environment(Environment::SANDBOX) // Change to Environment::PRODUCTION in live mode
-            ->build();
-
-        // Generate a consistent Item ID
-        $item_id = '#trip_id_'.Str::uuid();
-        $variation_id = '#variation_' . Str::uuid(); // Unique variation ID
-
-        // Handle image uploads
-        $imageURLs = $this->handleUploadedImages();
-
-        // Pricing setup
-        $price_money = new Money();
-        $price_money->setAmount($this->tripPrice);
-        $price_money->setCurrency('USD');
-
-        // Create Item Variation (Variation must reference the correct Item ID)
-        $item_variation_data = new CatalogItemVariation();
-        $item_variation_data->setItemId($item_id); // Must match the Item's ID
-        $item_variation_data->setName($this->tripLocation);
-        $item_variation_data->setPricingType('FIXED_PRICING');
-        $item_variation_data->setPriceMoney($price_money);
-
-        // Catalog Object for Item Variation
-        $catalog_variation_object = new CatalogObject('ITEM_VARIATION', $variation_id);
-        $catalog_variation_object->setItemVariationData($item_variation_data);
-
-        // Create Catalog Item
-        $item_data = new CatalogItem();
-        $item_data->setName($this->tripLocation);
-        $item_data->setDescription(strip_tags($this->tripDescription));
-        $item_data->setAbbreviation(substr($this->tripLocation, 0, 2));
-        $item_data->setVariations([$catalog_variation_object]); // Attach variations
-
-        // Catalog Object for Item (Uses the same Item ID)
-        $catalog_item_object = new CatalogObject('ITEM', $item_id);
-        $catalog_item_object->setItemData($item_data);
-
-        // Upsert request body
-        $body = new UpsertCatalogObjectRequest(uniqid(), $catalog_item_object);
-
-        // API Call to upsert catalog object
-        $api_response = $client->getCatalogApi()->upsertCatalogObject($body);
-
-        if ($api_response->isSuccess()) {
-            // Save trip to database
-            TripsModel::create([
-                'tripID' => $item_id, // Store the Square trip ID
-                'tripLocation' => $this->tripLocation,
-                'tripPhoto' => $imageURLs,
-                'tripDescription' => $this->tripDescription,
-                'tripActivities' => $this->tripActivities,
-                'tripLandscape' => $tripLandscapeJson,
-                'tripAvailability' => $this->tripAvailability,
-                'tripStartDate' => $this->tripStartDate,
-                'tripEndDate' => $this->tripEndDate,
-                'tripPrice' => $this->tripPrice,
-                'tripCosts' => $tripCostsJson,
-                'num_trips' => $this->num_trips,
-                'active' => true,
-            ]);
-
-            $this->status = 'Trip created successfully!';
-            \Log::info('API response: ' . json_encode($api_response->getResult()));
-        } else {
-            $this->error = 'Error communicating with Square SDK';
-            \Log::error('API Error: ' . json_encode($api_response->getErrors()));
+        } catch (ApiException $e) {
+            // Handle errors, logging, etc.
+            \Log::error('Square API Error: ' . $e->getMessage());
+            $this->error = 'Failed to create the trip. Check logs for more details';
         }
-    } catch (ApiException $e) {
-        // Handle errors, logging, etc.
-        \Log::error('Square API Error: ' . $e->getMessage());
-        $this->error = 'Failed to create the trip. Check logs for more details';
     }
-}
-
+    
 
         
     public function resetForm(): void {

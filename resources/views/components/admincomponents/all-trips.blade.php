@@ -139,7 +139,8 @@
                     </td>
 
                     <td>
-                        <form method="post" action="{{ route('admin.trip.delete', ['tripID' => $trip->tripID]) }}">
+                        <form method="post"
+                            action="{{ route('admin.trip.delete', ['tripID' => ltrim($trip->tripID, '#trip_id_')]) }}">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger text-white">

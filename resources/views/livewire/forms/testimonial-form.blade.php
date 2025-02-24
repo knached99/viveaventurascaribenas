@@ -13,7 +13,7 @@
                         <div class="form-group">
                             <input type="text" wire:model="name" name="name"
                                 class="form-control {{ $errors->has('name') ? 'border border-danger' : '' }}"
-                                placeholder="First Name">
+                                placeholder="First Name" required>
                             @error('name')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -25,7 +25,7 @@
                         <div class="form-group">
                             <input type="email" wire:model="email"
                                 class="form-control {{ $errors->has('email') ? 'border border-danger' : '' }}"
-                                placeholder="Email (required for follow-up only)">
+                                placeholder="Email (required for follow-up only)" required>
                             @error('email')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -33,27 +33,33 @@
                     </div>
 
                     <!-- Trip Selection -->
+                    @if (\Route::currentRouteName() !== 'destination' && !isset($trip['tripID']))
+                        <div class="col-12">
+                            <div class="form-group">
 
-                    <div class="col-12">
-                        <div class="form-group">
-                            <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
-                                wire:model="tripID">
-                                <option value="" disabled selected>Where did you travel with us?</option>
-                                @if (\Route::currentRouteName() === 'destination' && isset($tripID))
-                                    <option value="{{ $tripID }}" selected disabled>Trip Selected</option>
-                                @else
-                                    @forelse ($trips as $trip)
-                                        <option value="{{ $trip['tripID'] }}">{{ $trip['tripLocation'] }}</option>
-                                    @empty
-                                        <option value="" disabled>No trips available</option>
-                                    @endforelse
-                                @endif
-                            </select>
-                            @error('tripID')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                                <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
+                                    wire:model="tripID" required>
+                                    <option value="" disabled {{ empty($tripID) ? 'selected' : '' }}>Where did you
+                                        travel with us?</option>
+
+                                    @foreach ($trips as $trip)
+                                        <option value="{{ $trip['tripID'] }}"
+                                            {{ $tripID == $trip['tripID'] ? 'selected' : '' }}>
+                                            {{ $trip['tripLocation'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            @else
+                                <input type="hidden" wire:model="tripID" value="{{ $tripID }}" />
+
+
+
+                                @error('tripID')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
-                    </div>
+                    @endif
 
                     {{-- <input type="hidden" wire:model="tripID" value="{{ $tripID }}" /> --}}
                     <!-- Trip Selection -->
@@ -66,7 +72,8 @@
                             <label class="form-label">Travel Date</label>
                             <input wire:model="trip_date" type="month" max="{{ date('Y-m') }}"
                                 value="{{ date('Y-m') }}"
-                                class="form-control {{ $errors->has('trip_date') ? 'border border-danger' : '' }}">
+                                class="form-control {{ $errors->has('trip_date') ? 'border border-danger' : '' }}"
+                                required>
                             @error('trip_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -80,7 +87,7 @@
                             <div class="rating">
                                 @for ($i = 5; $i >= 1; $i--)
                                     <input wire:model="trip_rating" type="radio" name="rating"
-                                        value="{{ $i }}" id="{{ $i }}">
+                                        value="{{ $i }}" id="{{ $i }}" required>
                                     <label for="{{ $i }}">☆</label>
                                 @endfor
                             </div>
@@ -94,7 +101,7 @@
                     <div class="col-12">
                         <div class="form-group">
                             <textarea wire:model="testimonial" class="form-control {{ $errors->has('testimonial') ? 'border border-danger' : '' }}"
-                                rows="7" placeholder="Tell us about your experience (What made your trip special?)"></textarea>
+                                rows="7" placeholder="Tell us about your experience (What made your trip special?)" required></textarea>
                             @error('testimonial')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -105,7 +112,7 @@
                     <div class="col-12">
                         <div class="form-group d-flex align-items-center">
                             <input wire:model="consent" type="checkbox" class="form-check-input me-2" id="consent"
-                                name="consent">
+                                name="consent" required>
                             <label class="form-label mb-0 m-3" for="consent">I consent to my testimonial being used
                                 on the
                                 website</label>

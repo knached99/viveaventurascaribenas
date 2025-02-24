@@ -25,7 +25,7 @@ class TripsModel extends Model
     protected $fillable = [
         // 'tripID',
         'tripID',
-        // 'square_catalog_object_id',
+        'idempotencyKey',
         'tripLocation',
         'tripPhoto',
         'tripDescription',
@@ -44,6 +44,7 @@ class TripsModel extends Model
 
     protected $casts = [
         'tripID' => 'string',
+        'idempotencyKey' => 'string',
         'tripPhoto'=>'array',
         'tripLandsacpe'=>'array',
     ];

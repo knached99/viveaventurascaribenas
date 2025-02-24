@@ -194,6 +194,8 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
 
                         <!-- Slots Available -->
                         <div class="mb-4">
+                            <label for="tripPrice" class="form-label">Available Slots</label>
+
                             <input type="text" name="num_trips" placeholder="Enter number of available slots"
                                 class="form-control {{ $errors->has('form.num_trips') ? 'is-invalid' : '' }}"
                                 wire:model="form.num_trips" />

@@ -48,10 +48,23 @@
                 @if (is_array($result) && isset($result['type']))
                     @php
                         // We need to determine the image source based on the result type
+                        // $tripImages = isset($result['trip'])
+                        //     ? json_decode($result['trip']['tripPhoto'], true)
+                        //     : json_decode($result['tripPhoto'], true);
+                        // $imageSrc = $tripImages[0] ?? asset('assets/images/image_placeholder.jpg');
+
                         $tripImages = isset($result['trip'])
-                            ? json_decode($result['trip']['tripPhoto'], true)
-                            : json_decode($result['tripPhoto'], true);
-                        $imageSrc = $tripImages[0] ?? asset('assets/images/image_placeholder.jpg');
+                            ? (is_string($result['trip']['tripPhoto'])
+                                ? json_decode($result['trip']['tripPhoto'], true)
+                                : $result['trip']['tripPhoto'])
+                            : (is_string($result['tripPhoto'])
+                                ? json_decode($result['tripPhoto'], true)
+                                : $result['tripPhoto']);
+
+                        $imageSrc =
+                            is_array($tripImages) && !empty($tripImages)
+                                ? $tripImages[0]
+                                : asset('assets/images/image_placeholder.jpg');
 
                         // Set location for alt text
                         $location =
@@ -61,7 +74,7 @@
                     @endphp
 
                     @if ($result['type'] === 'trip')
-                        <a href="{{ route('admin.trip', ['tripID' => $result['tripID']]) }}"
+                        <a href="{{ route('admin.trip', ['tripID' => ltrim($result['tripID'], '#trip_id_')]) }}"
                             class="text-decoration-none">
                             <li class="list-group-item p-2 border-b hover:bg-gray-100 cursor-pointer">
                                 <img src="{{ $imageSrc }}"

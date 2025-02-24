@@ -67,7 +67,7 @@ class Search extends Component
                 ->orWhere('city', 'LIKE', "%{$this->searchQuery}%")
                 ->orWhere('state', 'LIKE', "%{$this->searchQuery}%")
                 ->orWhere('zip_code', 'LIKE', "%{$this->searchQuery}%")
-                ->select('bookingID', 'tripID', 'name', 'email', 'phone_number', 'stripe_product_id')
+                ->select('bookingID', 'tripID', 'name', 'email', 'phone_number')
                 ->get()
                 ->map(function ($booking) {
                     $booking['type'] = 'booking';
@@ -85,7 +85,7 @@ class Search extends Component
                 ->orWhere('city', 'LIKE', "%{$this->searchQuery}%")
                 ->orWhere('state', 'LIKE', "%{$this->searchQuery}%")
                 ->orWhere('zip_code', 'LIKE', "%{$this->searchQuery}%")
-                ->select('reservationID', 'tripID', 'name', 'email', 'phone_number', 'stripe_product_id')
+                ->select('reservationID', 'tripID', 'name', 'email', 'phone_number',)
                 ->get()
                 ->map(function ($reservation) {
                     $reservation['type'] = 'reservation';
