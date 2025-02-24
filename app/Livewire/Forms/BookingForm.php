@@ -193,106 +193,106 @@ class BookingForm extends Component
     
    
 
-private function createStripeCheckoutSession($customerId, $trip, $tripName, $amount)
-{
+// private function createStripeCheckoutSession($customerId, $trip, $tripName, $amount)
+// {
     
-    $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+//     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
         
     
-    try {
+//     try {
 
-        $discounts = !empty($trip->stripe_coupon_id) ? [['coupon'=>$trip->stripe_coupon_id]]
-        : null;
+//         $discounts = !empty($trip->stripe_coupon_id) ? [['coupon'=>$trip->stripe_coupon_id]]
+//         : null;
 
-        $sessionData = [
-            'payment_method_types' => ['card', 'cashapp', 'affirm'],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'usd',
-                    'product_data' => [
-                        'name' => $tripName,
-                        'metadata' => [
-                            'stripe_product_id' => $trip->stripe_product_id,
-                        ],
-                    ],
-                    'unit_amount' => $amount * 100, // Stripe requires amount in cents
-                    'tax_behavior'=>'exclusive',
-                ],
-                'quantity' => 1,
-            ]],
-            'automatic_tax' => ['enabled' => true],
-            'shipping_address_collection' => [
-                'allowed_countries' => ['US'],
-            ],
-            'customer' => $customerId,
-            'customer_update' => [
-                'address' => 'auto',
-                'shipping' => 'auto',
-            ],
-            'mode' => 'payment',
-            'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID='.$this->tripID.'&name='.base64_encode($this->name).'&email='.base64_encode($this->email),
+//         $sessionData = [
+//             'payment_method_types' => ['card', 'cashapp', 'affirm'],
+//             'line_items' => [[
+//                 'price_data' => [
+//                     'currency' => 'usd',
+//                     'product_data' => [
+//                         'name' => $tripName,
+//                         'metadata' => [
+//                             'stripe_product_id' => $trip->stripe_product_id,
+//                         ],
+//                     ],
+//                     'unit_amount' => $amount * 100, // Stripe requires amount in cents
+//                     'tax_behavior'=>'exclusive',
+//                 ],
+//                 'quantity' => 1,
+//             ]],
+//             'automatic_tax' => ['enabled' => true],
+//             'shipping_address_collection' => [
+//                 'allowed_countries' => ['US'],
+//             ],
+//             'customer' => $customerId,
+//             'customer_update' => [
+//                 'address' => 'auto',
+//                 'shipping' => 'auto',
+//             ],
+//             'mode' => 'payment',
+//             'success_url' => url('/success') . '?session_id={CHECKOUT_SESSION_ID}&tripID='.$this->tripID.'&name='.base64_encode($this->name).'&email='.base64_encode($this->email),
       
-            'cancel_url' => url('/booking/cancel') . '?' . http_build_query([
-                'tripID' => $this->tripID,
-                'name' => $this->name,
-                'email' => $this->email,
-            ]),
+//             'cancel_url' => url('/booking/cancel') . '?' . http_build_query([
+//                 'tripID' => $this->tripID,
+//                 'name' => $this->name,
+//                 'email' => $this->email,
+//             ]),
 
-            'metadata' => [
-                'tripID' => $this->tripID,
-                'stripe_product_id' => $trip->stripe_product_id,
-                'tax_code'=>'txcd_20030000', // General Services 
-                'name' => $this->name,
-                'email' => $this->email,
-                'phone_number' => $this->phone_number,
-                'address_line_1' => $this->address_line_1,
-                'address_line_2' => $this->address_line_2,
-                'city' => $this->city,
-                'state' => $this->state,
-                'zipcode' => $this->zipcode,
-                'preferred_start_date' => $this->preferred_start_date,
-                'preferred_end_date' => $this->preferred_end_date,
-            ],
-        ];
+//             'metadata' => [
+//                 'tripID' => $this->tripID,
+//                 'stripe_product_id' => $trip->stripe_product_id,
+//                 'tax_code'=>'txcd_20030000', // General Services 
+//                 'name' => $this->name,
+//                 'email' => $this->email,
+//                 'phone_number' => $this->phone_number,
+//                 'address_line_1' => $this->address_line_1,
+//                 'address_line_2' => $this->address_line_2,
+//                 'city' => $this->city,
+//                 'state' => $this->state,
+//                 'zipcode' => $this->zipcode,
+//                 'preferred_start_date' => $this->preferred_start_date,
+//                 'preferred_end_date' => $this->preferred_end_date,
+//             ],
+//         ];
 
-        if($discounts){
-            $sessionData['discounts'] = $discounts;
-        }
+//         if($discounts){
+//             $sessionData['discounts'] = $discounts;
+//         }
 
-        return $stripe->checkout->sessions->create($sessionData);
+//         return $stripe->checkout->sessions->create($sessionData);
 
-}
+// }
 
-catch(\Stripe\Exception\InvalidRequestException $e){
+// catch(\Stripe\Exception\InvalidRequestException $e){
 
-    \Log::critical('Error: '.$e->getMessage(). 'Encountered in method: '.__FUNCTION__. ' in class: '.__CLASS__. ' on line: '.__LINE__);
-}
+//     \Log::critical('Error: '.$e->getMessage(). 'Encountered in method: '.__FUNCTION__. ' in class: '.__CLASS__. ' on line: '.__LINE__);
+// }
 
-}
+// }
 
 
-private function getOrCreateStripeCustomer(string $email, string $name){
+// private function getOrCreateStripeCustomer(string $email, string $name){
 
-    $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+//     $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
 
-    // Retrieve customers with the given email
-    $customers = $stripe->customers->all(['email'=>$email]);
+//     // Retrieve customers with the given email
+//     $customers = $stripe->customers->all(['email'=>$email]);
 
-    // If a customer exists, return the first one
-    if(count($customers->data) > 0){
-        return $customers->data[0];
-    }
+//     // If a customer exists, return the first one
+//     if(count($customers->data) > 0){
+//         return $customers->data[0];
+//     }
 
-    // If no customer exists, create a new one
-    return $stripe->customers->create([
-        'email' => $email,
-        'name' => $name,
-        'metadata' => [
-            'name' => $name,
-            'email' => $email,
-        ],
-    ]);
-}
+//     // If no customer exists, create a new one
+//     return $stripe->customers->create([
+//         'email' => $email,
+//         'name' => $name,
+//         'metadata' => [
+//             'name' => $name,
+//             'email' => $email,
+//         ],
+//     ]);
+// }
 
 
     private function handleComingSoonReservation($trip, $reservationID){
