@@ -380,7 +380,7 @@ class BookingForm extends Component
             ];
     
             // Redirect to Stripe session
-            return redirect()->away($stripe_session->url);
+           // return redirect()->away($stripe_session->url);
     
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Handle specific error: Trip not found
