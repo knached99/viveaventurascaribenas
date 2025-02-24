@@ -307,7 +307,7 @@ class BookingForm extends Component
 
         Reservations::create([
             'reservationID'=>$reservationID,
-            'stripe_product_id'=>$trip->stripe_product_id,
+            'stripe_product_id'=>1245678910,
             'tripID'=>$trip->tripID,
             'name'=>$this->name,
             'email'=>$this->email,
