@@ -167,23 +167,23 @@ class Admin extends Controller
 
 
     public function profilePage(){
-        $objectIDs = [];
-        $response = $this->client->getCatalogApi()->listCatalog();
+        // $objectIDs = [];
+        // $response = $this->client->getCatalogApi()->listCatalog();
      
-            $result = $response->getResult();
-            // dd($result);
-            $resultArray = json_decode(json_encode($result), true);
-            foreach ($resultArray['objects'] as $object) {
-                $objectIDs[] = $object['id'];
-            }
+        //     $result = $response->getResult();
+        //     // dd($result);
+        //     $resultArray = json_decode(json_encode($result), true);
+        //     foreach ($resultArray['objects'] as $object) {
+        //         $objectIDs[] = $object['id'];
+        //     }
 
-           $body = new \Square\Models\BatchDeleteCatalogObjectsRequest();
-           $body->setObjectIds($objectIDs);
-           $response = $this->client->getCatalogApi()->batchDeleteCatalogObjects($body);
+        //    $body = new \Square\Models\BatchDeleteCatalogObjectsRequest();
+        //    $body->setObjectIds($objectIDs);
+        //    $response = $this->client->getCatalogApi()->batchDeleteCatalogObjects($body);
             
-        if($response){
-            dd($response->getResult());
-        }
+        // if($response){
+        //     dd($response->getResult());
+        // }
 
         // else{
         //     $errors = $response->getErrors();
