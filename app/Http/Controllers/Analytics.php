@@ -369,7 +369,10 @@ class Analytics extends Controller
         }
         // This is the most prevelant bot hitting the site 
 
-        $mostFrequentBot = array_keys($botCounts, max($botCounts))[0] ?? 'None';
+        $mostFrequentBot = !empty($botCounts) ? array_keys($botCounts, max($botCounts))[0] : 'None';
+
+        \Log::debug('Bot Counts:', $botCounts);
+
         
 
         // calculate the percentage of fake and real visitors 
