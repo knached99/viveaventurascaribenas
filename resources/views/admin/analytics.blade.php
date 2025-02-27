@@ -79,15 +79,47 @@
         </div>
 
         <!-- Visitor World Heatmap Chart -->
-        <div class="col-lg-12 mb-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">World Heatmap</h5>
-                    <p class="card-subtitle mb-4">This map shows where your visitors come from, with darker areas indicating higher distribution of visitors.</p>
-                    <x-admincomponents.heatmap-chart :heatmapData="$heatmapData" />
+      <div class="col-lg-12 mb-6">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">World Heatmap</h5>
+            <p class="card-subtitle mb-4">This map shows where your visitors come from, with darker areas indicating higher distribution of visitors.</p>
+            <x-admincomponents.heatmap-chart :heatmapData="$heatmapData" />
+
+            <!-- Color Legend -->
+            <div class="mt-4">
+                <h6>Visitor Density Legend</h6>
+                <div class="d-flex flex-wrap align-items-center">
+                    <div class="d-flex align-items-center me-3">
+                        <div style="width: 20px; height: 20px; background-color: #6f00ff; margin-right: 8px;"></div> 
+                        <span>50+ visitors</span>
+                    </div>
+                    <div class="d-flex align-items-center me-3">
+                        <div style="width: 20px; height: 20px; background-color: #903bff; margin-right: 8px;"></div> 
+                        <span>21-50 visitors</span>
+                    </div>
+                    <div class="d-flex align-items-center me-3">
+                        <div style="width: 20px; height: 20px; background-color: #8fb4ff; margin-right: 8px;"></div> 
+                        <span>11-20 visitors</span>
+                    </div>
+                    <div class="d-flex align-items-center me-3">
+                        <div style="width: 20px; height: 20px; background-color: #b5cdff; margin-right: 8px;"></div> 
+                        <span>6-10 visitors</span>
+                    </div>
+                    <div class="d-flex align-items-center me-3">
+                        <div style="width: 20px; height: 20px; background-color: #edf3ff; margin-right: 8px;"></div> 
+                        <span>1-5 visitors</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div style="width: 20px; height: 20px; background-color: black; margin-right: 8px;"></div> 
+                        <span>No visitors</span>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
 
     </div>
 </x-authenticated-theme-layout>
