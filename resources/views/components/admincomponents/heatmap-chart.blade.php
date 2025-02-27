@@ -96,7 +96,7 @@ $geojsonPath = asset('assets/js/countries.geojson');
                                         count > 10 ? '#8fb4ff' :
                                         count > 5 ? '#b5cdff' :
                                         count > 0 ? '#edf3ff' :
-                                                    '#FFEDA0';
+                                                    '#000';
                                                     
 
 
