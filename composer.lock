@@ -9348,10 +9348,7 @@
     "platform": {
         "php": "^8.2"
     },
-<<<<<<< HEAD
     "platform-dev": [],
-=======
-    "platform-dev": {},
->>>>>>> cd67f27 (Pushing Updated composer.lock File)
     "plugin-api-version": "2.6.0"
 }
+
