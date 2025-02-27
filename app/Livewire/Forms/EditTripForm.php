@@ -386,47 +386,47 @@ class EditTripForm extends Component
                     }
                 }
         
-                $accessToken = env('SQUARE_ACCESS_TOKEN');
-                $client = new \Square\SquareClient([
-                    'accessToken' => $accessToken,
-                    'environment' => \Square\Environment::SANDBOX,
-                ]);
+                // $accessToken = env('SQUARE_ACCESS_TOKEN');
+                // $client = new \Square\SquareClient([
+                //     'accessToken' => $accessToken,
+                //     'environment' => \Square\Environment::SANDBOX,
+                // ]);
         
-                $catalogApi = $client->getCatalogApi();
-                $retrieveResponse = $catalogApi->retrieveCatalogObject($this->trip->tripID);
+                // $catalogApi = $client->getCatalogApi();
+                // $retrieveResponse = $catalogApi->retrieveCatalogObject($this->trip->tripID);
         
-                if ($retrieveResponse->isSuccess()) {
-                    $catalogObject = $retrieveResponse->getResult()->getObject();
-                    $version = $catalogObject->getVersion();
+                // if ($retrieveResponse->isSuccess()) {
+                //     $catalogObject = $retrieveResponse->getResult()->getObject();
+                //     $version = $catalogObject->getVersion();
         
-                    $itemData = $catalogObject->getItemData();
-                    $itemData->setName($this->tripLocation);
-                    $itemData->setDescription(strip_tags($this->tripDescription));
-                    $itemData->setAbbreviation(substr($this->tripLocation, 0, 2));
+                //     $itemData = $catalogObject->getItemData();
+                //     $itemData->setName($this->tripLocation);
+                //     $itemData->setDescription(strip_tags($this->tripDescription));
+                //     $itemData->setAbbreviation(substr($this->tripLocation, 0, 2));
         
-                    $variations = $itemData->getVariations();
-                    if (isset($this->tripPrice) && is_numeric($this->tripPrice) && $this->tripPrice > 0) {
-                         // Retrieve the variations from the item data
-                        $variation = $variations[0]->getItemVariationData();
+                //     $variations = $itemData->getVariations();
+                //     if (isset($this->tripPrice) && is_numeric($this->tripPrice) && $this->tripPrice > 0) {
+                //          // Retrieve the variations from the item data
+                //         $variation = $variations[0]->getItemVariationData();
                         
-                        // Ensure that the variation's price is set
-                        $priceMoney = new \Square\Models\Money($this->tripPrice * 100, 'USD');
-                        $variation->setPriceMoney($priceMoney);
-                        \Log::info('Setting price for variation: ' . $priceMoney->getAmount());
+                //         // Ensure that the variation's price is set
+                //         $priceMoney = new \Square\Models\Money($this->tripPrice * 100, 'USD');
+                //         $variation->setPriceMoney($priceMoney);
+                //         \Log::info('Setting price for variation: ' . $priceMoney->getAmount());
 
-                    }
+                //     }
 
-                    else {
-                        $this->error = 'Invalid or missing trip price.';
-                        \Log::error('Invalid trip price: ' . $this->tripPrice);
-                        return;
-                    }
+                //     else {
+                //         $this->error = 'Invalid or missing trip price.';
+                //         \Log::error('Invalid trip price: ' . $this->tripPrice);
+                //         return;
+                //     }
         
-                    $idempotencyKey = (string) Str::uuid();
-                    $upsertRequest = new \Square\Models\UpsertCatalogObjectRequest($idempotencyKey, $catalogObject);
-                    $upsertResponse = $catalogApi->upsertCatalogObject($upsertRequest);
+                //     $idempotencyKey = (string) Str::uuid();
+                //     $upsertRequest = new \Square\Models\UpsertCatalogObjectRequest($idempotencyKey, $catalogObject);
+                //     $upsertResponse = $catalogApi->upsertCatalogObject($upsertRequest);
         
-                    if ($upsertResponse->isSuccess()) {
+                    // if ($upsertResponse->isSuccess()) {
                         $tripModel->update([
                             'tripLocation' => $this->tripLocation,
                             'tripPhoto' => !empty($newImageURLs) ? json_encode($newImageURLs) : $tripModel->tripPhoto,
@@ -445,14 +445,14 @@ class EditTripForm extends Component
         
                         Cache::put($this->cacheKey, $tripModel->toArray(), 600);
                         $this->success = 'Trip information updated successfully!';
-                    } else {
-                        $this->error = 'Failed to update trip in Square.';
-                        \Log::error('Square Error: ', $upsertResponse->getErrors());
-                    }
-                } else {
-                    $this->error = 'Failed to retrieve trip from Square.';
-                    \Log::error('Square Retrieve Error: ', $retrieveResponse->getErrors());
-                }
+                    // } else {
+                    //     $this->error = 'Failed to update trip in Square.';
+                    //     \Log::error('Square Error: ', $upsertResponse->getErrors());
+                    // }
+                // } else {
+                //     $this->error = 'Failed to retrieve trip from Square.';
+                //     \Log::error('Square Retrieve Error: ', $retrieveResponse->getErrors());
+                // }
             } catch (\Exception $e) {
                 $this->error = 'An error occurred while updating the trip.';
                 \Log::error($e->getMessage());
