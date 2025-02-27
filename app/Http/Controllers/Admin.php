@@ -192,6 +192,47 @@ class Admin extends Controller
         return view('admin/profile');
     }
 
+
+    public function bookingInfo($bookingID)
+    {
+        try {
+            $booking = BookingModel::with('trip')->where('bookingID', $bookingID)->firstOrFail();
+         
+        
+            return view('admin.booking', [
+                'bookingID' => $bookingID,
+                'booking' => $booking
+            ]);
+
+           
+    
+        } catch (ModelNotFoundException $e) {
+            \Log::error('ModelNotFoundException encountered on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' Error Message: ' . $e->getMessage());
+            abort(404);
+        } catch (\Exception $e) {
+            \Log::error('Exception encountered on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' Error Message: ' . $e->getMessage());
+            abort(500);
+        }
+    }
+
+
+    public function getReservationDetails($reservationID){
+        try{
+            
+            $reservation = Reservations::with(['trip'])->findOrFail($reservationID);
+
+            return view('admin.reservation', ['reservationID' => $reservationID, 'reservation'=>$reservation]);
+        
+    }
+    catch(ModelNotFoundException $e){
+        \Log::error('ModelNotFoundException encountered on line ' . __LINE__ . ' in class: ' . __CLASS__ . ' Error Message: ' . $e->getMessage());
+        abort(404);
+    }
+
+}
+
+
+
     public function allTripsPage(){
         $trips = TripsModel::select('tripID', 'tripLocation', 'tripPhoto', 'tripLandscape', 'tripAvailability', 'tripStartDate', 'tripEndDate', 'active', 'tripPrice', 'created_at', 'updated_at')->get();
          return view('admin/all-trips', compact('trips'));

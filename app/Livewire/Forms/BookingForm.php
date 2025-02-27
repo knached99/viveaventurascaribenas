@@ -357,7 +357,7 @@ class BookingForm extends Component
                 $this->error = 'This trip is unavailable right now. Please check again later';
             }
     
-            if ($this->tripAvailability === 'available' || $this->tripAvailability === 'coming soon') {
+            if (in_array($this->tripAvailability, ['available', 'coming soon'])) {
                 return $this->handleComingSoonReservation($trip, $reservationID);
             }
     

@@ -53,24 +53,39 @@
                         //     : json_decode($result['tripPhoto'], true);
                         // $imageSrc = $tripImages[0] ?? asset('assets/images/image_placeholder.jpg');
 
-                        $tripImages = isset($result['trip'])
-                            ? (is_string($result['trip']['tripPhoto'])
-                                ? json_decode($result['trip']['tripPhoto'], true)
-                                : $result['trip']['tripPhoto'])
-                            : (is_string($result['tripPhoto'])
-                                ? json_decode($result['tripPhoto'], true)
-                                : $result['tripPhoto']);
+                        $tripImages = [];
+
+                        if (isset($result['trip']) && isset($result['trip']['tripPhoto'])) {
+                            $tripImages = is_array($result['trip']['tripPhoto'])
+                                ? $result['trip']['tripPhoto']
+                                : json_decode($result['trip']['tripPhoto'], true);
+                        } elseif (isset($result['tripPhoto'])) {
+                            $tripImages = is_array($result['tripPhoto'])
+                                ? $result['tripPhoto']
+                                : json_decode($result['tripPhoto'], true);
+                        }
+
+                        // Ensure $tripImages is an array
+                        $tripImages = is_array($tripImages) ? $tripImages : [];
+
+                        $imageSrc = !empty($tripImages) ? $tripImages[0] : asset('assets/images/image_placeholder.jpg');
 
                         $imageSrc =
                             is_array($tripImages) && !empty($tripImages)
                                 ? $tripImages[0]
                                 : asset('assets/images/image_placeholder.jpg');
 
-                        // Set location for alt text
-                        $location =
-                            $result['type'] === 'trip'
-                                ? $result['tripLocation']
-                                : $result['trip']['tripLocation'] ?? 'Undefined Location';
+                        $imageSrc =
+                            is_array($tripImages) && !empty($tripImages)
+                                ? $tripImages[0]
+                                : asset('assets/images/image_placeholder.jpg');
+
+                        $location = match ($result['type']) {
+                            'trip' => $result['tripLocation'] ?? 'Undefined Location',
+                            'reservation' => $result['reservation']['tripLocation'] ?? 'Undefined Location',
+                            default => $result['trip']['tripLocation'] ?? 'Undefined Location',
+                        };
+
                     @endphp
 
                     @if ($result['type'] === 'trip')
@@ -105,13 +120,10 @@
                         <a href="{{ route('admin.reservation', ['reservationID' => $result['reservationID']]) }}"
                             class="text-decoration-none">
                             <li class="list-group-item p-4 border-b hover:bg-gray-100 cursor-pointer flex items-center">
-                                <div class="flex-shrink-0">
-                                    <img src="{{ $imageSrc }}" alt="{{ $location }}"
-                                        class="w-16 h-16 rounded-lg object-cover border border-gray-200 shadow-md rounded" />
-                                </div>
+
                                 <div class="ml-4">
                                     <h5 class="mb-1 font-semibold text-gray-800">
-                                        {{ $result['name'] ?? 'Unnamed Reservation' }}</h5>
+                                        {{ $result['name'] ?? 'No Name' }}</h5>
                                     <p class="mb-1 text-gray-500">{{ $result['email'] ?? 'No Email' }} |
                                         {{ $result['phone_number'] ?? 'No Phone Number' }}</p>
                                     <p class="mb-0 text-gray-600">

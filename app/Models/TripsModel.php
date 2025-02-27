@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
 
 class TripsModel extends Model
 {
-    use HasFactory;
+    use HasFactory,Searchable;
 
     protected $primaryKey = 'tripID';
     protected $table = 'trips';
@@ -52,5 +53,27 @@ class TripsModel extends Model
     public function testimonial()
     {
         return $this->belongsTo(Testimonials::class, 'testimonial_id', 'testimonialID');
+    }
+
+       /**
+     * Get the data that should be indexed for search.
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return [
+            'tripID' => $this->tripID,
+            'tripLocation' => $this->tripLocation,
+            'tripDescription' => $this->tripDescription,
+            'tripActivities' => $this->tripActivities,
+            'tripLandscape' => $this->tripLandscape,
+            'tripAvailability' => $this->tripAvailability,
+            'tripStartDate' => $this->tripStartDate,
+            'tripEndDate' => $this->tripEndDate,
+            'tripPrice' => $this->tripPrice,
+            'active' => $this->active,
+            'slug' => $this->slug,
+        ];
     }
 }

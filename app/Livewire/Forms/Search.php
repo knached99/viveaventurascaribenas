@@ -23,59 +23,41 @@ class Search extends Component
     public string $searchQuery = '';
 
     
-    public function search(){
-
+    public function search()
+    {
         $this->validate();
-
+    
         try {
-            
-            // Performing full-text search using Scout 
-
-            $tripsResults = TripsModel::search($this->searchQuery)->get();
-            $testimonialsResults = Testimonials::search($this->searchQuery)->get();
-            $bookingResults = BookingModel::search($this->searchQuery)->get();
-            $reservationResults = Reservations::search($this->searchQuery)->get();
-
-            // mapping results to include the type attribute 
-
-            $tripsResults = $tripsResults->map(function($trip){
-                $trip['type'] = 'trip';
-                return $trip;
+            $tripsResults = TripsModel::search($this->searchQuery)->get()->map(function ($trip) {
+                return array_merge($trip->toArray(), ['type' => 'trip']);
             })->toArray();
-
-            $testimonialsResults = $testimonialsResults->map(function($testimonial){
-             $testimonial['type'] = 'testimonial';
-             
-             return $testimonial;
+    
+            $testimonialsResults = Testimonials::search($this->searchQuery)->get()->map(function ($testimonial) {
+                return array_merge($testimonial->toArray(), ['type' => 'testimonial']);
             })->toArray();
-
-            $bookingResults = $bookingResults->map(function($booking){
-
-                $booking['type'] = 'booking';
+    
+            $bookingResults = BookingModel::search($this->searchQuery)->get()->map(function ($booking) {
+                return array_merge($booking->toArray(), ['type' => 'booking']);
             })->toArray();
-
-            $reservationsResults = $reservationResults->map(function($reservation){
-
-                $reservation['type'] = 'reservation';
+    
+            $reservationResults = Reservations::search($this->searchQuery)->get()->map(function ($reservation) {
+                return array_merge($reservation->toArray(), ['type' => 'reservation']);
             })->toArray();
-
-            $this->searchResults = array_merge($tripsResults, $testimonialsResults, $bookingResults, $reservationsResults);
-
-
-            // suggest similar term if no results are found 
-
-            if(empty($this->searchResults)){
+    
+            $this->searchResults = array_merge($tripsResults, $testimonialsResults, $bookingResults, $reservationResults);
+    
+            \Log::info('Search Results', ['results' => $this->searchResults]);
+    
+            if (empty($this->searchResults)) {
                 $this->suggestion = $this->findSimilarTerm($this->searchQuery);
             }
-        }
-
-        catch(\Exception $e){
+        } catch (\Exception $e) {
             $this->searchResults = [];
             $this->searchError = 'Unable to perform search';
             \Log::error("Search Error: {$e->getMessage()}");
-
         }
     }
+    
     // public function search()
     // {
     //     $this->validate();
