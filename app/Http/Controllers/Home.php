@@ -23,7 +23,7 @@ class Home extends Controller
     public function __construct(){
          $this->square = new SquareClient([
              'accessToken' => env('SQUARE_ACCESS_TOKEN'),
-             'environment' => env('SQUARE_ENVIRONMENT', 'sandbox')
+             'environment' => env('SQUARE_ENVIRONMENT', 'production')
          ]);
          $this->bookingID = Str::uuid();
     }

@@ -157,7 +157,7 @@ class TripForm extends Form {
                 ->bearerAuthCredentials(
                     BearerAuthCredentialsBuilder::init($accessToken)
                 )
-                ->environment(Environment::SANDBOX) // Change to Environment::PRODUCTION in live mode
+                ->environment(Environment::PRODUCTION) // Change to Environment::PRODUCTION in live mode
                 ->build();
     
             // Generate a consistent Item ID
