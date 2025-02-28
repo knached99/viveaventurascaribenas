@@ -1,5 +1,5 @@
 @php
-    $photos = json_decode($reservation->trip->tripPhoto, true);
+    $photos = is_string($reservation->trip->tripPhoto) ? json_decode($reservation->trip->tripPhoto, true) : $reservation->trip->tripPhoto;
     $firstPhoto = !empty($photos) ? asset($photos[0]) : asset('assets/images/booking_page_bg.webp');
 @endphp
 <x-authenticated-theme-layout>

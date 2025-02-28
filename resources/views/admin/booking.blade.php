@@ -1,13 +1,14 @@
 @php
     use Carbon\Carbon;
-    $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+/*    $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
     $stripeCheckoutID = $booking->stripe_checkout_id;
     $product = $stripe->products->retrieve($booking->stripe_product_id);
     $location = $product->name;
-
+*/
+    $location = $booking->trip->tripLocation;
     $fullPrice = $booking->trip->tripPrice;
 
-    $photos = json_decode($booking->trip->tripPhoto, true);
+    $photos = is_string($booking->trip->tripPhoto) ? json_decode($booking->trip->tripPhoto, true) : $booking->trip->tripPhoto;
     $firstPhoto = !empty($photos) ? asset($photos[0]) : asset('assets/images/booking_page_bg.webp');
 
     if (!empty($stripeCheckoutID)) {
