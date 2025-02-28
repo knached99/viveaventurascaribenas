@@ -467,15 +467,11 @@ public function deleteTrip($tripID) {
         $photos = is_string($trip->tripPhoto) ? json_decode($trip->tripPhoto, true) : $trip->tripPhoto;
         if (!empty($photos)) {
             foreach ($photos as $photoUrl) {
-                $filePath = parse_url($photoUrl, PHP_URL_PATH);
-                $filePath = ltrim($filePath, '/'); // Ensure relative path
+       
+                $filePath = str_replace(asset(Storage::url('')), '', $photoUrl);
 
-                // Check if the file exists before attempting to delete
-                if (Storage::disk('public')->exists($filePath)) {
+                if(Storage::disk('public')->exists($filePath)){
                     Storage::disk('public')->delete($filePath);
-                    \Log::info("Deleted photo: {$filePath}");
-                } else {
-                    \Log::warning("Photo not found: {$filePath}");
                 }
             }
         }
