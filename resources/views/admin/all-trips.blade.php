@@ -20,6 +20,11 @@
                 <div class="alert alert-success" role="alert">
                     {{ session('trip_deleted') }}
                 </div>
+
+            @elseif(session('trip_delete_error'))
+            <div class="alert alert-danger" role="alert">
+            {{session('trip_delete_error')}}
+            </div>
             @endif
 
             <div class="table-responsive">

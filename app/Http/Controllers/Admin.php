@@ -493,14 +493,14 @@ public function deleteTrip($tripID) {
             \Log::error("Square API error: " . json_encode($squareTrip->getErrors()));
         }
 
-        $this->success = 'Truo deleted successfully';
+        return redirect()->back()->with('trip_deleted', 'That trip was successfully deleted');
 
     } catch (ModelNotFoundException $e) {
         \Log::error("Trip not found: {$tripID}. Error: " . $e->getMessage());
-         $this->error = 'Cannot find trip to delete';
+        return redirect()->back()->with('trip_delete_error', 'Could not find trip to delete');
     } catch (\Exception $e) {
         \Log::error("Exception deleting trip ID {$tripID}: " . $e->getMessage());
-        $this->error = 'An error occurred while deleting the trip';
+        return redirect()->back()->with('trip_delete_error', 'An error occurred while attempting to delete the trip');
     }
 }
 
