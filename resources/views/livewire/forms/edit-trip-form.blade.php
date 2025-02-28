@@ -420,7 +420,7 @@
 
 
 
-                            <button wire:click="createDiscount" class="btn btn-primary ml-4 mt-2 float-start">Create
+                            <button wire:click="createDiscount" class="btn btn-primary ml-4 mt-2 float-start" disabled>Create
                                 Discount</button>
                             @if ($discountCreateSuccess)
                                 <span class="text-emerald-500">{{ $discountCreateSuccess }}</span>
