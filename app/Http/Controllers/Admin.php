@@ -464,9 +464,8 @@ public function deleteTrip($tripID) {
 
         // Delete associated photos
         \Log::info('Checking if photo exists');
-        $photos = json_decode($trip->tripPhoto, true);
-
-        if (!empty($photos) && is_array($photos)) {
+        $photos = is_string($trip->tripPhoto) ? json_decode($trip->tripPhoto, true) : $trip->tripPhoto;
+        if (!empty($photos)) {
             foreach ($photos as $photoUrl) {
                 $filePath = parse_url($photoUrl, PHP_URL_PATH);
                 $filePath = ltrim($filePath, '/'); // Ensure relative path
