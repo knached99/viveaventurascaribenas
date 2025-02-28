@@ -38,7 +38,7 @@
                 </p>
             </div>
 
-            <div class="row">
+            {{-- <div class="row">
                 <div class="col-md-6">
                     <!-- Payment Status -->
                     <div class="mb-6">
@@ -51,7 +51,7 @@
 
 
             </div>
-            <!-- End Row -->
+            <!-- End Row --> --}}
 
 
             <!-- Contact Information -->
