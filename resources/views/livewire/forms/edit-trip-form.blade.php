@@ -384,7 +384,7 @@
                         <div class="form-group">
                             <label class="form-label">Select Discount Type</label>
                             <select class="form-control {{ $errors->has('discountType') ? 'is-invalid' : '' }}"
-                                id="discountType" wire:model="discountType">
+                                id="discountType" wire:model="discountType" disabled>
                                 <option value="percentage">percentage</option>
                                 <option value="amount">amount</option>
                             </select>
@@ -395,14 +395,14 @@
                         <div class="form-group">
                             <label class="form-label">Discount Value</label>
                             <input type="number" wire:model="discountValue" id="discountValue"
-                                class="form-control {{ $errors->has('discountValue') ? 'is-invalid' : '' }}" />
+                                class="form-control {{ $errors->has('discountValue') ? 'is-invalid' : '' }}" readonly />
                             <x-input-error :messages="$errors->get('discountValue')" class="invalid-feedback" />
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Enter duration in months</label>
                             <input type="number" wire:model="discountDuration" id="discountDuration"
-                                class="form-control {{ $errors->has('discountDuration') ? 'is-invalid' : '' }}" />
+                                class="form-control {{ $errors->has('discountDuration') ? 'is-invalid' : '' }}" readonly />
                             <x-input-error :messages="$errors->get('discountDuration')" class="invalid-feedback" />
                         </div>
 
