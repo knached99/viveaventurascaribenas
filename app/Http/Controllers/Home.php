@@ -52,14 +52,18 @@ class Home extends Controller
         $photos = PhotoGalleryModel::with(['trip'])->select('photoID', 'photoLabel', 'photoDescription', 'photos', 'tripID')->get();
 
 
-        $mostPopularBookings = BookingModel::select('bookings.tripID', DB::raw('COUNT(*) as booking_count'))
-            ->where('trips.active', true)
-            ->join('trips', 'bookings.tripID', '=', 'trips.tripID')
-            ->groupBy('bookings.tripID', 'trips.tripID', 'trips.slug',  'trips.tripPhoto')
-            ->having('booking_count', '>', 2)
-            ->orderByDesc('booking_count')
-            ->take(4)
-            ->get();
+        $mostPopularTrips = DB::table('trips')
+        ->select('trips.tripID', 'trips.slug', 'trips.tripPhoto', DB::raw('
+            (SELECT COUNT(*) FROM bookings WHERE bookings.tripID = trips.tripID) + 
+            (SELECT COUNT(*) FROM reservations WHERE reservations.tripID = trips.tripID) 
+            AS total_count
+        '))
+        ->where('trips.active', true)
+        ->having('total_count', '>', 2)
+        ->orderByDesc('total_count')
+        ->take(4)
+        ->get();
+
     
         $popularTrips = [];
         $mostPopularTripId = null;
@@ -110,6 +114,7 @@ class Home extends Controller
        
         $trip = TripsModel::where('slug', $slug)->where('active', true)->firstOrFail();
         $tripID = $trip->tripID;
+        $isMostPopular = false;
 
         $testimonials = Testimonials::with('trip')
         ->where('tripID', $tripID)
@@ -117,14 +122,27 @@ class Home extends Controller
         ->get();
 
         $averageTestimonialRating = $testimonials->isNotEmpty() ? $testimonials->avg('trip_rating') : 0;
-        $mostPopularBooking = BookingModel::select('bookingID')
-        ->selectRaw('COUNT(*) as booking_count')
-        ->groupBy('bookingID')
-        ->having('booking_count', '>', 2)
-        ->orderByDesc('booking_count')
-        ->first();
+        // Combines both bookings and reservations into a single dataset.
+        
+        $mostPopularBooking = DB::table(function ($query) {
+            $query->select('tripID', DB::raw('COUNT(*) as total_count'))
+                ->from('bookings')
+                ->groupBy('tripID')
+                ->unionAll(
+                    DB::table('reservations')
+                        ->select('tripID', DB::raw('COUNT(*) as total_count'))
+                        ->groupBy('tripID')
+                );
+        }, 'combined_counts')
+            ->select('tripID', DB::raw('SUM(total_count) as booking_count'))
+            ->groupBy('tripID')
+            ->having('booking_count', '>', 2)
+            ->orderByDesc('booking_count')
+            ->first();
 
-        $isMostPopular = true; // default is false
+        if($mostPopularBooking && isset($tripID)){
+            $isMostPopular = ($mostPopularBooking->tripID == $tripID);
+        }
 
         // Old logic using Stripe, need to update to use Square
         
