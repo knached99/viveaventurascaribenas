@@ -52,7 +52,7 @@ class Home extends Controller
         $photos = PhotoGalleryModel::with(['trip'])->select('photoID', 'photoLabel', 'photoDescription', 'photos', 'tripID')->get();
 
 
-        $mostPopularTrips = DB::table('trips')
+        $mostPopularBookings = DB::table('trips')
         ->select('trips.tripID', 'trips.slug', 'trips.tripPhoto', DB::raw('
             (SELECT COUNT(*) FROM bookings WHERE bookings.tripID = trips.tripID) + 
             (SELECT COUNT(*) FROM reservations WHERE reservations.tripID = trips.tripID) 
