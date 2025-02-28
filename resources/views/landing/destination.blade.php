@@ -214,7 +214,7 @@
                                                 <img src="{{ asset('assets/images/beach.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
                                                     style="height: 50px; width: 50px; margin: 5px;" />
-                                                <span style="display: block;">Beach</span>
+                                                <span style="display: block;">Coastal</span>
                                             </div>
                                         @break
 
@@ -223,7 +223,7 @@
                                                 <img src="{{ asset('assets/images/buildings.png') }}" data-bs-toggle="tooltip"
                                                     data-bs-placement="bottom" data-bs-title="{{ $landscape }}"
                                                     style="height: 50px; width: 50px; margin: 5px;" />
-                                                <span style="display: block;">City</span>
+                                                <span style="display: block;">Urban</span>
                                             </div>
                                         @break
 
