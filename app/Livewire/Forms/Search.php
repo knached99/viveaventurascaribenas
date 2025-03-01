@@ -32,17 +32,24 @@ class Search extends Component
                 return array_merge($trip->toArray(), ['type' => 'trip']);
             })->toArray();
     
-            $testimonialsResults = Testimonials::with(['trip'])->search($this->searchQuery)->get()->map(function ($testimonial) {
-                return array_merge($testimonial->toArray(), ['type' => 'testimonial']);
-            })->toArray();
-    
-            $bookingResults = BookingModel::with(['trip'])->search($this->searchQuery)->get()->map(function ($booking) {
-                return array_merge($booking->toArray(), ['type' => 'booking']);
-            })->toArray();
-    
-            $reservationResults = Reservations::with(['trip'])->search($this->searchQuery)->get()->map(function ($reservation) {
-                return array_merge($reservation->toArray(), ['type' => 'reservation']);
-            })->toArray();
+            $testimonialsResults = Testimonials::search($this->searchQuery)
+            ->query(fn ($query) => $query->with('trip'))
+            ->get()
+            ->map(fn ($testimonial) => array_merge($testimonial->toArray(), ['type' => 'testimonial']))
+            ->toArray();
+        
+        $bookingResults = BookingModel::search($this->searchQuery)
+            ->query(fn ($query) => $query->with('trip'))
+            ->get()
+            ->map(fn ($booking) => array_merge($booking->toArray(), ['type' => 'booking']))
+            ->toArray();
+        
+        $reservationResults = Reservations::search($this->searchQuery)
+            ->query(fn ($query) => $query->with('trip'))
+            ->get()
+            ->map(fn ($reservation) => array_merge($reservation->toArray(), ['type' => 'reservation']))
+            ->toArray();
+        
     
             $this->searchResults = array_merge($tripsResults, $testimonialsResults, $bookingResults, $reservationResults);
     
