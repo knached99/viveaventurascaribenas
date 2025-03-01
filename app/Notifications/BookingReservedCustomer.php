@@ -42,7 +42,7 @@ class BookingReservedCustomer extends Notification
                     ->line('Reservation Details:')
                     ->line('Reservation ID: '.$this->data['reservationID'])
                     ->line('Trip: '.$this->data['tripLocation'])
-                    ->line('Your preferred travel dates: '.$this->data['preferredStartDate'].' -  '.$this->data['preferredEndDate'])
+                    ->line('Your preferred travel dates: '.date('F jS, Y', strtotime($this->data['preferredStartDate'])).' -  '.date('F jS, Y', strtotime($this->data['preferredEndDate'])))
                     ->line('Status: Reservation Confirmed')
                     ->line('Thanks for booking your reservation with us!')
                     ->line('We will be reaching out to finalize your reservation within 24-48 hours')
