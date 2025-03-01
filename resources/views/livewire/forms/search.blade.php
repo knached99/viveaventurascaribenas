@@ -80,11 +80,14 @@
                                 ? $tripImages[0]
                                 : asset('assets/images/image_placeholder.jpg');
 
-                        $location = match ($result['type']) {
+
+                        $location = match($result['type']) {
+
                             'trip' => $result['tripLocation'] ?? 'Undefined Location',
-                            'reservation' => $result['reservation']['tripLocation'] ?? 'Undefined Location',
-                            default => $result['trip']['tripLocation'] ?? 'Undefined Location',
+                            'reservation', 'booking', 'testimonial' => $result['trip']['tripLocation'] ?? 'Undefined Location',
+                            default => 'Undefined Location',
                         };
+
 
                     @endphp
 
