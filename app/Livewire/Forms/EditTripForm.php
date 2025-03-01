@@ -378,13 +378,13 @@ class EditTripForm extends Component
                     }
                 }
         
-                // if ($tripModel->tripAvailability !== $this->tripAvailability && strtolower($this->tripAvailability) === 'available') {
-                //     $reservations = Reservations::where('tripID', $this->trip->tripID)->get();
-                //     foreach ($reservations as $reservation) {
-                //         Notification::route('mail', $reservation->email)
-                //             ->notify(new TripAvailableNotification($this->trip, $reservation->reservationID, $reservation->customerName));
-                //     }
-                // }
+                if ($tripModel->tripAvailability !== $this->tripAvailability && strtolower($this->tripAvailability) === 'available') {
+                    $reservations = Reservations::where('tripID', $this->trip->tripID)->get();
+                    foreach ($reservations as $reservation) {
+                        Notification::route('mail', $reservation->email)
+                            ->notify(new TripAvailableNotification($this->trip, $reservation->reservationID, $reservation->customerName));
+                    }
+                }
         
                 // $accessToken = env('SQUARE_ACCESS_TOKEN');
                 // $client = new \Square\SquareClient([

@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\URL;
 
 class TripAvailableNotification extends Notification
 {
@@ -43,10 +44,17 @@ class TripAvailableNotification extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
+
+        // Signed URL valid for 1 day to prevent tampering 
+        $signedURL = URL::temporarySignedRoute('booking', now()->addDay(), [
+            'slug'=>$this->trip->slug,
+            'reservationID'=>$this->reservationID
+        ]);
+
         return (new MailMessage)
             ->greeting($this->timeOfDayGreeting() . ' ' . $this->customerName)
             ->line('The trip you reserved is now available to book!')
-            ->action('Click here to continue booking this trip', url('/booking/' . $this->trip->slug . '/' . $this->reservationID))
+            ->action('Click here to continue booking this trip', $signedURL)
             ->line('Thank you for using '.config('app.name'))
             ->cc(env('MAIL_CC_ADDRESS'));
     }
