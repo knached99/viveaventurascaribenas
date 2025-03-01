@@ -14,7 +14,8 @@
             : ($trip->tripAvailability === 'unavailable'
                 ? 'You cannot book this trip as it is currently unavailable.'
                 : ($trip->tripAvailability === 'coming soon'
-                    ? 'Once this trip becomes available, you will be notified to complete the booking.'
+                      ? 'This trip is available to reserve'
+                  //  ? 'Once this trip becomes available, you will be notified to complete the booking.'
                     : 'This trip is available for booking.'));
 
     // $tripPhotos = json_decode($trip->tripPhoto, true);
