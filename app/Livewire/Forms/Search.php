@@ -52,7 +52,7 @@ class Search extends Component
         
     
             $this->searchResults = array_merge($tripsResults, $testimonialsResults, $bookingResults, $reservationResults);
-            \Log::info('Search Results: '. $this->searchResults);
+            \Log::info('Search Results: '. json_encode($this->searchResults));
             if (empty($this->searchResults)) {
                 $this->suggestion = $this->findSimilarTerm($this->searchQuery);
             }
