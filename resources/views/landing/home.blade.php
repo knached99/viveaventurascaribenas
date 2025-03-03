@@ -114,7 +114,7 @@
                     you’ll cherish forever.</p>
                 <p><a href="{{ route('destinations') }}" class="btn btn-primary py-3 px-4">Book a Travel</a></p>
 
-                <div
+                <div class="m-5"
                     style="background-image:url({{ asset('assets/images/old_san_juan.png') }}); background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%; height: 800px; max-height: 800px;">
                 </div>
             </div>
@@ -272,7 +272,7 @@
 <!-- Testimonial Submission -->
 <div class="row justify-content-center pb-4">
     <div class="col-md-12 heading-section text-center">
-        <h2 class="mb-4">Share Your Travel Experience with Us!</h2>
+        <h2 class="m-5">Share Your Travel Experience with Us!</h2>
         <p class="text-secondary">Your feedback helps us improve and inspires other travelers. We'd love to
             hear
             about your journey!</p>
