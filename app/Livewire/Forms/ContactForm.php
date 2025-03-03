@@ -38,6 +38,7 @@ class ContactForm extends Component
         'name.required'=>'Your name is required',
         'email.required'=>'Your email is required',
         'email.email'=>'You\'ve entered an invalid email',
+        'subject.required'=>'Choose a subject',
         'message.required'=>'Please provide a reason for why you\'re reaching out to us',
         'message.max'=>'Your message is too long',
     ];
