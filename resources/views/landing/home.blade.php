@@ -210,6 +210,8 @@
                         </p>
                     </div>
                 </div>
+                <!-- This data is displayed after 5 bookings -->
+                @if($totalBookings >= 5 || $totalCustomers >= 5 || $totalTrips >= 5)
                 <div class="row">
                     <div class="col-md-4 justify-content-center counter-wrap ftco-animate">
                         <div class="block-18 text-center mb-4">
@@ -236,6 +238,8 @@
                         </div>
                     </div>
                 </div>
+                @endif 
+                <!-- -->
             </div>
         </div>
     </div>
