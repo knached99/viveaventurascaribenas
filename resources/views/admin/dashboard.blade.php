@@ -1,5 +1,23 @@
 @php
     $totalTransactions = count($bookings);
+    use Carbon\Carbon;
+
+    $greeting = '';
+
+    $hour = Carbon::now()->hour();
+
+    if($hour >=5 && $hour < 12){
+        $greeting = 'Good Morning';
+    }
+
+    elseif($hour >=12 && $hour < 18){
+        $greeting = 'Good Afternoon';
+    }
+    else{
+
+        $greeting = 'Good Evening';
+    }
+
 @endphp
 
 <x-authenticated-theme-layout>
@@ -9,7 +27,7 @@
                 <div class="d-flex align-items-start row">
                     <div class="col-sm-7">
                         <div class="card-body">
-                            <h5 class="card-title text-primary mb-3">Welcome back, {{ auth()->user()->name }} !</h5>
+                            <h5 class="card-title text-primary mb-3"> {{$greeting. ',' auth()->user()->name }} !</h5>
                             <p class="mb-6">
                                 Manage all administrative activities from this dashboard.
                             </p>
