@@ -281,6 +281,7 @@ class Analytics extends Controller
             'heatmapData' => $heatmapData,
             'most_visited_url' => $mostVisitedURL,
             'topReferrerURL' => $topReferrerURL,
+            'baseURL' => $baseURL,
             'total_visitors_count' => $totalVisitors,
             'totalBots' => $botData['totalBots'],
             'mostFrequentBot' => $botData['mostFrequentBot'],
@@ -293,7 +294,7 @@ class Analytics extends Controller
         // Store in cache for one week
         Cache::put('analytics_data', $analyticsData, now()->addWeek());
     
-        return view('admin.analytics', $analyticsData, $baseURL);
+        return view('admin.analytics', $analyticsData);
     }
     
    
