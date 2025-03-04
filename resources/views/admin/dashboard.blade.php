@@ -26,7 +26,7 @@
                 <div class="d-flex align-items-start row">
                     <div class="col-sm-7">
                         <div class="card-body">
-                            <h5 class="card-title text-primary mb-3">{{$greeting}}, {{auth()->user()->name }} !</h5>
+                            <h5 class="card-title text-primary mb-3">{{$greeting}}, {{auth()->user()->name }}!</h5>
                             <p class="mb-6">
                                 Manage all administrative activities from this dashboard.
                             </p>
