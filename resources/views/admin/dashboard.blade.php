@@ -1,10 +1,9 @@
 @php
     $totalTransactions = count($bookings);
-    use Carbon\Carbon;
-
+    
     $greeting = '';
 
-    $hour = Carbon::now()->hour();
+    $hour = (new \DateTime())->format('H');  // Get the current hour using PHP DateTime class
 
     if($hour >=5 && $hour < 12){
         $greeting = 'Good Morning';
