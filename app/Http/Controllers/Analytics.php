@@ -207,7 +207,12 @@ class Analytics extends Controller
             ->get();
         
         $topReferrerURLs = $visitorReferrers->pluck('visitor_referrer')->toArray();
-        $topReferrerURLs = array_map(fn($url) => is_string($url) && $url !== '' ? $url : 'unknown', $topReferrerURLs);
+        $baseURL = 'https://viveaventurascaribenas.net';
+
+        // strip the base URL from each referrer URL 
+        
+        $topReferrerURLs = array_map(fn($url) => is_string($url) && $url !== '' ? str_replace($baseURL, '', $url) : 'Unknown', $topReferrerURLs);
+
         $referrerURLCounts = array_count_values($topReferrerURLs);
         arsort($referrerURLCounts);
         $topReferrerURL = array_key_first($referrerURLCounts);
