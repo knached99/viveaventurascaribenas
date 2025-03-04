@@ -207,12 +207,7 @@ class Analytics extends Controller
             ->get();
         
         $topReferrerURLs = $visitorReferrers->pluck('visitor_referrer')->toArray();
-        $baseURL = 'https://viveaventurascaribenas.net';
-
-        // strip the base URL from each referrer URL 
-        
-        $topReferrerURLs = array_map(fn($url) => is_string($url) && $url !== '' ? str_replace($baseURL, '', $url) : 'Unknown', $topReferrerURLs);
-
+        $topReferrerURLs = array_map(fn($url) => is_string($url) && $url !== '' ? $url : 'unknown', $topReferrerURLs);
         $referrerURLCounts = array_count_values($topReferrerURLs);
         arsort($referrerURLCounts);
         $topReferrerURL = array_key_first($referrerURLCounts);
@@ -281,7 +276,6 @@ class Analytics extends Controller
             'heatmapData' => $heatmapData,
             'most_visited_url' => $mostVisitedURL,
             'topReferrerURL' => $topReferrerURL,
-            'baseURL' => $baseURL,
             'total_visitors_count' => $totalVisitors,
             'totalBots' => $botData['totalBots'],
             'mostFrequentBot' => $botData['mostFrequentBot'],
