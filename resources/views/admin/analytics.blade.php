@@ -25,7 +25,7 @@
         <h5 class="card-title">Top Referrer URL</h5>
         <p class="block">Shows which external websites or platforms drive the most visitors to your site</p>
         @if($topReferrerURL !== 'unknown')
-        <a href="{{$topReferrerURL}}" target="_blank" rel="noopener noreferrer">{{$topReferrerURL}}</a> 
+        <a href="{{$baseURL . $topReferrerURL}}" target="_blank" rel="noopener noreferrer">{{ $topReferrerURL }}</a>
         @else 
         <span class="text-secondary">{{$topReferrerURL}}</span>
         @endif

@@ -293,7 +293,7 @@ class Analytics extends Controller
         // Store in cache for one week
         Cache::put('analytics_data', $analyticsData, now()->addWeek());
     
-        return view('admin.analytics', $analyticsData);
+        return view('admin.analytics', $analyticsData, $baseURL);
     }
     
    
