@@ -57,7 +57,7 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                             <label for="tripLocation" class="form-label">Trip Location</label>
                             <input type="text" id="tripLocation" name="tripLocation"
                                 class="form-control {{ $errors->has('form.tripLocation') ? 'is-invalid' : '' }}"
-                                placeholder="(e.g.) San Juan, Costa Rica" wire:model="form.tripLocation" autofocus />
+                                placeholder="(e.g.) San Jose, Costa Rica" wire:model="form.tripLocation" autofocus />
                             <x-input-error :messages="$errors->get('form.tripLocation')" class="invalid-feedback" />
                         </div>
 
