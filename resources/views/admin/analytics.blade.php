@@ -24,11 +24,12 @@
         
         <h5 class="card-title">Top Referrer URL</h5>
         <p class="block">Shows which external websites or platforms drive the most visitors to your site</p>
-        @if($topReferrerURL !== 'unknown')
-        <button class="btn btn-outline-primary" onclick="redirectToURL({$topReferrerURL})">{{$topReferrerURL}}</button>
-        {{-- <a href="{{$topReferrerURL}}" target="_blank" rel="noopener noreferrer">{{$topReferrerURL}}</a>  --}}
+       @if($topReferrerURL !== 'unknown')
+        <button class="btn btn-outline-primary" onclick="redirectToURL('{{ $topReferrerURL }}')">
+            {{ $topReferrerURL }}
+        </button>
         @else 
-        <span class="text-secondary">{{$topReferrerURL}}</span>
+        <span class="text-secondary">{{ $topReferrerURL }}</span>
         @endif
         </div>
         </div>
@@ -123,76 +124,84 @@
 
 
     </div>
-    @once
-    @push('scripts')
-    <script>
-/**
- * Checks if the given URL is considered safe by querying urlscan.io for prior scans.
- *
- * @param {string} url - The URL to check.
- * @returns {Promise<boolean>} - Returns true if safe, false otherwise.
- */
-async function checkUrlSafety(url) {
-  // Validate URL syntax and protocol.
-  try {
-    const parsedUrl = new URL(url);
-    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-      console.error('Invalid protocol. Only HTTP and HTTPS are allowed.');
+   @once
+@push('scripts')
+<script>
+  /**
+   * Checks if the given URL is considered safe by querying urlscan.io for prior scans.
+   *
+   * @param {string} url - The URL to check.
+   * @returns {Promise<boolean>} - Returns true if safe, false otherwise.
+   */
+  async function checkUrlSafety(url) {
+    // Validate URL syntax and protocol.
+    try {
+      const parsedUrl = new URL(url);
+      if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+        console.error('Invalid protocol. Only HTTP and HTTPS are allowed.');
+        return false;
+      }
+    } catch (error) {
+      console.error('Invalid URL format:', error);
       return false;
     }
-  } catch (error) {
-    console.error('Invalid URL format:', error);
-    return false;
-  }
-
-  // Query urlscan.io's search API for previous scan results.
-  try {
-    const apiEndpoint = `https://urlscan.io/api/v1/search/?q=url:${encodeURIComponent(url)}`;
-    const response = await fetch(apiEndpoint);
-    if (!response.ok) {
-      console.error('Failed to fetch scan results from urlscan.io.');
-      return false;
-    }
-    const data = await response.json();
-
-    // Check each scan result for malicious or suspicious verdicts.
-    if (data.results && data.results.length > 0) {
-      for (const result of data.results) {
-        if (result.verdicts) {
-          if (result.verdicts.malicious || result.verdicts.suspicious) {
-            console.error('URL flagged as unsafe by urlscan.io.');
-            return false;
+  
+    // Query urlscan.io's search API for previous scan results.
+    try {
+      const apiEndpoint = `https://urlscan.io/api/v1/search/?q=url:${encodeURIComponent(url)}`;
+      const response = await fetch(apiEndpoint);
+      if (!response.ok) {
+        console.error('Failed to fetch scan results from urlscan.io.');
+        return false;
+      }
+      const data = await response.json();
+  
+      // Check each scan result for malicious or suspicious verdicts.
+      if (data.results && data.results.length > 0) {
+        for (const result of data.results) {
+          if (result.verdicts) {
+            if (result.verdicts.malicious || result.verdicts.suspicious) {
+              console.error('URL flagged as unsafe by urlscan.io.');
+              return false;
+            }
           }
         }
       }
+      // If no concerning verdict is found, consider the URL safe.
+      return true;
+    } catch (error) {
+      console.error('Error while checking URL safety:', error);
+      return false;
     }
-    // If no concerning verdict is found, consider the URL safe.
-    return true;
-  } catch (error) {
-    console.error('Error while checking URL safety:', error);
-    return false;
   }
-}
-
-
-    async function redirectToURL(url){
-        const isSafe = await checkUrlSafety(url);
-        if(!isSafe){
-            alert('The URL provided is not safe to visit.');
-            return;
-
-            const anchor = document.createElement('a');
-            anchor.href = url;
-            anchor.target = '_blank';
-            anchor.rel = 'noopener noreferrer';
-
-            document.body.appendChild(anchor);
-            anchor.click();
-
-            document.body.removeChild(anchor);
-        }
+  
+  /**
+   * Redirects the user to the specified URL in a new tab after verifying its safety.
+   *
+   * @param {string} url - The URL to redirect to.
+   */
+  async function redirectToURL(url) {
+    const isSafe = await checkUrlSafety(url);
+    if (!isSafe) {
+      alert('The URL provided is not safe to visit.');
+      return;
     }
-    </script>
-    @endpush 
-    @endonce 
+  
+    // Create an anchor element with target="_blank" and secure rel attributes.
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+  
+    // Append the anchor, simulate a click, then remove it.
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  }
+  
+  // Expose the function to the global scope
+  window.redirectToURL = redirectToURL;
+</script>
+@endpush 
+@endonce
 </x-authenticated-theme-layout>
