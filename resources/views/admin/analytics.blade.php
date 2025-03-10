@@ -128,77 +128,65 @@
 @once
     @push('scripts')
     <script>
-      /**
-       * Checks if the given URL is considered safe by querying urlscan.io for prior scans.
-       *
-       * @param {string} url - The URL to check.
-       * @returns {Promise<boolean>} - Returns true if safe, false otherwise.
-       */
-      async function checkUrlSafety(url) {
+    document.addEventListener("DOMContentLoaded", function () {
+    async function checkUrlSafety(url) {
         try {
-          const parsedUrl = new URL(url);
-          if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-            console.error('Invalid protocol. Only HTTP and HTTPS are allowed.');
-            return false;
-          }
-        } catch (error) {
-          console.error('Invalid URL format:', error);
-          return false;
-        }
-      
-        try {
-          const apiEndpoint = `https://urlscan.io/api/v1/search/?q=url:${encodeURIComponent(url)}`;
-          const response = await fetch(apiEndpoint);
-          if (!response.ok) {
-            console.error('Failed to fetch scan results from urlscan.io.');
-            return false;
-          }
-          const data = await response.json();
-      
-          if (data.results && data.results.length > 0) {
-            for (const result of data.results) {
-              if (result.verdicts) {
-                if (result.verdicts.malicious || result.verdicts.suspicious) {
-                  console.error('URL flagged as unsafe by urlscan.io.');
-                  return false;
-                }
-              }
+            const parsedUrl = new URL(url);
+            if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+                console.error('Invalid protocol. Only HTTP and HTTPS are allowed.');
+                return false;
             }
-          }
-          return true;
         } catch (error) {
-          console.error('Error while checking URL safety:', error);
-          return false;
+            console.error('Invalid URL format:', error);
+            return false;
         }
-      }
-      
-      /**
-       * Redirects the user to the specified URL in a new tab after verifying its safety.
-       *
-       * @param {string} url - The URL to redirect to.
-       */
-      async function redirectToURL(url) {
+
+        try {
+            const apiEndpoint = `https://urlscan.io/api/v1/search/?q=url:${encodeURIComponent(url)}`;
+            const response = await fetch(apiEndpoint);
+            if (!response.ok) {
+                console.error('Failed to fetch scan results from urlscan.io.');
+                return false;
+            }
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                for (const result of data.results) {
+                    if (result.verdicts) {
+                        if (result.verdicts.malicious || result.verdicts.suspicious) {
+                            console.error('URL flagged as unsafe by urlscan.io.');
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        } catch (error) {
+            console.error('Error while checking URL safety:', error);
+            return false;
+        }
+    }
+
+    async function redirectToURL(url) {
         const isSafe = await checkUrlSafety(url);
         if (!isSafe) {
-          alert('The URL provided is not safe to visit.');
-          return;
+            alert('The URL provided is not safe to visit.');
+            return;
         }
-      
-        // Create an anchor element with target="_blank" and secure rel attributes.
+
         const anchor = document.createElement('a');
         anchor.href = url;
         anchor.target = '_blank';
         anchor.rel = 'noopener noreferrer';
-      
-        // Append the anchor, simulate a click, then remove it.
+
         document.body.appendChild(anchor);
         anchor.click();
         document.body.removeChild(anchor);
-      }
-      
-      // Expose the function to the global scope so that inline onclick can find it.
-      window.redirectToURL = redirectToURL;
+    }
+
+    window.redirectToURL = redirectToURL; // Make function globally accessible
+});
+
     </script>
-    @endpush 
-    @endonce 
+    @endpush
 </x-authenticated-theme-layout>
