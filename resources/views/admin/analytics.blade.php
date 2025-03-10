@@ -118,50 +118,9 @@
     <!-- Script Section -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            async function checkUrlSafety(url) {
-                // Validate URL syntax and allowed protocols
-                try {
-                    const parsedUrl = new URL(url);
-                    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-                        console.error('Invalid protocol. Only HTTP and HTTPS are allowed.');
-                        return false;
-                    }
-                } catch (error) {
-                    console.error('Invalid URL format:', error);
-                    return false;
-                }
-                
-                // Query urlscan.io's API to check URL safety
-                try {
-                    const apiEndpoint = `https://urlscan.io/api/v1/search/?q=url:${encodeURIComponent(url)}`;
-                    const response = await fetch(apiEndpoint);
-                    if (!response.ok) {
-                        console.error('Failed to fetch scan results from urlscan.io.');
-                        return false;
-                    }
-                    const data = await response.json();
-                    if (data.results && data.results.length > 0) {
-                        for (const result of data.results) {
-                            if (result.verdicts && (result.verdicts.malicious || result.verdicts.suspicious)) {
-                                console.error('URL flagged as unsafe by urlscan.io.');
-                                return false;
-                            }
-                        }
-                    }
-                    return true;
-                } catch (error) {
-                    console.error('Error while checking URL safety:', error);
-                    return false;
-                }
-            }
-
-            async function redirectToURL(url) {
-                const isSafe = await checkUrlSafety(url);
-                if (!isSafe) {
-                    alert('The URL provided is not safe to visit.');
-                    return;
-                }
-                
+ 
+             function redirectToURL(url) {
+        
                 // Determine if the URL is external
                 const currentDomain = "viveaventurascaribenas.net";
                 let target = '_self';
