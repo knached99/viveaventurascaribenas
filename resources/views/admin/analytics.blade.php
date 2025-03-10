@@ -116,33 +116,19 @@
     </div>
 
     <!-- Script Section -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
- 
-             function redirectToURL(url) {
-        
-                // Determine if the URL is external
-                const currentDomain = "viveaventurascaribenas.net";
-                let target = '_self';
-                try {
-                    const parsedUrl = new URL(url);
-                    if (parsedUrl.hostname !== currentDomain) {
-                        target = '_blank';
-                    }
-                } catch (error) {
-                    console.error('Error parsing URL:', error);
-                }
-                
-                // For external URLs, open in a new tab with proper security attributes
-                if (target === '_blank') {
-                    window.open(url, '_blank', 'noopener,noreferrer');
-                } else {
-                    window.location.replace(url);
-                }
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function redirectToURL(url) {
+            // If the URL doesn't start with "http://" or "https://", add "https://"
+            if (!/^https?:\/\//i.test(url)) {
+                url = "https://" + url;
             }
+            // Open the URL in a new tab with proper security attributes
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+        // Expose the function globally so the inline onclick can access it.
+        window.redirectToURL = redirectToURL;
+    });
+</script>
 
-            // Expose the function globally so the inline onclick can access it.
-            window.redirectToURL = redirectToURL;
-        });
-    </script>
 </x-authenticated-theme-layout>
