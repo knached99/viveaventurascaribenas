@@ -102,6 +102,15 @@ class Home extends Controller
     }
 
 
+    public function termsAndConditions(){
+        return view('terms');
+    }
+
+    public function userPrivacy(){
+        return view('privacy');
+    }
+
+
     public function reservationConfirmed($reservationID){
         try{
         $reservation = Reservations::findOrFail($reservationID);
