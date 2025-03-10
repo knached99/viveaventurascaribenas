@@ -122,5 +122,4 @@
           }
         });
     </script>
-    @endpush
 </x-authenticated-theme-layout>
