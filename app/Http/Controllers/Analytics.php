@@ -370,8 +370,7 @@ class Analytics extends Controller
                 break;
             }
         }
-    
-        \Log::info('User agent detected: '.$userAgent);
+
         return [
             'browser' => $browser,
             'os' => $os
