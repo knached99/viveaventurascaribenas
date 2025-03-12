@@ -299,22 +299,33 @@ class Analytics extends Controller
      * @param string $userAgent
      * @return array
      */
-
-     // Refactored code for readibility. Also time complexity is O(1) because we're using a hashmap 
     protected function parseUserAgent($userAgent)
     {
         $browser = 'Unknown';
         $os = 'Unknown';
     
-        // Browser detection using a hash map (associative array)
+        // Extended browser detection using a hash map.
+        // Order matters: some substrings (e.g., "Chrome") are present in other UA strings.
         $browserMap = [
-            'MSIE' => 'Internet Explorer',
-            'Trident' => 'Internet Explorer',
-            'Firefox' => 'Firefox',
-            'Chrome' => 'Chrome',
-            'Safari' => 'Safari',
-            'Opera' => 'Opera',
-            'OPR' => 'Opera'
+            'OPR'              => 'Opera',                // Opera (Blink-based)
+            'Opera'            => 'Opera',                // Older Opera versions
+            'Edg'              => 'Edge',                 // Microsoft Edge (Chromium-based) often shows as "Edg"
+            'Edge'             => 'Edge',                 // Legacy Microsoft Edge
+            'MSIE'             => 'Internet Explorer',
+            'Trident'          => 'Internet Explorer',    // IE 11
+            'Chrome'           => 'Chrome',
+            'Chromium'         => 'Chromium',
+            'Firefox'          => 'Firefox',
+            'Safari'           => 'Safari',               // Must come after Chrome/Chromium because Chrome UA contains "Safari"
+            'SamsungBrowser'   => 'Samsung Internet',
+            'UCBrowser'        => 'UC Browser',
+            'QQBrowser'        => 'QQ Browser',
+            'Baidu'            => 'Baidu Browser',
+            'Vivaldi'          => 'Vivaldi',
+            'Maxthon'          => 'Maxthon',
+            'Iceweasel'        => 'Firefox (Iceweasel)',
+            'IceCat'           => 'Firefox (IceCat)',
+            // Add additional browser tokens as needed…
         ];
     
         foreach ($browserMap as $key => $name) {
@@ -324,16 +335,33 @@ class Analytics extends Controller
             }
         }
     
-        // OS detection using a hash map
+        // Extended OS detection using a hash map.
         $osMap = [
-            'Windows NT 11.0' => 'Windows 11',
-            'Windows NT 10.0' => 'Windows 10',
-            'Windows NT 6.3' => 'Windows 8.1',
-            'Windows NT 6.2' => 'Windows 8',
-            'Windows NT 6.1' => 'Windows 7',
-            'Mac OS X' => 'Mac OS X',
-            'Android' => 'Android',
-            'iPhone' => 'iOS'
+            'Windows NT 11.0'  => 'Windows 11',
+            'Windows NT 10.0'  => 'Windows 10',
+            'Windows NT 6.3'   => 'Windows 8.1',
+            'Windows NT 6.2'   => 'Windows 8',
+            'Windows NT 6.1'   => 'Windows 7',
+            'Windows NT 6.0'   => 'Windows Vista',
+            'Windows NT 5.1'   => 'Windows XP',
+            'Windows XP'       => 'Windows XP',
+            'Mac OS X'         => 'Mac OS X',
+            'Android'          => 'Android',
+            'iPhone'           => 'iOS',
+            'iPad'             => 'iOS',
+            'iPod'             => 'iOS',
+            'Linux'            => 'Linux',
+            'CrOS'             => 'Chrome OS',
+            'BlackBerry'       => 'BlackBerry OS',
+            'BB10'             => 'BlackBerry OS',
+            'Tizen'            => 'Tizen',
+            'WebOS'            => 'WebOS',
+            'FreeBSD'          => 'FreeBSD',
+            'OpenBSD'          => 'OpenBSD',
+            // Examples of smart TV or gaming consoles (UA strings vary widely)
+            'Nintendo'         => 'Nintendo',
+            'PlayStation'      => 'PlayStation',
+            // Add additional OS tokens as needed…
         ];
     
         foreach ($osMap as $key => $name) {
@@ -348,7 +376,7 @@ class Analytics extends Controller
             'os' => $os
         ];
     }
-
+    
 
     // Determines if user agents are bots and returns number of bots found 
 
