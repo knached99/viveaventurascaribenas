@@ -206,7 +206,7 @@
                     </div>
 
                     <!-- Landscape -->
-                    {{-- <div class="mb-4">
+                    <div class="mb-4">
                         <label for="tripLandscape" class="form-label">Trip Landscape</label>
                         <select id="tripLandscape" wire:model="tripLandscape" multiple
                             class="form-select {{ $errors->has('tripLandscape') ? 'is-invalid' : '' }}">
@@ -223,49 +223,7 @@
                                 {{ in_array('Mountainous', $tripLandscape) ? 'selected' : '' }}>Mountainous</option>
                         </select>
                         <x-input-error :messages="$errors->get('tripLandscape')" class="invalid-feedback" />
-                    </div> --}}
-
-
-                <div x-data="dropdown(@json($tripLandscape ?? []))" class="relative w-72">
-                <label for="tripLandscape" class="block font-semibold mb-2">Trip Landscape</label>
-
-                <!-- Selected Items Display -->
-                <div class="border p-2 rounded cursor-pointer" @click="open = !open">
-                    <template x-if="selectedLandscapes.length">
-                        <div class="flex flex-wrap gap-2">
-                            <template x-for="landscape in selectedLandscapes" :key="landscape.value">
-                                <div class="flex items-center bg-gray-200 p-1 rounded">
-                                    <img :src="landscape.image" class="w-6 h-6 mr-2 rounded-full" />
-                                    <span x-text="landscape.name"></span>
-                                    <button class="ml-2 text-red-500" @click.stop="remove(landscape.value)">✕</button>
-                                </div>
-                            </template>
-                        </div>
-                    </template>
-                    <template x-if="!selectedLandscapes.length">
-                        <span class="text-gray-500">Select Landscape</span>
-                    </template>
-                </div>
-
-                <!-- Dropdown List -->
-                <div x-show="open" @click.away="open = false" class="absolute w-full mt-2 bg-white border rounded shadow-lg z-10">
-                    <template x-for="landscape in landscapes" :key="landscape.value">
-                        <div 
-                            class="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
-                            @click="toggle(landscape)"
-                        >
-                            <img :src="landscape.image" class="w-8 h-8 mr-3 rounded-full" />
-                            <span x-text="landscape.name"></span>
-                            <span x-show="selected.includes(landscape.value)" class="ml-auto text-green-500 font-bold">✔</span>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- Hidden Input for Form Submission -->
-                <input type="hidden" name="tripLandscape" :value="JSON.stringify(selected)" />
-            </div>
-
-
+                    </div>
 
                     <!-- Availability -->
                     <div class="mb-3">
@@ -528,41 +486,4 @@
 
         promoCodeDisplay.textContent = 'Promo Code: ' + result;
     }
-</script>
-
-
-<script>
-function dropdown(preselectedLandscapes) {
-    return {
-        open: false,
-        selected: preselectedLandscapes, 
-        landscapes: [
-            { value: 'Beach', name: 'Beach', image: 'https://viveaventurascaribenas.net/assets/images/beach.png' },
-            { value: 'City', name: 'City', image: 'https://viveaventurascaribenas.net/assets/images/buildings.png' },
-            { value: 'Country Side', name: 'Country Side', image: 'https://viveaventurascaribenas.net/assets/images/farm.png' },
-            { value: 'Forested', name: 'Forested', image: 'https://viveaventurascaribenas.net/assets/images/forest.png' },
-            { value: 'Mountainous', name: 'Mountainous', image: 'https://viveaventurascaribenas.net/assets/images/mountain.png' },
-        ],
-        selectedLandscapes: [],
-
-        init() {
-            // Load preselected landscapes into the display array
-            this.selectedLandscapes = this.landscapes.filter(landscape => this.selected.includes(landscape.value));
-        },
-
-        toggle(landscape) {
-            if (this.selected.includes(landscape.value)) {
-                this.remove(landscape.value);
-            } else {
-                this.selected.push(landscape.value);
-                this.selectedLandscapes.push(landscape);
-            }
-        },
-
-        remove(value) {
-            this.selected = this.selected.filter(item => item !== value);
-            this.selectedLandscapes = this.selectedLandscapes.filter(item => item.value !== value);
-        }
-    };
-}
 </script>
