@@ -53,8 +53,18 @@ class GetFileInfo extends Command
         if (in_array(File::mimeType($filePath), ['image/jpeg', 'image/png'])) {
             $this->line("\nEXIF Data:");
             
-            $absolutePath = Storage::disk('local')->path($filePath);
-            $exif = @exif_read_data($absolutePath, false);
+            $absolutePath = Storage::disk('public')->exists($filePath)
+            ? Storage::disk('public')->path($filePath)
+            : (Storage::disk('local')->exists($filePath)
+                ? Storage::disk('local')->path($filePath)
+                : null);
+        
+        if (!$absolutePath) {
+            $this->error("File not found in storage.");
+            return;
+        }
+        
+        $exif = @exif_read_data($absolutePath, false);
         
             if ($exif) {
                 $this->line("FileName: " . basename($filePath));
