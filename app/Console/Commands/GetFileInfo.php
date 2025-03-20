@@ -29,71 +29,69 @@ class GetFileInfo extends Command
     public function handle()
     {
         $filePath = $this->argument('filePath');
-
-        if(!File::exists($filePath)){
+    
+        // Normalize the file path to remove "./" if present
+        $filePath = ltrim($filePath, './');
+    
+        // Check if file exists in 'local' or 'public' storage disks
+        if (Storage::disk('public')->exists($filePath)) {
+            $absolutePath = Storage::disk('public')->path($filePath);
+        } elseif (Storage::disk('local')->exists($filePath)) {
+            $absolutePath = Storage::disk('local')->path($filePath);
+        } elseif (file_exists($filePath)) { // For absolute paths
+            $absolutePath = realpath($filePath);
+        } else {
             $this->error("File not found: {$filePath}");
             return;
         }
-
-        $fileInfo =  [
-            'File Type'=> File::mimeType($filePath),
-            'File Size'=> $this->formatFileSize(File::size($filePath)),
-            'Uploaded On' => date('F jS, Y \a\t g:i a', strtotime('@' . File::lastModified($filePath))),
-            'Stored In'=>Storage::disk('local')->path($filePath),
+    
+        $fileInfo = [
+            'File Type' => File::mimeType($absolutePath),
+            'File Size' => $this->formatFileSize(File::size($absolutePath)),
+            'Uploaded On' => date('F jS, Y \a\t g:i a', strtotime('@' . File::lastModified($absolutePath))),
+            'Stored In' => $absolutePath,
         ];
-
+    
         $this->info("File info for: {$filePath}");
-
-        foreach($fileInfo as $key => $value){
+    
+        foreach ($fileInfo as $key => $value) {
             $this->line("{$key}: {$value}");
         }
-
-        // Here, we'll extract the exif data if the file is an image 
-        
-        if (in_array(File::mimeType($filePath), ['image/jpeg', 'image/png'])) {
+    
+        // Extract EXIF data if it's an image
+        if (in_array(File::mimeType($absolutePath), ['image/jpeg', 'image/png'])) {
             $this->line("\nEXIF Data:");
             
-            $absolutePath = Storage::disk('public')->exists($filePath)
-            ? Storage::disk('public')->path($filePath)
-            : (Storage::disk('local')->exists($filePath)
-                ? Storage::disk('local')->path($filePath)
-                : null);
-        
-        if (!$absolutePath) {
-            $this->error("File not found in storage.");
-            return;
-        }
-        
-        $exif = @exif_read_data($absolutePath, false);
-        
+            $exif = @exif_read_data($absolutePath, false);
+    
             if ($exif) {
-                $this->line("FileName: " . basename($filePath));
+                $this->line("FileName: " . basename($absolutePath));
                 $make = $exif['Make'] ?? 'N/A';
                 $model = $exif['Model'] ?? 'N/A';
                 $this->line("Make: {$make}");
                 $this->line("Model: {$model}");
-        
+    
                 $exposureTime = $exif['ExposureTime'] ?? 'N/A';
-                $fNumber = isset($exif['FNumber']) 
-                    ? 'f/' . (number_format($exif['FNumber'], 1))
+                $fNumber = isset($exif['FNumber'])
+                    ? 'f/' . number_format($exif['FNumber'], 1)
                     : 'N/A';
                 $iso = $exif['ISOSpeedRatings'] ?? 'N/A';
-                $flash = (isset($exif['Flash']) && $exif['Flash'] == 0) ? 'Off' : 'On';
+                $flash = isset($exif['Flash']) && $exif['Flash'] == 0 ? 'Off' : 'On';
                 $focalLength = isset($exif['FocalLength'])
                     ? (is_array($exif['FocalLength'])
                         ? round($exif['FocalLength'][0] / $exif['FocalLength'][1], 1)
                         : $exif['FocalLength']) . 'mm'
                     : 'N/A';
-        
+    
                 $this->line("ExposureTime: {$exposureTime}");
                 $this->line("FNumber: {$fNumber}");
                 $this->line("ISO: {$iso}");
                 $this->line("Flash: {$flash}");
                 $this->line("FocalLength: {$focalLength}");
-        
+    
                 $dateTime = $exif['DateTimeOriginal'] ?? 'N/A';
                 $this->line("DateTime: {$dateTime}");
-        
+    
                 if (isset($exif['GPSLatitude']) && isset($exif['GPSLongitude'])) {
                     $lat = $this->getGPSCoordinate(
                         $exif['GPSLatitude'],
@@ -103,32 +101,31 @@ class GetFileInfo extends Command
                         $exif['GPSLongitude'],
                         $exif['GPSLongitudeRef']
                     );
-        
+    
                     $this->line("GPSLatitude: " . ($lat ?? 'N/A'));
                     $this->line("GPSLongitude: " . ($lon ?? 'N/A'));
                 } else {
                     $this->line("GPSLatitude: N/A");
                     $this->line("GPSLongitude: N/A");
                 }
-        
+    
                 $whiteBalance = $exif['WhiteBalance'] ?? 'N/A';
                 $whiteBalanceText = $whiteBalance == 1 ? 'Auto' : 'Manual';
                 $this->line("WhiteBalance: {$whiteBalanceText}");
-        
+    
                 $comment = $exif['COMMENT'] ?? 'N/A';
                 if (is_array($comment)) {
                     $comment = implode(' ', $comment);
                 }
                 $this->line("COMMENT: {$comment}");
             } else {
-                $this->error("No EXIF data found or EXIF is not supported for this file.");
+                $this->error("No EXIF data found or EXIF data is not supported.");
             }
         } else {
-            $this->error("File type is not supported for EXIF data.");
+            $this->error("File is not an image or not supported for EXIF data.");
         }
-        
     }
-
+    
     /**
  * This function converts GPS coordinates from EXIF format to decimal degrees.
  *
