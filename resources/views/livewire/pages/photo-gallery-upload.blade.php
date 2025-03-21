@@ -65,44 +65,15 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
                                 <span class="text-slate-600"><a href="{{ route('admin.create-trip') }}">Create a
                                         trip</a> to associate this upload</span>
                             @else
-                            <div x-data="dropdown()" class="relative w-72">
                                 <label for="tripID" class="form-label">Associate photos with a trip</label>
 
-                                <!-- Selected Trip -->
-                                 <div class="border p-2 rounded cursor-pointer flex items-center" @click="open = !open">
-                                 <template x-if="selectedTrip">
-                                 <div class="flex items-center">
-                                 <img :src="selectedTrip.image" class="w-8 h-8 mr-3 rounded-full" />
-                                 <span x-text="selectedTrip.name"></span>
-                                 </div>
-                                 </template>
-                                 <template x-if="!selectedTrip">
-                                 <span class="text-gray-500">Select a Trip</span>
-                                 </template>
-                                 </div>
-                                <!-- / Selected Trip --> 
-                                
-                                <!-- Dropdown List -->
-                                <div x-show="open" @click.away="open = false" class="absolute w-full mt-2 bg-white border rounded shadow-lg z-10">
-                                    @foreach ($trips as $trip)
-                                        <div class="flex items-center p-2 hover:bg-gray-100 cursor-pointer"
-                                            @click="selectTrip({ id: '{{ $trip['tripID'] }}', name: '{{ $trip['tripLocation'] }}', image: '{{ $trip['tripImage'] }}' })">
-                                            <img src="{{ $trip['tripImage'] }}" class="w-8 h-8 mr-3 rounded-full" />
-                                            <span>{{ $trip['tripLocation'] }}</span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                                <!-- / Dropdown List -->
-                                <input type="hidden" name="tripID" x-model="selectedTripID"/>
-                                
-                                {{-- <select class="form-control p-2 {{ $errors->has('form.tripID') ? 'is-invalid' : '' }}"
+                                <select class="form-control p-2 {{ $errors->has('form.tripID') ? 'is-invalid' : '' }}"
                                     name="tripID" wire:model="form.tripID">
                                     <option value="" disabled selected>Select a Trip</option>
                                     @foreach ($trips as $trip)
                                         <option value="{{ $trip['tripID'] }}">{{ $trip['tripLocation'] }}</option>
                                     @endforeach
-                                </select> --}}
-                                </div>
+                                </select>
                                 <x-input-error :messages="$errors->get('form.tripID')" class="invalid-feedback" />
                             @endif
                         </div>
@@ -138,18 +109,3 @@ new #[Layout('layouts.authenticated-theme')] class extends Component {
     </div>
 
 </div>
-
-<script>
-function dropdown(){
-    return {
-        open: false,
-        selectedTrip: null,
-        selectedTripID: '',
-        selectTrip(trip){
-            this.selectedTrip = trip;
-            this.selectedTripID = trip.id;
-            this.open = false;
-        }
-    }
-}
-</script>
