@@ -149,10 +149,10 @@
                             <div class="mb-3">
                                 <label class="form-label">You can upload up to 6 images</label>
                                 <input type="file" wire:model="tripPhotos"
-                                    class="form-control  {{ $errors->has('tripPhotos.*') ? 'is-invalid' : '' }}"
+                                    class="form-control  {{ $errors->has('tripPhotos') ? 'is-invalid' : '' }}"
                                     multiple />
                                 {{-- <x-input-error :messages="$errors->get('tripPhotos.*')" class="invalid-feedback" /> --}}
-                                <x-input-error :messages="$errors->get('tripPhotos.*')" class="invalid-feedback" />
+                                <x-input-error :messages="$errors->get('tripPhotos')" class="invalid-feedback" />
                             </div>
                         @endif
 

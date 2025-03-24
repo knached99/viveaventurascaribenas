@@ -361,7 +361,7 @@ class EditTripForm extends Component
         
             if (empty($this->trip->tripPhoto)) {
                 $rules['tripPhotos'] = 'array|max:6';
-                $rules['tripPhotos.*'] = 'image|mimes:jpeg,png,jpg|max:2048';
+                $rules['tripPhotos'] = 'image|mimes:jpeg,png,jpg|max:2048';
             }
         
             $this->validate($rules);
