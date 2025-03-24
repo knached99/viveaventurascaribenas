@@ -336,11 +336,8 @@ class EditTripForm extends Component
         }
 
 
- 
-       
-        public function editTrip(): void
-        {
-            // Validate input data
+        public function rules(){
+        // Validate input data
             $rules = [
                 'tripLocation' => 'required|string|max:255',
                 'tripLandscape' => 'required|array',
@@ -360,11 +357,29 @@ class EditTripForm extends Component
             }
         
             if (empty($this->trip->tripPhoto)) {
-                $rules['tripPhotos'] = 'array|max:6';
-                $rules['tripPhotos'] = 'image|mimes:jpeg,png,jpg|max:2048';
+                $rules['tripPhotos.*'] = 'array|max:6';
+                $rules['tripPhotos.*'] = 'image|mimes:jpeg,png,jpg|max:2048';
             }
+        }
         
-            $this->validate($rules);
+        protected $messages = [
+            'tripLocation.required' => 'Trip location is required',
+            'tripLocation.max'=> 'Trip location name cannot exceed 255 characters',
+            'tripLandscape.required'=>'Trip landscape(s) are required',
+            'tripAvailability.required'=>'Trip availability is required',
+            'tripDescription.required'=>'Trip description is required',
+            'tripActivities.required'=>'Trip activities are required',
+            'num_trips.required'=>'Please enter a number for the number of slots you want to make available for this trip',
+
+        ];
+       
+        public function editTrip(): void
+        {
+            
+
+            
+        
+            $this->validate();
         
             try {
                 $tripModel = TripsModel::findOrFail($this->trip->tripID);
