@@ -152,7 +152,7 @@
                                     class="form-control  {{ $errors->has('tripPhotos.*') ? 'is-invalid' : '' }}"
                                     multiple />
                                 {{-- <x-input-error :messages="$errors->get('tripPhotos.*')" class="invalid-feedback" /> --}}
-                                <x-input-error :messages="$errors->get('tripPhotos')" class="invalid-feedback" />
+                                <x-input-error :messages="$errors->get('tripPhotos.*')" class="invalid-feedback" />
                             </div>
                         @endif
 
