@@ -5,9 +5,7 @@
              style="visibility: hidden;">
              <div class="text-body">
                  ©
-                 <script>
-                     document.write(new Date().getFullYear());
-                 </script>
+                  2025
                  , made with ❤️ by
                  <a href="https://themeselection.com" target="_blank" class="footer-link">ThemeSelection</a>
              </div>
