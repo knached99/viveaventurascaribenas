@@ -49,14 +49,14 @@
  <!-- Core JS -->
  <!-- build:js assets/vendor/js/core.js -->
 
- <script defer src="{{ asset('assets/theme_assets/assets/vendor/libs/jquery/jquery.js') }}"></script>
- <script defer src="{{ asset('assets/theme_assets/assets/vendor/libs/popper/popper.js') }}"></script>
+ <script src="{{ asset('assets/theme_assets/assets/vendor/libs/jquery/jquery.js') }}"></script>
+ <script src="{{ asset('assets/theme_assets/assets/vendor/libs/popper/popper.js') }}"></script>
  {{-- <script src="{{asset('assets/theme_assets/assets/vendor/js/bootstrap.js')}}"></script> --}}
- <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
  </script>
- <script defer src="{{ asset('assets/theme_assets/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
- <script defer src="{{ asset('assets/theme_assets/assets/vendor/js/menu.js') }}"></script>
+ <script src="{{ asset('assets/theme_assets/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
+ <script src="{{ asset('assets/theme_assets/assets/vendor/js/menu.js') }}"></script>
  {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script> --}}
   <!-- Main JS -->
  <script src="{{ asset('assets/theme_assets/assets/js/main.js') }}"></script>
@@ -65,16 +65,16 @@
  {{-- <script src="{{asset('assets/theme_assets/assets/js/dashboards-analytics.js')}}"></script> --}}
  <!-- Place this tag before closing body tag for github widget button. -->
  <script async defer src="https://buttons.github.io/buttons.js"></script>
- <script defer src="https://cdn.datatables.net/2.1.5/js/dataTables.js"></script>
- <script defer src="https://cdn.datatables.net/2.1.5/js/dataTables.bootstrap5.js"></script>
- <script defer src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+ <script src="https://cdn.datatables.net/2.1.5/js/dataTables.js"></script>
+ <script src="https://cdn.datatables.net/2.1.5/js/dataTables.bootstrap5.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
  
-<script defer src=" https://cdn.datatables.net/buttons/3.2.0/js/dataTables.buttons.js"></script>
-<script defer src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.dataTables.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-<script defer src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.html5.min.js"></script>
+<script src=" https://cdn.datatables.net/buttons/3.2.0/js/dataTables.buttons.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.dataTables.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.2.0/js/buttons.html5.min.js"></script>
  <script>
      // Initialize DataTable with loading animation
      $(document).ready(function() {
