@@ -80,7 +80,7 @@
     <script src="{{ asset('assets/theme_assets/assets/js/config.js') }}"></script>
 
 
-    <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
+    {{-- <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script> --}}
 
     <!-- Loading ChartJS Open Source Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
