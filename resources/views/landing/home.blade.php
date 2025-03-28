@@ -115,7 +115,7 @@
                 <p><a href="{{ route('destinations') }}" class="btn btn-primary py-3 px-4">Book a Travel</a></p>
 
                 <div class="m-5"
-                    style="background-image:url({{ asset('assets/images/old_san_juan.png') }}); background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%; height: 800px; max-height: 800px;">
+                    style="background-image:url({{ asset('assets/images/cancun_mexico_1.jpg') }}); background-size: contain; background-repeat: no-repeat; background-position: center; width: 100%; height: 800px; max-height: 800px;">
                 </div>
             </div>
 
