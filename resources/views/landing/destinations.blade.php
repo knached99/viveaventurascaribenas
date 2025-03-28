@@ -2,7 +2,7 @@
 
 <x-travelcomponents.navbar />
 
-<section class="hero-wrap hero-wrap-2 js-fullheight" style="background-image: url({{ asset('assets/images/campeche_mexico_5.avif') }});"
+<section class="hero-wrap hero-wrap-2 js-fullheight" style="background-image: url({{ asset('assets/images/playa_del_carmen.avif') }});"
     data-stellar-background-ratio="0.5">
     <div class="overlay"></div>
     <div class="container">
