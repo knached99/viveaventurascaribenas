@@ -3,7 +3,7 @@
 <x-travelcomponents.navbar />
 
 <section class="hero-wrap hero-wrap-2 js-fullheight"
-    style="background-image: url('{{ asset('assets/images/contactImage2.jpg') }}');" data-stellar-background-ratio="0.5">
+    style="background-image: url('{{ asset('assets/images/cancun_mexico_2.jpg') }}');" data-stellar-background-ratio="0.5">
     <div class="overlay"></div>
     <div class="container">
         <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-center">
