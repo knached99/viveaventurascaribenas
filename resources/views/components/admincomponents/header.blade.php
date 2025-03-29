@@ -89,4 +89,10 @@
     @livewireStyles
 </head>
 
-<body @if(\Route::currentRouteName() === 'login' || \Route::currentRouteName() === 'forgot-password') style="background-image: url({{asset('assets/images/cancun_mexico_2.jpg')}}); background-size: cover; background-repeat: no-repeat; background-position: center;" @endif>
+@php
+    $routes = ['login', 'password.request', 'password.reset'];
+@endphp
+
+<body @if(in_array(\Route::currentRouteName(), $routes)) 
+      style="background-image: url({{ asset('assets/images/cancun_mexico_2.jpg') }}); background-size: cover; background-repeat: no-repeat; background-position: center;" 
+      @endif>
