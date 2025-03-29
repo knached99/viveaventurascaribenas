@@ -23,7 +23,7 @@ new #[Layout('layouts.theme')] class extends Component {
     }
 }; ?>
 
-<div class="container-xxl">
+<div class="container-xxl" style="background-image: url({{asset('assets/images/cancun_mexico_2.jpg')}}); background-size: cover; background-repeat: no-repeat; background-position: center;">
     <div class="authentication-wrapper authentication-basic container-p-y">
         <div class="authentication-inner">
             <!-- Register -->
