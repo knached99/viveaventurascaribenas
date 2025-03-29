@@ -83,10 +83,10 @@
     {{-- <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script> --}}
 
     <!-- Loading ChartJS Open Source Library -->
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"
         integrity="sha512-L0Shl7nXXzIlBSUUPpxrokqq4ojqgZFQczTYlGjzONGTDAcLremjwaWv5A+EDLnxhQzY5xUZPWLOLqYRkY0Cbw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     @livewireStyles
 </head>
 
-<body>
+<body @if(\Route::currentRouteName() === 'login' || \Route::currentRouteName() === 'forgot-password') style="background-image: url({{asset('assets/images/cancun_mexico_2.jpg')}}); background-size: cover; background-repeat: no-repeat; background-position: center;" @endif>
