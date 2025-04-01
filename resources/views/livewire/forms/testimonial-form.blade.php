@@ -13,7 +13,7 @@
                         <div class="form-group">
                             <input type="text" wire:model="name" name="name"
                                 class="form-control {{ $errors->has('name') ? 'border border-danger' : '' }}"
-                                placeholder="First Name" required>
+                                placeholder="First Name">
                             @error('name')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -25,7 +25,7 @@
                         <div class="form-group">
                             <input type="email" wire:model="email"
                                 class="form-control {{ $errors->has('email') ? 'border border-danger' : '' }}"
-                                placeholder="Email (required for follow-up only)" required>
+                                placeholder="Email (required for follow-up only)">
                             @error('email')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -37,7 +37,7 @@
                     <div class="col-12">
                         <div class="form-group">
                             <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
-                                wire:model="tripID" required>
+                                wire:model="tripID">
                                 <option value="" disabled {{ empty($tripID) ? 'selected' : '' }}>Where did you
                                     travel with us?</option>
 
@@ -95,7 +95,7 @@
                     <div class="col-12">
                         <div class="form-group">
                             <textarea wire:model="testimonial" class="form-control {{ $errors->has('testimonial') ? 'border border-danger' : '' }}"
-                                rows="7" placeholder="Tell us about your experience (What made your trip special?)" required></textarea>
+                                rows="7" placeholder="Tell us about your experience (What made your trip special?)"></textarea>
                             @error('testimonial')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -106,7 +106,7 @@
                     <div class="col-12">
                         <div class="form-group d-flex align-items-center">
                             <input wire:model="consent" type="checkbox" class="form-check-input me-2" id="consent"
-                                name="consent" required>
+                                name="consent">
                             <label class="form-label mb-0 m-3" for="consent">I consent to my testimonial being used
                                 on the
                                 website</label>
