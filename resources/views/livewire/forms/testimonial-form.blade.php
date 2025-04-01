@@ -67,7 +67,7 @@
                             <input wire:model="trip_date" type="month" max="{{ date('Y-m') }}"
                                 value="{{ date('Y-m') }}"
                                 class="form-control {{ $errors->has('trip_date') ? 'border border-danger' : '' }}"
-                                required>
+                                >
                             @error('trip_date')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -81,7 +81,7 @@
                             <div class="rating">
                                 @for ($i = 5; $i >= 1; $i--)
                                     <input wire:model="trip_rating" type="radio" name="rating"
-                                        value="{{ $i }}" id="{{ $i }}" required>
+                                        value="{{ $i }}" id="{{ $i }}">
                                     <label for="{{ $i }}">☆</label>
                                 @endfor
                             </div>
