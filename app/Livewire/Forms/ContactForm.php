@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ContactNotification;
 // use App\Mail\ContactFormSubmitted;
-use App\Helpers\Helper;
+
 use Exception;
 
 class ContactForm extends Component
@@ -72,7 +72,7 @@ class ContactForm extends Component
 
             $notificationClass = ContactNotification::class;
 
-            Helper::sendNotification($data, $recipientEmail, $notificationClass);
+            $this->sendNotification($data, $recipientEmail, $notificationClass);
 
             $this->status = 'Your message has been sent successfully! We will respond to you within 24-48 hours.';
             $this->resetForm();
@@ -86,6 +86,11 @@ class ContactForm extends Component
         }
     }
 
+    public function sendNotification(array $data, string $recipientEmail, string $notificationClass): void 
+    {
+        Notification::route('mail', $recipientEmail)->notify(new $notificationClass($data));
+        // Mail::to($recipientEmail)->send(new $notificationClass($data));
+    }
 
     public function resetForm(): void 
     {

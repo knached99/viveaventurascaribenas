@@ -1,8 +1,6 @@
 <?php
 
 namespace App\Helpers;  
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
 
 class Helper
 {
@@ -79,12 +77,5 @@ class Helper
         return ($ipLong & $mask) === ($subnetLong & $mask);
     }
 
-
-    // general helper function which sends notification
-    // to specified recipient using specified notification class 
-      
-    public static function sendNotification(array $data, string $recipient, string $notificationClass){
-        Notification::route('mail', $recipient)->notify(new $notificationClass($data));
-    }
   
 }

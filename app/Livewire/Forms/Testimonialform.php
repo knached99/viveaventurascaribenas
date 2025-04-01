@@ -14,7 +14,6 @@ use Spatie\Honeypot\Http\Livewire\Concerns\HoneypotData;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\TestimonialSubmitted;
-use App\Helpers\Helper;
 use Exception;
 
 class TestimonialForm extends Component
@@ -113,7 +112,7 @@ class TestimonialForm extends Component
             Testimonials::create($data);
             $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com';
             $notificationClass = TestimonialSubmitted::class;
-            Helper::sendNotification($data, $recipientEmail, $notificationClass);
+            $this->sendNotification($data, $recipientEmail, $notificationClass);
 
             $this->status = 'Your testimonial has been submitted! Thank you for providing valuable feedback!';
             $this->resetForm();
@@ -129,6 +128,10 @@ class TestimonialForm extends Component
     }
 
 
+    public function sendNotification(array $data, string $recipientEmail, string $notificationClass): void {
+
+        Notification::route('mail', $recipientEmail)->notify(new $notificationClass($data));
+    }
 
 
     public function resetForm(): void {
