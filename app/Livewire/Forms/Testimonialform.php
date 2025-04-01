@@ -86,19 +86,26 @@ class TestimonialForm extends Component
 
 
     public function submitTestimonialForm(): void {
-    
+        
+        \Log::info('Executing function: '.__FUNCTION__. '...');
+        \Log::info('Validating form inputs and protecting against spam...');
         $this->validate();
         $this->protectAgainstSpam();
 
         try{
 
+            \Log::info('Retrieving booking by email: '.$this->email);
+
             $booking = BookingModel::where('email', $this->email)->first();
 
             if(empty($booking)){
-
+            
+                \Log::info('Booking with email: '.$this->email.' not found!');
                 $this->error = 'You cannot submit a testimonial unless you\'ve booked a trip with us';
                 return; // Kills the PHP script to prevent form submission 
             }
+
+            \Log::info('storing data in an array..');
 
             $data = [
                 'testimonialID' => Str::uuid(),
@@ -112,13 +119,20 @@ class TestimonialForm extends Component
                 'testimonial_approval_status' => 'Pending',
             ];
 
+            \Log::info('Posting data to DB...');
+
             Testimonials::create($data);
+            \Log::info('Data submitted to DB!');
+
             $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com';
             $notificationClass = TestimonialSubmitted::class;
+            \Log::info('Sending notficication to '.$recipientEmail);
             $this->sendNotification($data, $recipientEmail, $notificationClass);
-
+            \Log::info('notification sent');
+            \Log::info('Testimonial submitted! Resetting form values..');
             $this->status = 'Your testimonial has been submitted! Thank you for providing valuable feedback!';
             $this->resetForm();
+            \Log::info('Form values reset!');
 
             
         }
