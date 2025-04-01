@@ -14,6 +14,7 @@ use Spatie\Honeypot\Http\Livewire\Concerns\HoneypotData;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\TestimonialSubmitted;
+use App\Helpers\Helper;
 use Exception;
 
 class TestimonialForm extends Component
@@ -45,7 +46,6 @@ class TestimonialForm extends Component
     public string $error = '';
 
 
-
     protected $rules = [
         'name' => 'required|string',
         'email'=>'required|string|email|unique:testimonials',
@@ -62,7 +62,6 @@ class TestimonialForm extends Component
         'email.email'=>'You\'ve entered an invalid email',
         'email.unique'=>'You\'ve already submitted a testimonial with us before',
         'tripID.required'=>'You must select the trip you went on',
-        'tripID.uuid'=> 'Option selected is not valid',
         'trip_date.required'=>'You must provide the month you went on this trip',
         'trip_rating.required'=>'You need to provide a rating for this trip',
         'testimonial.required'=>'Your testimonial is required',
@@ -72,8 +71,7 @@ class TestimonialForm extends Component
     ];
 
     
-
-    public function mount(?string $tripID = null)
+    public function mount()
     {
         $this->extraFields = new HoneypotData();
         $this->trips = TripsModel::select('tripID', 'tripLocation')
@@ -81,35 +79,20 @@ class TestimonialForm extends Component
             ->orWhere('tripEndDate', '<', Carbon::now())
             ->get()
             ->toArray();
-
-            if ($tripID && Str::isUuid($tripID)) {
-                $this->tripID = $tripID;
-            }
-    
+            //$this->testimonialID = (string) Str::uuid(); // Generate UUID for the testimonialID
     }
 
 
-     // 🔹 This method is triggered when the event is emitted
-     public function tripSelected($tripID)
-     {
-         if (Str::isUuid($tripID)) {
-             $this->tripID = $tripID;
-         }
-     }
- 
-
     public function submitTestimonialForm(): void {
-
+    
         $this->validate();
         $this->protectAgainstSpam();
-        
 
         try{
 
             $booking = BookingModel::where('email', $this->email)->first();
-            $trip = TripsModel::where('tripID', $this->tripID)->where('active', true)->first();
 
-            if(empty($booking) || empty($trip)){
+            if(empty($booking)){
 
                 $this->error = 'You cannot submit a testimonial unless you\'ve booked a trip with us';
                 return; // Kills the PHP script to prevent form submission 
@@ -128,16 +111,13 @@ class TestimonialForm extends Component
             ];
 
             Testimonials::create($data);
-            $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'travel@viveaventurascaribenas.net';
+            $recipientEmail = config('mail.mailers.smtp.to_email') ?? 'support@viveaventurascaribenas.com';
             $notificationClass = TestimonialSubmitted::class;
-            $this->sendNotification($data, $recipientEmail, $notificationClass);
-            
-            // 🔹 Emit tripID to maintain selection
-            $this->emit('tripSelected', $this->tripID);
-            
+            Helper::sendNotification($data, $recipientEmail, $notificationClass);
+
             $this->status = 'Your testimonial has been submitted! Thank you for providing valuable feedback!';
             $this->resetForm();
-            
+
             
         }
 
@@ -149,41 +129,27 @@ class TestimonialForm extends Component
     }
 
 
-    public function sendNotification(array $data, string $recipientEmail, string $notificationClass): void {
-
-        Notification::route('mail', $recipientEmail)->notify(new $notificationClass($data));
-    }
 
 
     public function resetForm(): void {
 
         $this->name = '';
         $this->email = '';
+        $this->tripID = '';
         $this->trip_date = '';
         $this->trip_rating = 0;
         $this->testimonial = '';
         $this->consent = false;
+
     }
 
 
-    // public function render(){
+    public function render(){
 
-    //     return view('livewire.forms.testimonial-form', [
-    //         'trips'=>$this->trips,
-    //     ]);
-    // }
-
-
-
-    public function render()
-{
-    return view('livewire.forms.testimonial-form', [
-        'trips' => $this->trips, 
-        'tripID' => $this->tripID,
-    ]);
-}
-
-    
+        return view('livewire.forms.testimonial-form', [
+            'trips'=>$this->trips,
+        ]);
+    }
 
 
 }
