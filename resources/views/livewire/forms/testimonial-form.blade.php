@@ -1,4 +1,4 @@
-@props(['isHomePage'])
+@props(['isHomePage', 'tripID'])
 <section class="ftco-section py-5">
     <div class="container">
 
@@ -33,33 +33,27 @@
                     </div>
 
                     <!-- Trip Selection -->
-                    @if (\Route::currentRouteName() !== 'destination' && !isset($trip['tripID']))
-                        <div class="col-12">
-                            <div class="form-group">
+                  @if (empty($tripID))
+                    <div class="col-12">
+                        <div class="form-group">
+                            <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
+                                wire:model="tripID" required>
+                                <option value="" disabled {{ empty($tripID) ? 'selected' : '' }}>Where did you
+                                    travel with us?</option>
 
-                                <select class="form-control {{ $errors->has('tripID') ? 'border border-danger' : '' }}"
-                                    wire:model="tripID" required>
-                                    <option value="" disabled {{ empty($tripID) ? 'selected' : '' }}>Where did you
-                                        travel with us?</option>
-
-                                    @foreach ($trips as $trip)
-                                        <option value="{{ $trip['tripID'] }}"
-                                            {{ $tripID == $trip['tripID'] ? 'selected' : '' }}>
-                                            {{ $trip['tripLocation'] }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            @else
-                                <input type="hidden" wire:model="tripID" value="{{ $tripID }}" />
-
-
-
-                                @error('tripID')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
+                                @foreach ($trips as $trip)
+                                    <option value="{{ $trip['tripID'] }}"
+                                        {{ $tripID == $trip['tripID'] ? 'selected' : '' }}>
+                                        {{ $trip['tripLocation'] }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
-                    @endif
+                    </div>
+                @else
+                    <input type="hidden" wire:model="tripID" value="{{ $tripID }}" />
+                @endif
+
 
                     {{-- <input type="hidden" wire:model="tripID" value="{{ $tripID }}" /> --}}
                     <!-- Trip Selection -->

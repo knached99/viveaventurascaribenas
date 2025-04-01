@@ -70,7 +70,7 @@ class TestimonialForm extends Component
     ];
 
     
-    public function mount()
+    public function mount($tripID = null)
     {
         $this->extraFields = new HoneypotData();
         $this->trips = TripsModel::select('tripID', 'tripLocation')
@@ -79,7 +79,10 @@ class TestimonialForm extends Component
             ->get()
             ->toArray();
             //$this->testimonialID = (string) Str::uuid(); // Generate UUID for the testimonialID
-    }
+         if($tripID){
+            $this->tripID = $tripID;
+         }
+        }
 
 
     public function submitTestimonialForm(): void {
@@ -132,6 +135,12 @@ class TestimonialForm extends Component
 
         Notification::route('mail', $recipientEmail)->notify(new $notificationClass($data));
     }
+
+    public function updatedTripID($value)
+    {
+        $this->tripID = $value;
+    }
+
 
 
     public function resetForm(): void {
