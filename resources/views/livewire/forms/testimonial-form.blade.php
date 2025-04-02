@@ -1,4 +1,4 @@
-@props(['isHomePage', 'tripID'])
+@props(['tripID'])
 <section class="ftco-section py-5">
     <div class="container">
 
