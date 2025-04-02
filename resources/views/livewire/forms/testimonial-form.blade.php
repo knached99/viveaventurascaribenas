@@ -48,6 +48,9 @@
                                     </option>
                                 @endforeach
                             </select>
+                              @error('tripID')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                 @else
