@@ -48,7 +48,7 @@ class TestimonialForm extends Component
     protected $rules = [
         'name' => 'required|string',
         'email'=>'required|string|email|unique:testimonials',
-        'tripID'=>'required|uuid',
+        'tripID'=>'required',
         'trip_date'=>'required|string',
         'trip_rating'=>'required|integer',
         'testimonial'=>'required|string|max:1000',
