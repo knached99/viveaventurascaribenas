@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Models\Testimonials;
 use App\Models\TripsModel;
 use App\Models\BookingModel;
+use App\Models\Reservations;
 use Spatie\Honeypot\Http\Livewire\Concerns\UsesSpamProtection;
 use Spatie\Honeypot\Http\Livewire\Concerns\HoneypotData;
 use Illuminate\Support\Str;
@@ -79,7 +80,8 @@ class TestimonialForm extends Component
             ->get()
             ->toArray();
             //$this->testimonialID = (string) Str::uuid(); // Generate UUID for the testimonialID
-    }
+ 
+        }
 
 
     public function submitTestimonialForm(): void {
@@ -89,7 +91,10 @@ class TestimonialForm extends Component
 
         try{
 
-            $booking = BookingModel::where('email', $this->email)->first();
+           // $booking = BookingModel::where('email', $this->email)->first();
+           // Looking up booking in reservation model since we are not using booking mnodel at this time 
+
+           $booking = Reservations::where('email', $this->email)->first();
 
             if(empty($booking)){
 

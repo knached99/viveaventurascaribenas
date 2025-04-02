@@ -1,3 +1,4 @@
+@props(['numTestimonials'])
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
         <a href="#" class="app-brand-link">
@@ -15,28 +16,18 @@
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        @php 
-           $activeAdminRoutes = [
-            'admin.dashboard',
-            'admin.profile',
-            'admin.testimonials',
-            'admin.analytics',
-         
-        ];
-        
-         $isAdminActive = in_array(request()->route()->getName(), $activeAdminRoutes) ? 'active open' : '';
+        @php
+            $activeAdminRoutes = ['admin.dashboard', 'admin.profile', 'admin.testimonials', 'admin.analytics'];
 
-         $activeTripRoutes = [
-          'admin.create-trip',
-          'admin.all-trips',
-          'admin.photo-gallery'
-         ];
+            $isAdminActive = in_array(request()->route()->getName(), $activeAdminRoutes) ? 'active open' : '';
 
-         $isTripsActive = in_array(request()->route()->getName(), $activeTripRoutes) ? 'active open' : '';
+            $activeTripRoutes = ['admin.create-trip', 'admin.all-trips', 'admin.photo-gallery'];
 
-          @endphp 
+            $isTripsActive = in_array(request()->route()->getName(), $activeTripRoutes) ? 'active open' : '';
+
+        @endphp
         <!-- Dashboards -->
-        <li class="menu-item {{$isAdminActive}}">
+        <li class="menu-item {{ $isAdminActive }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bxs-dashboard"></i>
 
@@ -60,10 +51,20 @@
 
                 <li class="menu-item {{ request()->routeIs('admin.testimonials') ? 'active' : '' }}">
                     <a href="{{ route('admin.testimonials') }}" class="menu-link text-decoration-none">
-                        <div class="text-truncate" data-i18n="testimonials"><i
-                                class='menu-icon tf-icons bx bx-paper-plane'></i> Testimonials</div>
+                        <div class="text-truncate" data-i18n="testimonials">
+                            <i class='menu-icon tf-icons bx bx-paper-plane'></i> Testimonial
+                            <span
+                                class="relative inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500 text-white text-xs font-medium">
+                                <i class="bx bx-bell"></i>
+                                <span
+                                    class="absolute top-0 right-0 -mt-1 -mr-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                                    {{ $numTestimonials }}
+                                </span>
+                            </span>
+                        </div>
                     </a>
                 </li>
+
 
                 <li class="menu-item {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
                     <a href="{{ route('admin.analytics') }}" class="menu-link text-decoration-none">
@@ -77,7 +78,7 @@
         </li>
 
         <!-- Layouts -->
-        <li class="menu-item {{$isTripsActive}}">
+        <li class="menu-item {{ $isTripsActive }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle text-decoration-none">
                 <i class="menu-icon tf-icons bx bx-map-alt"></i>
                 <div class="text-truncate" data-i18n="Trips">Trips</div>
