@@ -52,7 +52,7 @@
                 <li class="menu-item {{ request()->routeIs('admin.testimonials') ? 'active' : '' }}">
                     <a href="{{ route('admin.testimonials') }}" class="menu-link text-decoration-none">
                         <div class="text-truncate" data-i18n="testimonials">
-                            <i class='menu-icon tf-icons bx bx-paper-plane'></i> Testimonial
+                            <i class='menu-icon tf-icons bx bx-paper-plane'></i> Testimonials
                             <span
                                 class="relative inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500 text-white text-xs font-medium">
                                 <i class="bx bx-bell"></i>
