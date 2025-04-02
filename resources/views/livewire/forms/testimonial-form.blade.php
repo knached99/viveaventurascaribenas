@@ -7,15 +7,7 @@
 
                 <form class="row g-3" wire:submit.prevent="submitTestimonialForm">
                     <x-honeypot livewire-model="extraFields" />
-                        @if($errors->any())
-                        <div class="alert alert-danger">
-                        <ul>
-                        @foreach($errors->all() as $error)
-                        <li>{{$error}}</li>
-                        @endforeach
-                        </ul>
-                        </div>
-                        @endif
+                 
                     <!-- Name Input -->
                     <div class="col-12">
                         <div class="form-group">
