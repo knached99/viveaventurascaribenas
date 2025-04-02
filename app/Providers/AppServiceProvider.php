@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\Testimonials;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +25,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Retreiving number of testimonials 
+        // for authenticated users only 
+        View::composer('*', function($view){
+            $numTestimonials = 0; // initialize to 0 even when user is not logged in
+            if(Auth::check()){
+                $numTestimonials = Testimonials::where('testimonial_approval_status', 'Pending')->count();
+                $view->with('numTestimonials', $numTestimonials);
+            }
+        });
     }
 }
