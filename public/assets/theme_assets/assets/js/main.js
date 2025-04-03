@@ -116,3 +116,17 @@ let menu, animate;
   // Auto update menu collapsed/expanded based on the themeConfig
   window.Helpers.setCollapsed(true, false);
 })();
+
+
+// loader 
+let loader = function() {
+
+  setTimeout(function() {
+
+    if($('#loader').length > 0){
+      $('#loader').removeClass('show');
+    }
+  }, 1);
+};
+
+loader();
