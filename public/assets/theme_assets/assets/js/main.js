@@ -116,39 +116,3 @@ let menu, animate;
   // Auto update menu collapsed/expanded based on the themeConfig
   window.Helpers.setCollapsed(true, false);
 })();
-
-
-// loader 
-document.addEventListener("DOMContentLoaded", function(){
-
- const loader = document.getElementById("loader");
-
- function showLoader(){
-
-  loader.classList.add("show", "fullscreen");
- }
-
-
- function hideLoader(){
-  loader.classList.remove("show", "fullscreen");
- }
-
- function checkURLPath(){
-  const currentPath = window.location.pathname;
-
-  if(currentPath.startsWith("/admin/")){
-
-    showLoader();
-
-    setTimeout(hideLoader, 1500);
-  }
-
-  else{
-
-    hideLoader();
-  }
- }
-
- checkURLPath();
-
-});

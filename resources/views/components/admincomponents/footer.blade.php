@@ -27,12 +27,6 @@
  </footer>
  <!-- / Footer -->
 
- <!-- Loading animation -->
-<div id="loader" class="show fullscreen">
-<img src='{{asset('assets/theme_assets/assets/img/icons/animations/authenticated_loading_animation.gif')}}'/>
-</div>
- <!-- / Loading animation -->
-
  <div class="content-backdrop fade"></div>
  </div>
  <!-- Content wrapper -->

@@ -65,8 +65,6 @@
     <!-- Page -->
     <link rel="stylesheet" href="{{ asset('assets/theme_assets/assets/vendor/css/pages/page-auth.css') }}" />
 
-    <!-- loading animation -->
-    <link rel="stylesheet" href="{{asset('assets/theme_assets/assets/css/loader.css')}}"/>
     <!-- Leaflet Plugins for World heatmap chart -->
 
         <!-- Leaflet JS -->
