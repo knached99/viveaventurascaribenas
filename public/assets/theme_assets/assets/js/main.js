@@ -119,14 +119,36 @@ let menu, animate;
 
 
 // loader 
-let loader = function() {
+document.addEventListener("DOMContentLoaded", function(){
 
-  setTimeout(function() {
+ const loader = document.getElementById("loader");
 
-    if($('#loader').length > 0){
-      $('#loader').removeClass('show');
-    }
-  }, 1);
-};
+ function showLoader(){
 
-loader();
+  loader.classList.add("show", "fullscreen");
+ }
+
+
+ function hideLoader(){
+  loader.classList.remove("show", "fullscreen");
+ }
+
+ function checkURLPath(){
+  const currentPath = window.location.pathname;
+
+  if(currentPath.startsWith("/admin/")){
+
+    showLoader();
+
+    setTimeout(hideLoader, 1500);
+  }
+
+  else{
+
+    hideLoader();
+  }
+ }
+
+ checkURLPath();
+
+});
