@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Retreiving number of testimonials 
+        // Globally retreiving number of testimonials 
         // for authenticated users only 
         View::composer('*', function($view){
             $numTestimonials = 0; // initialize to 0 even when user is not logged in
