@@ -19,7 +19,7 @@ new #[Layout('layouts.theme')] class extends Component {
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: false);
     }
 }; ?>
 

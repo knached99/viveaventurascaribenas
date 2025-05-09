@@ -113,13 +113,16 @@ class Home extends Controller
 
 
     public function reservationConfirmed($reservationID){
+
         try{
+        
         $reservation = Reservations::findOrFail($reservationID);
         $customerName = $reservation->name;
         $customerEmail = $reservation->email;
         return view('reservation-confirmed', ['reservationID'=>$reservationID, 'customerName' => $customerName, 'customerEmail' => $customerEmail]);
         
         }
+
         catch(ModelNotFoundException $e){
             \Log::error("Reservation not found: {$reservationID}. Error: " . $e->getMessage());
             abort(404);
