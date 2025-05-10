@@ -353,9 +353,10 @@ class BookingForm extends Component
             $tripName = $this->tripName ?? 'Trip Reservation';
     
             // Check trip availability
-            if ($trip->num_trips === 0 || $this->tripAvailability === 'unavailable') {
+            if ($trip->num_trips === 0 || $this->tripAvailability === 'unavailable' || $this->tripEndDate < Carbon::now()) {
                 $this->error = 'This trip is unavailable right now. Please check again later';
             }
+            
     
             if (in_array($this->tripAvailability, ['available', 'coming soon'])) {
                 return $this->handleComingSoonReservation($trip, $reservationID);
