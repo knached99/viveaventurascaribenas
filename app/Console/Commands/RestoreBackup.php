@@ -5,6 +5,9 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exceotion\ProcessFailedException;
+
 class RestoreBackup extends Command
 {
     /**
@@ -39,29 +42,34 @@ class RestoreBackup extends Command
         $indicator = ['|', '/', '-', '\\'];
         $i = 0;
 
-        $command = sprintf(
+        // Using Symfony process instead of proc_open() as it safely escapes arguments
+        // and prevents shell injection attacks 
+
+        $proc = Process::fromShellCommandline(sprintf(
             'mysql --user=%s --password=%s --host=%s %s < %s',
-            env('DB_USERNAME'),
-            env('DB_PASSWORD'),
-            env('DB_HOST'),
-            env('DB_DATABASE'),
-            env('DB_SOCKET'),
-            $file
-        );
+            escapeshellarg(env('DB_USERNAME')),
+            escapeshellarg(env('DB_PASSWORD')),
+            escapeshellarg(env('DB_HOST')),
+            escapeshellarg(env('DB_DATABASE')),
+            escapeshellarg($file)
+        ));
 
-        $process = proc_open($command, [
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w']
-        ], $pipes);
+        $proc->run(function($type, $buffer) use (&$i, $indicator, $output){
 
-        while(proc_get_status($process)['running']){
-            $output->write("\r" . $indicator[$i % 4]);
-            $i++;
-            usleep(100000); // Sleeps for 100 milliseconds
+            if($type === Process::OUT || $type === Process::ERR){
+                $output->write("\r".$indicator[$i % 4]);
+                $i++;
+                usleep(100000);
+            }
 
+        });
+
+        if(!$proc->isSuccessful()){
+            throw new ProcessFialedException($proc);
         }
-        proc_close($process);
+
         $output->writeln("\rDatabase restored successfully.");
+
 
     }
 }
