@@ -67,19 +67,21 @@ class RestoreBackup extends Command
         return 0;
     }
 
-    private function createBackup($output)
+    private function createBackup()
     {
         Log::info("Initiating backup creation...");
-
+    
         if (!File::exists($this->backupDir)) {
             File::makeDirectory($this->backupDir, 0755, true);
-            $output->writeln('<info>Backups directory created!</info>');
-            Log::info("Backup directory created at {$this->backupDir}");
+            $this->info('Backups directory created!');
+            Log::info("Backup directory created at " . $this->backupDir);
+        } else {
+            Log::info("Backup directory already exists at " . $this->backupDir);
         }
-
+    
         $timestamp = now()->format('Y-m-d_H-i-s');
         $dumpPath = $this->backupDir . "/backup_$timestamp.sql";
-
+    
         $dumpCommand = sprintf(
             'mysqldump --user=%s --password=%s --host=%s %s > %s',
             escapeshellarg(env('DB_USERNAME')),
@@ -88,23 +90,28 @@ class RestoreBackup extends Command
             escapeshellarg(env('DB_DATABASE')),
             escapeshellarg($dumpPath)
         );
-
+    
         Log::info("Creating new backup at $dumpPath");
-
-        $this->output->writeln('<info>Creating backup. Please wait...</info>');
-        $this->output->withProgressBar(range(1, 10), function () use ($dumpCommand) {
+        $this->info('Creating backup. Please wait...');
+    
+        // Simulated progress bar while running the backup process
+        $this->withProgressBar(range(1, 10), function () use ($dumpCommand, $dumpPath) {
             $process = Process::fromShellCommandline($dumpCommand);
             $process->run();
-            usleep(150000); // Simulate progress
+            usleep(150000); // simulate time passing
+    
             if (!$process->isSuccessful()) {
                 Log::error("Failed to create backup: " . $process->getErrorOutput());
                 throw new ProcessFailedException($process);
             }
         });
-
-        $output->writeln("\n<info>Backup created at: $dumpPath</info>");
+    
+        $this->newLine();
+        $this->info("✅ Created a new backup at: $dumpPath");
         Log::info("Backup created successfully at: $dumpPath");
+        return 0;
     }
+    
 
     private function restoreBackup($output)
     {
