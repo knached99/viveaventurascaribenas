@@ -7,6 +7,7 @@ use App\Models\VisitorModel;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Illuminate\Support\Facades\Crypt;
 
 class InspectVisitorIP extends Command {
 
@@ -69,10 +70,11 @@ class InspectVisitorIP extends Command {
             return;
         }
         $selectedIp = $ipArray[$index];
-        $this->info("You selected IP: $selectedIp");
+        $decryptedSelectedIP = Crypt::decryptString($selectedIp);
+        $this->info("You selected IP: $decryptedSelectedIP");
 
         // Fetch additional info from the database
-        $ipDetails = VisitorModel::where('visitor_ip_address', $selectedIp)->first();
+        $ipDetails = VisitorModel::where('visitor_ip_address', $decryptedSelectedIP)->first();
 
         if (!$ipDetails) {
             $this->warn('No additional data found for this IP in the database.');
@@ -83,7 +85,7 @@ class InspectVisitorIP extends Command {
 
         // Fetch geolocation data
         $this->info('Fetching geolocation data...');
-        $response = Http::get("http://ip-api.com/json/{$selectedIp}");
+        $response = Http::get("http://ip-api.com/json/{$decryptedSelectedIP}");
 
         if ($response->failed()) {
             $this->error('Failed to fetch geolocation data.');
