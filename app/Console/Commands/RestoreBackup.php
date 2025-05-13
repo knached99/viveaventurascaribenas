@@ -62,7 +62,7 @@ class RestoreBackup extends Command
             $prompt = $this->ask("No backups found, would you like to create a new one? Y or y to continue");
             
             if($prompt === 'Y' || $prompt === 'y'){
-            
+            Log::info("User selected ".$prompt. ' to continue backup creation');
 
             $process = Process::fromShellCommandline($dumpCommand);
             $process->run();
