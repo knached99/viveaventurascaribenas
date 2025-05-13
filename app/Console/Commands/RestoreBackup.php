@@ -37,10 +37,10 @@ class RestoreBackup extends Command
 
         // Generate a list of backup .sql files
         $files = collect(File::files($backupDir))
-            ->filter(fn($file) => $file->getExtension() === 'sql')
-            ->map(fn($file) => $file->getRealPath())
-            ->values()
-            ->all();
+            ->filter(fn($file) => $file->getExtension() === 'sql') // filters all file extensions to only look for .sql
+            ->map(fn($file) => $file->getRealPath()) // transforms each file object to absolute path
+            ->values() // resets array keys to be zero based sequential 
+            ->all(); // converts back to PHP array
 
         Log::info("[RestoreBackup] Found " . count($files) . " .sql backup file(s).");
 
@@ -59,6 +59,10 @@ class RestoreBackup extends Command
             );
 
             Log::info("[RestoreBackup] No backups found. Creating new backup at $dumpPath");
+            $prompt = $this->ask("No backups found, would you like to create a new one? Y or y to continue");
+            
+            if($prompt === 'Y' || $prompt === 'y'){
+            
 
             $process = Process::fromShellCommandline($dumpCommand);
             $process->run();
@@ -68,9 +72,16 @@ class RestoreBackup extends Command
                 throw new ProcessFailedException($process);
             }
 
-            $output->writeln("<info>No backups found. Created a new backup at: $dumpPath</info>");
+            // $output->writeln("<info>No backups found. Created a new backup at: $dumpPath</info>");
             Log::info("[RestoreBackup] Backup created successfully at $dumpPath");
             return 0;
+        }
+
+        else{
+            $output->writln("<info>Backup Process Terminated</info>");
+            Log::info("User terminated the backup process");
+            return 0;
+        }
         }
 
         // Prompt the user to select a backup file
