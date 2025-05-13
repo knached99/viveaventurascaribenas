@@ -146,7 +146,7 @@ class RestoreBackup extends Command
         $this->printAsciiBanner($output);
 
         $this->output->writeln('<info>Restoring database. Please wait...</info>');
-        $this->output->withProgressBar(range(1, 10), function () use ($selectedPath) {
+        $this->withProgressBar(range(1, 10), function () use ($selectedPath) {
             $restoreCommand = sprintf(
                 'mysql --user=%s --password=%s --host=%s %s < %s',
                 escapeshellarg(env('DB_USERNAME')),
