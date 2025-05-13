@@ -78,7 +78,7 @@ class RestoreBackup extends Command
         }
 
         else{
-            $output->writln("<info>Backup Process Terminated</info>");
+            $output->writeln("<info>Backup Process Terminated</info>");
             Log::info("User terminated the backup process");
             return 0;
         }
