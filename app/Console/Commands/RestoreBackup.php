@@ -71,18 +71,16 @@ class RestoreBackup extends Command
     private function createBackup()
     {
         Log::info("Initiating backup creation...");
-    
+
         if (!File::exists($this->backupDir)) {
             File::makeDirectory($this->backupDir, 0755, true);
             $this->info('Backups directory created!');
             Log::info("Backup directory created at " . $this->backupDir);
-        } else {
-            Log::info("Backup directory already exists at " . $this->backupDir);
         }
-    
+
         $timestamp = now()->format('Y-m-d_H-i-s');
         $dumpPath = $this->backupDir . "/backup_$timestamp.sql";
-    
+
         $dumpCommand = sprintf(
             'mysqldump --user=%s --password=%s --host=%s %s > %s',
             escapeshellarg(env('DB_USERNAME')),
@@ -91,28 +89,26 @@ class RestoreBackup extends Command
             escapeshellarg(env('DB_DATABASE')),
             escapeshellarg($dumpPath)
         );
-    
+
         Log::info("Creating new backup at $dumpPath");
         $this->info('Creating backup. Please wait...');
-    
-        // Simulated progress bar while running the backup process
-        $this->withProgressBar(range(1, 10), function () use ($dumpCommand, $dumpPath) {
+
+        $this->withProgressBar(range(1, 10), function () use ($dumpCommand) {
             $process = Process::fromShellCommandline($dumpCommand);
             $process->run();
-            usleep(150000); // simulate time passing
-    
+            usleep(150000);
+
             if (!$process->isSuccessful()) {
                 Log::error("Failed to create backup: " . $process->getErrorOutput());
                 throw new ProcessFailedException($process);
             }
         });
-    
+
         $this->newLine();
         $this->info("✅ Created a new backup at: $dumpPath");
         Log::info("Backup created successfully at: $dumpPath");
         return 0;
     }
-    
 
     private function restoreBackup($output)
     {
@@ -124,60 +120,29 @@ class RestoreBackup extends Command
             Log::info("[RestoreBackup] Created backup directory at {$this->backupDir}");
         }
 
-        $files = collect(File::files($this->backupDir))
-        ->filter(fn($file) => $file->getExtension() === 'sql')
-        ->map(function ($file) {
-            $path = $file->getRealPath();
-            $filename = basename($path);
-    
-            // Extract the datetime from the filename
-            if (preg_match('/backup_(\d{4}-\d{2}-\d{2})_(\d{2}-\d{2}-\d{2})\.sql/', $filename, $matches)) {
-                $dateTimeString = "{$matches[1]} {$matches[2]}";
-                $dateTime = Carbon::createFromFormat('Y-m-d H-i-s', $dateTimeString);
-                $readable = $dateTime->format('l, F jS, Y \a\t g a'); // e.g. Wednesday, July 10th, 2025 at 10 pm
-            } else {
-                $readable = 'Unknown Date';
-            }
-    
-            return [
-                'path' => $path,
-                'label' => $readable . " ({$filename})"
-            ];
-        })
-        ->values()
-        ->all();
-
-        Log::info("Found " . count($files) . " .sql backup file(s)");
+        $files = $this->getBackupFiles();
 
         if (count($files) === 0) {
             $prompt = $this->ask('No backups found, would you like to create a new one? Y for yes or N to terminate program');
 
-            if($prompt === 'Y' || $prompt === 'y'){
-                $this->createBackup();
-            }
-            else {
-            return 0;
+            if (strtolower($prompt) === 'y') {
+                $this->createBackup($output);
+                $files = $this->getBackupFiles(); // ✅ Re-check after creating backup
+            } else {
+                $this->info('No backups found. Program terminated.');
+                return 0;
             }
         }
 
-      
+        if (count($files) === 0) {
+            $this->error("❌ Still no backup files found. Aborting.");
+            return 0;
+        }
+
         $fileChoices = array_map(fn($f) => $f['label'], $files);
 
-        $selected = null;
-
-        while (!in_array($selected, $fileChoices)) {
-            $selected = $this->choice('Select a backup to restore', $fileChoices, null);
-        
-            if (!in_array($selected, $fileChoices)) {
-                $this->error('❌ Invalid selection. Please choose a valid backup file from the list.');
-            }
-        }
-        
-
-        $selectedIndex = array_search($selected, $fileChoices);
+        $selected = $this->choice('Select a backup to restore', $fileChoices, null);
         $selectedPath = collect($files)->firstWhere('label', $selected)['path'];
-
-        
 
         Log::info("User selected backup file: $selectedPath");
         $this->printAsciiBanner($output);
@@ -195,8 +160,7 @@ class RestoreBackup extends Command
 
             $proc = Process::fromShellCommandline($restoreCommand);
             $proc->run();
-
-            usleep(150000); // Simulate progress
+            usleep(150000);
 
             if (!$proc->isSuccessful()) {
                 Log::error("Database restore failed: " . $proc->getErrorOutput());
@@ -210,6 +174,31 @@ class RestoreBackup extends Command
         return 0;
     }
 
+    private function getBackupFiles()
+    {
+        return collect(File::files($this->backupDir))
+            ->filter(fn($file) => $file->getExtension() === 'sql')
+            ->map(function ($file) {
+                $path = $file->getRealPath();
+                $filename = basename($path);
+
+                if (preg_match('/backup_(\d{4}-\d{2}-\d{2})_(\d{2}-\d{2}-\d{2})\.sql/', $filename, $matches)) {
+                    $dateTimeString = "{$matches[1]} {$matches[2]}";
+                    $dateTime = Carbon::createFromFormat('Y-m-d H-i-s', $dateTimeString);
+                    $readable = $dateTime->format('l, F jS, Y \a\t g a');
+                } else {
+                    $readable = 'Unknown Date';
+                }
+
+                return [
+                    'path' => $path,
+                    'label' => $readable . " ({$filename})"
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
     private function printAsciiBanner($output)
     {
         $ascii = <<<ASCII
@@ -219,8 +208,8 @@ class RestoreBackup extends Command
  | |_| |  _ <| |_| || (__| |  | | | | | (_| |
  |____/|_| \_\\____(_)___|_|  |_|_| |_|\__, |
                                       |___/  
-
 ASCII;
+
         $output->writeln("<fg=cyan>$ascii</fg=cyan>");
     }
 }
