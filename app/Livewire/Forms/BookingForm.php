@@ -91,8 +91,6 @@ class BookingForm extends Component
             'preferred_start_date' => ['required', 'date', 'after_or_equal:' . $minStartDate],
             'preferred_end_date' => ['required', 'date', 'after:preferred_start_date'],
         ];
-
-        $phoneNum = '888-888-8888';
         
         // if(empty($this->reservation)){
         //     $rules['preferred_start_date'] = 'required|date|after_or_equal:'.$minStartDate;
