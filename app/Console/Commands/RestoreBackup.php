@@ -8,6 +8,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 
 class RestoreBackup extends Command
 {
@@ -21,6 +22,7 @@ class RestoreBackup extends Command
 
     public function handle()
     {
+        Log::info('[RestoreBackup] Command started.');
         $output = new ConsoleOutput();
         $backupDir = storage_path('app/backups');
 
@@ -28,16 +30,21 @@ class RestoreBackup extends Command
         if (!File::exists($backupDir)) {
             File::makeDirectory($backupDir, 0755, true);
             $output->writeln('<info>Backups directory created.</info>');
+            Log::info("[RestoreBackup] Created backup directory at $backupDir.");
+        } else {
+            Log::info("[RestoreBackup] Backup directory already exists at $backupDir.");
         }
 
-        // Here, we generate a list of backup .sql files
+        // Generate a list of backup .sql files
         $files = collect(File::files($backupDir))
             ->filter(fn($file) => $file->getExtension() === 'sql')
             ->map(fn($file) => $file->getRealPath())
             ->values()
             ->all();
 
-        //If there are no backups, we create a backup
+        Log::info("[RestoreBackup] Found " . count($files) . " .sql backup file(s).");
+
+        // If there are no backups, we create a new backup
         if (empty($files)) {
             $timestamp = now()->format('Y-m-d_H-i-s');
             $dumpPath = $backupDir . "/backup_$timestamp.sql";
@@ -51,25 +58,32 @@ class RestoreBackup extends Command
                 escapeshellarg($dumpPath)
             );
 
+            Log::info("[RestoreBackup] No backups found. Creating new backup at $dumpPath");
+
             $process = Process::fromShellCommandline($dumpCommand);
             $process->run();
 
             if (!$process->isSuccessful()) {
+                Log::error('[RestoreBackup] Failed to create backup: ' . $process->getErrorOutput());
                 throw new ProcessFailedException($process);
             }
 
             $output->writeln("<info>No backups found. Created a new backup at: $dumpPath</info>");
+            Log::info("[RestoreBackup] Backup created successfully at $dumpPath");
             return 0;
         }
 
-        // We will prompt the user to select a backup file
+        // Prompt the user to select a backup file
         $fileChoices = array_map('basename', $files);
         $selected = $this->choice('Select a backup to restore', $fileChoices);
         $selectedPath = $backupDir . '/' . $selected;
 
-        $output->writeln('Restoring database from selected backup...');
+        Log::info("[RestoreBackup] User selected backup file: $selectedPath");
 
-        // finally, we restore the backup using the selected file
+        $output->writeln('Restoring database from selected backup...');
+        Log::info('[RestoreBackup] Beginning restore process...');
+
+        // Restore the backup using the selected file
         $indicator = ['|', '/', '-', '\\'];
         $i = 0;
 
@@ -92,10 +106,12 @@ class RestoreBackup extends Command
         });
 
         if (!$proc->isSuccessful()) {
+            Log::error('[RestoreBackup] Database restore failed: ' . $proc->getErrorOutput());
             throw new ProcessFailedException($proc);
         }
 
         $output->writeln("\r<info>Database restored successfully from $selected</info>");
+        Log::info("[RestoreBackup] Database restored successfully from $selectedPath");
         return 0;
     }
 }
