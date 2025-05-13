@@ -15,7 +15,7 @@ class RestoreBackup extends Command
      *
      * @var string
      */
-    protected $signature = 'db:restore {file : The path to the .sql file to restore}';
+    protected $signature = 'db:restore';
     protected $description = 'Restore the database from a .sql file';
 
     
