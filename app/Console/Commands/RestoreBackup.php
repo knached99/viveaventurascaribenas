@@ -11,92 +11,34 @@ use Illuminate\Support\Facades\File;
 
 class RestoreBackup extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'db:restore';
-    protected $description = 'Restore the database from a .sql file';
+    protected $description = 'Restore the database from an existing .sql backup or create one if none exist';
 
-    
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
     }
-    /**
-     * Execute the console command.
-     */
-    // public function handle()
-    // {
-    //     $file = $this->argument('file');
 
-    //     if(!file_exists($file)){
-    //         $this->error('The specified backup file: '.$file. ' was not found on the server.');
-    //         return 1; // exit code 1
-    //     }
-
-    //     $output = new ConsoleOutput();
-    //     $output->writeln('Executing database restore...');
-
-    //     // Displays loading indicator
-
-    //     $indicator = ['|', '/', '-', '\\'];
-    //     $i = 0;
-
-    //     // Using Symfony process instead of proc_open() as it safely escapes arguments
-    //     // and prevents shell injection attacks 
-
-    //     $proc = Process::fromShellCommandline(sprintf(
-    //         'mysql --user=%s --password=%s --host=%s %s < %s',
-    //         escapeshellarg(env('DB_USERNAME')),
-    //         escapeshellarg(env('DB_PASSWORD')),
-    //         escapeshellarg(env('DB_HOST')),
-    //         escapeshellarg(env('DB_DATABASE')),
-    //         escapeshellarg($file)
-    //     ));
-
-    //     $proc->run(function($type, $buffer) use (&$i, $indicator, $output){
-
-    //         if($type === Process::OUT || $type === Process::ERR){
-    //             $output->write("\r".$indicator[$i % 4]);
-    //             $i++;
-    //             usleep(100000);
-    //         }
-
-    //     });
-
-    //     if(!$proc->isSuccessful()){
-    //         throw new ProcessFailedException($proc);
-    //     }
-
-    //     $output->writeln("\rDatabase restored successfully.");
-
-
-    // }
-
-    public function handle(){
-
+    public function handle()
+    {
         $output = new ConsoleOutput();
-        $backupDirectory = storage_path('app/backups');
+        $backupDir = storage_path('app/backups');
 
-        // here, we check to see if backup dir exists, if not, then we create it 
-        if(!File::exists($backupDir)){
-
+        // Ensuring the backups directory exists
+        if (!File::exists($backupDir)) {
             File::makeDirectory($backupDir, 0755, true);
-            $output->writeln('<info>Backups directory created!</info>');
+            $output->writeln('<info>Backups directory created.</info>');
         }
 
-        // then we generate a list of all available backup files 
-
+        // Here, we generate a list of backup .sql files
         $files = collect(File::files($backupDir))
-        ->filter(fn($file) => $file->getExtension() === 'sql')
-        ->map(fn($file) => $file->getRealPath())
-        ->values()
-        ->all();
+            ->filter(fn($file) => $file->getExtension() === 'sql')
+            ->map(fn($file) => $file->getRealPath())
+            ->values()
+            ->all();
 
-        // If there are no backups, we create a backup 
-
-        if(empty($files)){
+        //If there are no backups, we create a backup
+        if (empty($files)) {
             $timestamp = now()->format('Y-m-d_H-i-s');
             $dumpPath = $backupDir . "/backup_$timestamp.sql";
 
@@ -109,51 +51,51 @@ class RestoreBackup extends Command
                 escapeshellarg($dumpPath)
             );
 
-            $proc = Process::fromShellCommandline($dumpCommand);
-            $proc->run();
+            $process = Process::fromShellCommandline($dumpCommand);
+            $process->run();
 
-            if(!$proc->isSuccesful()){
-                throw new ProcessFailedException($proc);
+            if (!$process->isSuccessful()) {
+                throw new ProcessFailedException($process);
             }
 
             $output->writeln("<info>No backups found. Created a new backup at: $dumpPath</info>");
             return 0;
+        }
 
-            // Prompt user to select from a list of backups 
-            $fileChoices = array_map('basename', $files);
-            $selected = $this->choice('Select a backup to restore', $fileChoices);
-            $selectedPath = $backupDir . '/' . $selected;
+        // We will prompt the user to select a backup file
+        $fileChoices = array_map('basename', $files);
+        $selected = $this->choice('Select a backup to restore', $fileChoices);
+        $selectedPath = $backupDir . '/' . $selected;
 
-            $output->writeln('Restoring database from selected backup...');
+        $output->writeln('Restoring database from selected backup...');
 
-            // here, we restore using selected file
-            $indicator = ['|', '/', '-', '\\'];
-            $i = 0;
+        // finally, we restore the backup using the selected file
+        $indicator = ['|', '/', '-', '\\'];
+        $i = 0;
 
-            $restoreCommand = sprintf(
-                'mysql --user=%s --password=%s --host=%s %s < %s',
-                escapeshellarg(env('DB_USERNAME')),
-                escapeshellarg(env('DB_PASSWORD')),
-                escapeshellarg(env('DB_HOST')),
-                escapeshellarg(env('DB_DATABASE')),
-                escapeshellarg($selectedPath)
+        $restoreCommand = sprintf(
+            'mysql --user=%s --password=%s --host=%s %s < %s',
+            escapeshellarg(env('DB_USERNAME')),
+            escapeshellarg(env('DB_PASSWORD')),
+            escapeshellarg(env('DB_HOST')),
+            escapeshellarg(env('DB_DATABASE')),
+            escapeshellarg($selectedPath)
         );
 
-            $process = Process::fromShellCommandline($restoreCommand);
-            $process->run(function ($type, $buffer) use (&$i, $indicator, $output) {
-                if ($type === Process::OUT || $type === Process::ERR) {
-                    $output->write("\r" . $indicator[$i % 4]);
-                    $i++;
-                    usleep(100000);
-                }
-            });
-
-            if(!$process->isSuccessful()){
-                throw new ProcessFailedException($process);
+        $proc = Process::fromShellCommandline($restoreCommand);
+        $proc->run(function ($type, $buffer) use (&$i, $indicator, $output) {
+            if ($type === Process::OUT || $type === Process::ERR) {
+                $output->write("\r" . $indicator[$i % 4]);
+                $i++;
+                usleep(100000);
             }
+        });
 
-            $output->writeln("\r<info>Database restored successfully from $selected</info>");
-            return 0;
+        if (!$proc->isSuccessful()) {
+            throw new ProcessFailedException($proc);
         }
+
+        $output->writeln("\r<info>Database restored successfully from $selected</info>");
+        return 0;
     }
 }
