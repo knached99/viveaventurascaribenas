@@ -9,6 +9,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class RestoreBackup extends Command
 {
@@ -124,10 +125,27 @@ class RestoreBackup extends Command
         }
 
         $files = collect(File::files($this->backupDir))
-            ->filter(fn($file) => $file->getExtension() === 'sql')
-            ->map(fn($file) => $file->getRealPath())
-            ->values()
-            ->all();
+        ->filter(fn($file) => $file->getExtension() === 'sql')
+        ->map(function ($file) {
+            $path = $file->getRealPath();
+            $filename = basename($path);
+    
+            // Extract the datetime from the filename
+            if (preg_match('/backup_(\d{4}-\d{2}-\d{2})_(\d{2}-\d{2}-\d{2})\.sql/', $filename, $matches)) {
+                $dateTimeString = "{$matches[1]} {$matches[2]}";
+                $dateTime = Carbon::createFromFormat('Y-m-d H-i-s', $dateTimeString);
+                $readable = $dateTime->format('l, F jS, Y \a\t g a'); // e.g. Wednesday, July 10th, 2025 at 10 pm
+            } else {
+                $readable = 'Unknown Date';
+            }
+    
+            return [
+                'path' => $path,
+                'label' => $readable . " ({$filename})"
+            ];
+        })
+        ->values()
+        ->all();
 
         Log::info("Found " . count($files) . " .sql backup file(s)");
 
@@ -137,19 +155,21 @@ class RestoreBackup extends Command
         }
 
       
-        $fileChoices = array_map('basename', $files);
+        $fileChoices = array_map($files, 'label');
         $selected = null;
 
-        while(!in_array($selected, $fileChoices)){
+        while (!in_array($selected, $fileChoices)) {
             $selected = $this->choice('Select a backup to restore', $fileChoices, null);
-
-            if(!in_array($selected, $fileChoices)){
-                $this->error('❌ Invalid selection. Please choose a valid backup file from the list.');  
+        
+            if (!in_array($selected, $fileChoices)) {
+                $this->error('❌ Invalid selection. Please choose a valid backup file from the list.');
             }
         }
+        
 
         $selectedIndex = array_search($selected, $fileChoices);
-        $selectedPath = $files[$selectedIndex]; 
+        $selectedPath = collect($files)->firstWhere('label', $selected)['path'];
+
         
 
         Log::info("User selected backup file: $selectedPath");
