@@ -45,53 +45,28 @@ class RestoreBackup extends Command
         // Using Symfony process instead of proc_open() as it safely escapes arguments
         // and prevents shell injection attacks 
 
-        // $proc = Process::fromShellCommandline(sprintf(
-        //     'mysql --user=%s --password=%s --host=%s %s < %s',
-        //     escapeshellarg(env('DB_USERNAME')),
-        //     escapeshellarg(env('DB_PASSWORD')),
-        //     escapeshellarg(env('DB_HOST')),
-        //     escapeshellarg(env('DB_DATABASE')),
-        //     escapeshellarg($file)
-        // ));
-
-        // $proc->run(function($type, $buffer) use (&$i, $indicator, $output){
-
-        //     if($type === Process::OUT || $type === Process::ERR){
-        //         $output->write("\r".$indicator[$i % 4]);
-        //         $i++;
-        //         usleep(100000);
-        //     }
-
-        // });
-
-        // if(!$proc->isSuccessful()){
-        //     throw new ProcessFialedException($proc);
-        // }
-
-        // Adding the below to test for pattern matching using Semgrep scanner
-
-        $command = sprintf(
+        $proc = Process::fromShellCommandline(sprintf(
             'mysql --user=%s --password=%s --host=%s %s < %s',
-            env('DB_USERNAME'),
-            env('DB_PASSWORD'),
-            env('DB_HOST'),
-            env('DB_DATABASE'),
-            env('DB_SOCKET'),
-            $file
-        );
+            escapeshellarg(env('DB_USERNAME')),
+            escapeshellarg(env('DB_PASSWORD')),
+            escapeshellarg(env('DB_HOST')),
+            escapeshellarg(env('DB_DATABASE')),
+            escapeshellarg($file)
+        ));
 
-        $process = proc_open($command, [
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w']
-        ], $pipes);
+        $proc->run(function($type, $buffer) use (&$i, $indicator, $output){
 
-        while(proc_get_status($process)['running']){
-            $output->write("\r" . $indicator[$i % 4]);
-            $i++;
-            usleep(100000);
+            if($type === Process::OUT || $type === Process::ERR){
+                $output->write("\r".$indicator[$i % 4]);
+                $i++;
+                usleep(100000);
+            }
 
+        });
+
+        if(!$proc->isSuccessful()){
+            throw new ProcessFailedException($proc);
         }
-        proc_close($process);
 
         $output->writeln("\rDatabase restored successfully.");
 
