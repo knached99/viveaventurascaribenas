@@ -130,8 +130,10 @@ class RestoreBackup extends Command
         }
 
         $fileChoices = array_map('basename', $files);
-        $selected = $this->choice('Select a backup to restore', $fileChoices);
-        $selectedPath = $this->backupDir . '/' . $selected;
+        $selected = $this->choice('Select a backup to restore', $fileChoices, 0);
+        $selectedIndex = array_search($selected, $fileChoices);
+        $selectedPath = $files[$selectedIndex]; 
+        
 
         Log::info("User selected backup file: $selectedPath");
         $this->printAsciiBanner($output);
