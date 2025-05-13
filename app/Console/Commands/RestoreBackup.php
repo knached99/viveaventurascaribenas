@@ -4,9 +4,10 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Output\ConsoleOutput;
-
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exceotion\ProcessFailedException;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class RestoreBackup extends Command
 {
