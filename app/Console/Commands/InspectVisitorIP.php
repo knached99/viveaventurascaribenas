@@ -80,7 +80,10 @@ class InspectVisitorIP extends Command {
             $this->warn('No additional data found for this IP in the database.');
         } else {
             $this->info('Database record for this IP:');
-            $this->line(json_encode($ipDetails->toArray(), JSON_PRETTY_PRINT));
+            // $this->line(json_encode($ipDetails->toArray(), JSON_PRETTY_PRINT));
+            $this->table(['Field', 'Value'], 
+            collect($ipDetails)->map(fn($value, $key) => [$key, $value])->toArray()
+            );
         }
 
         // Fetch geolocation data
