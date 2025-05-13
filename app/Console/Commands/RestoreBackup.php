@@ -14,11 +14,12 @@ class RestoreBackup extends Command
 {
     protected $signature = 'db:restore';
     protected $description = 'Restore the database from an existing .sql backup or create one if none exist';
+    protected $backupDir;
 
     public function __construct()
     {
-        $this->backupDir = storage_path('app/backups');
         parent::__construct();
+        $this->backupDir = storage_path('app/backups');
     }
 
     public function handle()
@@ -31,29 +32,30 @@ class RestoreBackup extends Command
             2 => 'Terminate Program'
         ];
         
-        $validChoices = array_keys($options); // Only the keys (0-2) in the array are valid options
-        while(true){
+        $validChoices = array_keys($options);
+
+        while (true) {
             $output->writeln("\n<info>--- Backup Utility Menu ---</info>");
-            foreach($options as $key => $label){
+            foreach ($options as $key => $label) {
                 $output->writeln("[$key] $label");
             }
 
-            $choice = (int) $this->ask('Choose an option from the menu: ');
+            $choice = (int) $this->ask('Choose an option from the menu:');
 
-            if(!in_array($choice, $validChoices, true)){
+            if (!in_array($choice, $validChoices, true)) {
                 $this->error("Invalid option, please try again.");
                 continue;
             }
 
-            switch($choice){
-                case 0: 
-                    $this->createBackup();
+            switch ($choice) {
+                case 0:
+                    $this->createBackup($output);
                     break;
 
                 case 1:
-                    $this->restoreBackup();
+                    $this->restoreBackup($output);
                     break;
-                
+
                 case 2:
                     $output->writeln("<info>Program Terminated.</info>");
                     return 0;
@@ -61,113 +63,118 @@ class RestoreBackup extends Command
 
             break;
         }
-       
-    }
 
-    private function createBackup(){
-        Log::info("Initiating backup creation...");
-        
-        if(!File::exists($this->backupDir)){
-            File::makeDirectory($this->backupDir, 0755, true);
-            $output->writeln('<info>Backups directory created!</info>');
-            Log::info("Backup directory created at ".$this->backupDir."");
-        }
-
-        else{
-            Log::info("Backup directory already exists at ".$this->backupDir."");
-        }
-
-        $timestamp = now()->format('Y-m-d_H-i-s');
-        $dumpPath = $this->backupDir. "/backup_$timestamp.sql";
-
-        $dumpCommand = sprintf('mysqldump --user=%s --password=%s --host=%s %s > %s',
-        escapeshellarg(env('DB_USERNAME')),
-        escapeshellarg(env('DB_PASSWORD')),
-        escapeshellarg(env('DB_HOST')),
-        escapeshellarg(env('DB_DATABASE')),
-        escapeshellarg($dumpPath));
-
-        Log::info("Creating new backup at ".$dumpPath);
-
-        $process = Process::fromShellCommandline($dumpCommand);
-        $process->run();
-
-        if(!$process->isSuccessful()){
-            Log::error("Failed to create backup: ".$process->getErrorOutput());
-            throw new ProcessFailedException($process);
-        }
-
-        $output->writeln("<info>Created a new backup at: $dumpPath</info>");
-        Log::info("Backup created successfully at: $dumpPath");
         return 0;
     }
 
+    private function createBackup($output)
+    {
+        Log::info("Initiating backup creation...");
 
-    private function restoreBackup(){
-        
-        Log::info("<info> Executing backup restore command...");
+        if (!File::exists($this->backupDir)) {
+            File::makeDirectory($this->backupDir, 0755, true);
+            $output->writeln('<info>Backups directory created!</info>');
+            Log::info("Backup directory created at {$this->backupDir}");
+        }
 
-        if(!File::exists($this->backupDir)){
-            File::makeDirectory($backupDir, 0755, true);
+        $timestamp = now()->format('Y-m-d_H-i-s');
+        $dumpPath = $this->backupDir . "/backup_$timestamp.sql";
+
+        $dumpCommand = sprintf(
+            'mysqldump --user=%s --password=%s --host=%s %s > %s',
+            escapeshellarg(env('DB_USERNAME')),
+            escapeshellarg(env('DB_PASSWORD')),
+            escapeshellarg(env('DB_HOST')),
+            escapeshellarg(env('DB_DATABASE')),
+            escapeshellarg($dumpPath)
+        );
+
+        Log::info("Creating new backup at $dumpPath");
+
+        $this->output->writeln('<info>Creating backup. Please wait...</info>');
+        $this->output->withProgressBar(range(1, 10), function () use ($dumpCommand) {
+            $process = Process::fromShellCommandline($dumpCommand);
+            $process->run();
+            usleep(150000); // Simulate progress
+            if (!$process->isSuccessful()) {
+                Log::error("Failed to create backup: " . $process->getErrorOutput());
+                throw new ProcessFailedException($process);
+            }
+        });
+
+        $output->writeln("\n<info>Backup created at: $dumpPath</info>");
+        Log::info("Backup created successfully at: $dumpPath");
+    }
+
+    private function restoreBackup($output)
+    {
+        Log::info("Executing backup restore command...");
+
+        if (!File::exists($this->backupDir)) {
+            File::makeDirectory($this->backupDir, 0755, true);
             $output->writeln('<info>Backups directory created.</info>');
-            Log::info("[RestoreBackup] Created backup directory at $backupDir.");
-        }
-        else{
-            Log::info("Backup directory already exists at $backupDir");
+            Log::info("[RestoreBackup] Created backup directory at {$this->backupDir}");
         }
 
-        $files = collect(File::files($backupDir))
-        ->filter(fn($file) => $file->getExtension() === 'sql')
-        ->map(fn($file) => $file->getRealPath())
-        ->values()
-        ->all();
+        $files = collect(File::files($this->backupDir))
+            ->filter(fn($file) => $file->getExtension() === 'sql')
+            ->map(fn($file) => $file->getRealPath())
+            ->values()
+            ->all();
 
-        Log::info("Found ".count($files). " .sql backup file(s)");
+        Log::info("Found " . count($files) . " .sql backup file(s)");
 
-        if(count($files) === 0){
-            $output->writeln("<info> No backups found, exiting program. Re-run the program and select the first option to create a new backup");
+        if (count($files) === 0) {
+            $output->writeln("<info>No backups found. Please create a new backup first.</info>");
             return 0;
         }
 
         $fileChoices = array_map('basename', $files);
         $selected = $this->choice('Select a backup to restore', $fileChoices);
-        $selectedPath = $this->backupDir. '/'. $selected;
-        
-        Log::info("User selected the following backup file: ".$selectedPath);
+        $selectedPath = $this->backupDir . '/' . $selected;
 
-        $output->writeln("Restoring database from selected backup...");
-        Log::info("Beginning restore process...");
+        Log::info("User selected backup file: $selectedPath");
+        $this->printAsciiBanner($output);
 
-        $indicator = ['|', '/', '-', '\\'];
-        $i = 0;
+        $this->output->writeln('<info>Restoring database. Please wait...</info>');
+        $this->output->withProgressBar(range(1, 10), function () use ($selectedPath) {
+            $restoreCommand = sprintf(
+                'mysql --user=%s --password=%s --host=%s %s < %s',
+                escapeshellarg(env('DB_USERNAME')),
+                escapeshellarg(env('DB_PASSWORD')),
+                escapeshellarg(env('DB_HOST')),
+                escapeshellarg(env('DB_DATABASE')),
+                escapeshellarg($selectedPath)
+            );
 
-        $restoreCommand = sprintf(
-            'mysql --user=%s --password=%s --host=%s %s < %s',
-            escapeshellarg(env('DB_USERNAME')),
-            escapeshellarg(env('DB_PASSWORD')),
-            escapeshellarg(env('DB_HOST')),
-            escapeshellarg(env('DB_DATABASE')),
-            escapeshellarg($selectedPath)
-        );
+            $proc = Process::fromShellCommandline($restoreCommand);
+            $proc->run();
 
-        $proc = Process::fromShellCommandline($restoreCommand);
-        $proc->run(function ($type, $buffer) use (&$i, $indicator, $output) {
-            if ($type === Process::OUT || $type === Process::ERR) {
-                $output->write("\r" . $indicator[$i % 4]);
-                $i++;
-                usleep(100000);
+            usleep(150000); // Simulate progress
+
+            if (!$proc->isSuccessful()) {
+                Log::error("Database restore failed: " . $proc->getErrorOutput());
+                throw new ProcessFailedException($proc);
             }
         });
 
-        if(!$proc->isSuccessful()){
-            Log::error("Database restore failed: ".$proc->getErrorOutput());
-            throw new ProcessFailedException($proc);
-        }
-
-        $output->writeln("\r<info>Database restored succsesfully from $selected</info>");
-        
+        $output->writeln("\n<info>Database restored successfully from $selected</info>");
         Log::info("Database restored successfully from $selectedPath");
-        return 0;
 
+        return 0;
+    }
+
+    private function printAsciiBanner($output)
+    {
+        $ascii = <<<ASCII
+  ____  ____   ____            _             
+ |  _ \|  _ \ / ___|  ___ _ __(_)_ __   __ _ 
+ | | | | |_) | |  _  / __| '__| | '_ \ / _` |
+ | |_| |  _ <| |_| || (__| |  | | | | | (_| |
+ |____/|_| \_\\____(_)___|_|  |_|_| |_|\__, |
+                                      |___/  
+
+ASCII;
+        $output->writeln("<fg=cyan>$ascii</fg=cyan>");
     }
 }
