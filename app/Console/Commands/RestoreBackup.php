@@ -136,8 +136,18 @@ class RestoreBackup extends Command
             return 0;
         }
 
+      
         $fileChoices = array_map('basename', $files);
-        $selected = $this->choice('Select a backup to restore', $fileChoices, 0);
+        $selected = null;
+
+        while(!in_array($selected, $fileChoices)){
+            $selected = $this->choice('Select a backup to restore', $fileChoices, null);
+
+            if(!in_array($selected, $fileChoices)){
+                $this->error('❌ Invalid selection. Please choose a valid backup file from the list.');  
+            }
+        }
+
         $selectedIndex = array_search($selected, $fileChoices);
         $selectedPath = $files[$selectedIndex]; 
         
@@ -167,7 +177,7 @@ class RestoreBackup extends Command
             }
         });
 
-        $output->writeln("\n<info>Database restored successfully from $selected</info>");
+        $this->info("\n✅ Database restored successfully from $selected");
         Log::info("Database restored successfully from $selectedPath");
 
         return 0;
