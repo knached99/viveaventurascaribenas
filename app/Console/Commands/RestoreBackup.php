@@ -155,7 +155,8 @@ class RestoreBackup extends Command
         }
 
       
-        $fileChoices = array_map($files, 'label');
+        $fileChoices = array_map(fn($f) => $f['label'], $files);
+
         $selected = null;
 
         while (!in_array($selected, $fileChoices)) {
