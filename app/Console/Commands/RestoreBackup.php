@@ -150,8 +150,14 @@ class RestoreBackup extends Command
         Log::info("Found " . count($files) . " .sql backup file(s)");
 
         if (count($files) === 0) {
-            $output->writeln("<info>No backups found. Please create a new backup first.</info>");
+            $prompt = $this->ask('No backups found, would you like to create a new one? Y for yes or N to terminate program');
+
+            if($prompt === 'Y' || $prompt === 'y'){
+                $this->createBackup();
+            }
+            else {
             return 0;
+            }
         }
 
       
