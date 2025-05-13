@@ -74,7 +74,7 @@ class InspectVisitorIP extends Command {
         $this->info("You selected IP: $decryptedSelectedIP");
 
         // Fetch additional info from the database
-        $ipDetails = VisitorModel::where('visitor_ip_address', $decryptedSelectedIP)->first();
+        $ipDetails = VisitorModel::where('visitor_ip_address', $selectedIp)->first();
 
         if (!$ipDetails) {
             $this->warn('No additional data found for this IP in the database.');
