@@ -72,7 +72,7 @@ class RestoreBackup extends Command
                 throw new ProcessFailedException($process);
             }
 
-            // $output->writeln("<info>No backups found. Created a new backup at: $dumpPath</info>");
+             $output->writeln("<info>Created a new backup at: $dumpPath</info>");
             Log::info("[RestoreBackup] Backup created successfully at $dumpPath");
             return 0;
         }
