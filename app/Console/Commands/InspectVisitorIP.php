@@ -261,6 +261,7 @@ class InspectVisitorIP extends Command
     $this->info("🛰️  Map generated! View it at:\n$mapURL");
 }
 
+
 protected function searchIPsByCountry()
 {
     $country = Str::lower($this->ask("Enter a country name (e.g. Mexico): "));
@@ -286,7 +287,10 @@ protected function searchIPsByCountry()
     }
 
     $this->info("Searching for IPs located in {$country}...");
-    $this->showLoadingSpinner("Searching IPs");
+
+    // Spinner characters for animation
+    $spinnerChars = ['|', '/', '-', '\\'];
+    $spinnerIndex = 0;
 
     $matchingIPs = [];
     $limit = 100;
@@ -312,11 +316,20 @@ protected function searchIPsByCountry()
                 }
             }
         } catch (\Exception $e) {
-            continue;
+            // Skip on error
         }
+
+        // Display spinner with current IP being processed
+        echo "\r" . $spinnerChars[$spinnerIndex++] . " Searching IPs... Current: {$ip} ";
+        $spinnerIndex %= count($spinnerChars);
+        flush();
+
+        // Optional small delay for smooth spinner animation
+        usleep(100000); // 0.1 seconds
     }
 
-    $this->stopLoadingSpinner();
+    // Clear spinner line
+    echo "\r" . str_repeat(' ', 80) . "\r";
 
     if (empty($matchingIPs)) {
         $this->warn("No IPs found for: {$country}");
@@ -329,37 +342,6 @@ protected function searchIPsByCountry()
 }
 
 
-
-
-protected $spinnerRunning = false;
-
-protected function showLoadingSpinner()
-{
-    $spinnerChars = ['|', '/', '-', '\\'];
-    $spinnerIndex = 0;
-
-    // Start time or some flag for the spinner duration
-    $start = time();
-
-    while ($this->spinnerRunning) {
-        echo "\r" . $spinnerChars[$spinnerIndex++] . " Decrypting IPs...";
-        $spinnerIndex %= count($spinnerChars);
-
-        // Do some chunk of work here or sleep briefly
-        usleep(100000); // 0.1 second
-
-        // You need to update $this->spinnerRunning = false; when your actual work is done
-    }
-    
-    echo "\rDone decrypting IPs.       \n";
-}
-
-
-protected function stopLoadingSpinner()
-{
-    $this->spinnerRunning = false;
-    echo "\033[1D✔️\n";
-}
 
 
 protected function generateMapForGeoPoints(array $geoPoints, string $title = '🌍 Visitor IPs')
