@@ -264,71 +264,62 @@ class InspectVisitorIP extends Command
 protected function searchIPsByCountry()
 {
     $country = $this->ask("Enter a country name (e.g. Mexico): ");
+    $targetCountry = Str::lower($country);
 
-    // Limit to only 100 encrypted IPs right away
+    // Pull only 100 IPs from DB
     $encryptedIPs = VisitorModel::pluck('visitor_ip_address')->unique()->take(100)->values();
 
     if ($encryptedIPs->isEmpty()) {
-        $this->error("No IP addresses found");
+        $this->error("No IP addresses found.");
         return;
     }
 
-    $decryptedIPs = [];
-
-    $this->info("Decrypting up to 100 IP addresses...");
-
-    foreach ($encryptedIPs as $index => $ip) {
+    $decryptedIPs = collect($encryptedIPs)->map(function ($encrypted, $i) {
         try {
-            $decrypted = Crypt::decryptString($ip);
-            $decryptedIPs[] = $decrypted;
+            return Crypt::decryptString($encrypted);
         } catch (\Exception $e) {
-            $this->warn("Skipping invalid IP at index {$index}");
+            return null;
         }
-    }
+    })->filter()->values();
 
-    if (empty($decryptedIPs)) {
-        $this->error("No valid decrypted IPs to search with.");
+    if ($decryptedIPs->isEmpty()) {
+        $this->error("No valid decrypted IPs.");
         return;
     }
 
     $matchingIPs = [];
 
-    $this->info("Checking IPs against country: {$country}...");
-    $total = count($decryptedIPs);
+    // Make each request and immediately check result
+    foreach ($decryptedIPs as $ip) {
+        try {
+            $response = Http::timeout(2)->get("http://ip-api.com/json/{$ip}");
 
-    foreach ($decryptedIPs as $i => $ip) {
-        $progress = $i + 1;
-        $this->line("[$progress/$total] Checking IP: {$ip}");
+            if ($response->successful() && $response->json('status') === 'success') {
+                $data = $response->json();
 
-        $response = Http::get("http://ip-api.com/json/{$ip}");
-
-        if ($response->successful() && $response->json('status') === 'success') {
-            $data = $response->json();
-
-            if (Str::lower($data['country']) === Str::lower($country)) {
-                $matchingIPs[] = [
-                    'ip' => $ip,
-                    'city' => $data['city'] ?? 'N/A',
-                    'region' => $data['regionName'] ?? 'N/A',
-                    'lat' => $data['lat'],
-                    'lon' => $data['lon'],
-                ];
+                if (Str::lower($data['country']) === $targetCountry) {
+                    $matchingIPs[] = [
+                        'ip' => $ip,
+                        'city' => $data['city'] ?? 'N/A',
+                        'region' => $data['regionName'] ?? 'N/A',
+                        'lat' => $data['lat'],
+                        'lon' => $data['lon'],
+                    ];
+                }
             }
-        } else {
-            $this->warn("Failed to retrieve data for IP: {$ip}");
+        } catch (\Exception $e) {
+            // Fail silently to save time
+            continue;
         }
-
-        usleep(300000); // 0.3 seconds
     }
 
     if (empty($matchingIPs)) {
-        $this->warn("No IPs found for: $country");
+        $this->warn("No IPs found for: {$country}");
         return;
     }
 
     $this->info("Found the following IPs for {$country}:");
     $this->table(['IP', 'City', 'Region/State', 'Latitude', 'Longitude'], $matchingIPs);
-
     $this->generateMapForGeoPoints($matchingIPs, "🌍 IPs from {$country}");
 }
 
