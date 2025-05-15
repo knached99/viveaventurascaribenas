@@ -22,15 +22,21 @@ class InspectVisitorIP extends Command
             '2' => 'Inspect and plot multiple IPs',
             '3' => 'Search for IPs by country',
         ], 0);
-        
-        return match($action) {
-            '1' => $this->inspectSingleIP(),
-            '2' => $this->inspectAndPlotMultipleIPs(),
-            '3' => $this->searchIPsByCountry(),
-            default => $this->error("Invalid option selected."),
-        };
-        
+    
+        switch ($action) {
+            case '1':
+                return $this->inspectSingleIP();
+            case '2':
+                return $this->inspectAndPlotMultipleIPs();
+            case '3':
+                return $this->searchIPsByCountry();
+            default:
+                $this->error("Invalid option selected.");
+                return 1;
+        }
     }
+    
+    
 
     protected function inspectSingleIP()
     {
