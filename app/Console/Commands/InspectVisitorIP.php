@@ -42,7 +42,7 @@ class InspectVisitorIP extends Command
 
         $spinner->finish('IP addresses fetched!');
 
-        $choice = $this->choice('How many IPs would you like to view?', ['10', '50', '100', 'All'], 0);
+        $choice = $this->choice('How many IPs would you like to view?', ['10', '50', '100', '1000'], 0);
         $limitedIPs = match ($choice) {
             '10' => $ipAddresses->take(10),
             '50' => $ipAddresses->take(50),
