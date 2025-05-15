@@ -39,7 +39,7 @@ class MaxMindService
         try {
          
             // Use MaxMind Reader to get location data
-            $record = $this->reader->country($decryptedIP);
+            $record = $this->reader->city($decryptedIP);
 
             $location = [
                 'country' => $record->country->isoCode ?? null,
