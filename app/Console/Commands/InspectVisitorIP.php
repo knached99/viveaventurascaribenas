@@ -333,32 +333,27 @@ protected function searchIPsByCountry()
 
 protected $spinnerRunning = false;
 
-protected function showLoadingSpinner($message = 'Loading...')
+protected function showLoadingSpinner()
 {
-    $this->spinnerRunning = true;
-    $chars = ['|', '/', '-', '\\'];
-    $i = 0;
+    $spinnerChars = ['|', '/', '-', '\\'];
+    $spinnerIndex = 0;
 
-    echo $message . ' ';
-    $spinner = function () use (&$i, $chars) {
-        echo "\033[1D" . $chars[$i++ % count($chars)];
-        usleep(100000); // 100ms
-    };
+    // Start time or some flag for the spinner duration
+    $start = time();
 
-    $this->spinnerProcess = function () use ($spinner) {
-        while ($this->spinnerRunning) {
-            $spinner();
-        }
-    };
+    while ($this->spinnerRunning) {
+        echo "\r" . $spinnerChars[$spinnerIndex++] . " Decrypting IPs...";
+        $spinnerIndex %= count($spinnerChars);
 
-    // Start spinner in background
-    register_shutdown_function(function () {
-        $this->spinnerRunning = false;
-    });
+        // Do some chunk of work here or sleep briefly
+        usleep(100000); // 0.1 second
 
-    $this->spinnerThread = new \Threaded();
-    $this->spinnerThread->run = $this->spinnerProcess;
+        // You need to update $this->spinnerRunning = false; when your actual work is done
+    }
+    
+    echo "\rDone decrypting IPs.       \n";
 }
+
 
 protected function stopLoadingSpinner()
 {
