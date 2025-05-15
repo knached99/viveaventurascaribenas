@@ -140,7 +140,7 @@ class InspectVisitorIP extends Command {
         }
 
         $geoPoints = [];
-        $chunks = array_chunk($decryptedIps, 10); // processing in batches of 10 to avoid rate limiting 
+        $chunks = array_chunk($decryptedIPs, 10); // processing in batches of 10 to avoid rate limiting 
 
         foreach($chunks as $chunk){
 
