@@ -186,7 +186,7 @@ class InspectVisitorIP extends Command
         
         $filename = public_path('visitor_map.html');
         file_put_contents($filename, $html);
-        
-        $this->info("Map generated! Open the following file in your browser:\n$filename");
+        $mapURL = env('APP_URL').'visitor_map.html';
+        $this->info("Map generated! Open the following page in your browser:\n$mapURL");
     }
 }
