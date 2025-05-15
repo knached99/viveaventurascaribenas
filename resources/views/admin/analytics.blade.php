@@ -109,6 +109,13 @@
                                 <span>No visitors</span>
                             </div>
                         </div>
+
+                        <div class="d-flex flex-wrap align-items-center">
+                        <div class="d-flex align-items-center m-3">
+                        <div style="width: 20px; height: 20px; background-color: #FFD700; margin-right: 8px;"></div>
+                        <span>Density of visitors in Regions/States and Cities</span>
+                        </div>
+                        </div>
                     </div>
                 </div>
             </div>
