@@ -53,6 +53,7 @@ class MaxMindService
                 'longitude' => $record->location->longitude ?? null,
             ];
 
+            \Log::info('Location data: '.json_encode($location));
             // Cache the location for 1 day
             Cache::put($cacheKey, $location, 1440);
 
