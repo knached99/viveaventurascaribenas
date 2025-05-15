@@ -109,7 +109,7 @@
                                 <span>No visitors</span>
                             </div>
 
-                            <div class="d-flex align-items-center me-3">
+                            <div class="d-flex align-items-center ml-3">
                                 <div style="width: 20px; height: 20px; background-color: #FFD700; margin-right: 8px;"></div> 
                                 <span>Regions/States and Cities</span>
                             </div>
