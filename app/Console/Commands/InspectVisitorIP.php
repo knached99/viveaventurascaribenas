@@ -298,7 +298,7 @@ protected function searchIPsByCountry(){
 
     $this->info("Decrypting IPs...");
 
-    $decryptedIPs = collect($encryptIPs)->map(function($encryptedIP){
+    $decryptedIPs = collect($encryptedIPs)->map(function($encryptedIP){
 
         try{
 
