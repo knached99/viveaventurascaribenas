@@ -277,7 +277,7 @@ class Analytics extends Controller
             $lat = $visitor['lat'] ?? null;
             $lon = $visitor['lon'] ?? null;
 
-            if(!$country || !$state || !$city || $at === null || $lon === null){
+            if(!$country || !$state || !$city || $lat === null || $lon === null){
                 continue;
             }
 
