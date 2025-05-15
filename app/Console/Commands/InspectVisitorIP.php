@@ -261,22 +261,21 @@ class InspectVisitorIP extends Command
     $this->info("🛰️  Map generated! View it at:\n$mapURL");
 }
 
-
 protected function searchIPsByCountry()
 {
     $country = $this->ask("Enter a country name (e.g. Mexico): ");
 
-    $encryptedIPs = VisitorModel::pluck('visitor_ip_address')->unique()->values();
+    // Limit to only 100 encrypted IPs right away
+    $encryptedIPs = VisitorModel::pluck('visitor_ip_address')->unique()->take(100)->values();
 
     if ($encryptedIPs->isEmpty()) {
         $this->error("No IP addresses found");
         return;
     }
 
-    $limit = 100;
     $decryptedIPs = [];
 
-    $this->info("Decrypting IP addresses...");
+    $this->info("Decrypting up to 100 IP addresses...");
 
     foreach ($encryptedIPs as $index => $ip) {
         try {
@@ -314,14 +313,12 @@ protected function searchIPsByCountry()
                     'lat' => $data['lat'],
                     'lon' => $data['lon'],
                 ];
-
-                if (count($matchingIPs) >= $limit) break;
             }
         } else {
             $this->warn("Failed to retrieve data for IP: {$ip}");
         }
 
-        usleep(300000); // sleep 0.3 seconds to avoid rate limit
+        usleep(300000); // 0.3 seconds
     }
 
     if (empty($matchingIPs)) {
