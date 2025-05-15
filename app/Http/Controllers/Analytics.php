@@ -229,8 +229,10 @@ class Analytics extends Controller
         $countries = [];
         $browsers = [];
         $operatingSystems = [];
+        $locationCounts = [];
     
-        // Process visitors and aggregate data
+        // Processing visitors and aggregating the data
+
         foreach ($visitors as &$visitor) {
             $ip = $visitor['visitor_ip_address'];
             $location = $locations[$ip] ?? null;
@@ -253,53 +255,44 @@ class Analytics extends Controller
             $browsers[$visitor['browser']] = ($browsers[$visitor['browser']] ?? 0) + 1;
             $os = $visitor['operating_system'] ?: 'Unknown';
             $operatingSystems[$os] = ($operatingSystems[$os] ?? 0) + 1;
+
+            $topBrowsers = array_slice($browsers, 0, 5, true);
+            $topOperatingSystems = array_slice($operatingSystems, 0, 5, true);
+        
+        // aggregating heatmap data 
+
+        $country = $visitor['country'];
+        $state = $visitor['state'];
+        $city = $visitor['city'];
+        $lat = $visitor['latitude'];
+        $lon = $visitor['longitude'];
+
+        if(!$country || !$state || !$city || $lat === null || $lon === null){
+            continue; 
+        }
+
+        $key = "{$country}|{$state}|{$city}|{$lat}|{$lon}";
+
+        if(!isset($locationCounts[$key])){
+
+            $locationCounts = [$key] = [
+                'country' => $country,
+                'state' => $state,
+                'city' => $city,
+                'latitude' => $lat,
+                'longitude' => $lon,
+                'count' => 0
+            ];
+        }
+
+            $locationCounts[$key]['count']++;
         }
     
         arsort($browsers);
         arsort($operatingSystems);
-    
-        $topBrowsers = array_slice($browsers, 0, 5, true);
-        $topOperatingSystems = array_slice($operatingSystems, 0, 5, true);
-    
-        // Prepare heatmap data
-        // $heatmapData = [];
-        // foreach (array_count_values($countries) as $country => $count) {
-        //     $heatmapData[] = ['country' => $country, 'count' => $count];
-        // }
-
-        $locationCounts = [];
-
-        foreach($visitors as $visitor){
-
-            $country = $visitor['country'] ?? null;
-            $state = $visitor['state'] ?? null;
-            $city = $visitor['city'] ?? null;
-            $lat = $visitor['lat'] ?? null;
-            $lon = $visitor['lon'] ?? null;
-
-            if(!$country || !$state || !$city || $lat === null || $lon === null){
-                continue;
-            }
-
-            $key = "{$country}|{$state}|{$city}|{$lat}|{$lon}";
-
-            if(!isset($locationCounts[$key])){
-
-                $locationCounts[$key] = [
-                    'country' => $country, 
-                    'state' => $state,
-                    'city' => $city,
-                    'latitude' => $lat, 
-                    'longitude' => $lon, 
-                    'count' => 0
-                ];
-            }
-
-            $locationCounts[$key]['count'] ++;
-        }
-
         $heatmapData = array_values($locationCounts);
 
+        
         \Log::info('Heatmap Data:'. json_encode($heatmapData));
     
         // Get bot crawler data
