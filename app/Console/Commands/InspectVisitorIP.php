@@ -17,24 +17,34 @@ class InspectVisitorIP extends Command
 
     public function handle()
     {
-        $action = $this->choice('Select an action:', [
+        $options = [
             '1' => 'Inspect a single IP',
             '2' => 'Inspect and plot multiple IPs',
             '3' => 'Search for IPs by country',
-        ], 0);
+        ];
+    
+        // Flip it so the user sees descriptions, but you get the number back
+        $action = array_search(
+            $this->choice('Select an action:', array_values($options), 0),
+            $options
+        );
     
         switch ($action) {
             case '1':
                 return $this->inspectSingleIP();
+    
             case '2':
                 return $this->inspectAndPlotMultipleIPs();
+    
             case '3':
                 return $this->searchIPsByCountry();
+    
             default:
                 $this->error("Invalid option selected.");
                 return 1;
         }
     }
+    
     
     
 
