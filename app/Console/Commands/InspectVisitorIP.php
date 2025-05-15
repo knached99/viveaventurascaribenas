@@ -284,33 +284,30 @@ protected function saveOffset(int $offset){
 }
 
 
-protected function searchIPsByCountry(){
+protected $spinnerChars = ['|', '/', '-', '\\'];
 
+protected function searchIPsByCountry()
+{
     $country = Str::lower($this->ask("Search for IP by country (e.g. Mexico): "));
 
     $encryptedIPs = VisitorModel::pluck("visitor_ip_address")->unique();
 
-    if($encryptedIPs->isEmpty()){
-        
+    if ($encryptedIPs->isEmpty()) {
         $this->error("No IP addresses found");
         return;
     }
 
     $this->info("Decrypting IPs...");
 
-    $decryptedIPs = collect($encryptedIPs)->map(function($encryptedIP){
-
-        try{
-
+    $decryptedIPs = collect($encryptedIPs)->map(function ($encryptedIP) {
+        try {
             return Crypt::decryptString($encryptedIP);
-        }
-
-        catch(\Exception $e){
+        } catch (\Exception $e) {
             return null;
         }
     })->filter()->values();
 
-    if($decryptedIPs->isEmpty()){
+    if ($decryptedIPs->isEmpty()) {
         $this->error("No valid decrypted IPs");
         return;
     }
@@ -318,36 +315,33 @@ protected function searchIPsByCountry(){
     $offset = $this->getLastOffset();
     $total = $decryptedIPs->count();
 
-    if($offset >= $total){
-
+    if ($offset >= $total) {
         $this->info("All IPs processed");
-        
-        // deleting save file to reset next time 
-
         unlink(base_path($this->progressFile));
         return;
     }
 
     $this->info("Searching for IPs located in {$country}...");
-    $this->info("Processing IPs {$offset} to ".min($offset + $this->chunkSize, $total));
+    $this->info("Processing IPs {$offset} to " . min($offset + $this->chunkSize, $total));
 
     $matchingIPs = [];
     $count = 0;
+    $spinnerIndex = 0;
 
     $chunk = $decryptedIPs->slice($offset, $this->chunkSize);
 
-    foreach($chunk as $ip){
+    foreach ($chunk as $ip) {
+        // Show spinner
+        echo "\rSearching IPs... " . $this->spinnerChars[$spinnerIndex % count($this->spinnerChars)] . " Current IP: {$ip}  ";
+        $spinnerIndex++;
 
-        try{
+        try {
+            $response = Http::timeout(1.5)->get("http://ip-api.com/json/{$ip}");
 
-            $resopnse = Http::timeout(1.5)->get("http://ip-api.com/json/{$ip}");
-
-            if($response->successful() && $response->json('status') === 'success'){
-
+            if ($response->successful() && $response->json('status') === 'success') {
                 $data = $response->json();
 
-                if(Str::lower($data['country']) === $country){
-
+                if (Str::lower($data['country']) === $country) {
                     $matchingIPs[] = [
                         'ip' => $ip,
                         'city' => $data['city'] ?? 'N/A',
@@ -355,33 +349,29 @@ protected function searchIPsByCountry(){
                         'lat' => $data['lat'] ?? 'N/A',
                         'lon' => $data['lon'] ?? 'N/A',
                     ];
-
                     $count++;
                 }
             }
-        }
-
-        catch(\Exception $e){
+        } catch (\Exception $e) {
             continue;
         }
     }
 
-    // saving new offset 
+    // Clear spinner line after done
+    echo "\r" . str_repeat(' ', 80) . "\r";
+
     $newOffset = $offset + $this->chunkSize;
     $this->saveOffset($newOffset);
 
-    if(empty($matchingIPs)){
+    if (empty($matchingIPs)) {
         $this->warn("No IPs found for: {$country} in this batch.");
-    }
-
-    else{
-
+    } else {
         $this->info("Found the following IPs for {$country} in this batch:");
         $this->table(['IP', 'City', 'Region/State', 'Latitude', 'Longitude'], $matchingIPs);
         $this->generateMapForGeoPoints($matchingIPs, "🌍 IPs from {$country}");
     }
-    $this->info("Processed batch done. Run command again to continue from offset {$newOffset}.");
 
+    $this->info("Processed batch done. Run command again to continue from offset {$newOffset}.");
 }
 
 
