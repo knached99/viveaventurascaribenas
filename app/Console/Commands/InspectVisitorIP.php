@@ -16,7 +16,7 @@ class InspectVisitorIP extends Command
     protected $description = 'Inspect visitor IPs and get geolocation data';
 
     // Variables used in the queue process of the ip search method 
-    protected $chunkSize = 100;
+    protected $chunkSize = 1000;
     protected $progressFile = 'storage/app/ip_search_progress.txt';
 
 
