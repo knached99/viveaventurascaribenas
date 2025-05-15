@@ -263,18 +263,16 @@ class InspectVisitorIP extends Command
 
 protected function searchIPsByCountry()
 {
-    $country = $this->ask("Enter a country name (e.g. Mexico): ");
-    $targetCountry = Str::lower($country);
-
-    // Pull only 100 IPs from DB
-    $encryptedIPs = VisitorModel::pluck('visitor_ip_address')->unique()->take(100)->values();
+    $country = Str::lower($this->ask("Enter a country name (e.g. Mexico): "));
+    $encryptedIPs = VisitorModel::pluck('visitor_ip_address')->unique();
 
     if ($encryptedIPs->isEmpty()) {
         $this->error("No IP addresses found.");
         return;
     }
 
-    $decryptedIPs = collect($encryptedIPs)->map(function ($encrypted, $i) {
+    $this->info("Decrypting IPs...");
+    $decryptedIPs = collect($encryptedIPs)->map(function ($encrypted) {
         try {
             return Crypt::decryptString($encrypted);
         } catch (\Exception $e) {
@@ -287,17 +285,21 @@ protected function searchIPsByCountry()
         return;
     }
 
-    $matchingIPs = [];
+    $this->info("Searching for IPs located in {$country}...");
+    $this->showLoadingSpinner("Searching IPs");
 
-    // Make each request and immediately check result
+    $matchingIPs = [];
+    $limit = 100;
+    $count = 0;
+
     foreach ($decryptedIPs as $ip) {
         try {
-            $response = Http::timeout(2)->get("http://ip-api.com/json/{$ip}");
+            $response = Http::timeout(1.5)->get("http://ip-api.com/json/{$ip}");
 
             if ($response->successful() && $response->json('status') === 'success') {
                 $data = $response->json();
 
-                if (Str::lower($data['country']) === $targetCountry) {
+                if (Str::lower($data['country']) === $country) {
                     $matchingIPs[] = [
                         'ip' => $ip,
                         'city' => $data['city'] ?? 'N/A',
@@ -305,13 +307,16 @@ protected function searchIPsByCountry()
                         'lat' => $data['lat'],
                         'lon' => $data['lon'],
                     ];
+                    $count++;
+                    if ($count >= $limit) break;
                 }
             }
         } catch (\Exception $e) {
-            // Fail silently to save time
             continue;
         }
     }
+
+    $this->stopLoadingSpinner();
 
     if (empty($matchingIPs)) {
         $this->warn("No IPs found for: {$country}");
@@ -323,6 +328,43 @@ protected function searchIPsByCountry()
     $this->generateMapForGeoPoints($matchingIPs, "🌍 IPs from {$country}");
 }
 
+
+
+
+protected $spinnerRunning = false;
+
+protected function showLoadingSpinner($message = 'Loading...')
+{
+    $this->spinnerRunning = true;
+    $chars = ['|', '/', '-', '\\'];
+    $i = 0;
+
+    echo $message . ' ';
+    $spinner = function () use (&$i, $chars) {
+        echo "\033[1D" . $chars[$i++ % count($chars)];
+        usleep(100000); // 100ms
+    };
+
+    $this->spinnerProcess = function () use ($spinner) {
+        while ($this->spinnerRunning) {
+            $spinner();
+        }
+    };
+
+    // Start spinner in background
+    register_shutdown_function(function () {
+        $this->spinnerRunning = false;
+    });
+
+    $this->spinnerThread = new \Threaded();
+    $this->spinnerThread->run = $this->spinnerProcess;
+}
+
+protected function stopLoadingSpinner()
+{
+    $this->spinnerRunning = false;
+    echo "\033[1D✔️\n";
+}
 
 
 protected function generateMapForGeoPoints(array $geoPoints, string $title = '🌍 Visitor IPs')
