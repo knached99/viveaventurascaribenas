@@ -81,7 +81,7 @@ $geojsonPath = asset('assets/js/countries.geojson');
     document.addEventListener('DOMContentLoaded', function () {
         var map = L.map('heatmap').setView([20, 0], 2);
 
-        // Dark-themed tile layer
+        // Dark tile layer
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             maxZoom: 18,
             attribution: '© OpenStreetMap contributors & CartoDB'
@@ -90,7 +90,7 @@ $geojsonPath = asset('assets/js/countries.geojson');
         var heatmapData = @json($heatmapData ?? []);
 
         if (heatmapData.length > 0) {
-            // Step 1: Country shading layer
+            // Step 1: Show countries as base layer
             const countryCounts = {};
             heatmapData.forEach(data => {
                 if (data.country) {
@@ -132,43 +132,33 @@ $geojsonPath = asset('assets/js/countries.geojson');
                 })
                 .catch(console.error);
 
-            // Step 2: City/State circle markers
+            // Step 2: Overlay state + city markers with hover popups
             heatmapData.forEach(function (data) {
                 if (data.latitude !== null && data.longitude !== null) {
+                    var popupContent = `
+                        <strong>City:</strong> ${data.city}<br>
+                        <strong>State:</strong> ${data.state}<br>
+                        <strong>Country:</strong> ${data.country}<br>
+                        <strong>Visits:</strong> ${data.count}`;
+
                     var marker = L.circleMarker([data.latitude, data.longitude], {
-                        radius: Math.log2(data.count + 1) * 6,
+                        radius: Math.log2(data.count + 1) * 4,
                         fillColor: '#FFD700',
                         color: '#FFD700',
                         weight: 1,
                         opacity: 1,
-                        fillOpacity: 0.85
+                        fillOpacity: 0.7
                     });
 
-                    // Marker popup with full detail
-                    marker.bindPopup(
-                        `<strong>City:</strong> ${data.city || 'Unknown'}<br>
-                         <strong>State:</strong> ${data.state || 'Unknown'}<br>
-                         <strong>Country:</strong> ${data.country || 'Unknown'}<br>
-                         <strong>Visits:</strong> ${data.count}`
-                    );
+                    marker.bindPopup(popupContent);
 
-                    // Tooltip on hover
-                    marker.bindTooltip(`${data.city || ''}, ${data.state || ''}`, {
-                        permanent: false,
-                        direction: 'top',
-                        offset: [0, -10]
-                    });
-
-                    // Open popup on hover
-                    marker.on('mouseover', function () {
+                    marker.on('mouseover', function (e) {
                         this.openPopup();
                     });
-                    marker.on('mouseout', function () {
+
+                    marker.on('mouseout', function (e) {
                         this.closePopup();
                     });
-
-                    // Make marker stand above country layer
-                    marker.setZIndexOffset(1000);
 
                     marker.addTo(map);
                 }
