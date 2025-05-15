@@ -88,105 +88,156 @@ class InspectVisitorIP extends Command
         $this->table(['Field', 'Value'], collect($geoData)->map(fn($v, $k) => [$k, $v])->toArray());
     }
 
+
     protected function inspectAndPlotMultipleIPs()
-    {
-        $output = new ConsoleOutput();
-        $spinner = new ProgressIndicator($output);
-        $spinner->start('Fetching IP addresses from VisitorModel...');
-        sleep(1);
+{
+    $output = new ConsoleOutput();
+    $spinner = new ProgressIndicator($output);
 
-        $encryptedIps = VisitorModel::pluck('visitor_ip_address')->unique()->values();
-        if ($encryptedIps->isEmpty()) {
-            $this->error("No IP addresses found.");
-            return;
-        }
+    // Step 1: Fetch IPs
+    $spinner->start('Fetching IP addresses from VisitorModel...');
+    sleep(1);
 
-        $spinner->finish('IP addresses fetched!');
-
-        $choice = $this->choice('How many IPs would you like to inspect?', ['10', '50', '100', 'All'], 0);
-        $limit = match ($choice) {
-            '10' => 10,
-            '50' => 50,
-            '100' => 100,
-            default => $encryptedIps->count(),
-        };
-
-        $limitedIps = $encryptedIps->take($limit)->values()->toArray();
-        $decryptedIps = [];
-
-        foreach ($limitedIps as $encryptedIp) {
-            try {
-                $decryptedIps[] = Crypt::decryptString($encryptedIp);
-            } catch (\Exception $e) {
-                continue;
-            }
-        }
-
-        $geoPoints = [];
-        $chunks = array_chunk($decryptedIps, 10); // Process in batches of 10 to avoid rate-limiting
-
-        foreach ($chunks as $chunk) {
-            foreach ($chunk as $ip) {
-                $response = Http::get("http://ip-api.com/json/{$ip}");
-                if ($response->successful() && $response->json('status') === 'success') {
-                    $geoPoints[] = [
-                        'ip' => $ip,
-                        'lat' => $response->json('lat'),
-                        'lon' => $response->json('lon'),
-                        'country' => $response->json('country')
-                    ];
-                }
-                usleep(300000); // 0.3s delay per IP to be kind to the API
-            }
-        }
-
-        if (empty($geoPoints)) {
-            $this->error("No valid geolocation data found.");
-            return;
-        }
-
-        $html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Visitor IP Map</title>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-            <style>
-                #map { height: 90vh; width: 100%; }
-            </style>
-        </head>
-        <body>
-            <h2 style="text-align:center;">Visitor IP Locations</h2>
-            <div id="map"></div>
-            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-            <script>
-                var map = L.map('map').setView([20, 0], 2);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 18,
-                    attribution: '© OpenStreetMap contributors'
-                }).addTo(map);
-        HTML;
-        
-        foreach ($geoPoints as $point) {
-            $ip = htmlspecialchars($point['ip'], ENT_QUOTES);
-            $lat = $point['lat'];
-            $lon = $point['lon'];
-            $country = htmlspecialchars($point['country'], ENT_QUOTES);
-            $html .= "\nL.marker([$lat, $lon]).addTo(map).bindPopup('{$ip} - {$country}');";
-        }
-        
-        $html .= <<<HTML
-        
-            </script>
-        </body>
-        </html>
-        HTML;
-        
-        $filename = public_path('visitor_map.html');
-        file_put_contents($filename, $html);
-        $mapURL = env('APP_URL').'visitor_map.html';
-        $this->info("Map generated! Open the following page in your browser:\n$mapURL");
+    $encryptedIps = VisitorModel::pluck('visitor_ip_address')->unique()->values();
+    if ($encryptedIps->isEmpty()) {
+        $spinner->finish('No IP addresses found.');
+        $this->error("No IP addresses found.");
+        return;
     }
+
+    $spinner->finish('IP addresses fetched!');
+
+    // Step 2: User selects number of IPs
+    $choice = $this->choice('How many IPs would you like to inspect?', ['10', '50', '100', 'All'], 0);
+    $limit = match ($choice) {
+        '10' => 10,
+        '50' => 50,
+        '100' => 100,
+        default => $encryptedIps->count(),
+    };
+
+    $limitedIps = $encryptedIps->take($limit)->values()->toArray();
+    $decryptedIps = [];
+
+    foreach ($limitedIps as $encryptedIp) {
+        try {
+            $decryptedIps[] = Crypt::decryptString($encryptedIp);
+        } catch (\Exception $e) {
+            continue;
+        }
+    }
+
+    if (empty($decryptedIps)) {
+        $this->error("No IPs could be decrypted.");
+        return;
+    }
+
+    // Step 3: Geolocate with progress bar
+    $geoPoints = [];
+    $progressBar = $this->output->createProgressBar(count($decryptedIps));
+    $progressBar->start();
+
+    $chunks = array_chunk($decryptedIps, 10);
+
+    foreach ($chunks as $chunk) {
+        foreach ($chunk as $ip) {
+            $response = Http::get("http://ip-api.com/json/{$ip}");
+            if ($response->successful() && $response->json('status') === 'success') {
+                $geoPoints[] = [
+                    'ip' => $ip,
+                    'lat' => $response->json('lat'),
+                    'lon' => $response->json('lon'),
+                    'country' => $response->json('country')
+                ];
+            }
+            usleep(300000);
+            $progressBar->advance();
+        }
+    }
+
+    $progressBar->finish();
+    $this->newLine();
+
+    if (empty($geoPoints)) {
+        $this->error("No valid geolocation data found.");
+        return;
+    }
+
+    // Step 4: Generate dark-mode hacker-style map
+    $html = <<<HTML
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Visitor IP Map</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <style>
+            body {
+                background-color: #0d0d0d;
+                color: #00ff00;
+                font-family: "Courier New", monospace;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+            h2 {
+                margin: 20px 0;
+            }
+            #map { height: 90vh; width: 100%; border-top: 2px solid #00ff00; }
+        </style>
+    </head>
+    <body>
+        <h2>🌐 Tracing Visitor IPs...</h2>
+        <div id="map"></div>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            var map = L.map('map', {
+                zoomControl: false
+            }).setView([20, 0], 2);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            var greenIcon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+                shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+    HTML;
+
+    foreach ($geoPoints as $point) {
+        $ip = htmlspecialchars($point['ip'], ENT_QUOTES);
+        $lat = $point['lat'];
+        $lon = $point['lon'];
+        $country = htmlspecialchars($point['country'], ENT_QUOTES);
+        $html .= "\nL.marker([$lat, $lon], {icon: greenIcon}).addTo(map).bindPopup('<b>{$ip}</b><br>{$country}');";
+    }
+
+    $html .= <<<HTML
+
+        </script>
+    </body>
+    </html>
+    HTML;
+
+    $filename = public_path('visitor_map.html');
+
+    if(file_exists($filename)){
+        unlink($filename);
+    }
+    
+    file_put_contents($filename, $html);
+    $mapURL = env('APP_URL') . 'visitor_map.html';
+
+    $this->info("🛰️  Map generated! View it at:\n$mapURL");
+}
+
+   
 }
