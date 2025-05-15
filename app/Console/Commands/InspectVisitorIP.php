@@ -288,9 +288,9 @@ protected function searchIPsByCountry(){
 
     $country = Str::lower($this->ask("Search for IP by country (e.g. Mexico): "));
 
-    $encryptedIps = VisitorModel::pluck("visitor_ip_address")->unique();
+    $encryptedIPs = VisitorModel::pluck("visitor_ip_address")->unique();
 
-    if($encryptedIps->isEmpty()){
+    if($encryptedIPs->isEmpty()){
         
         $this->error("No IP addresses found");
         return;
