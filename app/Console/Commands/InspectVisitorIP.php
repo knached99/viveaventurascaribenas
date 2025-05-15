@@ -261,61 +261,53 @@ class InspectVisitorIP extends Command
     $this->info("🛰️  Map generated! View it at:\n$mapURL");
 }
 
-
-protected function searchIPsByCountry(){
-
+protected function searchIPsByCountry()
+{
     $country = $this->ask("Enter a country name (e.g. Mexico): ");
 
     $encryptedIPs = VisitorModel::pluck('visitor_ip_address')->unique()->values();
 
-    if($encryptedIPs->isEmpty()){
+    if ($encryptedIPs->isEmpty()) {
         $this->error("No IP addresses found");
         return;
     }
 
     $limit = 100;
-
     $decryptedIPs = [];
 
-    foreach($encryptedIps as $ip){
+    foreach ($encryptedIPs as $ip) {
         try {
-
-            $decryptedIPs[] = Crypt::decryptString(10);
-        }
-
-        catch(\Exception $e){
+            $decryptedIPs[] = Crypt::decryptString($ip);
+        } catch (\Exception $e) {
             continue;
         }
     }
 
     $matchingIPs = [];
 
-    foreach($decryptedIPs as $ip){
-
+    foreach ($decryptedIPs as $ip) {
         $response = Http::get("http://ip-api.com/json/{$ip}");
 
-        if($response->successful() && $response->json('status') === 'success'){
-
+        if ($response->successful() && $response->json('status') === 'success') {
             $data = $response->json();
 
-            if(Str::lower($data['country']) === Str::lower($country)){
-                
+            if (Str::lower($data['country']) === Str::lower($country)) {
                 $matchingIPs[] = [
-                    'ip'=>$ip,
-                    'city'=>$data['city'] ?? 'N/A',
-                    'region'=>$data['regionName'] ?? 'N/A',
+                    'ip' => $ip,
+                    'city' => $data['city'] ?? 'N/A',
+                    'region' => $data['regionName'] ?? 'N/A',
                     'lat' => $data['lat'],
                     'lon' => $data['lon'],
                 ];
 
-                if(count($matchingIPs) >= $limit) break;
+                if (count($matchingIPs) >= $limit) break;
             }
         }
 
-        usleep(300000); // avoiding rate limits
+        usleep(300000); // avoid rate limits
     }
 
-    if(empty($matchingIPs)){
+    if (empty($matchingIPs)) {
         $this->warn("No IPs found for: $country");
         return;
     }
@@ -323,8 +315,9 @@ protected function searchIPsByCountry(){
     $this->info("Found the following IPs for {$country}:");
     $this->table(['IP', 'City', 'Region/State', 'Latitude', 'Longitude'], $matchingIPs);
 
-    $this->generateMapForGeoPoints($matchingIPs, $title =  "🌍 IPs from {$country}");
+    $this->generateMapForGeoPoints($matchingIPs, $title = "🌍 IPs from {$country}");
 }
+
 
 
 protected function generateMapForGeoPoints(array $geoPoints, string $title = '🌍 Visitor IPs')
