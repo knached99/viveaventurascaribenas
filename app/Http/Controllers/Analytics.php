@@ -273,9 +273,8 @@ class Analytics extends Controller
 
         $key = "{$country}|{$state}|{$city}|{$lat}|{$lon}";
 
-        if(!isset($locationCounts[$key])){
-
-            $locationCounts = [$key] = [
+        if (!isset($locationCounts[$key])) {
+            $locationCounts[$key] = [
                 'country' => $country,
                 'state' => $state,
                 'city' => $city,
@@ -284,7 +283,7 @@ class Analytics extends Controller
                 'count' => 0
             ];
         }
-
+        
             $locationCounts[$key]['count']++;
         }
     
