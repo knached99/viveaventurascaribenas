@@ -184,7 +184,7 @@ class InspectVisitorIP extends Command
             h2 {
                 margin: 20px 0;
             }
-            #map { height: 90vh; width: 100%; border-top: 2px solid #00ff00; }
+            #map { height: 90vh; width: 100%; border-top: 2px solid #00ff00; background-color: #000;}
         </style>
     </head>
     <body>
@@ -232,7 +232,7 @@ class InspectVisitorIP extends Command
     if(file_exists($filename)){
         unlink($filename);
     }
-    
+
     file_put_contents($filename, $html);
     $mapURL = env('APP_URL') . 'visitor_map.html';
 
