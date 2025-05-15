@@ -145,13 +145,48 @@ class InspectVisitorIP extends Command
             return;
         }
 
-        $markers = [];
+        $html = <<<HTML
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Visitor IP Map</title>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+            <style>
+                #map { height: 90vh; width: 100%; }
+            </style>
+        </head>
+        <body>
+            <h2 style="text-align:center;">Visitor IP Locations</h2>
+            <div id="map"></div>
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            <script>
+                var map = L.map('map').setView([20, 0], 2);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 18,
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+        HTML;
+        
         foreach ($geoPoints as $point) {
-            $label = urlencode($point['ip']);
-            $markers[] = "color:red|label:•|{$point['lat']},{$point['lon']}";
+            $ip = htmlspecialchars($point['ip'], ENT_QUOTES);
+            $lat = $point['lat'];
+            $lon = $point['lon'];
+            $country = htmlspecialchars($point['country'], ENT_QUOTES);
+            $html .= "\nL.marker([$lat, $lon]).addTo(map).bindPopup('{$ip} - {$country}');";
         }
-
-        $mapUrl = "https://quickchart.io/map?markers=" . implode('&markers=', $markers);
-        $this->info("Map URL with IP pins:\n$mapUrl");
+        
+        $html .= <<<HTML
+        
+            </script>
+        </body>
+        </html>
+        HTML;
+        
+        $filename = public_path('visitor_map.html');
+        file_put_contents($filename, $html);
+        
+        $this->info("Map generated! Open the following file in your browser:\n$filename");
     }
 }
