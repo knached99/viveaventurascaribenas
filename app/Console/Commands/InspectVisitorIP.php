@@ -261,6 +261,7 @@ class InspectVisitorIP extends Command
     $this->info("🛰️  Map generated! View it at:\n$mapURL");
 }
 
+
 protected function searchIPsByCountry()
 {
     $country = $this->ask("Enter a country name (e.g. Mexico): ");
@@ -275,17 +276,31 @@ protected function searchIPsByCountry()
     $limit = 100;
     $decryptedIPs = [];
 
-    foreach ($encryptedIPs as $ip) {
+    $this->info("Decrypting IP addresses...");
+
+    foreach ($encryptedIPs as $index => $ip) {
         try {
-            $decryptedIPs[] = Crypt::decryptString($ip);
+            $decrypted = Crypt::decryptString($ip);
+            $decryptedIPs[] = $decrypted;
         } catch (\Exception $e) {
-            continue;
+            $this->warn("Skipping invalid IP at index {$index}");
         }
+    }
+
+    if (empty($decryptedIPs)) {
+        $this->error("No valid decrypted IPs to search with.");
+        return;
     }
 
     $matchingIPs = [];
 
-    foreach ($decryptedIPs as $ip) {
+    $this->info("Checking IPs against country: {$country}...");
+    $total = count($decryptedIPs);
+
+    foreach ($decryptedIPs as $i => $ip) {
+        $progress = $i + 1;
+        $this->line("[$progress/$total] Checking IP: {$ip}");
+
         $response = Http::get("http://ip-api.com/json/{$ip}");
 
         if ($response->successful() && $response->json('status') === 'success') {
@@ -302,9 +317,11 @@ protected function searchIPsByCountry()
 
                 if (count($matchingIPs) >= $limit) break;
             }
+        } else {
+            $this->warn("Failed to retrieve data for IP: {$ip}");
         }
 
-        usleep(300000); // avoid rate limits
+        usleep(300000); // sleep 0.3 seconds to avoid rate limit
     }
 
     if (empty($matchingIPs)) {
@@ -315,7 +332,7 @@ protected function searchIPsByCountry()
     $this->info("Found the following IPs for {$country}:");
     $this->table(['IP', 'City', 'Region/State', 'Latitude', 'Longitude'], $matchingIPs);
 
-    $this->generateMapForGeoPoints($matchingIPs, $title = "🌍 IPs from {$country}");
+    $this->generateMapForGeoPoints($matchingIPs, "🌍 IPs from {$country}");
 }
 
 
