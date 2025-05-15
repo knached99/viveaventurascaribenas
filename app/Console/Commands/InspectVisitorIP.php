@@ -47,7 +47,8 @@ class InspectVisitorIP extends Command
             '10' => $ipAddresses->take(10),
             '50' => $ipAddresses->take(50),
             '100' => $ipAddresses->take(100),
-            default => $ipAddresses,
+            '1000' => $ipAddresses->take(1000),
+            'default'=>$ipAddresses->take(5),
         };
 
         $ipArray = $limitedIPs->values()->toArray();
@@ -113,7 +114,7 @@ class InspectVisitorIP extends Command
         '10' => 10,
         '50' => 50,
         '100' => 100,
-        default => $encryptedIps->count(),
+        '1000' => 1000,
     };
 
     $limitedIps = $encryptedIps->take($limit)->values()->toArray();
