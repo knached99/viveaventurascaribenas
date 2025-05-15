@@ -19,12 +19,15 @@ class InspectVisitorIP extends Command
     {
         $action = $this->choice('Select an action:', [
             '1' => 'Inspect a single IP',
-            '2' => 'Inspect and plot multiple IPs'
+            '2' => 'Inspect and plot multiple IPs',
+            '3' => 'Search for IPs by country',
         ], 0);
 
-        return $action === '1'
-            ? $this->inspectSingleIP()
-            : $this->inspectAndPlotMultipleIPs();
+        match($action){
+            '1' => $this->inspectSingleIP(),
+            '2' => $this->inspectAndPlotMultipleIPs(),
+            '3' => $this->searchIPsByCountry(),
+        };
     }
 
     protected function inspectSingleIP()
@@ -238,6 +241,142 @@ class InspectVisitorIP extends Command
     $mapURL = env('APP_URL') . 'visitor_map.html';
 
     $this->info("🛰️  Map generated! View it at:\n$mapURL");
+}
+
+
+protected function searchIPsByCountry(){
+
+    $country = $this->ask("Enter a country name (e.g. Mexico): ");
+
+    $encryptedIPs = VisitorModel::pluck('visitor_ip_address')->unique()->values();
+
+    if($encryptedIPs->isEmpty()){
+        $this->error("No IP addresses found");
+        return;
+    }
+
+    $limit = 100;
+
+    $decryptedIPs = [];
+
+    foreach($encryptedIps as $ip){
+        try {
+
+            $decryptedIPs[] = Crypt::decryptString(10);
+        }
+
+        catch(\Exception $e){
+            continue;
+        }
+    }
+
+    $matchingIPs = [];
+
+    foreach($decryptedIPs as $ip){
+
+        $response = Http::get("http://ip-api.com/json/{$ip}");
+
+        if($response->successful() && $response->json('status') === 'success'){
+
+            $data = $response->json();
+
+            if(Str::lower($data['country']) === Str::lower($country)){
+                
+                $matchingIPs[] = [
+                    'ip'=>$ip,
+                    'city'=>$data['city'] ?? 'N/A',
+                    'region'=>$data['regionName'] ?? 'N/A',
+                    'lat' => $data['lat'],
+                    'lon' => $data['lon'],
+                ];
+
+                if(count($matchingIPs) >= $limit) break;
+            }
+        }
+
+        usleep(300000); // avoiding rate limits
+    }
+
+    if(empty($matchingIPs)){
+        $this->warn("No IPs found for: $country");
+        return;
+    }
+
+    $this->info("Found the following IPs for {$country}:");
+    $this->table(['IP', 'City', 'Region/State', 'Latitude', 'Longitude'], $matchingIPs);
+
+    $this->generateMapForGeoPoints($matchingIPs, $title =  "🌍 IPs from {$country}");
+}
+
+
+protected function generateMapForGeoPoints(array $geoPoints, string $title = '🌍 Visitor IPs')
+{
+    $html = <<<HTML
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>{$title}</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <style>
+            body {
+                background-color: #0d0d0d;
+                color: #00ff00;
+                font-family: "Courier New", monospace;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+            h2 { margin: 20px 0; }
+            #map { height: 90vh; width: 100%; border-top: 2px solid #00ff00; background-color: #000;}
+        </style>
+    </head>
+    <body>
+        <h2>{$title}</h2>
+        <div id="map"></div>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            var map = L.map('map', { zoomControl: false }).setView([20, 0], 2);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            var greenIcon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+                shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+    HTML;
+
+    foreach ($geoPoints as $point) {
+        $ip = htmlspecialchars($point['ip'], ENT_QUOTES);
+        $lat = $point['lat'];
+        $lon = $point['lon'];
+        $city = htmlspecialchars($point['city'] ?? '', ENT_QUOTES);
+        $region = htmlspecialchars($point['region'] ?? '', ENT_QUOTES);
+        $html .= "\nL.marker([$lat, $lon], {icon: greenIcon}).addTo(map).bindPopup('<b>{$ip}</b><br>{$city}, {$region}');";
+    }
+
+    $html .= <<<HTML
+
+        </script>
+    </body>
+    </html>
+    HTML;
+
+    $filename = public_path('visitor_map.html');
+    if(file_exists($filename)) unlink($filename);
+    file_put_contents($filename, $html);
+
+    $mapURL = env('APP_URL') . 'visitor_map.html';
+    $this->info("🗺️  Map generated! View it at:\n$mapURL");
 }
 
    
