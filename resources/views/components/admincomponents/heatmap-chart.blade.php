@@ -76,7 +76,6 @@ $geojsonPath = asset('assets/js/countries.geojson');
 @endphp
 
 <div id="heatmap" style="height: 500px; width: 100%;"></div>
-<pre>{{json_encode($heatmapData, JSON_PRETTY_PRINT)}}</pre>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var map = L.map('heatmap').setView([20, 0], 2);
