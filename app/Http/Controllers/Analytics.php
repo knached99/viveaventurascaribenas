@@ -237,6 +237,10 @@ class Analytics extends Controller
     
             $visitor['country'] = $location['country'] ?? null;
             $visitor['continent'] = $location['continent'] ?? null;
+            $visitor['state'] = $location['state'] ?? null;
+            $visitor['city'] = $location['city'] ?? null;
+            $visitor['latitude'] = $location['latitude'] ?? null;
+            $visitor['longitude'] = $location['longitude'] ?? null;
     
             $parsedAgent = $this->parseUserAgent($visitor['visitor_user_agent']);
             $visitor['browser'] = $parsedAgent['browser'];
@@ -258,10 +262,43 @@ class Analytics extends Controller
         $topOperatingSystems = array_slice($operatingSystems, 0, 5, true);
     
         // Prepare heatmap data
-        $heatmapData = [];
-        foreach (array_count_values($countries) as $country => $count) {
-            $heatmapData[] = ['country' => $country, 'count' => $count];
+        // $heatmapData = [];
+        // foreach (array_count_values($countries) as $country => $count) {
+        //     $heatmapData[] = ['country' => $country, 'count' => $count];
+        // }
+
+        $locationCounts = [];
+
+        foreach($visitors as $visitor){
+
+            $country = $visitor['country'] ?? null;
+            $state = $visitor['state'] ?? null;
+            $city = $visitor['city'] ?? null;
+            $lat = $visitor['lat'] ?? null;
+            $lon = $visitor['lon'] ?? null;
+
+            if(!$country || !$state || !$city || $at === null || $lon === null){
+                continue;
+            }
+
+            $key = "{$country}|{$state}|{$city}|{$lat}|{$lon}";
+
+            if(!isset($locationCounts[$key])){
+
+                $locationCounts[$key] = [
+                    'country' => $country, 
+                    'state' => $state,
+                    'city' => $city,
+                    'latitude' => $lat, 
+                    'longitude' => $lon, 
+                    'count' => 0
+                ];
+            }
+
+            $locationCounts[$key]['count'] ++;
         }
+
+        $heatmapData = array_values($locationCounts);
     
         // Get bot crawler data
         $botData = $this->getBotCrawlers($visitors);

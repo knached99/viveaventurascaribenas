@@ -12,8 +12,8 @@ class MaxMindService
 
     public function __construct()
     {
-        
-        $databasePath = storage_path('app/mmdb/GeoLite2-Country_20241129/GeoLite2-Country_20241129/GeoLite2-Country.mmdb');
+        $databasePath = storage_path('app/mmdb/GeoLite2-City_20250509/GeoLite2-City.mmdb');
+        // $databasePath = storage_path('app/mmdb/GeoLite2-Country_20241129/GeoLite2-Country_20241129/GeoLite2-Country.mmdb');
         if (!file_exists($databasePath)) {
             throw new \Exception('GeoLite2-Country database not found at ' . $databasePath);
         }
@@ -37,19 +37,20 @@ class MaxMindService
         }
 
         try {
-            // Validate IP
-            // if (!filter_var($ip, FILTER_VALIDATE_IP)) {
-            //     Log::warning("Invalid IP address: {$decryptedIP}");
-            //     return null;
-            // }
-
+         
             // Use MaxMind Reader to get location data
             $record = $this->reader->country($decryptedIP);
 
             $location = [
                 'country' => $record->country->isoCode ?? null,
+                'country_name' => $record->country->name ?? null,
                 'continent' => $record->continent->name ?? null,
                 'is_eu' => $record->country->isInEuropeanUnion ?? false,
+                'state' => $record->subdivisions[0]->name ?? null,
+                'city' => $record->city->name ?? null,
+                'postal_code' => $record->postal->code ?? null,
+                'latitude' => $record->location->latitude ?? null,
+                'longitude' => $record->location->longitude ?? null,
             ];
 
             // Cache the location for 1 day
