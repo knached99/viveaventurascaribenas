@@ -108,17 +108,13 @@
                                 <div style="width: 20px; height: 20px; background-color: black; margin-right: 8px;"></div> 
                                 <span>No visitors</span>
                             </div>
-                        </div>
-                        
-                           <!-- Additional info about city/state density -->
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                        <div class="d-flex align-items-center">
-                            <div style="width: 20px; height: 20px; background-color: #FFD700; margin-right: 8px;"></div>
-                            <span>Density of visitors in Regions/States and Cities</span>
-                        </div>
-                    </div>
-                </div>
 
+                            <div class="d-flex align-items-center me-3">
+                                <div style="width: 20px; height: 20px; background-color: #FFD700; margin-right: 8px;"></div> 
+                                <span>Regions/States and Cities</span>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
