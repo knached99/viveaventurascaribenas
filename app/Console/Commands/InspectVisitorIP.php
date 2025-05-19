@@ -451,8 +451,8 @@ protected function generateMapForGeoPoints(array $geoPoints, string $title = 'ðŸ
             }).addTo(map);
 
             var greenIcon = L.icon({
-                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-                shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                iconUrl: '/assets/images/location__pin.png',
+                shadowUrl: '/assets/images/marker__shadow.png',
                 iconSize: [25, 41],
                 iconAnchor: [12, 41],
                 popupAnchor: [1, -34],
