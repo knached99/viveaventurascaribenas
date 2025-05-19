@@ -215,7 +215,7 @@ class InspectVisitorIP extends Command
         </style>
     </head>
     <body>
-        <h2>🌐 Generated Location Pins On The Map</h2>
+        <h2>🌐 Traced Locations</h2>
         <div id="map"></div>
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
         <script>
