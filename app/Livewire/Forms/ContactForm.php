@@ -78,7 +78,7 @@ class ContactForm extends Component
             $this->resetForm();
 
         } catch (Exception $e) {
-            $this->error = 'Unable to send submit contact form, something went wrong. If this issue persists, please email us directly at '. config('mail.mailers.smtp.to_email');
+            $this->error = 'Unable to submit contact form, something went wrong. If this issue persists, please email us directly at '. config('mail.mailers.smtp.to_email');
             $this->resetForm();
             \Log::error('Notification Exception Caught: ' . $e->getMessage());
             \Log::info(['Contact Submission Details: ', $data]);
