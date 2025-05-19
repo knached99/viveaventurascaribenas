@@ -9,6 +9,7 @@ use Symfony\Component\Console\Helper\ProgressIndicator;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Validator;
 
 class InspectVisitorIP extends Command
 {
@@ -26,6 +27,7 @@ class InspectVisitorIP extends Command
             '1' => 'Inspect a single IP',
             '2' => 'Inspect and plot multiple IPs',
             '3' => 'Search for IPs by country',
+            '4' => 'Inspect details for given IP',
         ];
     
         // Flip it so the user sees descriptions, but you get the number back
@@ -43,6 +45,9 @@ class InspectVisitorIP extends Command
     
             case '3':
                 return $this->searchIPsByCountry();
+            
+            case '4':
+                return $this->inspectIPDetails();
     
             default:
                 $this->error("Invalid option selected.");
@@ -267,6 +272,39 @@ class InspectVisitorIP extends Command
 }
 
 
+    protected function inspectIPDetails()
+    {
+        $ip = $this->ask('Enter IP you want to lookup: (e.g. 127.0.0.1)');
+
+        $validator = Validator::make(['ip' => $ip], [
+            'ip' => 'required|ip',
+        ]);
+
+        if ($validator->fails()) {
+            $this->error($validator->errors()->first('ip'));
+            return;
+        }
+
+        $this->info("Retrieving information for IP: {$ip}...");
+
+        $response = Http::get("http://ip-api.com/json/{$ip}");
+        $data = $response->json();
+
+        // Using null coalescence to avoid undefined index error if status isn’t present
+        if ($response->failed() || ($data['status'] ?? 'fail') === 'fail') {
+            $this->error('Failed to retrieve geolocation data');
+            return;
+        }
+
+        $this->info('Geolocation Data:');
+        $this->table(['Field', 'Value'], collect($data)->map(fn($v, $k) => [$k, $v])->toArray());
+    }
+
+
+
+// Below methods are for retrieving and saving last offset of the IP search method 
+// These are needed if the terminal session timesout, the method can be executed again and
+// will resume the search from the last offset 
 protected function getLastOffset(){
 
     if(file_exists(base_path($this->progressFile))){
