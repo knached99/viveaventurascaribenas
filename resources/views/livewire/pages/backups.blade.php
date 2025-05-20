@@ -1,7 +1,3 @@
-@php
-    dd($backups ?? 'backups variable not set');
-@endphp
-
 <x-authenticated-theme-layout>
 <div class="container my-4">
     <div class="d-flex justify-content-start mb-4">
