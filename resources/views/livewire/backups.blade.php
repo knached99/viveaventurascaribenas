@@ -1,9 +1,10 @@
 <x-authenticated-theme-layout>
 <div class="container my-4">
     <div class="d-flex justify-content-start mb-4">
-        <a href="{{ route('admin.backup.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>Create Backup
-        </a>
+          <button wire:click="createBackup" class="btn btn-sm btn-primary">
+                    <i class="fa-solid fa-circle-plus"></i>
+                    Create Backup 
+                    </button>
     </div>
 
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -18,12 +19,7 @@
                     </p>
                 </div>
                 <div class="card-footer bg-transparent border-0 d-flex justify-content-end gap-2">
-                 
-                    <button wire:click="createBackup" class="btn btn-sm btn-primary">
-                    <i class="fa-solid fa-circle-plus"></i>
-                    Create Backup 
-                    </button>
-
+            
                     <button wire:click="deleteBackup('{{$backup['name']}}')" class="btn btn-sm btn-danger">
                     <i class="fa-solid fa-trash"></i>
                     Delete Backup 
