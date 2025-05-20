@@ -182,9 +182,6 @@ class Backups extends Component {
 
     public function render()
     {    
-        return view('livewire.pages.backups', [
-            'backups' => $this->backups
-
-        ]);
+        return view('livewire.pages.backups')->layout('layouts.authenticated-theme');
     }
 }    
