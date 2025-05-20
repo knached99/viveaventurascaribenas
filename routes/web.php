@@ -74,7 +74,7 @@ Route::group(['middleware' => 'auth', 'verified'], function () {
     Route::get('/admin/photo-gallery', [PhotoGalleryController::class, 'retrivePhotoGallery'])->name('admin.photo-gallery');
     Route::delete('/admin/deletePhotosFromGallery/{photoID}', [PhotoGalleryController::class, 'deletePhotosFromGallery'])->name('admin.deletePhotosFromGallery');
 
-    Route::middleware(['password.confirm'])->get('/admin/backups', [Backups::class])->name('admin.backups');
+    Route::middleware(['password.confirm'])->get('/admin/backups', \App\Livewire\Admincomponents\Backups::class)->name('admin.backups');
 });
 // Route::view('admin/dashboard', 'admin/dashboard')
 //     ->middleware(['auth', 'verified'])
