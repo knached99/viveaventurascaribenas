@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Square\SquareClient;
 use Square\Models\CatalogQueryResponse;
@@ -252,6 +253,9 @@ class Admin extends Controller
         $testimonial = Testimonials::with('trip')->where('testimonialID', $testimonialID)->firstOrFail();
         return view('admin/testimonial', ['testimonialID'=>$testimonialID, 'testimonial'=>$testimonial]);
     }   
+
+
+ 
 
     public function approveTestimonial($testimonialID){
         try{
@@ -499,8 +503,6 @@ public function deleteTrip($tripID) {
         return redirect()->back()->with('trip_delete_error', 'An error occurred while attempting to delete the trip');
     }
 }
-
-    
     
 
     private function formatSize($bytes)

@@ -425,4 +425,7 @@ class BookingForm extends Component
             'reservation'=>$this->reservation,
         ]);
     }
+
+    
 }
+

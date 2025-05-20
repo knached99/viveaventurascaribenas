@@ -73,6 +73,13 @@
                     </a>
                 </li>
 
+                <li class="menu-item {{request()->routeIs('admin.backups') ? 'active' : ''}}">
+                <a href="{{route('admin.backups')}}" class="menu-link text-decoration-none">
+                <div class="text-truncate" data-i18n="backups">
+                <i class="menu-icon tf-icons fa-solid fa-cloud-arrow-down"></i> Backups</div>
+                </a>
+                </li>
+
 
             </ul>
         </li>
