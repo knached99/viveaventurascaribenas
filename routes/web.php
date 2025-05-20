@@ -74,7 +74,7 @@ Route::group(['middleware' => 'auth', 'verified'], function () {
     Route::get('/admin/photo-gallery', [PhotoGalleryController::class, 'retrivePhotoGallery'])->name('admin.photo-gallery');
     Route::delete('/admin/deletePhotosFromGallery/{photoID}', [PhotoGalleryController::class, 'deletePhotosFromGallery'])->name('admin.deletePhotosFromGallery');
 
-    Volt::middleware(['password.confirm'])->get('/admin/backups', \App\Livewire\Admincomponents\Backups::class)->name('admin.backups');
+    Volt::route('/admin/backups', 'pages.backups')->name('admin.backups');
 });
 // Route::view('admin/dashboard', 'admin/dashboard')
 //     ->middleware(['auth', 'verified'])
