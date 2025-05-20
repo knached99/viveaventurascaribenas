@@ -1,3 +1,7 @@
+@php
+    dd($backups ?? 'backups variable not set');
+@endphp
+
 <x-authenticated-theme-layout>
 <div class="container my-4">
     <div class="d-flex justify-content-start mb-4">
@@ -6,7 +10,8 @@
                     Create Backup 
                     </button>
     </div>
-    @if(!empty($backups) || is_array($backups) || count($backups) > 0)
+
+    @if(isset($backups) && is_array($backups) && count($backups) > 0)
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         @foreach($backups as $backup)
         <div class="col">
