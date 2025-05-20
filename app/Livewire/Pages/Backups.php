@@ -19,14 +19,14 @@ class Backups extends Component {
     public string $error = '';
 
     public function mount(){
-
         $this->backupDir = storage_path('app/backups');
-        $this->loadBackups();
-
-    }   
+        $this->backups = $this->loadBackups();
+    }
+    
 
     public function createBackup(){
-
+        $this->success = '';
+        $this->error = '';
         Log::info('Iniating backup creation via UI...');
         Log::info('Executing method: '.__FUNCTION__. ' in class: '.__CLASS__);
 
@@ -128,9 +128,9 @@ class Backups extends Component {
 
         Log::info('Checking if backup file: '.$filePath. ' exists...');
 
-        if(Storage::exists($filePath)){
+        if(File::exists($filePath)){
             Log::info("File found: $filePath. Deleting...");
-            $deleted = Storage::delete($filePath);
+            $deleted = File::delete($filePath);
 
             if($deleted){
                 $this->success = 'The selected backup has been deleted successfully!';
