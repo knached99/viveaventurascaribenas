@@ -11,7 +11,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 use Carbon\Carbon;
 use Exception;
 
-class backups extends Component {
+class Backups extends Component {
 
     public $backupDir;
     public array $backups = [];
@@ -77,7 +77,7 @@ class backups extends Component {
         
         // Sanitizing incoming file to protect against malicious user input
         $filePath = $this->backupDir . '/'.basename($fileName);
-        
+
         Log::info('Checking if backup file: '.$filePath. ' exists...');
 
         if(Storage::exists($filePath)){

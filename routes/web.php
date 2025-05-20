@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\PhotoGalleryController;
 use Livewire\Volt\Volt;
 use App\Http\Livewire\TripInfoForm;
+use App\Livewire\Admincomponents\Backups;
 
 // Landing Pages 
 
