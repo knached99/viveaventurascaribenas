@@ -19,7 +19,13 @@
                     </p>
                 </div>
                 <div class="card-footer bg-transparent border-0 d-flex justify-content-end gap-2">
-            
+
+                    <button wire:click="restoreFromSelectedBackup('{{$backup['name']}}')" class="btn btn-sm btn-secondary">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    Restore Backup
+                    </button>
+
+                    
                     <button wire:click="deleteBackup('{{$backup['name']}}')" class="btn btn-sm btn-danger">
                     <i class="fa-solid fa-trash"></i>
                     Delete Backup 

@@ -39,7 +39,6 @@ class Backups extends Component {
 
             $timestamp = now()->format('Y-m-d_H-i-s');
             $dumpPath = $this->backupDir . "/backup_$timestamp.sql";
-
             
             $username = env('DB_USERNAME');
             $password = env('DB_PASSWORD');
@@ -67,8 +66,56 @@ class Backups extends Component {
         }
     }
 
-   // this method retrieves all available backups and lists them 
 
+    public function restoreFromSelectedBackup($fileName) {
+
+        Log::info('Executing method: '.__FUNCTION__. ' in class: '.__CLASS__. ' at '.now());
+        
+        $filePath = $this->backupDir.'/'.basename($fileName);
+
+        if(!File::exists($filePath)) {
+            $this->error = 'The selected backup file does not exist';
+            Log::error('Backup restore could not be completed because the file: '.$filePath. ' was not found');
+            return;
+        }
+
+        try { 
+
+            $username = env('DB_USERNAME');
+            $password = env('DB_PASSWORD');
+            $host = env('DB_HOST');
+            $database = env('DB_DATABASE');
+
+            Log::info('Attempting to restore from selected backup file: '.$filePath);
+
+            $command = [
+                'mysql',
+                '--user='.$username,
+                '--password='.$password,
+                '--host='.$host, 
+                $database,
+            ];
+
+            $process = new Process($command);
+            $process->setInput(file_get_contents($filePath));
+            $process->run();
+
+            if(!$process->isSuccessful()){ 
+                throw new ProcessFailedException($process);
+            }
+
+            $this->success = 'Database restored successfully from backup!';
+            Log::info('Backup restore was completed successfully from the selected file: '.$filePath);
+        }
+
+        catch(Exception $e){
+
+            $this->error = 'An error occurred while attempting to restore the backup';
+            Log::error('Exception caught in method: '.__FUNCTION__.' in class:  '.__CLASS__. ' at '.now(). ' error: '.$e->getMessage().'');
+        }
+
+    }
+    
 
    public function deleteBackup($fileName){
 
@@ -110,6 +157,8 @@ class Backups extends Component {
     }
 
    }
+
+    // this method retrieves all available backups and lists them 
 
    private function loadBackups(){
     
