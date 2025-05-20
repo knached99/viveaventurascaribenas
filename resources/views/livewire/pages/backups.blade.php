@@ -6,7 +6,7 @@
                     Create Backup 
                     </button>
     </div>
-
+    @if(!empty($backups) || is_array($backups) || count($backups) > 0)
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         @foreach($backups as $backup)
         <div class="col">
@@ -34,6 +34,9 @@
             </div>
         </div>
         @endforeach
+        @else 
+        <h5 class="text-lg fw-bold">No backups found</h5>
+        @endif
     </div>
 </div>
 </x-authenticated-theme-layout>

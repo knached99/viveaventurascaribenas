@@ -181,8 +181,6 @@ class Backups extends Component {
 
     public function render(){
 
-        return view('livewire.backups', [
-            'backups' => $this->backups
-        ]);
+        return view('livewire.backups');
     }
 }
