@@ -180,11 +180,7 @@ class Backups extends Component {
     }
 
     public function render()
-    {
-        $backups = $this->loadBackups();
-    
-        return view('livewire.backups', [
-            'backups' => $backups,
-        ]);
+    {    
+        return view('livewire.pages.backups');
     }
 }    
