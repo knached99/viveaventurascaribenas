@@ -12,10 +12,10 @@
         <div class="col">
             <div class="card h-100 shadow-sm border-0 backup-card transition">
                 <div class="card-body">
-                    <h5 class="card-title">{{ $backup['filename'] }}</h5>
+                    <h5 class="card-title">{{ $backup['name'] }}</h5>
                     <p class="card-text">
                         Size: {{ number_format($backup['size'] / 1024, 2) }} KB<br>
-                        Last Modified: {{ \Carbon\Carbon::createFromTimestamp($backup['lastModified'])->toDayDateTimeString() }}
+                        Last Modified: {{ \Carbon\Carbon::createFromTimestamp($backup['modified'])->toDayDateTimeString() }}
                     </p>
                 </div>
                 <div class="card-footer bg-transparent border-0 d-flex justify-content-end gap-2">
