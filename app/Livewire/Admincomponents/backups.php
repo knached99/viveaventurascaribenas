@@ -21,7 +21,8 @@ class Backups extends Component {
     public function mount(){
 
         $this->backupDir = storage_path('app/backups');
-        $this->loadBackups();
+        $this->backups = $this->loadBackups();
+
     }   
 
     public function createBackup(){
@@ -160,31 +161,30 @@ class Backups extends Component {
 
     // this method retrieves all available backups and lists them 
 
-   private function loadBackups(){
+    private function loadBackups()
+    {
+        if(!File::exists($this->backupDir)){
+            File::makeDirectory($this->backupDir, 0755, true);
+        }
     
-    if(!File::exists($this->backupDir)){
-        File::makeDirectory($this->backupDir, 0755, true);
+        return collect(File::files($this->backupDir))
+            ->filter(fn($file) => $file->getExtension() === 'sql')
+            ->map(fn($file) => [
+                'name' => $file->getFilename(),
+                'size' => $file->getSize(),
+                'modified' => $file->getMTime(),
+                'path' => $file->getRealPath(),
+            ])
+            ->values()
+            ->toArray();
     }
-
-    $this->backups = collect(File::files($this->backupDir))
-    ->filter(fn($file) => $file->getExtension() === 'sql')
-    ->map(fn($file) => [
-        'name' => $file->getFilename(),
-        'size' => $file->getSize(),
-        'modified' => $file->getMTime(),
-        'path' => $file->getRealPath(),
-    ])
-    ->values()
-    ->toArray();
-
-    }
+    
 
     public function render()
     {    
-        $backups = $this->loadBackups();
-
         return view('livewire.pages.backups', [
-            'backups' => $backups
+            'backups' => $this->backups
+
         ]);
     }
 }    
