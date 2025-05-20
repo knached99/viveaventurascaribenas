@@ -17,7 +17,7 @@
           <button wire:click="createBackup" class="btn btn-sm btn-primary">
                     <i class="fa-solid fa-circle-plus"></i>
                     Create Backup 
-                    <div class="spinner-border text-primary" role="status" wire:loading wire:target="createBackup">
+                    <div class="spinner-border " role="status" wire:loading wire:target="createBackup">
                     <span class="visually-hidden">Creating Backup...</span>
                     </div>
                     </button>
@@ -40,7 +40,7 @@
                     <button wire:click="restoreFromSelectedBackup('{{$backup['name']}}')" class="btn btn-sm btn-secondary">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     Restore Backup
-                    <div class="spinner-border text-primary" role="status" wire:loading wire:target="restoreFromSelectedBackup">
+                    <div class="spinner-border " role="status" wire:loading wire:target="restoreFromSelectedBackup">
                     <span class="visually-hidden">Restoring From Backup...</span>
                     </div>
                     </button>
@@ -49,7 +49,7 @@
                     <button wire:click="deleteBackup('{{$backup['name']}}')" class="btn btn-sm btn-danger">
                     <i class="fa-solid fa-trash"></i>
                     Delete Backup 
-                    <div class="spinner-border text-primary" role="status" wire:loading wire:target="deleteBackup">
+                    <div class="spinner-border " role="status" wire:loading wire:target="deleteBackup">
                     <span class="visually-hidden">Deleting Backup...</span>
                     </div>
                     </button>
