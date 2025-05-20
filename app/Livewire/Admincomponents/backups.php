@@ -34,8 +34,9 @@ class Backups extends Component {
             Log::warning('Backup directory does not exist, making one now...');
             File::makeDirectory($this->backupDir, 0755, true);
             Log::info('Backup directory successfully created!');
+        }
 
-            Log::info('Connecting to mysql database and generating sql dump...');
+        Log::info('Connecting to mysql database and generating sql dump...');
 
             $timestamp = now()->format('Y-m-d_H-i-s');
             $dumpPath = $this->backupDir . "/backup_$timestamp.sql";
@@ -63,7 +64,6 @@ class Backups extends Component {
             }
 
             $this->success = 'Backup is successfully created!';
-        }
     }
 
 
