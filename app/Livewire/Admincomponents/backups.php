@@ -21,7 +21,7 @@ class Backups extends Component {
     public function mount(){
 
         $this->backupDir = storage_path('app/backups');
-        $this->backups = loadBackups();
+        $this->loadBackups();
     }   
 
     public function createBackup(){
@@ -180,7 +180,10 @@ class Backups extends Component {
     }
 
     public function render(){
-
-        return view('livewire.backups');
+        $this->backups = $this->loadBackups();
+        
+        return view('livewire.backups', [
+            'backups' => $this->backups
+        ]);
     }
 }
