@@ -1,8 +1,25 @@
 <div class="container my-4">
+    @if($success)
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ $success }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if($error)
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ $error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="d-flex justify-content-start mb-4">
           <button wire:click="createBackup" class="btn btn-sm btn-primary">
                     <i class="fa-solid fa-circle-plus"></i>
                     Create Backup 
+                    <div class="spinner-border text-primary" role="status" wire:loading wire:target="createBackup">
+                    <span class="visually-hidden">Creating Backup...</span>
+                    </div>
                     </button>
     </div>
 
@@ -23,12 +40,18 @@
                     <button wire:click="restoreFromSelectedBackup('{{$backup['name']}}')" class="btn btn-sm btn-secondary">
                     <i class="fa-solid fa-clock-rotate-left"></i>
                     Restore Backup
+                    <div class="spinner-border text-primary" role="status" wire:loading wire:target="restoreFromSelectedBackup">
+                    <span class="visually-hidden">Restoring From Backup...</span>
+                    </div>
                     </button>
 
                     
                     <button wire:click="deleteBackup('{{$backup['name']}}')" class="btn btn-sm btn-danger">
                     <i class="fa-solid fa-trash"></i>
                     Delete Backup 
+                    <div class="spinner-border text-primary" role="status" wire:loading wire:target="deleteBackup">
+                    <span class="visually-hidden">Deleting Backup...</span>
+                    </div>
                     </button>
                 </div>
             </div>

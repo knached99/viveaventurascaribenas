@@ -65,6 +65,8 @@ class Backups extends Component {
             }
 
             $this->success = 'Backup is successfully created!';
+            $this->backups = $this->loadBackups();
+
     }
 
 
@@ -107,6 +109,8 @@ class Backups extends Component {
 
             $this->success = 'Database restored successfully from backup!';
             Log::info('Backup restore was completed successfully from the selected file: '.$filePath);
+            $this->backups = $this->loadBackups();
+
         }
 
         catch(Exception $e){
@@ -135,6 +139,8 @@ class Backups extends Component {
             if($deleted){
                 $this->success = 'The selected backup has been deleted successfully!';
                 Log::info('Backup file: '.$filePath. ' deleted successfully!');
+                $this->backups = $this->loadBackups();
+
             }
 
             else {
