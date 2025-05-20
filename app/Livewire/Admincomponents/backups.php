@@ -21,7 +21,7 @@ class Backups extends Component {
     public function mount(){
 
         $this->backupDir = storage_path('app/backups');
-        $this->loadBackups();
+        $this->backups = loadBackups();
     }   
 
     public function createBackup(){
