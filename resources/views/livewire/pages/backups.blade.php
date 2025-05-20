@@ -1,11 +1,13 @@
 <?php 
+
 use App\Livewire\Components\Backups;
+use Livewire\Volt\Component;
 
 new #[Layout('layouts.authenticated-theme')] class extends Component {
 
     };
     ?>
-    
+
 <div class="container my-4">
     <div class="d-flex justify-content-start mb-4">
           <button wire:click="createBackup" class="btn btn-sm btn-primary">
