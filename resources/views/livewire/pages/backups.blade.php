@@ -48,6 +48,8 @@
             </div>
         </button>
     </div>
+    <h5 class="text-center fw-bold">Your Available Backups</h5>
+
 
     {{-- Backup Cards --}}
     @if (isset($backups) && is_array($backups) && count($backups) > 0)
@@ -55,7 +57,6 @@
             style="max-height: 500px; max-width: 100%;">
             @foreach ($backups as $backup)
                 <div class="col">
-                    <h5 class="text-center fw-bold">Your Available Backups</h5>
 
                     <div class="card h-100 shadow-sm border-0 backup-card transition">
                         <div class="card-body">
