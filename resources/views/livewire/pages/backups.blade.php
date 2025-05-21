@@ -1,4 +1,4 @@
-<div class="container my-4">
+<div class="container-fluid p-3 p-sm-4">
     @if($success)
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ $success }}
@@ -13,52 +13,51 @@
         </div>
     @endif
 
-    <div class="d-flex justify-content-start mb-4">
-          <button wire:click="createBackup" class="btn btn-sm btn-primary">
-                    <i class="fa-solid fa-circle-plus"></i>
-                    Create Backup 
-                    <div class="spinner-border " role="status" wire:loading wire:target="createBackup">
-                    <span class="visually-hidden">Creating Backup...</span>
-                    </div>
-                    </button>
+    <div class="d-flex flex-column flex-sm-row justify-content-start align-items-start mb-4 gap-2">
+        <button wire:click="createBackup" class="btn btn-primary d-flex align-items-center gap-2">
+            <span>Create Backup</span>
+            <div class="spinner-border spinner-border-sm" role="status" wire:loading wire:target="createBackup">
+                <span class="visually-hidden">Creating Backup...</span>
+            </div>
+        </button>
     </div>
 
     @if(isset($backups) && is_array($backups) && count($backups) > 0)
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        @foreach($backups as $backup)
-        <div class="col">
-            <div class="card h-100 shadow-sm border-0 backup-card transition">
-                <div class="card-body">
-                    <h5 class="card-title">{{ $backup['name'] }}</h5>
-                    <p class="card-text">
-                        Size: {{ number_format($backup['size'] / 1024, 2) }} KB<br>
-                        {{ \Carbon\Carbon::createFromTimestamp($backup['modified'])->setTimezone('America/New_York')->toDayDateTimeString() }}
-                    </p>
-                </div>
-                <div class="card-footer bg-transparent border-0 d-flex justify-content-end gap-2">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+            @foreach($backups as $backup)
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 backup-card transition">
+                        <div class="card-body">
+                            <h5 class="card-title text-break">{{ $backup['name'] }}</h5>
+                            <p class="card-text small text-muted">
+                                Size: {{ number_format($backup['size'] / 1024, 2) }} KB<br>
+                                {{ \Carbon\Carbon::createFromTimestamp($backup['modified'])->setTimezone('America/New_York')->toDayDateTimeString() }}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 d-flex flex-column flex-md-row justify-content-end gap-2">
+                            <button wire:click="restoreFromSelectedBackup('{{ $backup['name'] }}')" class="btn btn-secondary d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                <span>Restore</span>
+                                <div class="spinner-border spinner-border-sm" role="status" wire:loading wire:target="restoreFromSelectedBackup('{{ $backup['name'] }}')">
+                                    <span class="visually-hidden">Restoring...</span>
+                                </div>
+                            </button>
 
-                    <button wire:click="restoreFromSelectedBackup('{{$backup['name']}}')" class="btn btn-sm btn-secondary">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                    Restore Backup
-                    <div class="spinner-border " role="status" wire:loading wire:target="restoreFromSelectedBackup">
-                    <span class="visually-hidden">Restoring From Backup...</span>
+                            <button wire:click="deleteBackup('{{ $backup['name'] }}')" class="btn btn-danger d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-trash"></i>
+                                <span>Delete</span>
+                                <div class="spinner-border spinner-border-sm" role="status" wire:loading wire:target="deleteBackup('{{ $backup['name'] }}')">
+                                    <span class="visually-hidden">Deleting...</span>
+                                </div>
+                            </button>
+                        </div>
                     </div>
-                    </button>
-
-                    
-                    <button wire:click="deleteBackup('{{$backup['name']}}')" class="btn btn-sm btn-danger">
-                    <i class="fa-solid fa-trash"></i>
-                    Delete Backup 
-                    <div class="spinner-border " role="status" wire:loading wire:target="deleteBackup">
-                    <span class="visually-hidden">Deleting Backup...</span>
-                    </div>
-                    </button>
                 </div>
-            </div>
+            @endforeach
         </div>
-        @endforeach
-        @else 
-        <h5 class="text-lg fw-bold">No backups found</h5>
-        @endif
-    </div>
+    @else
+        <div class="mt-3">
+            <h5 class="fw-bold">No backups found</h5>
+        </div>
+    @endif
 </div>
