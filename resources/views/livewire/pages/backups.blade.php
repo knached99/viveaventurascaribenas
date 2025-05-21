@@ -15,6 +15,8 @@
             <li>
                 To restore data, locate the desired backup and click <strong>"Restore."</strong>
             </li>
+
+            <li> To delete a backup, simply locate the desired backup and click <strong> "Delete"</strong>
         </ol>
     </div>
 
