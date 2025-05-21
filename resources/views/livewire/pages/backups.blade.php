@@ -1,5 +1,6 @@
 <div class="container-fluid p-3 p-sm-4">
-    <div class="bg-light rounded-3 shadow-sm p-4 w-100 w-md-75 float-start">
+    {{-- Intro Section --}}
+    <div class="bg-light rounded-3 shadow-sm p-4 w-100 w-md-75 mx-auto mb-4">
         <h6 class="fw-bold mb-3">
             This page provides an overview of all available backups.
         </h6>
@@ -15,9 +16,8 @@
             </li>
         </ul>
     </div>
-</div>
 
-
+    {{-- Alert Messages --}}
     @if($success)
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ $success }}
@@ -32,6 +32,7 @@
         </div>
     @endif
 
+    {{-- Backup Action Buttons --}}
     <div class="d-flex flex-column flex-sm-row justify-content-start align-items-start mb-4 gap-2">
         <button wire:click="createBackup" class="btn btn-primary d-flex align-items-center gap-2">
             <span>Create Backup</span>
@@ -41,6 +42,7 @@
         </button>
     </div>
 
+    {{-- Backup Cards --}}
     @if(isset($backups) && is_array($backups) && count($backups) > 0)
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
             @foreach($backups as $backup)
@@ -75,7 +77,7 @@
             @endforeach
         </div>
     @else
-        <div class="mt-3">
+        <div class="mt-4">
             <h5 class="fw-bold">No backups found</h5>
         </div>
     @endif
