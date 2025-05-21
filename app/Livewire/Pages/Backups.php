@@ -77,7 +77,10 @@ class Backups extends Component {
 
 
     public function restoreFromSelectedBackup($fileName) {
-
+        
+        $this->success = '';
+        $this->error = '';
+        
         Log::info('Executing method: '.__FUNCTION__. ' in class: '.__CLASS__. ' at '.now());
         
         $filePath = $this->backupDir.'/'.basename($fileName);
@@ -137,6 +140,9 @@ class Backups extends Component {
 
    public function deleteBackup($fileName){
 
+    $this->success = '';
+    $this->error = '';
+    
     try {
         Log::info('Executing method: '.__FUNCTION__. ' in class: '.__CLASS__. ' at '. date('F jS, Y, \a\t H:i:a', strtotime(now())));
         
