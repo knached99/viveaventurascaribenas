@@ -51,8 +51,21 @@
                     <div class="card h-100 shadow-sm border-0 backup-card transition">
                         <div class="card-body">
                             <h5 class="card-title text-break" style="word-break: break-word;">{{ $backup['name'] }}</h5>
+
+                            @php
+                             $size = $backup['size']; // default is bytes 
+                             if($size >= 1073741824){
+                                $formattedSize = number_format($size / 1073741824, 2). ' GB';
+                             }
+                             elseif($size >= 1048576){
+                                $formattedSize = number_format($size / 1048576, 2 ). ' MB';
+                             }
+                             else {
+                                $formattedSize = number_format($size / 1024, 2). ' KB';
+                             }
+                            @endphp
                             <p class="card-text small text-muted">
-                                Size: {{ number_format($backup['size'] / 1024, 2) }} KB<br>
+                                Size: {{$formattedSize}}<br>
                                 {{ \Carbon\Carbon::createFromTimestamp($backup['modified'])->setTimezone('America/New_York')->toDayDateTimeString() }}
                             </p>
                         </div>
