@@ -38,7 +38,7 @@
 
     {{-- Backup Action Buttons --}}
     <div class="d-flex flex-column flex-sm-row flex-wrap align-items-start gap-2 mb-4">
-        <button wire:click="createBackup" class="btn btn-primary d-flex align-items-center gap-2">
+        <button wire:click="createBackup" class="btn btn-primary d-flex align-items-center gap-2"  wire:loading.remove wire:target="createBackup">
             <span>Create Backup</span>
             <div class="spinner-border spinner-border-sm" role="status" wire:loading wire:target="createBackup">
                 <span class="visually-hidden">Creating Backup...</span>
@@ -73,15 +73,15 @@
                             </p>
                         </div>
                         <div class="card-footer bg-transparent border-0 d-flex flex-column flex-md-row justify-content-end gap-2">
-                            <button wire:click="restoreFromSelectedBackup('{{ $backup['name'] }}')" class="btn btn-secondary d-flex align-items-center gap-2">
+                            <button wire:click="restoreFromSelectedBackup('{{ $backup['name'] }}')" class="btn btn-secondary d-flex align-items-center gap-2" wire:loading.remove wire:target="restoreFromSelectedBackup('{{ $backup['name'] }}')">
                                 <i class="fa-solid fa-clock-rotate-left"></i>
                                 <span>Restore</span>
-                                <div class="spinner-border spinner-border-sm" role="status" wire:loading wire:target="restoreFromSelectedBackup('{{ $backup['name'] }}')">
+                                <div wire:loading wire:target="restoreFromSelectedBackup('{{ $backup['name'] }}')" class="spinner-border spinner-border-sm" role="status" >
                                     <span class="visually-hidden">Restoring...</span>
                                 </div>
                             </button>
 
-                            <button wire:click="deleteBackup('{{ $backup['name'] }}')" class="btn btn-danger d-flex align-items-center gap-2">
+                            <button wire:click="deleteBackup('{{ $backup['name'] }}')" class="btn btn-danger d-flex align-items-center gap-2" wire:loading.remove wire:target="deleteBackup('{{ $backup['name'] }}')">
                                 <i class="fa-solid fa-trash"></i>
                                 <span>Delete</span>
                                 <div class="spinner-border spinner-border-sm" role="status" wire:loading wire:target="deleteBackup('{{ $backup['name'] }}')">
