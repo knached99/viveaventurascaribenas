@@ -39,6 +39,8 @@ class Backups extends Component {
 
         Log::info('Connecting to mysql database and generating sql dump...');
 
+        try{
+
             $timestamp = now()->format('Y-m-d_H-i-s');
             $dumpPath = $this->backupDir . "/backup_$timestamp.sql";
             
@@ -60,12 +62,16 @@ class Backups extends Component {
                 file_put_contents($dumpPath, $buffer, FILE_APPEND);
             });
 
-            if(!$process->isSuccessful()){
-                throw new ProcessFailedException($process);
-            }
-
             $this->success = 'Backup is successfully created!';
             $this->backups = $this->loadBackups();
+        }
+
+        catch(ProcessFailedException $e){
+            $this->error = 'Backup creation failed due to an internal error. If this persists, please contact the developer';
+            Log::error('Method: '.__FUNCTION__. ' in class: '.__CLASS__.' failed to execute at '.date('F jS, Y, \a\t H:ia', strtotime(now())). ' due to the following error: '.$e->getMessage());
+            return;
+        }
+
 
     }
 
@@ -103,10 +109,6 @@ class Backups extends Component {
             $process->setInput(file_get_contents($filePath));
             $process->run();
 
-            if(!$process->isSuccessful()){ 
-                throw new ProcessFailedException($process);
-            }
-
             $this->success = 'Database restored successfully from backup!';
             Log::info('Backup restore was completed successfully from the selected file: '.$filePath);
             $this->backups = $this->loadBackups();
@@ -117,6 +119,12 @@ class Backups extends Component {
 
             $this->error = 'An error occurred while attempting to restore the backup';
             Log::error('Exception caught in method: '.__FUNCTION__.' in class:  '.__CLASS__. ' at '.now(). ' error: '.$e->getMessage().'');
+        }
+
+        catch(ProcessFailedException $e){
+            $this->error = 'An error occurred while attempting to restore the backup';
+            Log::error('Exception caught in method: '.__FUNCTION__.' in class:  '.__CLASS__. ' at '.now(). ' error: '.$e->getMessage().'');
+            return;
         }
 
     }
@@ -147,6 +155,7 @@ class Backups extends Component {
 
                 $this->error = 'Failed to delete the backup file: '.$fileName.'';
                 Log::error('Failed to delete: '.$filePath);
+                return;
             }
         }
 
@@ -154,6 +163,7 @@ class Backups extends Component {
 
             $this->error = 'You attmpted to delete a non-existent backup file. If this issue persists, contact the developer';
             Log::warning('Attempted to delete a non-existing fle: '.$filePath);
+            return;
         }
 
     }
@@ -161,6 +171,7 @@ class Backups extends Component {
     catch(Exception $e){
         $this->error = 'An error occurred while deleting the backup';
         Log::error('Exception caught in method: '.__FUNCTION__. ' in class: '.__CLASS__. ' at: '.now().' Error: '.$e->getMessage());
+        return;
     }
 
    }
