@@ -1,6 +1,6 @@
-<div class="container-fluid p-3 p-sm-4">
+<div class="container py-4 px-3 px-sm-4">
     {{-- Intro Section --}}
-    <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 w-100 w-md-75 mx-auto mb-5 border">
+    <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 mx-auto mb-5 border" style="max-width: 900px;">
         <h5 class="fw-semibold mb-3 text-primary">
             Backup Overview
         </h5>
@@ -17,25 +17,24 @@
             </li>
         </ol>
     </div>
-</div>
 
     {{-- Alert Messages --}}
     @if($success)
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
             {{ $success }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     @if($error)
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
             {{ $error }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
     {{-- Backup Action Buttons --}}
-    <div class="d-flex flex-column flex-sm-row justify-content-start align-items-start mb-4 gap-2">
+    <div class="d-flex flex-column flex-sm-row flex-wrap align-items-start gap-2 mb-4">
         <button wire:click="createBackup" class="btn btn-primary d-flex align-items-center gap-2">
             <span>Create Backup</span>
             <div class="spinner-border spinner-border-sm" role="status" wire:loading wire:target="createBackup">
@@ -51,7 +50,7 @@
                 <div class="col">
                     <div class="card h-100 shadow-sm border-0 backup-card transition">
                         <div class="card-body">
-                            <h5 class="card-title text-break">{{ $backup['name'] }}</h5>
+                            <h5 class="card-title text-break" style="word-break: break-word;">{{ $backup['name'] }}</h5>
                             <p class="card-text small text-muted">
                                 Size: {{ number_format($backup['size'] / 1024, 2) }} KB<br>
                                 {{ \Carbon\Carbon::createFromTimestamp($backup['modified'])->setTimezone('America/New_York')->toDayDateTimeString() }}
