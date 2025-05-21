@@ -1,19 +1,21 @@
 <div class="container-fluid p-3 p-sm-4">
-
-<h6 style="font-weight: 800;">
-This page provides an overview of all available backups. 
-Backups serve as snapshots of the data stored on the server and can be used to restore critical information in the event of data loss or other incidents.
-</h6>
-
-<ul class="block list-group">
- <li class="list-group-item">
- To create a new backup, click the "Create Backup" button. This will generate a snapshot of your database in its current state.  
- </li>
- 
- <li class="list-group-item">
- To restore data, simply locate the desired backup and click "Restore."
- </li>
-</ul>
+    <div class="bg-light rounded-3 shadow-sm p-4 w-100 w-md-75 float-start">
+        <h6 class="fw-bold mb-3">
+            This page provides an overview of all available backups.
+        </h6>
+        <p class="text-muted mb-3">
+            Backups serve as snapshots of the data stored on the server and can be used to restore critical information in the event of data loss or other incidents.
+        </p>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                To create a new backup, click the <strong>"Create Backup"</strong> button. This will generate a snapshot of your database in its current state.
+            </li>
+            <li class="list-group-item">
+                To restore data, locate the desired backup and click <strong>"Restore."</strong>
+            </li>
+        </ul>
+    </div>
+</div>
 
 
     @if($success)
