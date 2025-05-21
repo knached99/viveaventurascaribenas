@@ -1,22 +1,23 @@
 <div class="container-fluid p-3 p-sm-4">
     {{-- Intro Section --}}
-    <div class="bg-light rounded-3 shadow-sm p-4 w-100 w-md-75 mx-auto mb-4">
-        <h6 class="fw-bold mb-3">
-            This page provides an overview of all available backups.
-        </h6>
-        <p class="text-muted mb-3">
-            Backups serve as snapshots of the data stored on the server and can be used to restore critical information in the event of data loss or other incidents.
+    <div class="bg-white rounded-4 shadow-sm p-4 p-md-5 w-100 w-md-75 mx-auto mb-5 border">
+        <h5 class="fw-semibold mb-3 text-primary">
+            Backup Overview
+        </h5>
+        <p class="text-muted mb-4">
+            Backups are snapshots of the data stored on the server and can be used to restore critical information in case of data loss or other incidents. Use the instructions below to manage your backups efficiently.
         </p>
 
-        <div class="block m-3">
-           <span class="text-dark text-lg">
+        <ol class="ps-3 text-dark">
+            <li class="mb-2">
                 To create a new backup, click the <strong>"Create Backup"</strong> button. This will generate a snapshot of your database in its current state.
-            </span>
-            <span class="text-dark text-lg">
+            </li>
+            <li>
                 To restore data, locate the desired backup and click <strong>"Restore."</strong>
-            </span>
-        
+            </li>
+        </ol>
     </div>
+</div>
 
     {{-- Alert Messages --}}
     @if($success)
