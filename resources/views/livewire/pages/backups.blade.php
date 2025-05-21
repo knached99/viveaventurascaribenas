@@ -12,11 +12,12 @@
             <li class="mb-2">
                 To create a new backup, click the <strong>"Create Backup"</strong> button. This will generate a snapshot of your database in its current state.
             </li>
-            <li>
+            <li class="mb-2">
                 To restore data, locate the desired backup and click <strong>"Restore."</strong>
             </li>
 
-            <li> To delete a backup, simply locate the desired backup and click <strong> "Delete"</strong>
+            <li class="mb-2"> To delete a backup, simply locate the desired backup and click <strong> "Delete"</strong>
+            </li>
         </ol>
     </div>
 
