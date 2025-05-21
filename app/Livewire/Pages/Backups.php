@@ -105,9 +105,14 @@ class Backups extends Component {
                 $database,
             ];
 
+            // $process = new Process($command);
+            // $process->setInput(file_get_contents($filePath));
+            // $process->run();
             $process = new Process($command);
-            $process->setInput(file_get_contents($filePath));
-            $process->run();
+            $process->run(function($type, $buffer) use($filePath){
+                file_put_contents($filePath, $buffer, FILE_APPEND);
+            });
+
 
             $this->success = 'Database restored successfully from backup!';
             Log::info('Backup restore was completed successfully from the selected file: '.$filePath);
