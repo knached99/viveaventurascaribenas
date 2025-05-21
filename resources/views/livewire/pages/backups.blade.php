@@ -7,14 +7,15 @@
         <p class="text-muted mb-3">
             Backups serve as snapshots of the data stored on the server and can be used to restore critical information in the event of data loss or other incidents.
         </p>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">
+
+        <div class="block m-3">
+           <span class="text-dark text-lg">
                 To create a new backup, click the <strong>"Create Backup"</strong> button. This will generate a snapshot of your database in its current state.
-            </li>
-            <li class="list-group-item">
+            </span>
+            <span class="text-dark text-lg">
                 To restore data, locate the desired backup and click <strong>"Restore."</strong>
-            </li>
-        </ul>
+            </span>
+        
     </div>
 
     {{-- Alert Messages --}}
