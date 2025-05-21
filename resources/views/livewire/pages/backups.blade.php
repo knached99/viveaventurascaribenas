@@ -53,9 +53,10 @@
     @if (isset($backups) && is_array($backups) && count($backups) > 0)
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 overflow-scroll"
             style="max-height: 500px; max-width: 100%;">
-            <h5 class="text-center fw-bold">Your Available Backups</h5>
             @foreach ($backups as $backup)
                 <div class="col">
+                    <h5 class="text-center fw-bold">Your Available Backups</h5>
+
                     <div class="card h-100 shadow-sm border-0 backup-card transition">
                         <div class="card-body">
                             <h5 class="card-title text-break" style="word-break: break-word;">{{ $backup['name'] }}</h5>
