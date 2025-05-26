@@ -53,123 +53,7 @@ class Analytics extends Controller
    }
    
 
-//    public function showAnalytics()
-//    {
-//        $visitors = VisitorModel::select(
-//            'visitor_uuid', 
-//            'visitor_ip_address', 
-//            'visitor_user_agent', 
-//            'visited_url', 
-//            'visitor_referrer', 
-//            'visited_at', 
-//            'unique_identifier'
-//        )->get()->toArray();
 
-   
-//        // Calculate the most visited URL
-//        $mostVisitedURLs = array_column($visitors, 'visited_url');
-//        $urlCounts = array_count_values($mostVisitedURLs);
-//        arsort($urlCounts);
-//        $mostVisitedURL = array_key_first($urlCounts);
-
-
-//             $visitorReferrers = DB::table('visitors')
-//             ->select('visitor_referrer')
-//             ->whereNotNull('visitor_referrer')
-//             ->get();
-
-//         // Convert collection to an array of visitor_referrer values
-//         $topReferrerURLs = $visitorReferrers->pluck('visitor_referrer')->toArray();
-
-//         // Replace null or non-string values with 'unknown'
-//         $topReferrerURLs = array_map(
-//             fn($url) => is_string($url) && $url !== '' ? $url : 'unknown',
-//             $topReferrerURLs
-//         );
-
-//         // Count total number of occurrences of each referrer
-//         $referrerURLCounts = array_count_values($topReferrerURLs);
-
-//         // Sort referrers by count in descending order
-//         arsort($referrerURLCounts);
-
-//         // Retrieve the most common referrer URL
-//         $topReferrerURL = array_key_first($referrerURLCounts);
-
-        
-//        // Count total visitors
-//        $totalVisitors = count($visitors);
-   
-//        // Extract unique IP addresses
-//        $ips = array_unique(array_column($visitors, 'visitor_ip_address'));
-   
-//        // Fetch and cache location data for IPs
-//        $locations = [];
-//        foreach ($ips as $ip) {
-//            $locations[$ip] = Cache::remember("geo_" . md5($ip), 1440, function () use ($ip) {
-//                return app(MaxMindService::class)->getLocation($ip);
-//            });
-//        }
-   
-//        // Initialize aggregation variables
-//        $countries = [];
-//        $browsers = [];
-//        $operatingSystems = [];
-   
-//        // Process visitors and aggregate data
-//        foreach ($visitors as &$visitor) {
-//            $ip = $visitor['visitor_ip_address'];
-//            $location = $locations[$ip] ?? null;
-   
-//            $visitor['country'] = $location['country'] ?? null;
-//            $visitor['continent'] = $location['continent'] ?? null;
-   
-//            $parsedAgent = $this->parseUserAgent($visitor['visitor_user_agent']);
-//            $visitor['browser'] = $parsedAgent['browser'];
-//            $visitor['operating_system'] = $parsedAgent['os'];
-   
-//            if (!empty($visitor['country'])) {
-//                $countries[] = $visitor['country'];
-//            }
-   
-//            $browsers[$visitor['browser']] = ($browsers[$visitor['browser']] ?? 0) + 1;
-//            $os = $visitor['operating_system'] ?: 'Unknown';
-//            $operatingSystems[$os] = ($operatingSystems[$os] ?? 0) + 1;
-//        }
-   
-//        // Sort browsers and operating systems in descending order
-//        arsort($browsers);
-//        arsort($operatingSystems);
-   
-//        // Get the top 5 browsers and operating systems
-//        $topBrowsers = array_slice($browsers, 0, 5, true);
-//        $topOperatingSystems = array_slice($operatingSystems, 0, 5, true);
-   
-//        // Prepare heatmap data
-//        $heatmapData = [];
-//        foreach (array_count_values($countries) as $country => $count) {
-//            $heatmapData[] = ['country' => $country, 'count' => $count];
-//        }
-
-
-//        // We will get the bots hitting this site here 
-//        $botData = $this->getBotCrawlers($visitors);
-   
-//        // Return the view with calculated data
-//        return view('admin.analytics', [
-//            'topBrowsers' => $topBrowsers,
-//            'topOperatingSystems' => $topOperatingSystems,
-//            'heatmapData' => $heatmapData,
-//            'most_visited_url' => $mostVisitedURL,
-//            'topReferrerURL' => $topReferrerURL,
-//            'total_visitors_count' => $totalVisitors,
-//            'totalBots'=>$botData['totalBots'],
-//            'mostFrequentBot'=>$botData['mostFrequentBot'],
-//            'botPercentage'=>$botData['botPercentage'],
-//            'realVisitorsPercentage'=>$botData['realVisitorsPercentage'],
-//        ]);
-//    }
-   
 
     // Implementing a more effective caching strategy 
     // caching both location and IP data for a week 
@@ -330,84 +214,64 @@ class Analytics extends Controller
      * @param string $userAgent
      * @return array
      */
-    protected function parseUserAgent($userAgent)
-    {
-        $browser = 'Unknown';
-        $os = 'Unknown';
     
-        // Extended browser detection using a hash map.
-        // Order matters: some substrings (e.g., "Chrome") are present in other UA strings.
-        $browserMap = [
-            'OPR'              => 'Opera',                // Opera (Blink-based)
-            'Opera'            => 'Opera',                // Older Opera versions
-            'Edg'              => 'Edge',                 // Microsoft Edge (Chromium-based) often shows as "Edg"
-            'Edge'             => 'Edge',                 // Legacy Microsoft Edge
-            'MSIE'             => 'Internet Explorer',
-            'Trident'          => 'Internet Explorer',    // IE 11
-            'Chrome'           => 'Chrome',
-            'Chromium'         => 'Chromium',
-            'Firefox'          => 'Firefox',
-            'Safari'           => 'Safari',               // Must come after Chrome/Chromium because Chrome UA contains "Safari"
-            'SamsungBrowser'   => 'Samsung Internet',
-            'UCBrowser'        => 'UC Browser',
-            'QQBrowser'        => 'QQ Browser',
-            'Baidu'            => 'Baidu Browser',
-            'Vivaldi'          => 'Vivaldi',
-            'Maxthon'          => 'Maxthon',
-            'Iceweasel'        => 'Firefox (Iceweasel)',
-            'IceCat'           => 'Firefox (IceCat)',
-            // Add additional browser tokens as needed…
-        ];
-    
-        foreach ($browserMap as $key => $name) {
-            if (strpos($userAgent, $key) !== false) {
-                $browser = $name;
-                break;
-            }
-        }
-    
-        // Extended OS detection using a hash map.
-        $osMap = [
-            'Windows NT 11.0'  => 'Windows 11',
-            'Windows NT 10.0'  => 'Windows 10',
-            'Windows NT 6.3'   => 'Windows 8.1',
-            'Windows NT 6.2'   => 'Windows 8',
-            'Windows NT 6.1'   => 'Windows 7',
-            'Windows NT 6.0'   => 'Windows Vista',
-            'Windows NT 5.1'   => 'Windows XP',
-            'Windows XP'       => 'Windows XP',
-            'Mac OS X'         => 'Mac OS X',
-            'Android'          => 'Android',
-            'iPhone'           => 'iOS',
-            'iPad'             => 'iOS',
-            'iPod'             => 'iOS',
-            'Linux'            => 'Linux',
-            'CrOS'             => 'Chrome OS',
-            'BlackBerry'       => 'BlackBerry OS',
-            'BB10'             => 'BlackBerry OS',
-            'Tizen'            => 'Tizen',
-            'WebOS'            => 'WebOS',
-            'FreeBSD'          => 'FreeBSD',
-            'OpenBSD'          => 'OpenBSD',
-            // Examples of smart TV or gaming consoles (UA strings vary widely)
-            'Nintendo'         => 'Nintendo',
-            'PlayStation'      => 'PlayStation',
-            // Add additional OS tokens as needed…
-        ];
-    
-        foreach ($osMap as $key => $name) {
-            if (strpos($userAgent, $key) !== false) {
-                $os = $name;
-                break;
-            }
+     protected function parseUserAgent($userAgent){
+        $browser = 'unknown';
+        $os = 'unknown';
+
+        $userAgentsFile = storage_path('app/userAgents.json.txt');
+
+        if(!file_exists($userAgentsFile)){
+            return ['browser' => $browser, 'os' => $os];
         }
 
-        return [
-            'browser' => $browser,
-            'os' => $os
-        ];
-    }
-    
+        $userAgents = json_decode(file_get_contents($userAgentsFile), true);
+
+        if(!is_aray($userAgents)){
+            return ['browser' => $browser, 'os' => $os];
+        }
+
+        // We will dynamically collect all browser/os tokens found in the dataset 
+
+        $browserTokens = [];
+        $osTokens = [];
+
+        foreach($userAgents as $ua){
+            // Browser Tokens
+            if (preg_match('/(Firefox|Chrome|Chromium|Safari|MSIE|Trident|Edge|Edg|Opera|OPR|SamsungBrowser|UCBrowser|QQBrowser|Baidu|Vivaldi|Maxthon|Iceweasel|IceCat|chromeframe)/i', $ua, $browserMatch)) {
+                $token = $browserMatch[1];
+                $browserTokens[$token] = $token;
+            }
+
+            // OS Tokens 
+
+            if (preg_match('/(Windows NT [0-9.]+|Windows [0-9.]+|Mac OS X|Mac_PowerPC|Android|Linux|iPhone|iPad|iPod|CrOS|BlackBerry|BB10|Tizen|WebOS|FreeBSD|OpenBSD|Nintendo|PlayStation)/i', $ua, $osMatch)) {
+                $token = $osMatch[1];
+                $osTokens[$token] = $token;
+            }
+
+            // checking the user agent against the dynamic tokens
+
+            foreach($browserTokens as $token){
+                if(stripos($userAgent, $token) !== false){
+                    $browser = $token;
+                    break;
+                }
+            }
+
+            foreach ($osTokens as $token) {
+                if (stripos($userAgent, $token) !== false) {
+                    $os = $token;
+                    break;
+                }
+            }
+
+            return [
+                'browser' => $browser,
+                'os' => $os,
+            ];
+        }
+     }
 
     // Determines if user agents are bots and returns number of bots found 
 
