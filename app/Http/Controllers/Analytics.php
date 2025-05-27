@@ -175,9 +175,7 @@ class Analytics extends Controller
         arsort($operatingSystems);
         $heatmapData = array_values($locationCounts);
 
-        
-        \Log::info('Heatmap Data:'. json_encode($heatmapData));
-    
+            
         // Get bot crawler data
         $botData = $this->getBotCrawlers($visitors);
     
