@@ -215,11 +215,12 @@ class Analytics extends Controller
      * @return array
      */
     
-     protected function parseUserAgent($userAgent){
+     private function parseUserAgent($userAgent): array {
+        
         $browser = 'unknown';
         $os = 'unknown';
 
-        $userAgentsFile = storage_path('app/userAgents.json.txt');
+        $userAgentsFile = storage_path('app/userAgents.json');
 
         if(!file_exists($userAgentsFile)){
             return ['browser' => $browser, 'os' => $os];
@@ -227,51 +228,55 @@ class Analytics extends Controller
 
         $userAgents = json_decode(file_get_contents($userAgentsFile), true);
 
-        if(!is_array($userAgents)){
+        if(!is_array($userAgents)) {
             return ['browser' => $browser, 'os' => $os];
         }
 
-        // We will dynamically collect all browser/os tokens found in the dataset 
+        // here, we will initialize the lists and 
+        // iterate over each user agent for the browsers and os and 
+        // we will collect those agents into these arrays 
 
-        $browserTokens = [];
-        $osTokens = [];
+        $browsers = [];
+        $operatingSystems = [];
 
-        foreach($userAgents as $ua){
-            // Browser Tokens
-            if (preg_match('/(Firefox|Chrome|Chromium|Safari|MSIE|Trident|Edge|Edg|Opera|OPR|SamsungBrowser|UCBrowser|QQBrowser|Baidu|Vivaldi|Maxthon|Iceweasel|IceCat|chromeframe)/i', $ua, $browserMatch)) {
-                $token = $browserMatch[1];
-                $browserTokens[$token] = $token;
-            }
+        // scanning user agents string and extracting all unique tokens 
+        foreach($userAgents as $ua) {
 
-            // OS Tokens 
-
-            if (preg_match('/(Windows NT [0-9.]+|Windows [0-9.]+|Mac OS X|Mac_PowerPC|Android|Linux|iPhone|iPad|iPod|CrOS|BlackBerry|BB10|Tizen|WebOS|FreeBSD|OpenBSD|Nintendo|PlayStation)/i', $ua, $osMatch)) {
-                $token = $osMatch[1];
-                $osTokens[$token] = $token;
-            }
-
-            // checking the user agent against the dynamic tokens
-
-            foreach($browserTokens as $token){
-                if(stripos($userAgent, $token) !== false){
-                    $browser = $token;
-                    break;
+            // browsers
+            if (preg_match_all('/\b(Firefox|Chrome|Chromium|Safari|MSIE|Trident|Edge|Edg|Opera|OPR|SamsungBrowser|UCBrowser|QQBrowser|Baidu|Vivaldi|Maxthon|Iceweasel|IceCat|chromeframe)\b/i', $ua, $matches)) {
+                foreach($matches[1] as $match) {
+                    $browsers[$match] = $match;
                 }
             }
 
-            foreach ($osTokens as $token) {
-                if (stripos($userAgent, $token) !== false) {
-                    $os = $token;
-                    break;
+            // operating systems 
+            if (preg_match_all('/\b(Windows NT [\d.]+|Windows [\d.]+|Mac OS X|Mac_PowerPC|Android|Linux|iPhone|iPad|iPod|CrOS|BlackBerry|BB10|Tizen|WebOS|FreeBSD|OpenBSD|Nintendo|PlayStation)\b/i', $ua, $matches)) {
+                  
+                foreach($matches[i] as $match) {
+                    $operatingSystems[$match] = $match;
                 }
             }
-
-            return [
-                'browser' => $browser,
-                'os' => $os,
-            ];
         }
-     }
+
+        foreach ($browsers as $webBrowser) {
+            if (stripos($userAgent, $webBrowser) !== false) {
+                $browser = $webBrowser;
+                break;
+            }
+        }
+
+        foreach ($operatingSystems as $operatingSystem) {
+            if (stripos($userAgent, $operatingSystem) !== false) {
+                $os = $operatingSystem;
+                break;
+            }
+        }
+
+        return [
+            'browser' => $browser,
+            'os' => $os,
+        ];
+    }
 
     // Determines if user agents are bots and returns number of bots found 
 
