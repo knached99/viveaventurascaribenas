@@ -236,6 +236,8 @@ class Analytics extends Controller
             $os = trim($osParts[0] ?? $os);
         }
 
+       
+
         // Now, we attempt to extract browser name and version from last "Name/Version" token
         foreach (array_reverse($parts) as $part) {
             if (strpos($part, '/') !== false) {
@@ -252,6 +254,10 @@ class Analytics extends Controller
                     }
                 }
             }
+        }
+        
+        if($browser == 'unknown' || $os == 'unknown'){
+            \Log::info('Unknown user agent detected: ', ['user agent' => $userAgent]);
         }
 
         return [
