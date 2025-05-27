@@ -214,30 +214,40 @@ class Analytics extends Controller
      * @param string $userAgent
      * @return array
      */
-    private function parseUserAgent(string $userAgent): array {
-
+   /**
+ * Best-effort dynamic UA parser without regex scanning on each token, hardcoded values, or external packages.
+ *
+ * @param string $userAgent
+ * @return array
+ */
+    private function parseUserAgent(string $userAgent): array
+    {
         $browser = 'unknown';
-        $operatingSystem = 'unknown';
+        $os = 'unknown';
 
-        // splitting strings by space delimited tokens 
+        // Here, we will split the UA string into space separated parts, this is for browseres
         $parts = preg_split('/[\s]+/', $userAgent);
 
-        // attempting to find sys info 
-        if(preg_match('/\(([^)]+)\)/', $userAgent. $matches)){
-            $operatingSystem = $matches[1]; // full platform string
+        // Then we will extract the OS from the first parentheses block, if it exists
+        if (preg_match('/\(([^)]+)\)/', $userAgent, $matches)) {
+            $os = trim($matches[1]); 
+            
+            $osParts = explode(';', $os);
+            $os = trim($osParts[0] ?? $os);
         }
 
-        // extracting browser version 
-        foreach(array_reverse($parts) as $part){
-            if(str_contains($part, '/')){
-                $segments = explode('/', $part);
-                if(count($segments) === 2) {
-                    $name = $segments[0];
+        // Now, we attempt to extract browser name and version from last "Name/Version" token
+        foreach (array_reverse($parts) as $part) {
+            if (strpos($part, '/') !== false) {
+                $segments = explode('/', $part, 2);
+
+                if (count($segments) === 2) {
+                    $name = strtolower($segments[0]);
                     $version = $segments[1];
 
-                    // skipping fake entries 
-                    if(!in_array(strtolower($name), ['mozilla', 'mobile', 'like', 'version', 'applewebkit'])){
-                        $browser = $name. ' '.$version;
+                    // Skipping known irrelevant or placeholder tokens
+                    if (!in_array($name, ['mozilla', 'mobile', 'like', 'version', 'applewebkit', 'khtml'])) {
+                        $browser = ucfirst($name) . ' ' . $version;
                         break;
                     }
                 }
@@ -245,10 +255,9 @@ class Analytics extends Controller
         }
 
         return [
-            'browser' => $browser !== '' ? $browser : 'other',
-            'os' => $operatingSystem !== '' ? $operatingSystem : 'other',
+            'browser' => $browser ?: 'Other',
+            'os' => $os ?: 'Other',
         ];
-
     }
 
     // Determines if user agents are bots and returns number of bots found 
