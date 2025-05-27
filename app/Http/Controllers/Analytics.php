@@ -232,6 +232,11 @@ class Analytics extends Controller
             return ['browser' => $browser, 'os' => $os];
         }
 
+        if ($browser === 'unknown' || $os === 'unknown') {
+            \Log::info('Unknown User Agent Detected', ['ua' => $userAgent]);
+        }
+        
+
         // here, we will initialize the lists and 
         // iterate over each user agent for the browsers and os and 
         // we will collect those agents into these arrays 
