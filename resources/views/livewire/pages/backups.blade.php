@@ -54,7 +54,7 @@
     @if (isset($backups) && is_array($backups) && count($backups) > 0)
         <h5 class="text-center fw-bold">Your Available Backups</h5>
 
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 overflow-scroll"
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 overflow-auto"
             style="max-height: 500px; max-width: 100%;">
             @foreach ($backups as $backup)
                 <div class="col">
