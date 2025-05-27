@@ -252,7 +252,7 @@ class Analytics extends Controller
             // operating systems 
             if (preg_match_all('/\b(Windows NT [\d.]+|Windows [\d.]+|Mac OS X|Mac_PowerPC|Android|Linux|iPhone|iPad|iPod|CrOS|BlackBerry|BB10|Tizen|WebOS|FreeBSD|OpenBSD|Nintendo|PlayStation)\b/i', $ua, $matches)) {
                   
-                foreach($matches[i] as $match) {
+                foreach($matches[1] as $match) {
                     $operatingSystems[$match] = $match;
                 }
             }
