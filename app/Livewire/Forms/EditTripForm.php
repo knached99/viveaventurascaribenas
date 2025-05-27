@@ -256,7 +256,8 @@ class EditTripForm extends Component
        // \Log::info('Appended image to the imageURLs array: ' . json_encode($imageURLs));
     
         // Remove the old image if it exists
-        $tripPhotos = json_decode($this->trip->tripPhoto, true);
+        // $tripPhotos = json_decode($this->trip->tripPhoto, true);
+        $tripPhotos = $this->trip->tripPhoto;
         $oldImage = basename($tripPhotos[$index]);
     
         if (\Storage::exists('public/booking_photos/' . $oldImage)) {
@@ -378,55 +379,7 @@ class EditTripForm extends Component
                     }
                 }
         
-                // if ($tripModel->tripAvailability !== $this->tripAvailability && strtolower($this->tripAvailability) === 'available') {
-                //     $reservations = Reservations::where('tripID', $this->trip->tripID)->get();
-                //     foreach ($reservations as $reservation) {
-                //         Notification::route('mail', $reservation->email)
-                //             ->notify(new TripAvailableNotification($this->trip, $reservation->reservationID, $reservation->customerName));
-                //     }
-                // }
-        
-                // $accessToken = env('SQUARE_ACCESS_TOKEN');
-                // $client = new \Square\SquareClient([
-                //     'accessToken' => $accessToken,
-                //     'environment' => \Square\Environment::SANDBOX,
-                // ]);
-        
-                // $catalogApi = $client->getCatalogApi();
-                // $retrieveResponse = $catalogApi->retrieveCatalogObject($this->trip->tripID);
-        
-                // if ($retrieveResponse->isSuccess()) {
-                //     $catalogObject = $retrieveResponse->getResult()->getObject();
-                //     $version = $catalogObject->getVersion();
-        
-                //     $itemData = $catalogObject->getItemData();
-                //     $itemData->setName($this->tripLocation);
-                //     $itemData->setDescription(strip_tags($this->tripDescription));
-                //     $itemData->setAbbreviation(substr($this->tripLocation, 0, 2));
-        
-                //     $variations = $itemData->getVariations();
-                //     if (isset($this->tripPrice) && is_numeric($this->tripPrice) && $this->tripPrice > 0) {
-                //          // Retrieve the variations from the item data
-                //         $variation = $variations[0]->getItemVariationData();
-                        
-                //         // Ensure that the variation's price is set
-                //         $priceMoney = new \Square\Models\Money($this->tripPrice * 100, 'USD');
-                //         $variation->setPriceMoney($priceMoney);
-                //         \Log::info('Setting price for variation: ' . $priceMoney->getAmount());
-
-                //     }
-
-                //     else {
-                //         $this->error = 'Invalid or missing trip price.';
-                //         \Log::error('Invalid trip price: ' . $this->tripPrice);
-                //         return;
-                //     }
-        
-                //     $idempotencyKey = (string) Str::uuid();
-                //     $upsertRequest = new \Square\Models\UpsertCatalogObjectRequest($idempotencyKey, $catalogObject);
-                //     $upsertResponse = $catalogApi->upsertCatalogObject($upsertRequest);
-        
-                    // if ($upsertResponse->isSuccess()) {
+            
                         $tripModel->update([
                             'tripLocation' => $this->tripLocation,
                             'tripPhoto' => !empty($newImageURLs) ? json_encode($newImageURLs) : $tripModel->tripPhoto,
@@ -445,14 +398,7 @@ class EditTripForm extends Component
         
                         Cache::put($this->cacheKey, $tripModel->toArray(), 600);
                         $this->success = 'Trip information updated successfully!';
-                    // } else {
-                    //     $this->error = 'Failed to update trip in Square.';
-                    //     \Log::error('Square Error: ', $upsertResponse->getErrors());
-                    // }
-                // } else {
-                //     $this->error = 'Failed to retrieve trip from Square.';
-                //     \Log::error('Square Retrieve Error: ', $retrieveResponse->getErrors());
-                // }
+             
             } catch (\Exception $e) {
                 $this->error = 'An error occurred while updating the trip.';
                 \Log::error($e->getMessage());
@@ -593,11 +539,5 @@ class EditTripForm extends Component
 //     }
 // }
 
-    
-    
-
-    public function render()
-    {
-        return view('livewire.forms.edit-trip-form');
-    }
+ 
 }
