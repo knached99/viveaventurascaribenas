@@ -208,77 +208,47 @@ class Analytics extends Controller
 
     /**
      * Parse user agent to get browser and operating system.
+     * This method intelligently infers the browser and operating system
+     * by parsing the userAgent parameter and checking substrings 
      *
      * @param string $userAgent
      * @return array
      */
-    
-     private function parseUserAgent($userAgent): array {
-        
+    private function parseUserAgent(string $userAgent): array {
+
         $browser = 'unknown';
-        $os = 'unknown';
+        $operatingSystem = 'unknown';
 
-        $userAgentsFile = storage_path('app/userAgents.json');
+        // splitting strings by space delimited tokens 
+        $parts = preg_split('/[\s]+/', $userAgent);
 
-        if(!file_exists($userAgentsFile)){
-            return ['browser' => $browser, 'os' => $os];
+        // attempting to find sys info 
+        if(preg_match('/\(([^)]+)\)/', $userAgent. $matches)){
+            $operatingSystem = $matches[1]; // full platform string
         }
 
-        $userAgents = json_decode(file_get_contents($userAgentsFile), true);
+        // extracting browser version 
+        foreach(array_reverse($parts) as $part){
+            if(str_contains($part, '/')){
+                $segments = explode('/', $part);
+                if(count($segments) === 2) {
+                    $name = $segments[0];
+                    $version = $segments[1];
 
-        if(!is_array($userAgents)) {
-            return ['browser' => $browser, 'os' => $os];
-        }
-
-        if ($browser === 'unknown' || $os === 'unknown') {
-            \Log::info('Unknown User Agent Detected', ['ua' => $userAgent]);
-        }
-        
-
-        // here, we will initialize the lists and 
-        // iterate over each user agent for the browsers and os and 
-        // we will collect those agents into these arrays 
-
-        $browsers = [];
-        $operatingSystems = [];
-
-        // scanning user agents string and extracting all unique tokens 
-        foreach($userAgents as $ua) {
-
-            // browsers
-            if (preg_match_all('/\b(Firefox|Chrome|Chromium|Safari|MSIE|Trident|Edge|Edg|Opera|OPR|SamsungBrowser|UCBrowser|QQBrowser|Baidu|Vivaldi|Maxthon|Iceweasel|IceCat|chromeframe)\b/i', $ua, $matches)) {
-                foreach($matches[1] as $match) {
-                    $browsers[$match] = $match;
+                    // skipping fake entries 
+                    if(!in_array(strtolower($name), ['mozilla', 'mobile', 'like', 'version', 'applewebkit'])){
+                        $browser = $name. ' '.$version;
+                        break;
+                    }
                 }
-            }
-
-            // operating systems 
-            if (preg_match_all('/\b(Windows NT [\d.]+|Windows [\d.]+|Mac OS X|Mac_PowerPC|Android|Linux|iPhone|iPad|iPod|CrOS|BlackBerry|BB10|Tizen|WebOS|FreeBSD|OpenBSD|Nintendo|PlayStation)\b/i', $ua, $matches)) {
-                  
-                foreach($matches[1] as $match) {
-                    $operatingSystems[$match] = $match;
-                }
-            }
-        }
-
-        foreach ($browsers as $webBrowser) {
-            if (stripos($userAgent, $webBrowser) !== false) {
-                $browser = $webBrowser;
-                break;
-            }
-        }
-
-        foreach ($operatingSystems as $operatingSystem) {
-            if (stripos($userAgent, $operatingSystem) !== false) {
-                $os = $operatingSystem;
-                break;
             }
         }
 
         return [
-            'browser' => $browser,
-            'os' => $os,
+            'browser' => $browser !== '' ? $browser : 'other',
+            'os' => $operatingSystem !== '' ? $operatingSystem : 'other',
         ];
+
     }
 
     // Determines if user agents are bots and returns number of bots found 
