@@ -227,7 +227,7 @@ class Analytics extends Controller
 
         $userAgents = json_decode(file_get_contents($userAgentsFile), true);
 
-        if(!is_aray($userAgents)){
+        if(!is_array($userAgents)){
             return ['browser' => $browser, 'os' => $os];
         }
 
