@@ -329,14 +329,12 @@ protected function searchIPsByCountry()
     $country = Str::lower($this->ask("Search for IP by country (e.g. Mexico): "));
 
     $encryptedIPs = VisitorModel::pluck("visitor_ip_address")->unique();
-
     if ($encryptedIPs->isEmpty()) {
         $this->error("No IP addresses found");
         return;
     }
 
     $this->info("Decrypting IPs...");
-
     $decryptedIPs = collect($encryptedIPs)->map(function ($encryptedIP) {
         try {
             return Crypt::decryptString($encryptedIP);
@@ -359,44 +357,41 @@ protected function searchIPsByCountry()
         return;
     }
 
-    $this->info("Searching for IPs located in {$country}...");
-    $this->info("Processing IPs {$offset} to " . min($offset + $this->chunkSize, $total));
+    $chunk = $decryptedIPs->slice($offset, $this->chunkSize)->values();
+    $chunks = $chunk->chunk(100); // ip-api.com allows 100 IPs per batch
 
     $matchingIPs = [];
-    $count = 0;
     $spinnerIndex = 0;
 
-    $chunk = $decryptedIPs->slice($offset, $this->chunkSize);
-
-    foreach ($chunk as $ip) {
-        // Show spinner
-        echo "\rSearching IPs... " . $this->spinnerChars[$spinnerIndex % count($this->spinnerChars)] . " Current IP: {$ip}  ";
+    foreach ($chunks as $subChunk) {
+        echo "\rQuerying batch... " . $this->spinnerChars[$spinnerIndex % count($this->spinnerChars)] . " ";
         $spinnerIndex++;
 
+        $batchPayload = $subChunk->map(fn($ip) => ['query' => $ip])->values()->toArray();
+
         try {
-            $response = Http::timeout(1.5)->get("http://ip-api.com/json/{$ip}");
+            $response = Http::timeout(3)->post('http://ip-api.com/batch', $batchPayload);
+            if ($response->failed()) continue;
 
-            if ($response->successful() && $response->json('status') === 'success') {
-                $data = $response->json();
-
-                if (Str::lower($data['country']) === $country) {
+            foreach ($response->json() as $result) {
+                if (($result['status'] ?? 'fail') === 'success' && Str::lower($result['country'] ?? '') === $country) {
                     $matchingIPs[] = [
-                        'ip' => $ip,
-                        'city' => $data['city'] ?? 'N/A',
-                        'region' => $data['regionName'] ?? 'N/A',
-                        'lat' => $data['lat'] ?? 'N/A',
-                        'lon' => $data['lon'] ?? 'N/A',
+                        'ip' => $result['query'],
+                        'city' => $result['city'] ?? 'N/A',
+                        'region' => $result['regionName'] ?? 'N/A',
+                        'lat' => $result['lat'] ?? 'N/A',
+                        'lon' => $result['lon'] ?? 'N/A',
                     ];
-                    $count++;
                 }
             }
         } catch (\Exception $e) {
             continue;
         }
+
+        usleep(300000); // Small delay to respect rate limiting
     }
 
-    // Clear spinner line after done
-    echo "\r" . str_repeat(' ', 80) . "\r";
+    echo "\r" . str_repeat(' ', 80) . "\r"; // clear spinner
 
     $newOffset = $offset + $this->chunkSize;
     $this->saveOffset($newOffset);
@@ -411,6 +406,7 @@ protected function searchIPsByCountry()
 
     $this->info("Processed batch done. Run command again to continue from offset {$newOffset}.");
 }
+
 
 
 
