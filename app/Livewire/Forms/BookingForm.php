@@ -341,77 +341,56 @@ class BookingForm extends Component
         return redirect()->route('reservation-confirmed', ['reservationID'=>$reservationID]);
     }
 
-    public function bookTrip()
-    {
-        $this->validate();
-    
-        try {
-            // Find the trip record
-            $trip = TripsModel::findOrFail($this->tripID);
-            $reservationID = Str::uuid();
-    
-            $tripName = $this->tripName ?? 'Trip Reservation';
-    
-            // Check trip availability
-            if ($trip->num_trips === 0 || $this->tripAvailability === 'unavailable' || $this->tripEndDate < Carbon::now()) {
-                $this->error = 'This trip is unavailable right now. Please check again later';
-            }
-            
-    
-            if (in_array($this->tripAvailability, ['available', 'coming soon'])) {
-                return $this->handleComingSoonReservation($trip, $reservationID);
-            }
-    
-            // $existingCustomer = $this->getOrCreateStripeCustomer($this->email, $this->name);
-    
-            // $amount = $trip->tripPrice;
-    
-            // Create Stripe checkout session
-            // $stripe_session = $this->createStripeCheckoutSession($existingCustomer->id, $trip, $tripName, $amount);
-    
-            // Booking information to log in case of error
-            $data = [
-                'name'=>$this->name,
-                'email'=>$this->email,
-                'phone'=>$this->phone_number,
-                'tripLocation'=>$trip->tripLocation,
-                'tripDescription'=>$trip->tripDescription,
-                'preferredStartDate'=>$this->preferred_start_date,
-                'preferredEndDate'=>$this->preferred_end_date,
-            ];
-    
-            // Redirect to Stripe session
-           // return redirect()->away($stripe_session->url);
-    
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            // Handle specific error: Trip not found
-            \Log::error('Trip not found for tripID: ' . $this->tripID);
-            $this->error = 'The trip you are looking for was not found';
-    
-        } catch (\Stripe\Exception\ApiErrorException $e) {
-            // Handle Stripe API error
-            \Log::error('Stripe API error: ' . $e->getMessage());
-            \Log::error('Booking information', $data);
-            \Log::error('Error ocurred on file: '.__FILE__ . ' in method: '.__FUNCTION__ . ' in class: '.__CLASS__. ' on line: ' . __LINE__);
-            $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
-    
-        } catch (\InvalidArgumentException $e) {
-            // Handle validation or invalid argument error
-            \Log::error('Invalid argument error: ' . $e->getMessage());
-            \Log::error('Booking information', $data);
-            \Log::error('Error ocurred on file: '.__FILE__ . ' in method: '.__FUNCTION__ . ' in class: '.__CLASS__. ' on line: ' . __LINE__);
-    
-            $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
-    
-        } catch (\Exception $e) {
-            // Catch all other exceptions
-            \Log::error('Unexpected Exception Caught: ' . $e->getMessage());
-            \Log::error('Booking information', $data);
-            \Log::error('Error ocurred on file: '.__FILE__ . ' in method: '.__FUNCTION__ . ' in class: '.__CLASS__. ' on line: ' . __LINE__);
-            $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
+   public function bookTrip()
+{
+    // Define $data early
+    $data = [
+        'name' => $this->name,
+        'email' => $this->email,
+        'phone' => $this->phone_number,
+        'tripLocation' => null,
+        'tripDescription' => null,
+        'preferredStartDate' => $this->preferred_start_date,
+        'preferredEndDate' => $this->preferred_end_date,
+    ];
+
+    try {
+        $trip = TripsModel::findOrFail($this->tripID);
+        $reservationID = Str::uuid();
+
+        $tripName = $this->tripName ?? 'Trip Reservation';
+
+        $data['tripLocation'] = $trip->tripLocation;
+        $data['tripDescription'] = $trip->tripDescription;
+
+        // Trip availability check
+        if ($trip->num_trips === 0 || $this->tripAvailability === 'unavailable' || $this->preferred_end_date < Carbon::now()) {
+            $this->error = 'This trip is unavailable right now. Please check again later';
         }
+
+        if (in_array($this->tripAvailability, ['available', 'coming soon'])) {
+            return $this->handleComingSoonReservation($trip, $reservationID);
+        }
+
+        // Stripe payment logic (commented out)
+        
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        \Log::error('Trip not found for tripID: ' . $this->tripID);
+        $this->error = 'The trip you are looking for was not found';
+    } catch (\Stripe\Exception\ApiErrorException $e) {
+        \Log::error('Stripe API error: ' . $e->getMessage());
+        \Log::error('Booking information', $data); // now safe
+        $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
+    } catch (\InvalidArgumentException $e) {
+        \Log::error('Invalid argument error: ' . $e->getMessage());
+        \Log::error('Booking information', $data); // now safe
+        $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
+    } catch (\Exception $e) {
+        \Log::error('Unexpected Exception Caught: ' . $e->getMessage());
+        \Log::error('Booking information', $data); // now safe
+        $this->error = 'An unexpected error was encountered. Don\'t worry though! Our technical wizards are working hard to fix this!';
     }
-    
+}
 
 
 
