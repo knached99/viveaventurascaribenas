@@ -54,16 +54,16 @@ class Home extends Controller
 
         $mostPopularBookings = DB::table('trips')
         ->select('trips.tripID', 'trips.slug', 'trips.tripPhoto', DB::raw('
-        (SELECT COUNT(*) FROM bookings WHERE bookings.tripID = trips.tripID) + 
-        (SELECT COUNT(*) FROM reservations WHERE reservations.tripID = trips.tripID) 
-        AS booking_count
-    '))
-    
+            (SELECT COUNT(*) FROM bookings WHERE bookings.tripID = trips.tripID) + 
+            (SELECT COUNT(*) FROM reservations WHERE reservations.tripID = trips.tripID) 
+            AS booking_count
+        '))
         ->where('trips.active', true)
-        ->having('total_count', '>', 2)
-        ->orderByDesc('total_count')
+        ->having('booking_count', '>', 2)  
+        ->orderByDesc('booking_count')     
         ->take(4)
         ->get();
+    
 
     
         $popularTrips = [];
